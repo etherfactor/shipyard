@@ -1,0 +1,6 @@
+@EtherGizmos.Shipyard_HostAddress = http://localhost:5216
+
+GET {{EtherGizmos.Shipyard_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
