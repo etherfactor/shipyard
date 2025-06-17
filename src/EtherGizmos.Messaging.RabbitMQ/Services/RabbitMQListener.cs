@@ -1,22 +1,121 @@
 ﻿using EtherGizmos.Messaging.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using System.Text;
 using System.Threading.Channels;
 
 namespace EtherGizmos.Messaging.Services;
 
 internal class RabbitMQListener : IMessageListener
 {
+    private readonly ILogger _logger;
+    private readonly ConnectionFactory _rmqConnectionFactory;
+    private readonly string? _queue;
+    private readonly string? _topic;
+    private readonly string? _subscription;
+
+    private readonly Channel<ReceivedMessage> _channel = System.Threading.Channels.Channel.CreateUnbounded<ReceivedMessage>();
+
+    private IConnection? _rmqConnection;
+    private IChannel? _rmqChannel;
+    private AsyncEventingBasicConsumer? _rmqConsumer;
+
     private bool _disposed;
 
-    public ChannelReader<ReceivedMessage> Channel => throw new NotImplementedException();
+    public ChannelReader<ReceivedMessage> Channel => _channel;
 
-    public Task StartAsync(CancellationToken cancellationToken = default)
+    public RabbitMQListener(
+        IServiceProvider serviceProvider,
+        string queue)
     {
-        throw new NotImplementedException();
+        _logger = serviceProvider.GetRequiredService<ILogger<RabbitMQListener>>();
+        _rmqConnectionFactory = serviceProvider.GetRequiredKeyedService<ConnectionFactory>(RabbitMQConstants.MessagingKey);
+        _queue = queue;
     }
 
-    public Task StopAsync(CancellationToken cancellationToken = default)
+    public RabbitMQListener(
+        IServiceProvider serviceProvider,
+        string topic,
+        string subscription)
     {
-        throw new NotImplementedException();
+        _logger = serviceProvider.GetRequiredService<ILogger<RabbitMQListener>>();
+        _rmqConnectionFactory = serviceProvider.GetRequiredKeyedService<ConnectionFactory>(RabbitMQConstants.MessagingKey);
+        _topic = topic;
+        _subscription = subscription;
+    }
+
+    public async Task StartAsync(CancellationToken cancellationToken = default)
+    {
+        _rmqConnection = await _rmqConnectionFactory.CreateConnectionAsync(cancellationToken: cancellationToken);
+        _rmqChannel = await _rmqConnection.CreateChannelAsync(cancellationToken: cancellationToken);
+
+        if (_queue is not null)
+        {
+            await _rmqChannel.QueueDeclareAsync(_queue, durable: true, exclusive: false, autoDelete: false, cancellationToken: cancellationToken);
+        }
+        else
+        {
+            await _rmqChannel.ExchangeDeclareAsync(_topic!, ExchangeType.Topic, durable: true, autoDelete: false, cancellationToken: cancellationToken);
+            await _rmqChannel.QueueDeclareAsync($"{_topic}:{_subscription}", durable: true, exclusive: false, autoDelete: false, cancellationToken: cancellationToken);
+            await _rmqChannel.QueueBindAsync($"{_topic}:{_subscription}", exchange: _topic!, routingKey: _subscription!, cancellationToken: cancellationToken);
+        }
+
+        _rmqConsumer = new AsyncEventingBasicConsumer(_rmqChannel);
+        _rmqConsumer.ReceivedAsync += RmqConsumer_ReceivedAsync;
+
+        await _rmqChannel.BasicConsumeAsync(_queue ?? $"{_topic}:{_subscription}", autoAck: false, consumer: _rmqConsumer, cancellationToken: cancellationToken);
+    }
+
+    private async Task RmqConsumer_ReceivedAsync(
+        object sender, BasicDeliverEventArgs @event)
+    {
+        while (_rmqChannel is null)
+        {
+            await Task.Delay(200, @event.CancellationToken);
+        }
+
+        try
+        {
+            var body = Encoding.UTF8.GetString(@event.Body.Span);
+
+            var message = new ReceivedMessage()
+            {
+                Id = @event.DeliveryTag.ToString(),
+                Type = @event.BasicProperties.Headers?["$type"]?.ToString()!,
+                Body = body,
+                Headers = @event.BasicProperties.Headers?
+                    .Select(e => new KeyValuePair<string, string>(e.Key, e.Value?.ToString() ?? ""))
+                    .ToDictionary() ?? new Dictionary<string, string>(),
+                LogicalSourceName = @event.BasicProperties.Headers?["$logical"]?.ToString()!,
+                Actions = null, //TODO: Implement RabbitMQ actions to complete, abandon, and dead-letter the message
+            };
+
+            await _channel.Writer.WriteAsync(message, @event.CancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Encountered an error while receiving a RabbitMQ message");
+            await _rmqChannel.BasicNackAsync(@event.DeliveryTag, false, true, @event.CancellationToken);
+        }
+    }
+
+    public async Task StopAsync(CancellationToken cancellationToken = default)
+    {
+        if (_rmqChannel is not null)
+            await _rmqChannel.DisposeAsync();
+
+        if (_rmqConnection is not null)
+            await _rmqConnection.DisposeAsync();
+
+        if (_rmqConsumer is not null)
+        {
+            _rmqConsumer.ReceivedAsync -= RmqConsumer_ReceivedAsync;
+        }
+
+        _channel.Writer.Complete();
+        await _channel.Reader.Completion;
     }
 
     protected virtual void Dispose(bool disposing)

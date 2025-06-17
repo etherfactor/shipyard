@@ -20,6 +20,6 @@ public static class IServiceCollectionExtensions
         @this.AddSingleton<IMessageReceiver, MessageReceiver>();
         @this.AddSingleton<IMessageSender, MessageSender>();
 
-        return @this;
+        return new MessagingBuilder(@this);
     }
 }

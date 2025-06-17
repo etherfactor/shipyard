@@ -66,15 +66,18 @@ internal class RabbitMQPublisher : IMessagePublisher
     public async Task StopAsync(
         CancellationToken cancellationToken = default)
     {
+        _publishCts?.Cancel();
+        if (_publishTask is not null)
+            await _publishTask;
+
+        _channel.Writer.Complete();
+        await _channel.Reader.Completion;
+
         if (_rmqChannel is not null)
             await _rmqChannel.DisposeAsync();
 
         if (_rmqConnection is not null)
             await _rmqConnection.DisposeAsync();
-
-        _publishCts?.Cancel();
-        if (_publishTask is not null)
-            await _publishTask;
     }
 
     private async Task ExecuteLoopAsync(
