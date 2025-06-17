@@ -1,4 +1,6 @@
-﻿namespace EtherGizmos.Messaging.Abstractions;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace EtherGizmos.Messaging.Abstractions;
 
 public interface IMessageBus
 {
@@ -21,4 +23,6 @@ public interface IMessageBus
     Task UnregisterListenerAsync(string logicalName, CancellationToken cancellationToken = default);
 
     Task UnregisterPublisherAsync(string logicalName, CancellationToken cancellationToken = default);
+    bool TryGetListener(string logicalName, [NotNullWhen(true)] out IMessageListener? listener);
+    bool TryGetPublisher(string logicalName, [NotNullWhen(true)] out IMessagePublisher? publisher);
 }

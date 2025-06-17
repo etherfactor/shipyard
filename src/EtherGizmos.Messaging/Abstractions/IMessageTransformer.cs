@@ -4,5 +4,5 @@ public interface IMessageTransformer
 {
     Task<SentMessage> WrapAsync(SentMessage envelope, CancellationToken cancellationToken = default);
 
-    Task<SentMessage> UnwrapAsync(SentMessage envelope, CancellationToken cancellationToken = default);
+    Task<ReceivedMessage> UnwrapAsync(ReceivedMessage envelope, CancellationToken cancellationToken = default);
 }

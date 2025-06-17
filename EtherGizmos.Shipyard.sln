@@ -22,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6B5FA21A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Messaging", "src\EtherGizmos.Messaging\EtherGizmos.Messaging.csproj", "{9E77EE3D-DC6E-4CCA-9736-E670AED1ECCC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Messaging.RabbitMQ", "src\EtherGizmos.Messaging.RabbitMQ\EtherGizmos.Messaging.RabbitMQ.csproj", "{E787D37F-7A83-4BD7-9ECA-E524FCC6C6D4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{9E77EE3D-DC6E-4CCA-9736-E670AED1ECCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E77EE3D-DC6E-4CCA-9736-E670AED1ECCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E77EE3D-DC6E-4CCA-9736-E670AED1ECCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E787D37F-7A83-4BD7-9ECA-E524FCC6C6D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E787D37F-7A83-4BD7-9ECA-E524FCC6C6D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E787D37F-7A83-4BD7-9ECA-E524FCC6C6D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E787D37F-7A83-4BD7-9ECA-E524FCC6C6D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{B5BBD912-F928-411A-A528-E8A84C048C43} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 		{C73EAD76-D6E0-0A12-9796-A2127568B5B2} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 		{9E77EE3D-DC6E-4CCA-9736-E670AED1ECCC} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
+		{E787D37F-7A83-4BD7-9ECA-E524FCC6C6D4} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FDAA95A9-84A5-47E0-85A2-730CDD821DD7}

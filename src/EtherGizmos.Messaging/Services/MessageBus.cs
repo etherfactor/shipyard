@@ -1,6 +1,7 @@
 ﻿using EtherGizmos.Messaging.Abstractions;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks.Dataflow;
 
 namespace EtherGizmos.Messaging.Services;
@@ -28,6 +29,34 @@ internal class MessageBus : IMessageBus
         _listenerFactory = listenerFactory;
         _publisherFactory = publisherFactory;
         _receiver = receiver;
+    }
+
+    public bool TryGetListener(
+        string logicalName, [NotNullWhen(true)] out IMessageListener? listener)
+    {
+        listener = null;
+
+        if (_listeners.TryGetValue(logicalName, out var lazy))
+        {
+            listener = lazy.Value.Result.Listener;
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool TryGetPublisher(
+        string logicalName, [NotNullWhen(true)] out IMessagePublisher? publisher)
+    {
+        publisher = null;
+
+        if (_publishers.TryGetValue(logicalName, out var lazy))
+        {
+            publisher = lazy.Value.Result;
+            return true;
+        }
+
+        return false;
     }
 
     public async Task<IMessageListener> RegisterListenerForQueueAsync(

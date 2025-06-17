@@ -1,4 +1,8 @@
-﻿namespace EtherGizmos.Messaging.Abstractions;
+﻿using EtherGizmos.Messaging.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
+namespace EtherGizmos.Messaging.Abstractions;
 
 public interface IMessageSender
 {
@@ -16,11 +20,23 @@ public static class IMessageSenderExtensions
         CancellationToken cancellationToken = default)
         where TMessage : class, new()
     {
+        var options = @this.Services
+            .GetRequiredService<IOptionsSnapshot<MessagingOptions>>()
+            .Value;
 
+        var type = options.ConvertType(typeof(TMessage));
+
+        var serializer = @this.Services.GetKeyedService<IMessageSerializer>(logicalName)
+            ?? @this.Services.GetRequiredService<IMessageSerializer>();
+
+        var body = serializer.Serialize(message);
 
         await @this.SendAsync(new SentMessage()
         {
-            //TODO: Populate this
+            Type = type,
+            Body = body,
+            Headers = new Dictionary<string, string>(),
+            LogicalDestinationName = logicalName,
         }, cancellationToken: cancellationToken);
     }
 }
