@@ -2,7 +2,7 @@
 
 namespace EtherGizmos.Messaging.Abstractions;
 
-public interface IMessagePublisher
+public interface IMessagePublisher : IDisposable
 {
     Task StartAsync(CancellationToken cancellationToken = default);
 
