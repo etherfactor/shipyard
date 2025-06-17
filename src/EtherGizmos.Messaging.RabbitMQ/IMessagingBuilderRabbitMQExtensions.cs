@@ -12,7 +12,7 @@ public static class IMessagingBuilderRabbitMQExtensions
         this IMessagingBuilder @this)
     {
         @this.Services
-            .AddKeyedSingleton("rabbitmq-messaging", (provider, _) =>
+            .AddKeyedSingleton(RabbitMQConstants.MessagingKey, (provider, _) =>
             {
                 var options = provider
                     .GetRequiredService<IOptionsSnapshot<RabbitMQMessagingOptions>>()
