@@ -11,6 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EtherGizmos.Configuration\EtherGizmos.Configuration.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Messaging.RabbitMQ\EtherGizmos.Messaging.RabbitMQ.csproj" />
     <ProjectReference Include="..\EtherGizmos.Shipyard.ServiceDefaults\EtherGizmos.Shipyard.ServiceDefaults.csproj" />
   </ItemGroup>
 

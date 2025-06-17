@@ -1,15 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace EtherGizmos.Messaging.Configuration;
+﻿namespace EtherGizmos.Messaging.Configuration;
 
 public class RabbitMQMessagingOptions
 {
+    public string? ConnectionString { get; set; }
+
     public string? Username { get; set; }
 
     public string? Password { get; set; }
 
-    [Required]
-    public string Host { get; set; } = null!;
+    public string? Host { get; set; }
 
     public int Port { get; set; } = 5672;
 }

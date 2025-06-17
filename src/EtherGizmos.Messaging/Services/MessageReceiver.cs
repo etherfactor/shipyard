@@ -14,7 +14,7 @@ internal class MessageReceiver : IMessageReceiver
 
     public MessageReceiver(
         IServiceProvider services,
-        IOptionsSnapshot<MessagingOptions> options)
+        IOptions<MessagingOptions> options)
     {
         _options = options.Value;
 

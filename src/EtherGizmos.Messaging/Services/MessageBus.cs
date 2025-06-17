@@ -20,7 +20,7 @@ internal class MessageBus : IMessageBus
     private ActionBlock<ReceivedMessage>? _pump;
 
     public MessageBus(
-        ILogger logger,
+        ILogger<MessageBus> logger,
         IMessageListenerFactory listenerFactory,
         IMessagePublisherFactory publisherFactory,
         IMessageReceiver receiver)

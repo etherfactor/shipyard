@@ -11,7 +11,7 @@ public class MessagePumpHostedService : IHostedService
     private readonly IMessageBus _bus;
 
     public MessagePumpHostedService(
-        IOptionsSnapshot<MessagingOptions> options,
+        IOptions<MessagingOptions> options,
         IMessageBus bus)
     {
         _options = options.Value;

@@ -21,7 +21,7 @@ public static class IMessageSenderExtensions
         where TMessage : class, new()
     {
         var options = @this.Services
-            .GetRequiredService<IOptionsSnapshot<MessagingOptions>>()
+            .GetRequiredService<IOptions<MessagingOptions>>()
             .Value;
 
         var type = options.ConvertType(typeof(TMessage));
