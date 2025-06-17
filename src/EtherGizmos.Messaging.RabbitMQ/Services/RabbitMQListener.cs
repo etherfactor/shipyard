@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System.Collections.Immutable;
 using System.Text;
 using System.Threading.Channels;
 
@@ -80,15 +81,22 @@ internal class RabbitMQListener : IMessageListener
         {
             var body = Encoding.UTF8.GetString(@event.Body.Span);
 
+            var allHeaders = @event.BasicProperties.Headers?
+                .Select(e => new KeyValuePair<string, string>(e.Key, Encoding.UTF8.GetString((byte[])e.Value!) ?? ""))
+                .ToDictionary() ?? new Dictionary<string, string>();
+
+            var headers = allHeaders
+                .Where(e => e.Key != "$type")
+                .Where(e => e.Key != "$logical")
+                .ToImmutableDictionary();
+
             var message = new ReceivedMessage()
             {
                 Id = @event.DeliveryTag.ToString(),
-                Type = @event.BasicProperties.Headers?["$type"]?.ToString()!,
+                Type = allHeaders["$type"],
                 Body = body,
-                Headers = @event.BasicProperties.Headers?
-                    .Select(e => new KeyValuePair<string, string>(e.Key, e.Value?.ToString() ?? ""))
-                    .ToDictionary() ?? new Dictionary<string, string>(),
-                LogicalSourceName = @event.BasicProperties.Headers?["$logical"]?.ToString()!,
+                Headers = headers,
+                LogicalSourceName = allHeaders["$logical"],
                 Actions = null, //TODO: Implement RabbitMQ actions to complete, abandon, and dead-letter the message
             };
 

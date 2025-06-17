@@ -33,7 +33,7 @@ public class MessagingOptions
         }
         else
         {
-            result = type.ToString();
+            result = type.AssemblyQualifiedName!;
         }
 
         return result;

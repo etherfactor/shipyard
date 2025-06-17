@@ -97,13 +97,24 @@ internal class RabbitMQPublisher : IMessagePublisher
                 {
                     var properties = new BasicProperties()
                     {
-                        Headers = message.Headers.Select(e => new KeyValuePair<string, object?>(e.Key, e.Value)).ToDictionary(),
+                        Headers = message.AllHeaders
+                            .Select(e => new KeyValuePair<string, object?>(e.Key, e.Value))
+                            .ToDictionary(),
                     };
 
                     var bytes = Encoding.UTF8.GetBytes(message.Body);
-                    await _rmqChannel.BasicPublishAsync(
-                        exchange: _topic ?? _queue!, routingKey: string.Empty, mandatory: true, body: bytes,
-                        basicProperties: properties, cancellationToken: cancellationToken);
+                    if (_topic is not null)
+                    {
+                        await _rmqChannel.BasicPublishAsync(
+                            exchange: _topic, routingKey: string.Empty, mandatory: true, body: bytes,
+                            basicProperties: properties, cancellationToken: cancellationToken);
+                    }
+                    else
+                    {
+                        await _rmqChannel.BasicPublishAsync(
+                            exchange: string.Empty, routingKey: _queue!, mandatory: true, body: bytes,
+                            basicProperties: properties, cancellationToken: cancellationToken);
+                    }
                 }
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }

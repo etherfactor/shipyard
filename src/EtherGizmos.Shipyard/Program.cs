@@ -1,6 +1,4 @@
 using EtherGizmos.Configuration;
-using EtherGizmos.Messaging;
-using EtherGizmos.Messaging.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,17 +16,6 @@ builder.AddServiceDefaults();
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
-builder.Services
-    .AddMessaging((opt, conf) =>
-    {
-        opt.Listeners.AddQueue("tracking-poll-request", "tracking-poll-request");
-    })
-    .UseRabbitMQ((opt, conf) =>
-    {
-        conf.GetSection("RabbitMQ")
-            .Bind(opt);
-    });
 
 var app = builder.Build();
 

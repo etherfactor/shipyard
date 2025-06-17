@@ -1,5 +1,6 @@
 ﻿using EtherGizmos.Messaging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace EtherGizmos.Messaging;
 
@@ -51,6 +52,35 @@ public static class IMessagingBuilderExtensions
         else
         {
             @this.Services.AddSingleton<IMessageSerializer, TSerializer>();
+        }
+
+        return @this;
+    }
+
+    public static IMessagingBuilder AddConsumersFromAssemblies(
+        this IMessagingBuilder @this,
+        params Assembly[] assemblies)
+    {
+        foreach (var assembly in assemblies)
+        {
+            var consumers = assembly.GetTypes()
+                .Where(type =>
+                    type.GetInterfaces().Any(intf =>
+                        intf.IsGenericType &&
+                        intf.GetGenericTypeDefinition() == typeof(IMessageConsumer<>)));
+
+            foreach (var consumer in consumers)
+            {
+                var types = consumer.GetInterfaces()
+                    .Where(type =>
+                        type.IsGenericType &&
+                        type.GetGenericTypeDefinition() == typeof(IMessageConsumer<>));
+
+                foreach (var type in types)
+                {
+                    @this.Services.AddScoped(type, consumer);
+                }
+            }
         }
 
         return @this;
