@@ -5,8 +5,17 @@ using EtherGizmos.Shipyard.Worker.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 var builder = Host.CreateApplicationBuilder(args);
+
+builder.AddServiceDefaults();
+
+builder.Services.AddSerilog((services, logger) =>
+    logger.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>()));
+
+//************************************************************
+// Configuration
 
 builder.Configuration
     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
@@ -15,7 +24,8 @@ builder.Configuration
         (new(@"(?<=[^_]):_(?=[^_])"), " "),
         (new(@"^ConnectionStrings:(?=[^_:])"), ""));
 
-builder.AddServiceDefaults();
+//************************************************************
+// Services
 
 builder.Services
     .AddMessaging((opt, conf) =>
@@ -34,6 +44,9 @@ builder.Services
     .AddConsumersFromAssemblies(typeof(Program).Assembly);
 
 builder.Services.AddHostedService<QueueTrackingRequestBackgroundService>();
+
+//************************************************************
+// Pipeline
 
 var app = builder.Build();
 
