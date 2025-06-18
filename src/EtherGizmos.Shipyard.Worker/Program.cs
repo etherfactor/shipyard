@@ -1,7 +1,9 @@
 ﻿using EtherGizmos.Configuration;
 using EtherGizmos.Messaging;
 using EtherGizmos.Messaging.Configuration;
-using EtherGizmos.Shipyard.Worker.Services;
+using EtherGizmos.Shipyard.Worker.Configuration;
+using EtherGizmos.Shipyard.Worker.Services.HostedServices;
+using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -28,6 +30,14 @@ builder.Configuration
 // Services
 
 builder.Services
+    .AddOptions<SeleniumDriverOptions>()
+    .Configure<IConfiguration>((opt, conf) =>
+    {
+        conf.GetSection("Selenium")
+            .Bind(opt);
+    });
+
+builder.Services
     .AddMessaging((opt, conf) =>
     {
         opt.Listeners.AddQueue("tracking-poll-request", "tracking.poll.request");
@@ -42,6 +52,16 @@ builder.Services
             .Bind(opt);
     })
     .AddConsumersFromAssemblies(typeof(Program).Assembly);
+
+builder.Services
+    .AddTransient<SeleniumChromiumClient>()
+    .AddTransient<IBrowserClient>(e =>
+    {
+        var client = e.GetRequiredService<SeleniumChromiumClient>();
+        _ = client.StartAsync();
+
+        return client;
+    });
 
 builder.Services.AddHostedService<QueueTrackingRequestBackgroundService>();
 

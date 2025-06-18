@@ -2,11 +2,11 @@
 using EtherGizmos.Shipyard.Worker.Consumers;
 using Microsoft.Extensions.Logging;
 
-namespace EtherGizmos.Shipyard.Worker.Services;
+namespace EtherGizmos.Shipyard.Worker.Services.HostedServices;
 
 public class QueueTrackingRequestBackgroundService : PeriodicBackgroundService
 {
-    private const string CRON_EXPRESSION = "*/15 * * * * *";
+    private const string CRON_EXPRESSION = "*/60 * * * * *";
 
     private readonly IMessageSender _sender;
 
@@ -24,7 +24,7 @@ public class QueueTrackingRequestBackgroundService : PeriodicBackgroundService
         {
             PackageId = 1,
             CarrierId = "usps",
-            ReferenceNumber = "123456789",
+            TrackingNumber = "123456789",
         }, cancellationToken: stoppingToken);
     }
 }

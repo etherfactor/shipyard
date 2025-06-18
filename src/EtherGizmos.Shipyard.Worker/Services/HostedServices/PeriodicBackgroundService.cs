@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NCrontab;
 
-namespace EtherGizmos.Shipyard.Worker.Services;
+namespace EtherGizmos.Shipyard.Worker.Services.HostedServices;
 
 public abstract class PeriodicBackgroundService : BackgroundService
 {
