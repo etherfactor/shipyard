@@ -7,7 +7,7 @@ var rmq = builder.AddRabbitMQ("rmq");
 var selenium = builder.AddContainer("selenium", "selenium/standalone-chromium:latest");
 selenium.WithHttpEndpoint(targetPort: 4444, name: "endpoint");
 
-var api = builder.AddProject<Projects.EtherGizmos_Shipyard>("api");
+var api = builder.AddProject<Projects.EtherGizmos_Shipyard_Api>("api");
 api.WaitFor(postgres).WithReference(postgres, connectionName: "PostgreSQL:ConnectionString");
 
 var worker = builder.AddProject<Projects.EtherGizmos_Shipyard_Worker>("worker");

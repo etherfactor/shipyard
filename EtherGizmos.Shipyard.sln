@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35806.99
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard", "src\EtherGizmos.Shipyard\EtherGizmos.Shipyard.csproj", "{2375BE4B-3676-D814-610F-E6593B940DD7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.Api", "src\EtherGizmos.Shipyard.Api\EtherGizmos.Shipyard.Api.csproj", "{2375BE4B-3676-D814-610F-E6593B940DD7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.AppHost", "src\EtherGizmos.Shipyard.AppHost\EtherGizmos.Shipyard.AppHost.csproj", "{B5BBD912-F928-411A-A528-E8A84C048C43}"
 EndProject

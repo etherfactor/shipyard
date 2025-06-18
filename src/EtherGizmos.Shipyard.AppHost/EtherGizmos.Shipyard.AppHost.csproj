@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EtherGizmos.Shipyard.Worker\EtherGizmos.Shipyard.Worker.csproj" />
-    <ProjectReference Include="..\EtherGizmos.Shipyard\EtherGizmos.Shipyard.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Shipyard.Api\EtherGizmos.Shipyard.Api.csproj" />
   </ItemGroup>
 
 </Project>
