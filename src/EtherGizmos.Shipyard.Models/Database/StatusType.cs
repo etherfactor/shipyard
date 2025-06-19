@@ -4,7 +4,7 @@
 /// Normally, this would be an enum, but we also want additional metadata, so we have to settle for a class. Doesn't change
 /// anything in the database, though.
 /// </summary>
-public class ShipmentStatusType
+public class StatusType
 {
     public virtual int Id { get; set; }
 

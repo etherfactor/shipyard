@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Models.Database.Base;
+﻿using EtherGizmos.Shipyard.Utilities.Abstractions;
 
 namespace EtherGizmos.Shipyard.Models.Database;
 
@@ -16,7 +16,7 @@ public class Package : Auditable
 
     public virtual int LastStatusTypeId { get; set; }
 
-    public virtual ShipmentStatusType LastStatusType { get; set; } = null!;
+    public virtual StatusType LastStatusType { get; set; } = null!;
 
     public virtual bool IsDelivered { get; set; }
 }

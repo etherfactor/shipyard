@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\EtherGizmos.Shipyard.Utilities\EtherGizmos.Shipyard.Utilities.csproj" />
-  </ItemGroup>
-
 </Project>

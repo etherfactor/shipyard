@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Models.Database.Base;
+﻿using EtherGizmos.Shipyard.Utilities.Abstractions;
 
 namespace EtherGizmos.Shipyard.Models.Database;
 
