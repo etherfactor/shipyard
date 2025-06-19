@@ -14,6 +14,10 @@ public class Package : Auditable
 
     public virtual string? Contents { get; set; }
 
+    public virtual DateTimeOffset LastPollAt { get; set; }
+
+    public virtual DateTimeOffset NextPollAt { get; set; }
+
     public virtual int LastStatusTypeId { get; set; }
 
     public virtual StatusType LastStatusType { get; set; } = null!;

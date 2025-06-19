@@ -8,6 +8,8 @@ public class TrackingUpdate : Auditable
 
     public virtual int PackageId { get; set; }
 
+    public virtual Package Package { get; set; } = null!;
+
     public virtual DateTimeOffset OccurredAt { get; set; }
 
     public virtual int StatusTypeId { get; set; }

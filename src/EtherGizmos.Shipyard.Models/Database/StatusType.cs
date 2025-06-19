@@ -12,7 +12,9 @@ public class StatusType
 
     public virtual string? Description { get; set; }
 
-    public virtual decimal PollingInterval { get; set; }
+    public virtual decimal PollingFactor { get; set; }
+
+    public virtual bool IsFinal { get; set; }
 }
 
 //Base polling rate: 6h (I don't want to be spammy), probably configurable

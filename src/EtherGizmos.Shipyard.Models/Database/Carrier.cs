@@ -12,5 +12,5 @@ public class Carrier : Auditable
     /// The intention is some sort of public, global identifier that distinguishes carriers. That way, we don't need to use
     /// a string id, but we can still uniquely identify them via an alternate key as needed.
     /// </summary>
-    public virtual string SomeSortOfDeterminateUniqueId { get; set; } = null!;
+    public virtual string Slug { get; set; } = null!;
 }
