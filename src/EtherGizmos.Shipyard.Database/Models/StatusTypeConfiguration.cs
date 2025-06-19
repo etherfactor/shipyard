@@ -9,7 +9,7 @@ public class StatusTypeConfiguration : IEntityTypeConfiguration<StatusType>
     public void Configure(
         EntityTypeBuilder<StatusType> entity)
     {
-        entity.ToTable("status_types", table=>table.HasTrigger("TR"));
+        entity.ToTable("status_types", table => table.HasTrigger("TR"));
 
         entity.HasKey(e => e.Id);
 

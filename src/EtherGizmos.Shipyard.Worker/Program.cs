@@ -1,6 +1,8 @@
 ﻿using EtherGizmos.Configuration;
 using EtherGizmos.Messaging;
 using EtherGizmos.Messaging.Configuration;
+using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Database.Services;
 using EtherGizmos.Shipyard.Worker.Configuration;
 using EtherGizmos.Shipyard.Worker.Services.HostedServices;
 using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
@@ -35,6 +37,13 @@ builder.Services
     {
         conf.GetSection("Selenium")
             .Bind(opt);
+    });
+
+builder.Services
+    .AddDatabase()
+    .AddUnitOfWork(opt =>
+    {
+        opt.BindDbContext<ApplicationContext>();
     });
 
 builder.Services

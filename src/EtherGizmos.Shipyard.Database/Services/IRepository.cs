@@ -1,0 +1,17 @@
+﻿namespace EtherGizmos.Shipyard.Database.Services;
+
+public interface IRepository { }
+
+public interface IRepository<TEntity> : IRepository
+    where TEntity : class
+{
+    IQueryable<TEntity> Data { get; }
+
+    void Attach(TEntity entity);
+
+    void Create(TEntity entity);
+
+    void Delete(TEntity entity);
+
+    void Detach(TEntity entity);
+}
