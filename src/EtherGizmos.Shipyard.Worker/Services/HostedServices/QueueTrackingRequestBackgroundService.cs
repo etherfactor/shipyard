@@ -34,6 +34,7 @@ public class QueueTrackingRequestBackgroundService : PeriodicBackgroundService
 
         var ready = packageRepo.Data
             .Where(e => e.NextPollAt < DateTimeOffset.UtcNow)
+            .Include(e => e.LastStatusType)
             .AsAsyncEnumerable();
 
         await Parallel.ForEachAsync(ready, async (package, ct) =>
@@ -44,6 +45,12 @@ public class QueueTrackingRequestBackgroundService : PeriodicBackgroundService
                 CarrierId = package.CarrierId,
                 TrackingNumber = package.TrackingNumber,
             }, cancellationToken: stoppingToken);
+
+            package.LastPollAt = DateTimeOffset.UtcNow;
+            package.NextPollAt = package.LastPollAt
+                + TimeSpan.FromHours(6) * (double)package.LastStatusType.PollingFactor;
         });
+
+        await uow.SaveChangesAsync(stoppingToken);
     }
 }

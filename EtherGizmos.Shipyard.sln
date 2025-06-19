@@ -34,6 +34,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.Databa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.Utilities", "src\EtherGizmos.Shipyard.Utilities\EtherGizmos.Shipyard.Utilities.csproj", "{8710B7E8-6A52-47AF-9BD1-5DD8883ACA9D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.OData", "src\EtherGizmos.Shipyard.OData\EtherGizmos.Shipyard.OData.csproj", "{8ACBD7CB-F94E-481E-A769-655AE12A939C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +82,10 @@ Global
 		{8710B7E8-6A52-47AF-9BD1-5DD8883ACA9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8710B7E8-6A52-47AF-9BD1-5DD8883ACA9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8710B7E8-6A52-47AF-9BD1-5DD8883ACA9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8ACBD7CB-F94E-481E-A769-655AE12A939C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8ACBD7CB-F94E-481E-A769-655AE12A939C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8ACBD7CB-F94E-481E-A769-655AE12A939C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8ACBD7CB-F94E-481E-A769-655AE12A939C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -95,6 +101,7 @@ Global
 		{29515E1D-C186-4FD7-B2E9-C427972E4A43} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 		{7044DA17-A7D2-4C0A-90A4-A18DC9CFC80F} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 		{8710B7E8-6A52-47AF-9BD1-5DD8883ACA9D} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
+		{8ACBD7CB-F94E-481E-A769-655AE12A939C} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FDAA95A9-84A5-47E0-85A2-730CDD821DD7}

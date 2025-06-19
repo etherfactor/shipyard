@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EtherGizmos.Configuration\EtherGizmos.Configuration.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Shipyard.OData\EtherGizmos.Shipyard.OData.csproj" />
     <ProjectReference Include="..\EtherGizmos.Shipyard.ServiceDefaults\EtherGizmos.Shipyard.ServiceDefaults.csproj" />
   </ItemGroup>
 
