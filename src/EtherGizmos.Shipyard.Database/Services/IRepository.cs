@@ -1,9 +1,11 @@
-﻿namespace EtherGizmos.Shipyard.Database.Services;
+﻿using EtherGizmos.Shipyard.Utilities.Abstractions;
+
+namespace EtherGizmos.Shipyard.Database.Services;
 
 public interface IRepository { }
 
 public interface IRepository<TEntity> : IRepository
-    where TEntity : class
+    where TEntity : class, IEntity
 {
     IQueryable<TEntity> Data { get; }
 

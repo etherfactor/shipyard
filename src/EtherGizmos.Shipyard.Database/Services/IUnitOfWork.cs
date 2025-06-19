@@ -1,4 +1,6 @@
-﻿namespace EtherGizmos.Shipyard.Database.Services;
+﻿using EtherGizmos.Shipyard.Utilities.Abstractions;
+
+namespace EtherGizmos.Shipyard.Database.Services;
 
 public interface IUnitOfWork : IDisposable
 {
@@ -7,5 +9,5 @@ public interface IUnitOfWork : IDisposable
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
     IRepository<TEntity> Repository<TEntity>()
-        where TEntity : class;
+        where TEntity : class, IEntity;
 }

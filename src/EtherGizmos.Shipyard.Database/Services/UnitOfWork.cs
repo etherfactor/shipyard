@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EtherGizmos.Shipyard.Utilities.Abstractions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
@@ -32,7 +33,7 @@ internal class UnitOfWork : IUnitOfWork
     }
 
     public IRepository<TEntity> Repository<TEntity>()
-        where TEntity : class
+        where TEntity : class, IEntity
     {
         LoadContext<TEntity>();
 

@@ -45,7 +45,8 @@ public static class IServiceCollectionExtensions
                         opt.AddPostgres()
                             .WithGlobalConnectionString(sqlOptions.ConnectionString);
                     });
-            });
+            })
+            .ForwardScoped<IMigrationRunner>();
 
         return @this;
     }
@@ -75,7 +76,7 @@ public static class IServiceCollectionExtensions
                     var context = (DbContext)provider.GetRequiredService(contextType);
                     return context
                         .GetType()
-                        .GetMethod(nameof(DbContext.Set), BindingFlags.Instance | BindingFlags.Public)!
+                        .GetMethod(nameof(DbContext.Set), BindingFlags.Instance | BindingFlags.Public, [])!
                         .MakeGenericMethod(entityType)
                         .Invoke(context, [])!;
                 });

@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EtherGizmos.Shipyard.Utilities.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace EtherGizmos.Shipyard.Database.Services;
 
 internal class GenericRepository<TEntity> : IRepository<TEntity>
-    where TEntity : class
+    where TEntity : class, IEntity
 {
     private readonly DbSet<TEntity> _entities;
 

@@ -1,5 +1,9 @@
 ﻿using EtherGizmos.Messaging.Abstractions;
+using EtherGizmos.Shipyard.Database.Services;
+using EtherGizmos.Shipyard.Models.Database;
 using EtherGizmos.Shipyard.Worker.Consumers;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace EtherGizmos.Shipyard.Worker.Services.HostedServices;
@@ -11,20 +15,35 @@ public class QueueTrackingRequestBackgroundService : PeriodicBackgroundService
     private readonly IMessageSender _sender;
 
     public QueueTrackingRequestBackgroundService(
+        IServiceProvider serviceProvider,
         ILogger<QueueTrackingRequestBackgroundService> logger,
         IMessageSender sender)
-        : base(CRON_EXPRESSION, logger)
+        : base(CRON_EXPRESSION, serviceProvider, logger)
     {
         _sender = sender;
     }
 
-    protected override async Task ExecuteIterationAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteIterationAsync(
+        IServiceProvider provider,
+        CancellationToken stoppingToken)
     {
-        await _sender.SendAsync("tracking-poll-request", new TrackingRequest()
+        var uowFactory = provider.GetRequiredService<IUnitOfWorkFactory>();
+        using var uow = uowFactory.Create();
+
+        var packageRepo = uow.Repository<Package>();
+
+        var ready = packageRepo.Data
+            .Where(e => e.NextPollAt < DateTimeOffset.UtcNow)
+            .AsAsyncEnumerable();
+
+        await Parallel.ForEachAsync(ready, async (package, ct) =>
         {
-            PackageId = 1,
-            CarrierId = "usps",
-            TrackingNumber = "123456789",
-        }, cancellationToken: stoppingToken);
+            await _sender.SendAsync("tracking-poll-request", new TrackingRequest()
+            {
+                PackageId = package.Id,
+                CarrierId = package.CarrierId,
+                TrackingNumber = package.TrackingNumber,
+            }, cancellationToken: stoppingToken);
+        });
     }
 }

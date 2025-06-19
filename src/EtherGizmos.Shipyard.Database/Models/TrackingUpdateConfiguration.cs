@@ -1,4 +1,5 @@
-﻿using EtherGizmos.Shipyard.Models.Database;
+﻿using EtherGizmos.Shipyard.Database.Extensions;
+using EtherGizmos.Shipyard.Models.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,6 +16,8 @@ public class TrackingUpdateConfiguration : IEntityTypeConfiguration<TrackingUpda
 
         entity.Property(e => e.Id)
             .HasColumnName("tracking_update_id");
+
+        entity.AuditProperties();
 
         entity.Property(e => e.PackageId)
             .HasColumnName("package_id");

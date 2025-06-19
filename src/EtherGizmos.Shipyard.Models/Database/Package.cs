@@ -2,7 +2,7 @@
 
 namespace EtherGizmos.Shipyard.Models.Database;
 
-public class Package : Auditable
+public class Package : Auditable, IEntity
 {
     public virtual int Id { get; set; }
 

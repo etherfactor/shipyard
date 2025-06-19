@@ -50,7 +50,7 @@ public record TrackingRequest
 {
     public int PackageId { get; init; }
 
-    public string CarrierId { get; init; } = null!;
+    public int CarrierId { get; init; }
 
     public string TrackingNumber { get; init; } = null!;
 }

@@ -1,4 +1,5 @@
-﻿using EtherGizmos.Shipyard.Models.Database;
+﻿using EtherGizmos.Shipyard.Database.Extensions;
+using EtherGizmos.Shipyard.Models.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,6 +16,8 @@ public class StatusTypeConfiguration : IEntityTypeConfiguration<StatusType>
 
         entity.Property(e => e.Id)
             .HasColumnName("status_type_id");
+
+        entity.AuditProperties();
 
         entity.Property(e => e.Name)
             .HasColumnName("name");

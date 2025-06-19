@@ -2,6 +2,7 @@
 using EtherGizmos.Messaging;
 using EtherGizmos.Messaging.Configuration;
 using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Database.Configuration;
 using EtherGizmos.Shipyard.Database.Services;
 using EtherGizmos.Shipyard.Worker.Configuration;
 using EtherGizmos.Shipyard.Worker.Services.HostedServices;
@@ -32,12 +33,24 @@ builder.Configuration
 // Services
 
 builder.Services
+    .AddOptions<PostgreSqlOptions>()
+    .Configure<IConfiguration>((opt, conf) =>
+    {
+        conf.GetSection("PostgreSql")
+            .Bind(opt);
+    })
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services
     .AddOptions<SeleniumDriverOptions>()
     .Configure<IConfiguration>((opt, conf) =>
     {
         conf.GetSection("Selenium")
             .Bind(opt);
-    });
+    })
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 builder.Services
     .AddDatabase()
@@ -57,7 +70,7 @@ builder.Services
     })
     .UseRabbitMQ((opt, conf) =>
     {
-        conf.GetSection("RabbitMQ")
+        conf.GetSection("RabbitMq")
             .Bind(opt);
     })
     .AddConsumersFromAssemblies(typeof(Program).Assembly);
