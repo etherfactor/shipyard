@@ -1,5 +1,5 @@
-using Asp.Versioning;
 using EtherGizmos.Configuration;
+using EtherGizmos.Shipyard.Models;
 using EtherGizmos.Shipyard.Models.Database;
 using EtherGizmos.Shipyard.OData;
 
@@ -23,7 +23,7 @@ builder.Services.AddOpenApi();
 builder.Services
     .AddOData((opt, conf) =>
     {
-        opt.DefaultApiVersion = new ApiVersion(0, 1);
+        opt.DefaultApiVersion = ApiVersions.V0_1;
         opt.VersionedRoutePrefixes = ["api/v{version:apiVersion}"];
         opt.ExecutingAssembly = typeof(Program).Assembly;
         opt.ModelAssemblies = [typeof(Package).Assembly];

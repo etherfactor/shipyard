@@ -12,9 +12,9 @@ public class Migration002_LoadTrackingTables : MigrationExtension
          */
         Merge.IntoTable("status_types")
             .Row(new { status_type_id = 0, name = "Unknown", polling_factor = 4m, is_final = false })
-            .Row(new { status_type_id = 10, name = "Waiting", polling_factor = 2m, is_final = false })
-            .Row(new { status_type_id = 20, name = "In transit", polling_factor = 1m, is_final = false })
-            .Row(new { status_type_id = 30, name = "Out for delivery", polling_factor = 0.167m, is_final = false })
+            .Row(new { status_type_id = 1, name = "Waiting", polling_factor = 2m, is_final = false })
+            .Row(new { status_type_id = 10, name = "In transit", polling_factor = 1m, is_final = false })
+            .Row(new { status_type_id = 20, name = "Out for delivery", polling_factor = 0.167m, is_final = false })
             .Row(new { status_type_id = 100, name = "Delivered", polling_factor = 0m, is_final = true })
             .Row(new { status_type_id = -10, name = "Failed attempt", polling_factor = 1m, is_final = false })
             .Row(new { status_type_id = -100, name = "Returned", polling_factor = 0m, is_final = true })

@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Asp.Versioning.Abstractions" Version="8.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\EtherGizmos.Shipyard.Utilities\EtherGizmos.Shipyard.Utilities.csproj" />
   </ItemGroup>
 
