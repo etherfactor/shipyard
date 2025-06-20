@@ -25,7 +25,7 @@ public abstract class AutoODataController : ODataController
         _serviceProvider = serviceProvider;
     }
 
-    private async Task<TEntity> LoadRecordOr404<TEntity, TDto, TKey>(
+    private async Task<TEntity> LoadRecordAsync<TEntity, TDto, TKey>(
         IUnitOfWork uow,
         IEnumerable<KeyMapping<TEntity, TDto, TKey>> keys,
         string target = ErrorConstants.RequestTarget.Uri,
@@ -241,13 +241,23 @@ public abstract class AutoODataController : ODataController
             using var uow = _uowFactory.Create(useRequestScope: true);
             var repository = uow.Repository<TEntity>();
 
-            var record = await _controller.LoadRecordOr404(uow, Keys, cancellationToken: cancellationToken);
+            var record = await _controller.LoadRecordAsync(uow, Keys, cancellationToken: cancellationToken);
 
             repository.Delete(record);
 
             await uow.SaveChangesAsync(cancellationToken: cancellationToken);
 
             return _controller.NoContent();
+        }
+
+        public IReferenceRequestBuilder<TFEntity, TFDto> ForReference<TFEntity, TFDto, TFKey>(
+            Func<TEntity, ICollection<TFEntity>> findCollection,
+            params KeyMapping<TFEntity, TFDto, TFKey>[] fkeys)
+            where TFEntity : class, IEntity
+            where TFDto : class, new()
+        {
+            return new SetReferenceRequestBuilder<TEntity, TDto, TKey, TFEntity, TFDto, TFKey>(
+                _controller, [.. Keys], findCollection, fkeys);
         }
 
         public async Task<IActionResult> GetAsync(
@@ -259,7 +269,7 @@ public abstract class AutoODataController : ODataController
             using var uow = _uowFactory.Create(useRequestScope: true);
             var repository = uow.Repository<TEntity>();
 
-            var record = await _controller.LoadRecordOr404(uow, Keys, cancellationToken: cancellationToken);
+            var record = await _controller.LoadRecordAsync(uow, Keys, cancellationToken: cancellationToken);
 
             var finished = _mapper
                 .MapExplicitly(record)
@@ -300,7 +310,7 @@ public abstract class AutoODataController : ODataController
             var validator = _modelValidatorFactory.GetValidator<TDto>();
             await validator.ValidateAsync(testRecord, cancellationToken);
 
-            var record = await _controller.LoadRecordOr404(uow, Keys, cancellationToken: cancellationToken);
+            var record = await _controller.LoadRecordAsync(uow, Keys, cancellationToken: cancellationToken);
 
             var recordAsDto = _mapper
                 .Map<TDto>(record);
@@ -345,6 +355,84 @@ public abstract class AutoODataController : ODataController
                 .ExecuteAsync(cancellationToken);
 
             return _controller.Ok(finished);
+        }
+    }
+
+    protected interface IReferenceRequestBuilder<TFEntity, TFDto>
+        where TFEntity : class
+        where TFDto : class, new()
+    {
+        Task<IActionResult> CreateAsync(CancellationToken cancellationToken = default);
+
+        Task<IActionResult> DeleteAsync(CancellationToken cancellationToken = default);
+    }
+
+    private class SetReferenceRequestBuilder<TEntity, TDto, TKey, TFEntity, TFDto, TFKey> :
+        IReferenceRequestBuilder<TFEntity, TFDto>
+        where TEntity : class, IEntity
+        where TDto : class, new()
+        where TFEntity : class, IEntity
+        where TFDto : class, new()
+    {
+        private readonly AutoODataController _controller;
+        private readonly IUnitOfWorkFactory _uowFactory;
+
+        public List<KeyMapping<TEntity, TDto, TKey>> Keys { get; }
+
+        public Func<TEntity, ICollection<TFEntity>> FindCollection { get; }
+
+        public List<KeyMapping<TFEntity, TFDto, TFKey>> FKeys { get; }
+
+        public SetReferenceRequestBuilder(
+            AutoODataController controller,
+            KeyMapping<TEntity, TDto, TKey>[] keys,
+            Func<TEntity, ICollection<TFEntity>> findCollection,
+            params KeyMapping<TFEntity, TFDto, TFKey>[] fkeys)
+        {
+            _controller = controller;
+            _uowFactory = _controller._serviceProvider.GetRequiredService<IUnitOfWorkFactory>();
+
+            Keys = [.. keys];
+            FindCollection = findCollection;
+            FKeys = [.. fkeys];
+        }
+
+        public async Task<IActionResult> CreateAsync(
+            CancellationToken cancellationToken = default)
+        {
+            using var uow = _uowFactory.Create(useRequestScope: true);
+            var repository = uow.Repository<TEntity>();
+
+            var record = await _controller.LoadRecordAsync(uow, Keys, cancellationToken: cancellationToken);
+
+            var foreignRepository = uow.Repository<TFEntity>();
+
+            var foreignRecord = await _controller.LoadRecordAsync(uow, FKeys, target: ErrorConstants.RequestTarget.Body, cancellationToken: cancellationToken);
+
+            FindCollection(record).Add(foreignRecord);
+
+            await uow.SaveChangesAsync(cancellationToken);
+
+            return _controller.NoContent();
+        }
+
+        public async Task<IActionResult> DeleteAsync(
+            CancellationToken cancellationToken = default)
+        {
+            using var uow = _uowFactory.Create(useRequestScope: true);
+            var repository = uow.Repository<TEntity>();
+
+            var record = await _controller.LoadRecordAsync(uow, Keys, cancellationToken: cancellationToken);
+
+            var foreignRepository = uow.Repository<TFEntity>();
+
+            var foreignRecord = await _controller.LoadRecordAsync(uow, FKeys, target: ErrorConstants.RequestTarget.Query, cancellationToken: cancellationToken);
+
+            FindCollection(record).Remove(foreignRecord);
+
+            await uow.SaveChangesAsync(cancellationToken);
+
+            return _controller.NoContent();
         }
     }
 }
