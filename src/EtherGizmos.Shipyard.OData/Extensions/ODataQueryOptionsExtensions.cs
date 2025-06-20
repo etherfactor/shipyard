@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.OData.Query;
+﻿using EtherGizmos.Shipyard.Models.Api.Errors;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder.Annotations;
 using Microsoft.OData.UriParser;

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EtherGizmos.Configuration\EtherGizmos.Configuration.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Shipyard.Database\EtherGizmos.Shipyard.Database.csproj" />
     <ProjectReference Include="..\EtherGizmos.Shipyard.OData\EtherGizmos.Shipyard.OData.csproj" />
     <ProjectReference Include="..\EtherGizmos.Shipyard.ServiceDefaults\EtherGizmos.Shipyard.ServiceDefaults.csproj" />
   </ItemGroup>

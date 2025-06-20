@@ -1,9 +1,17 @@
 using EtherGizmos.Configuration;
+using EtherGizmos.Shipyard.Api.Services.Middleware;
+using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Models;
+using EtherGizmos.Shipyard.Models.Api.Errors;
 using EtherGizmos.Shipyard.Models.Database;
 using EtherGizmos.Shipyard.OData;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.OData;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//**********************************************************
+// Configuration
 
 builder.Configuration
     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
@@ -12,13 +20,19 @@ builder.Configuration
         (new(@"(?<=[^_]):_(?=[^_])"), " "),
         (new(@"^ConnectionStrings:(?=[^_:])"), ""));
 
+//**********************************************************
+// Add Services
+
+// General
 builder.AddServiceDefaults();
 
-// Add services to the container.
+// Database
+builder.Services.AddDatabase();
 
+// Models
+
+// Controllers
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 
 builder.Services
     .AddOData((opt, conf) =>
@@ -29,18 +43,62 @@ builder.Services
         opt.ModelAssemblies = [typeof(Package).Assembly];
     });
 
+//**********************************************************
+// Add Middleware
+
 var app = builder.Build();
 
-app.MapDefaultEndpoints();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
 app.UseHttpsRedirection();
+app.UseRouting();
 
+app.
+    UseExceptionHandler(errorApp =>
+    {
+        errorApp.Run(async context =>
+        {
+            var pathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+
+            if (pathFeature?.Error is ReturnErrorException ex)
+            {
+                await context.Response.WriteErrorAsync(ex.Error);
+            }
+        });
+    });
+
+app.UseMiddleware<ReturnErrorExceptionMiddleware>();
+
+app
+    .UseCors(opt =>
+    {
+        opt.AllowAnyOrigin();
+        opt.AllowAnyMethod();
+        opt.AllowAnyHeader();
+    });
+
+app
+    .Use(async (context, next) =>
+    {
+        context.Request.EnableBuffering();
+        await next();
+    });
+
+app.UseSwagger()
+    .UseSwaggerUI(opt =>
+    {
+        var descriptions = app.DescribeApiVersions();
+
+        // build a swagger endpoint for each discovered API version
+        foreach (var description in descriptions)
+        {
+            var url = $"{description.GroupName}/swagger.json";
+            var name = description.GroupName.ToUpperInvariant();
+            opt.SwaggerEndpoint(url, name);
+        }
+    });
+
+app.UseODataRouteDebug();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

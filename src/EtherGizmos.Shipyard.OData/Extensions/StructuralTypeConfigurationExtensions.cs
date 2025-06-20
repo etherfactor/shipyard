@@ -1,4 +1,5 @@
-﻿using Microsoft.OData.ModelBuilder;
+﻿using EtherGizmos.Shipyard.Utilities.Helpers;
+using Microsoft.OData.ModelBuilder;
 using System.Reflection;
 
 namespace EtherGizmos.Shipyard.OData.Extensions;
