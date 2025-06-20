@@ -211,7 +211,7 @@ public abstract class AutoODataController : ODataController
             var repository = uow.Repository<TEntity>();
 
             var validator = _modelValidatorFactory.GetValidator<TDto>();
-            await validator.ValidateAsync(create);
+            await validator.ValidateAsync(create, cancellationToken);
             var record = _mapper.Map<TEntity>(create);
 
             foreach (var beforeSave in _onCreating)
@@ -220,7 +220,7 @@ public abstract class AutoODataController : ODataController
             }
 
             var dbValidator = _modelValidatorFactory.GetValidator<TEntity>();
-            await dbValidator.ValidateAsync(record);
+            await dbValidator.ValidateAsync(record, cancellationToken);
 
             repository.Create(record);
 
@@ -298,7 +298,7 @@ public abstract class AutoODataController : ODataController
             patch.Patch(testRecord);
 
             var validator = _modelValidatorFactory.GetValidator<TDto>();
-            await validator.ValidateAsync(testRecord);
+            await validator.ValidateAsync(testRecord, cancellationToken);
 
             var record = await _controller.LoadRecordOr404(uow, Keys, cancellationToken: cancellationToken);
 
@@ -318,7 +318,7 @@ public abstract class AutoODataController : ODataController
             }
 
             var dbValidator = _modelValidatorFactory.GetValidator<TEntity>();
-            await dbValidator.ValidateAsync(record);
+            await dbValidator.ValidateAsync(record, cancellationToken);
 
             await uow.SaveChangesAsync(cancellationToken: cancellationToken);
 

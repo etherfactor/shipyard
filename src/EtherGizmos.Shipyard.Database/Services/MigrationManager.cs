@@ -1,18 +1,19 @@
 ﻿using FluentMigrator.Runner;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EtherGizmos.Shipyard.Database.Services;
 
 internal class MigrationManager : IMigrationManager
 {
-    private readonly IMigrationRunner _migrationRunner;
+    private readonly IServiceProvider _serviceProvider;
 
     private bool _isMigrated;
     private readonly object _lock = new();
 
     public MigrationManager(
-        IMigrationRunner migrationRunner)
+        IServiceProvider serviceProvider)
     {
-        _migrationRunner = migrationRunner;
+        _serviceProvider = serviceProvider;
     }
 
     public void EnsureMigrated()
@@ -25,7 +26,12 @@ internal class MigrationManager : IMigrationManager
             if (_isMigrated)
                 return;
 
-            _migrationRunner.MigrateUp();
+            using var scope = _serviceProvider.CreateScope();
+            var provider = scope.ServiceProvider;
+
+            var runner = provider.GetRequiredService<IMigrationRunner>();
+
+            runner.MigrateUp();
             _isMigrated = true;
         }
     }

@@ -1,10 +1,13 @@
 using EtherGizmos.Configuration;
 using EtherGizmos.Shipyard.Api.Services.Middleware;
 using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Database.Configuration;
+using EtherGizmos.Shipyard.Database.Services;
 using EtherGizmos.Shipyard.Models;
 using EtherGizmos.Shipyard.Models.Api.Errors;
 using EtherGizmos.Shipyard.Models.Database;
 using EtherGizmos.Shipyard.OData;
+using EtherGizmos.Shipyard.Utilities;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.OData;
 
@@ -20,6 +23,16 @@ builder.Configuration
         (new(@"(?<=[^_]):_(?=[^_])"), " "),
         (new(@"^ConnectionStrings:(?=[^_:])"), ""));
 
+builder.Services
+    .AddOptions<PostgreSqlOptions>()
+    .Configure<IConfiguration>((opt, conf) =>
+    {
+        conf.GetSection("PostgreSql")
+            .Bind(opt);
+    })
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
 //**********************************************************
 // Add Services
 
@@ -27,9 +40,15 @@ builder.Configuration
 builder.AddServiceDefaults();
 
 // Database
-builder.Services.AddDatabase();
+builder.Services
+    .AddDatabase()
+    .AddUnitOfWork(opt =>
+    {
+        opt.BindDbContext<ApplicationContext>();
+    });
 
 // Models
+builder.Services.AddModelValidators();
 
 // Controllers
 builder.Services.AddControllers();

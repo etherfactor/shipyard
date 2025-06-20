@@ -1,12 +1,18 @@
 ﻿using Asp.Versioning;
-using EtherGizmos.Shipyard.OData.Configuration;
+using Asp.Versioning.OData;
+using AutoMapper;
+using EtherGizmos.Extensions.DependencyInjection;
+using EtherGizmos.Shipyard.OData.Services.Filters;
 using EtherGizmos.Shipyard.OData.Swagger;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Text.Json.Serialization;
+using ODataOptions = EtherGizmos.Shipyard.OData.Configuration.ODataOptions;
 
 namespace EtherGizmos.Shipyard.OData;
 
@@ -27,11 +33,31 @@ public static class IServiceCollectionExtensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        @this.AddOptions<ODataApiVersioningOptions>()
+            .Configure<IOptions<ODataOptions>>((@base, @ref) =>
+            {
+                foreach (var route in @ref.Value.VersionedRoutePrefixes)
+                {
+                    @base.AddRouteComponents(route);
+                }
+            });
+
         @this.AddOptions<ApiBehaviorOptions>()
             .Configure(opt =>
             {
                 opt.SuppressModelStateInvalidFilter = true;
             });
+
+        @this
+            .AddControllers(opt =>
+            {
+                opt.Filters.Add<ModelStateActionFilter>();
+            })
+            .AddJsonOptions(opt =>
+            {
+                opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            })
+            .AddOData();
 
         @this
             .AddApiVersioning(opt =>
@@ -48,16 +74,23 @@ public static class IServiceCollectionExtensions
             })
             .AddOData(opt =>
             {
-                foreach (var route in useOptions.VersionedRoutePrefixes)
-                {
-                    opt.AddRouteComponents(route);
-                }
+
             })
             .AddODataApiExplorer(opt =>
             {
                 opt.GroupNameFormat = "'v'VVV";
                 opt.SubstituteApiVersionInUrl = true;
             });
+
+        @this
+            .AddChildContainer((child, parent) =>
+            {
+                var options = parent.GetRequiredService<IOptions<ODataOptions>>()
+                    .Value;
+
+                child.AddAutoMapper(options.ModelAssemblies);
+            })
+            .ForwardTransient<IMapper>();
 
         @this.AddEndpointsApiExplorer();
         @this.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();

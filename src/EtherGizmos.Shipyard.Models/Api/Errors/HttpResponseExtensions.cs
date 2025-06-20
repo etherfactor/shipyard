@@ -16,7 +16,10 @@ public static class HttpResponseExtensions
         var typedError = error;
 
         @this.StatusCode = 200;
-        @this.HttpContext.Features.Get<IHttpResponseFeature>().ReasonPhrase = null;
+        var feature = @this.HttpContext.Features.Get<IHttpResponseFeature>();
+        if (feature is not null)
+            feature.ReasonPhrase = null;
+
         @this.Headers.Clear();
         @this.Body.SetLength(0);
 

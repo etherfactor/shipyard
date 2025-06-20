@@ -2,5 +2,5 @@
 
 public interface IModelValidator<TModel>
 {
-    public Task ValidateAsync(TModel model);
+    Task ValidateAsync(TModel model, CancellationToken cancellationToken = default);
 }

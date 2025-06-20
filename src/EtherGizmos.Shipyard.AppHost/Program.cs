@@ -13,7 +13,7 @@ var api = builder.AddProject<Projects.EtherGizmos_Shipyard_Api>("api");
 api.WaitFor(database).WithReference(database, connectionName: "PostgreSql:ConnectionString");
 
 var worker = builder.AddProject<Projects.EtherGizmos_Shipyard_Worker>("worker");
-worker.WaitFor(postgres).WithReference(postgres, connectionName: "PostgreSql:ConnectionString");
+worker.WaitFor(database).WithReference(database, connectionName: "PostgreSql:ConnectionString");
 worker.WaitFor(rmq).WithReference(rmq, connectionName: "RabbitMq:ConnectionString");
 worker.WaitFor(selenium).WithEnvironment("Selenium:ConnectionString", () => selenium.GetEndpoint("endpoint").Url + "/wd/hub");
 
