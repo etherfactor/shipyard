@@ -31,6 +31,15 @@ public static class ErrorConstants
             public const string MissingToken = $"{Source.Client}.{Root}.missingToken";
         }
 
+        public static class Reference
+        {
+            public const string Root = "reference";
+
+            public const string EntityNotFound = $"{Source.Client}.{Root}.entityNotFound";
+
+            public const string InvalidKeyType = $"{Source.Client}.{Root}.invalidKeyType";
+        }
+
         public static class UnsupportedOperation
         {
             public const string Root = "unsupportedOperation";

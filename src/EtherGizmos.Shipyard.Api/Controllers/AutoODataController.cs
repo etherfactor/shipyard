@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using EtherGizmos.Shipyard.Database.Services;
 using EtherGizmos.Shipyard.Models.Api.Errors;
-using EtherGizmos.Shipyard.Models.Extensions;
 using EtherGizmos.Shipyard.OData.Extensions;
 using EtherGizmos.Shipyard.Utilities.Abstractions;
 using Microsoft.AspNetCore.Mvc;
@@ -64,7 +63,7 @@ public abstract class AutoODataController : ODataController
             foreach (var key in keys.Select(e => (e.DtoKey, e.Value)))
             {
                 var selector = Expression.Lambda<Func<TDto, object?>>(Expression.Convert(key.DtoKey.Body, typeof(object)), [.. key.DtoKey.Parameters]);
-                error.AddDetail(selector, key.Value!);
+                error.AddDetail((selector, key.Value));
             }
 
             error.Return();
@@ -97,7 +96,7 @@ public abstract class AutoODataController : ODataController
         var maybeKey = keySegment?.Keys?.ElementAt(index).Value;
         if (maybeKey is not TKey parsedKey)
         {
-            new InvalidKeyTypeReferenceError<TEntity>(target)
+            new Error.Reference.InvalidKeyTypeReferenceError<TEntity>(target)
                 .AddDetail((typeof(TKey), maybeKey!))
                 .Return();
         }

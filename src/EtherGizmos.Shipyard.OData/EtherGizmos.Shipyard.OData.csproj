@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.OData.ApiExplorer" Version="8.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.OData" Version="9.3.2" NoWarn="NU1608" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="8.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.9.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.9.0" />
