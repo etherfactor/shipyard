@@ -59,7 +59,16 @@ public static class PackageDTOExamples
 {
     public static PackageDTO Get { get; } = new()
     {
-
+        Id = 1,
+        CreatedAt = DateTimeOffset.UtcNow,
+        ModifiedAt = DateTimeOffset.UtcNow,
+        CarrierId = 1,
+        TrackingNumber = "123456789",
+        Contents = "Some items",
+        LastPollAt = DateTimeOffset.UtcNow,
+        NextPollAt = DateTimeOffset.UtcNow,
+        LastStatusType = StatusTypeDTO.Delivered,
+        IsDelivered = true,
     };
 
     public static PackageDTO Post { get; } = Get;

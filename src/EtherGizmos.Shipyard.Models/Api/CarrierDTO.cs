@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using EtherGizmos.Shipyard.Models.Database;
 using EtherGizmos.Shipyard.Models.Extensions;
+using Swashbuckle.AspNetCore.Filters;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EtherGizmos.Shipyard.Models.Api;
 
@@ -37,4 +39,48 @@ public class CarrierDTOProfile : Profile
         fromDto.MapMember(dest => dest.Slug, src => src.Slug);
     })
     { }
+}
+
+[ExcludeFromCodeCoverage]
+public static class CarrierDTOExamples
+{
+    public static CarrierDTO Get { get; } = new()
+    {
+        Id = 1,
+        CreatedAt = DateTimeOffset.UtcNow,
+        ModifiedAt = DateTimeOffset.UtcNow,
+        Name = "USPS",
+        Slug = "usps",
+    };
+
+    public static CarrierDTO Post { get; } = Get;
+
+    public static CarrierDTO Patch { get; } = Post;
+}
+
+[ExcludeFromCodeCoverage]
+public class CarrierDTOExampleGet : IExamplesProvider<CarrierDTO>
+{
+    public CarrierDTO GetExamples()
+    {
+        return CarrierDTOExamples.Get;
+    }
+}
+
+[ExcludeFromCodeCoverage]
+public class CarrierDTOExamplePost : IExamplesProvider<CarrierDTO>
+{
+    public CarrierDTO GetExamples()
+    {
+        return CarrierDTOExamples.Post;
+    }
+}
+
+[ExcludeFromCodeCoverage]
+public class CarrierDTOExamplePatch : IExamplesProvider<CarrierDTO>
+{
+    public CarrierDTO GetExamples()
+    {
+        return CarrierDTOExamples.Patch;
+    }
 }
