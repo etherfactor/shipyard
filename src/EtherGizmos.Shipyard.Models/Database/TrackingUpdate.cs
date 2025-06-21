@@ -1,4 +1,6 @@
 ﻿using EtherGizmos.Shipyard.Utilities.Abstractions;
+using EtherGizmos.Shipyard.Utilities.Extensions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EtherGizmos.Shipyard.Models.Database;
 
@@ -19,4 +21,27 @@ public class TrackingUpdate : Auditable, IEntity
     public virtual string? Location { get; set; }
 
     public virtual string? Description { get; set; }
+}
+
+public class TrackingUpdateComparer : IEqualityComparer<TrackingUpdate>
+{
+    private static readonly TimeSpan ROUND_INTERVAL = TimeSpan.FromMinutes(5);
+
+    public bool Equals(TrackingUpdate? x, TrackingUpdate? y)
+    {
+        if (x is null || y is null)
+            return x == y;
+
+        return x.OccurredAt.Round(ROUND_INTERVAL) == y.OccurredAt.Round(ROUND_INTERVAL)
+            && x.StatusTypeId == y.StatusTypeId
+            && x.Location == y.Location;
+    }
+
+    public int GetHashCode([DisallowNull] TrackingUpdate obj)
+    {
+        return HashCode.Combine(
+            obj.OccurredAt,
+            obj.StatusTypeId,
+            obj.Location ?? "");
+    }
 }

@@ -33,19 +33,34 @@ internal class UspsBrowserTrackingProvider : ITrackingProvider
         var statuses = statusMatches
             .Select(match =>
             {
-                var detail = match.Groups["detail"].Value;
-                var location = match.Groups["location"].Value;
+                var detail = match.Groups["detail"].Value?.Replace("&nbsp;", " ")?.Trim() ?? "";
+                var location = match.Groups["location"].Value?.Replace("&nbsp;", " ")?.Trim() ?? "";
                 var date = match.Groups["date"].Value;
+
+                var statusTypeId = StatusTypeId.InTransit;
+
+                if (detail.Contains("Delivered", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    statusTypeId = StatusTypeId.Delivered;
+                }
+                else if (detail.Contains("Out for Delivery", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    statusTypeId = StatusTypeId.OutForDelivery;
+                }
+                else if (detail.Contains("USPS Awaiting Item", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    statusTypeId = StatusTypeId.Waiting;
+                }
 
                 return new TrackingResultDetail
                 {
-                    EventOccurredAt = DateTime.Parse(date),
-                    StatusTypeId = StatusTypeId.InTransit,
+                    OccurredAt = DateTime.Parse(date),
+                    StatusTypeId = statusTypeId,
                     Location = NullIfEmpty(location),
                     Description = NullIfEmpty(detail),
                 };
             })
-            .OrderBy(e => e.EventOccurredAt)
+            .OrderBy(e => e.OccurredAt)
             .ToImmutableList();
 
         DateTimeOffset? estimatedAt;
@@ -76,7 +91,7 @@ internal class UspsBrowserTrackingProvider : ITrackingProvider
         return result;
     }
 
-    private string? NullIfEmpty(string input)
+    private string? NullIfEmpty(string? input)
     {
         return !string.IsNullOrWhiteSpace(input) ? input : null;
     }

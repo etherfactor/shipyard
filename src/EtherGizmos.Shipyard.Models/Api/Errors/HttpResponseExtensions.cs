@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using System.Text.Json;
 
 namespace EtherGizmos.Shipyard.Models.Api.Errors;
@@ -15,13 +14,7 @@ public static class HttpResponseExtensions
 
         var typedError = error;
 
-        @this.StatusCode = 200;
-        var feature = @this.HttpContext.Features.Get<IHttpResponseFeature>();
-        if (feature is not null)
-            feature.ReasonPhrase = null;
-
-        @this.Headers.Clear();
-        @this.Body.SetLength(0);
+        @this.Clear();
 
         @this.StatusCode = (int)typedError.StatusCode;
         @this.ContentType = "application/json; charset=utf-8";

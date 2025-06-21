@@ -34,6 +34,9 @@ public class PackageConfiguration : IEntityTypeConfiguration<Package>
         entity.Property(e => e.Contents)
             .HasColumnName("contents");
 
+        entity.Property(e => e.EstimatedDeliveryAt)
+            .HasColumnName("estimated_delivery_at_utc");
+
         entity.Property(e => e.LastPollAt)
             .HasColumnName("last_poll_at_utc");
 
@@ -51,7 +54,7 @@ public class PackageConfiguration : IEntityTypeConfiguration<Package>
             .HasColumnName("is_delivered");
 
         entity.HasMany(e => e.TrackingUpdates)
-            .WithOne()
+            .WithOne(e => e.Package)
             .HasForeignKey(e => e.PackageId);
     }
 }

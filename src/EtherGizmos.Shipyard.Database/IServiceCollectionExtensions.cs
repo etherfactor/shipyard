@@ -40,7 +40,7 @@ public static class IServiceCollectionExtensions
                     .ConfigureRunner(opt =>
                     {
                         opt.ScanIn(typeof(ApplicationContext).Assembly).For.Migrations()
-                            .WithVersionTable(new CustomVersionTableMetadata());
+                            .WithVersionTable(new PostgresVersionTableMetadata());
 
                         opt.AddPostgres()
                             .WithGlobalConnectionString(sqlOptions.ConnectionString);

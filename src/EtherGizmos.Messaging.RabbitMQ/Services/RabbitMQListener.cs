@@ -90,6 +90,8 @@ internal class RabbitMQListener : IMessageListener
                 .Where(e => e.Key != "$logical")
                 .ToImmutableDictionary();
 
+            var actions = new RabbitMQMessageActions(_rmqChannel, @event.DeliveryTag);
+
             var message = new ReceivedMessage()
             {
                 Id = @event.DeliveryTag.ToString(),
@@ -97,7 +99,7 @@ internal class RabbitMQListener : IMessageListener
                 Body = body,
                 Headers = headers,
                 LogicalSourceName = allHeaders["$logical"],
-                Actions = null, //TODO: Implement RabbitMQ actions to complete, abandon, and dead-letter the message
+                Actions = actions,
             };
 
             await _channel.Writer.WriteAsync(message, @event.CancellationToken);

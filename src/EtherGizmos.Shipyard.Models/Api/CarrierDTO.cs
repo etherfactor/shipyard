@@ -2,6 +2,7 @@
 using EtherGizmos.Shipyard.Models.Database;
 using EtherGizmos.Shipyard.Models.Extensions;
 using Swashbuckle.AspNetCore.Filters;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace EtherGizmos.Shipyard.Models.Api;
@@ -14,8 +15,10 @@ public class CarrierDTO
 
     public DateTimeOffset ModifiedAt { get; set; }
 
+    [Required]
     public string Name { get; set; } = null!;
 
+    [Required]
     public string Slug { get; set; } = null!;
 }
 

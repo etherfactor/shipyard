@@ -23,7 +23,7 @@ public class TrackingUpdateConfiguration : IEntityTypeConfiguration<TrackingUpda
             .HasColumnName("package_id");
 
         entity.HasOne(e => e.Package)
-            .WithMany()
+            .WithMany(e => e.TrackingUpdates)
             .HasForeignKey(e => e.PackageId);
 
         entity.Property(e => e.OccurredAt)

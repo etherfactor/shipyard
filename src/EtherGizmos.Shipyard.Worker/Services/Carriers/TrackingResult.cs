@@ -4,7 +4,7 @@ public record TrackingResult
 {
     public required string TrackingNumber { get; init; }
 
-    public int LastStatusTypeId => Details.OrderBy(e => e.EventOccurredAt).Last().StatusTypeId;
+    public int LastStatusTypeId => Details.OrderBy(e => e.OccurredAt).Last().StatusTypeId;
 
     public required DateTimeOffset? EstimatedDeliveryAt { get; init; }
 

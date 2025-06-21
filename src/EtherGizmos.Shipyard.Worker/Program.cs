@@ -5,6 +5,7 @@ using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Configuration;
 using EtherGizmos.Shipyard.Database.Services;
 using EtherGizmos.Shipyard.Worker.Configuration;
+using EtherGizmos.Shipyard.Worker.Services.Carriers;
 using EtherGizmos.Shipyard.Worker.Services.HostedServices;
 using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using Microsoft.Extensions.Configuration;
@@ -84,6 +85,9 @@ builder.Services
 
         return client;
     });
+
+builder.Services
+    .AddSingleton<ITrackingProviderFactory, TrackingProviderFactory>();
 
 builder.Services.AddHostedService<QueueTrackingRequestBackgroundService>();
 

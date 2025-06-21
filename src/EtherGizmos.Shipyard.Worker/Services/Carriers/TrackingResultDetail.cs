@@ -2,7 +2,7 @@
 
 public record TrackingResultDetail
 {
-    public required DateTimeOffset EventOccurredAt { get; init; }
+    public required DateTimeOffset OccurredAt { get; init; }
 
     public required int StatusTypeId { get; init; }
 

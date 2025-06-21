@@ -1,6 +1,10 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var postgres = builder.AddPostgres("postgres");
+var postgresUsername = builder.AddParameter("postgres-username", "postgres", secret: true);
+var postgresPassword = builder.AddParameter("postgres-password", "nQW~xg-Z2Tzr5pkj*edJ5f", secret: true);
+
+var postgres = builder.AddPostgres("postgres", port: 57691, userName: postgresUsername, password: postgresPassword)
+    .WithDataVolume(isReadOnly: false);
 
 var database = postgres.AddDatabase("postgres-db", databaseName: "shipyard");
 

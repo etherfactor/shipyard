@@ -3,6 +3,7 @@ using EtherGizmos.Shipyard.Models.Api.Enums;
 using EtherGizmos.Shipyard.Models.Database;
 using EtherGizmos.Shipyard.Models.Extensions;
 using Swashbuckle.AspNetCore.Filters;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace EtherGizmos.Shipyard.Models.Api;
@@ -15,13 +16,17 @@ public class PackageDTO
 
     public DateTimeOffset ModifiedAt { get; set; }
 
-    public int CarrierId { get; set; }
+    [Required]
+    public int? CarrierId { get; set; }
 
-    public CarrierDTO Carrier { get; set; } = null!;
+    public CarrierDTO? Carrier { get; set; }
 
+    [Required]
     public string TrackingNumber { get; set; } = null!;
 
     public string? Contents { get; set; }
+
+    public DateTimeOffset? EstimatedDeliveryAt { get; set; }
 
     public DateTimeOffset LastPollAt { get; set; }
 
@@ -39,6 +44,7 @@ public class PackageDTOProfile : Profile
     public PackageDTOProfile() : base(nameof(PackageDTOProfile), mapper =>
     {
         var toDto = mapper.CreateMap<Package, PackageDTO>();
+        toDto.IgnoreAllMembers();
         toDto.MapMember(dest => dest.Id, src => src.Id);
         /* Begin Audit */
         toDto.MapMember(dest => dest.CreatedAt, src => src.CreatedAt);
@@ -48,11 +54,18 @@ public class PackageDTOProfile : Profile
         toDto.MapMember(dest => dest.Carrier, src => src.Carrier, opt => opt.ExplicitExpansion());
         toDto.MapMember(dest => dest.TrackingNumber, src => src.TrackingNumber);
         toDto.MapMember(dest => dest.Contents, src => src.Contents);
+        toDto.MapMember(dest => dest.EstimatedDeliveryAt, src => src.EstimatedDeliveryAt);
         toDto.MapMember(dest => dest.LastPollAt, src => src.LastPollAt);
         toDto.MapMember(dest => dest.NextPollAt, src => src.NextPollAt);
         toDto.MapMember(dest => dest.LastStatusType, src => src.LastStatusTypeId);
         toDto.MapMember(dest => dest.IsDelivered, src => src.IsDelivered);
         toDto.MapMember(dest => dest.TrackingUpdates, src => src.TrackingUpdates);
+
+        var fromDto = mapper.CreateMap<PackageDTO, Package>();
+        fromDto.IgnoreAllMembers();
+        fromDto.MapMember(dest => dest.CarrierId, src => src.CarrierId);
+        fromDto.MapMember(dest => dest.TrackingNumber, src => src.TrackingNumber);
+        fromDto.MapMember(dest => dest.Contents, src => src.Contents);
     })
     { }
 }

@@ -42,6 +42,7 @@ public class Migration001_CreateTrackingTables : MigrationExtension
             .WithColumn("carrier_id").AsInt32().NotNullable()
             .WithColumn("tracking_number").AsAnsiString(200).NotNullable()
             .WithColumn("contents").AsString(int.MaxValue).Nullable()
+            .WithColumn("estimated_delivery_at_utc").AsDateTime2().Nullable()
             .WithColumn("last_poll_at_utc").AsDateTime2().NotNullable()
             .WithColumn("next_poll_at_utc").AsDateTime2().NotNullable()
             .WithColumn("last_status_type_id").AsInt32().NotNullable()

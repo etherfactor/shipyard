@@ -32,6 +32,7 @@ public class PackageDTOConfiguration : IModelConfiguration
             entity.HasRequired(e => e.Carrier);
             entity.Property(e => e.TrackingNumber);
             entity.Property(e => e.Contents);
+            entity.Property(e => e.EstimatedDeliveryAt);
             entity.Property(e => e.LastPollAt);
             entity.Property(e => e.NextPollAt);
             entity.EnumProperty(e => e.LastStatusType);

@@ -14,6 +14,8 @@ public class Package : Auditable, IEntity
 
     public virtual string? Contents { get; set; }
 
+    public virtual DateTimeOffset? EstimatedDeliveryAt { get; set; }
+
     public virtual DateTimeOffset LastPollAt { get; set; }
 
     public virtual DateTimeOffset NextPollAt { get; set; }
