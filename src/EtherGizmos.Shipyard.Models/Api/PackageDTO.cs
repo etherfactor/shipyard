@@ -30,6 +30,8 @@ public class PackageDTO
     public StatusTypeDTO LastStatusType { get; set; }
 
     public bool IsDelivered { get; set; }
+
+    public List<TrackingUpdateDTO> TrackingUpdates { get; set; } = [];
 }
 
 public class PackageDTOProfile : Profile
@@ -50,6 +52,7 @@ public class PackageDTOProfile : Profile
         toDto.MapMember(dest => dest.NextPollAt, src => src.NextPollAt);
         toDto.MapMember(dest => dest.LastStatusType, src => src.LastStatusTypeId);
         toDto.MapMember(dest => dest.IsDelivered, src => src.IsDelivered);
+        toDto.MapMember(dest => dest.TrackingUpdates, src => src.TrackingUpdates);
     })
     { }
 }

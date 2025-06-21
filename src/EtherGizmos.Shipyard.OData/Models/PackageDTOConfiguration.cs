@@ -36,6 +36,7 @@ public class PackageDTOConfiguration : IModelConfiguration
             entity.Property(e => e.NextPollAt);
             entity.EnumProperty(e => e.LastStatusType);
             entity.Property(e => e.IsDelivered);
+            entity.HasMany(e => e.TrackingUpdates);
         }
     }
 }

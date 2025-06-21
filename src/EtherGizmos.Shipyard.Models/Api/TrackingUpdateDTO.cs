@@ -15,10 +15,6 @@ public class TrackingUpdateDTO
 
     public DateTimeOffset ModifiedAt { get; set; }
 
-    public int PackageId { get; set; }
-
-    public PackageDTO Package { get; set; } = null!;
-
     public DateTimeOffset OccurredAt { get; set; }
 
     public StatusTypeDTO StatusType { get; set; }
@@ -39,8 +35,6 @@ public class TrackingUpdateDTOProfile : Profile
         toDto.MapMember(dest => dest.CreatedAt, src => src.CreatedAt);
         toDto.MapMember(dest => dest.ModifiedAt, src => src.ModifiedAt);
         /*  End Audit  */
-        toDto.MapMember(dest => dest.PackageId, src => src.PackageId);
-        toDto.MapMember(dest => dest.Package, src => src.Package, opt => opt.ExplicitExpansion());
         toDto.MapMember(dest => dest.OccurredAt, src => src.OccurredAt);
         toDto.MapMember(dest => dest.StatusType, src => src.StatusTypeId);
         toDto.MapMember(dest => dest.Location, src => src.Location);
@@ -57,7 +51,6 @@ public static class TrackingUpdateDTOExamples
         Id = 1,
         CreatedAt = DateTimeOffset.UtcNow,
         ModifiedAt = DateTimeOffset.UtcNow,
-        PackageId = 1,
         OccurredAt = DateTimeOffset.UtcNow,
         StatusType = StatusTypeDTO.Delivered,
         Location = "Chicago, IL 60007",

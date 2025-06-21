@@ -1,6 +1,5 @@
 ﻿using EtherGizmos.Messaging.Abstractions;
 using EtherGizmos.Shipyard.Worker.Services.Carriers;
-using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -32,8 +31,8 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
 
         _logger.LogInformation("Received request message {@Message}", message);
 
-        var client = provider.GetRequiredService<IBrowserClient>();
-        var tracker = new UspsBrowserTrackingProvider(client);
+        var factory = provider.GetRequiredService<ITrackingProviderFactory>();
+        var tracker = factory.CreateProvider(message.CarrierSlug);
 
         var result = await tracker.TrackAsync(message.TrackingNumber, context.CancellationToken);
 
@@ -50,7 +49,7 @@ public record TrackingRequest
 {
     public int PackageId { get; init; }
 
-    public int CarrierId { get; init; }
+    public string CarrierSlug { get; init; } = null!;
 
     public string TrackingNumber { get; init; } = null!;
 }

@@ -23,4 +23,6 @@ public class Package : Auditable, IEntity
     public virtual StatusType LastStatusType { get; set; } = null!;
 
     public virtual bool IsDelivered { get; set; }
+
+    public virtual List<TrackingUpdate> TrackingUpdates { get; set; } = [];
 }

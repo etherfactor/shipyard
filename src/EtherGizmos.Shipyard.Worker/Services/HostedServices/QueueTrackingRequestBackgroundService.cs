@@ -42,7 +42,7 @@ public class QueueTrackingRequestBackgroundService : PeriodicBackgroundService
             await _sender.SendAsync("tracking-poll-request", new TrackingRequest()
             {
                 PackageId = package.Id,
-                CarrierId = package.CarrierId,
+                CarrierSlug = package.Carrier.Slug,
                 TrackingNumber = package.TrackingNumber,
             }, cancellationToken: stoppingToken);
 

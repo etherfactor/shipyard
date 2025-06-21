@@ -28,8 +28,6 @@ public class TrackingUpdateDTOConfiguration : IModelConfiguration
             entity.Property(e => e.CreatedAt);
             entity.Property(e => e.ModifiedAt);
             /*  End Audit  */
-            entity.Property(e => e.PackageId);
-            entity.HasRequired(e => e.Package);
             entity.Property(e => e.OccurredAt);
             entity.EnumProperty(e => e.StatusType);
             entity.Property(e => e.Location);

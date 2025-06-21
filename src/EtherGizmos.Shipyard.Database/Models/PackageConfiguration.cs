@@ -49,5 +49,9 @@ public class PackageConfiguration : IEntityTypeConfiguration<Package>
 
         entity.Property(e => e.IsDelivered)
             .HasColumnName("is_delivered");
+
+        entity.HasMany(e => e.TrackingUpdates)
+            .WithOne()
+            .HasForeignKey(e => e.PackageId);
     }
 }
