@@ -1,4 +1,6 @@
-﻿using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
+﻿using EtherGizmos.Shipyard.Models.Database.Enums;
+using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -10,9 +12,9 @@ internal class UspsBrowserTrackingProvider : ITrackingProvider
     private readonly IBrowserClient _client;
 
     public UspsBrowserTrackingProvider(
-        IBrowserClient client)
+        IServiceProvider serviceProvider)
     {
-        _client = client;
+        _client = serviceProvider.GetRequiredService<IBrowserClient>();
     }
 
     public async Task<TrackingResult> TrackAsync(
@@ -38,7 +40,7 @@ internal class UspsBrowserTrackingProvider : ITrackingProvider
                 return new TrackingResultDetail
                 {
                     EventOccurredAt = DateTime.Parse(date),
-                    Status = DeliveryStatusType.InTransit,
+                    StatusTypeId = StatusTypeId.InTransit,
                     Location = NullIfEmpty(location),
                     Description = NullIfEmpty(detail),
                 };
@@ -78,34 +80,4 @@ internal class UspsBrowserTrackingProvider : ITrackingProvider
     {
         return !string.IsNullOrWhiteSpace(input) ? input : null;
     }
-}
-
-public record TrackingResult
-{
-    public required string TrackingNumber { get; init; }
-
-    public DeliveryStatusType LastStatus => Details.OrderBy(e => e.EventOccurredAt).Last().Status;
-
-    public required DateTimeOffset? EstimatedDeliveryAt { get; init; }
-
-    public required IReadOnlyList<TrackingResultDetail> Details { get; init; }
-}
-
-public record TrackingResultDetail
-{
-    public required DateTimeOffset EventOccurredAt { get; init; }
-
-    public required DeliveryStatusType Status { get; init; }
-
-    public required string? Location { get; init; }
-
-    public required string? Description { get; init; }
-}
-
-public enum DeliveryStatusType
-{
-    Waiting,
-    InTransit,
-    Failed,
-    Delivered,
 }

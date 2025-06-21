@@ -20,6 +20,13 @@ public class Migration002_LoadTrackingTables : MigrationExtension
             .Row(new { status_type_id = -100, name = "Returned", polling_factor = 0m, is_final = true })
             .Row(new { status_type_id = -200, name = "Expired", polling_factor = 0m, is_final = true })
             .Match(e => new { e.status_type_id });
+
+        /*
+         * Load [dbo].[carriers]
+         */
+        Merge.IntoTable("carriers")
+            .Row(new { name = "USPS", slug = "usps" })
+            .Match(e => new { e.slug });
     }
 
     public override void Down()
