@@ -114,9 +114,9 @@ public static class IMapperExtensions
         public object Execute()
         {
             var membersToExpand = MembersToExpand
-                .Concat(QueryOptions.SelectMany(qopt => qopt.GetExpandedProperties()))
-                //.Concat(QueryOptions.SelectMany(qopt => qopt.GetFilteredProperties()))
-                //.Concat(QueryOptions.SelectMany(qopt => qopt.GetOrderedProperties()))
+                .Concat(QueryOptions.SelectMany(qopt => qopt.GetExpandedProperties().Select(e => e.Path)))
+                .Concat(QueryOptions.SelectMany(qopt => qopt.GetFilteredProperties().Select(e => e.Path)))
+                .Concat(QueryOptions.SelectMany(qopt => qopt.GetOrderedProperties().Select(e => e.Path)))
                 .Distinct();
 
             var queryable = Value.Yield().AsQueryable();
@@ -216,9 +216,9 @@ public static class IMapperExtensions
             CancellationToken cancellationToken = default)
         {
             var membersToExpand = MembersToExpand
-                .Concat(QueryOptions.SelectMany(qopt => qopt.GetExpandedProperties()))
-                //.Concat(QueryOptions.SelectMany(qopt => qopt.GetFilteredProperties()))
-                //.Concat(QueryOptions.SelectMany(qopt => qopt.GetOrderedProperties()))
+                .Concat(QueryOptions.SelectMany(qopt => qopt.GetExpandedProperties().Select(e => e.Path)))
+                .Concat(QueryOptions.SelectMany(qopt => qopt.GetFilteredProperties().Select(e => e.Path)))
+                .Concat(QueryOptions.SelectMany(qopt => qopt.GetOrderedProperties().Select(e => e.Path)))
                 .Distinct();
 
             var queryable1 = Mapper.ProjectTo<TTo>(Value, null, [.. membersToExpand]);

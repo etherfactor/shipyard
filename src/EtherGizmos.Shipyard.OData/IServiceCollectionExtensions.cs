@@ -22,24 +22,24 @@ public static class IServiceCollectionExtensions
         this IServiceCollection @this,
         Action<ODataOptions, IConfiguration> configureOptions)
     {
-        var useOptions = new ODataOptions();
-
         @this.AddOptions<ODataOptions>()
             .Configure(configureOptions)
-            .PostConfigure(options =>
-            {
-                useOptions = options;
-            })
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
         @this.AddOptions<ODataApiVersioningOptions>()
-            .Configure<IOptions<ODataOptions>>((@base, @ref) =>
+            .Configure<IOptions<ODataOptions>>((opt, @ref) =>
             {
                 foreach (var route in @ref.Value.VersionedRoutePrefixes)
                 {
-                    @base.AddRouteComponents(route);
+                    opt.AddRouteComponents(route);
                 }
+            });
+
+        @this.AddOptions<ApiVersioningOptions>()
+            .Configure<IOptions<ODataOptions>>((opt, @ref) =>
+            {
+                opt.DefaultApiVersion = @ref.Value.DefaultApiVersion;
             });
 
         @this.AddOptions<ApiBehaviorOptions>()
@@ -63,7 +63,6 @@ public static class IServiceCollectionExtensions
             .AddApiVersioning(opt =>
             {
                 opt.ReportApiVersions = true;
-                opt.DefaultApiVersion = useOptions.DefaultApiVersion;
                 opt.ApiVersionReader = new UrlSegmentApiVersionReader();
             })
             .AddMvc()
@@ -92,12 +91,18 @@ public static class IServiceCollectionExtensions
             })
             .ForwardTransient<IMapper>();
 
+        var fakeOptions = new ODataOptions();
+        configureOptions(fakeOptions, new ConfigurationManager());
+
         @this.AddEndpointsApiExplorer();
         @this.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
         @this
-            .AddSwaggerGen(opt =>
+            .AddSwaggerGen(opt => { })
+            .AddSwaggerExamplesFromAssemblies([.. fakeOptions.ModelAssemblies])
+            .AddOptions<SwaggerGenOptions>()
+            .Configure<IOptions<ODataOptions>>((opt, @ref) =>
             {
-                var file = useOptions.ExecutingAssembly.GetName().Name + ".xml";
+                var file = @ref.Value.ExecutingAssembly.GetName().Name + ".xml";
                 var path = Path.Combine(AppContext.BaseDirectory, file);
                 if (File.Exists(path))
                 {
@@ -112,8 +117,7 @@ public static class IServiceCollectionExtensions
                 opt.OperationFilter<OnlyJsonOperationFilter>();
                 opt.ExampleFilters();
                 opt.OperationFilter<ResponseSetFilter>();
-            })
-            .AddSwaggerExamplesFromAssemblies([.. useOptions.ModelAssemblies]);
+            });
 
         return @this;
     }
