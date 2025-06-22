@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EtherGizmos.Messaging\EtherGizmos.Messaging.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Common.Messaging\EtherGizmos.Common.Messaging.csproj" />
   </ItemGroup>
 
 </Project>

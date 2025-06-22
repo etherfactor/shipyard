@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.Api", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.AppHost", "src\EtherGizmos.Shipyard.AppHost\EtherGizmos.Shipyard.AppHost.csproj", "{B5BBD912-F928-411A-A528-E8A84C048C43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.ServiceDefaults", "src\EtherGizmos.Shipyard.ServiceDefaults\EtherGizmos.Shipyard.ServiceDefaults.csproj", "{C73EAD76-D6E0-0A12-9796-A2127568B5B2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Common.ServiceDefaults", "src\EtherGizmos.Common.ServiceDefaults\EtherGizmos.Common.ServiceDefaults.csproj", "{C73EAD76-D6E0-0A12-9796-A2127568B5B2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
@@ -18,13 +18,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6B5FA21A-23A2-4EFF-B611-23DD2E304A77}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Common.Messaging", "src\EtherGizmos.Common.Messaging\EtherGizmos.Common.Messaging.csproj", "{9E77EE3D-DC6E-4CCA-9736-E670AED1ECCC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Messaging", "src\EtherGizmos.Messaging\EtherGizmos.Messaging.csproj", "{9E77EE3D-DC6E-4CCA-9736-E670AED1ECCC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Common.RabbitMQ", "src\EtherGizmos.Common.Messaging.RabbitMQ\EtherGizmos.Common.RabbitMQ.csproj", "{E787D37F-7A83-4BD7-9ECA-E524FCC6C6D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Messaging.RabbitMQ", "src\EtherGizmos.Messaging.RabbitMQ\EtherGizmos.Messaging.RabbitMQ.csproj", "{E787D37F-7A83-4BD7-9ECA-E524FCC6C6D4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Configuration", "src\EtherGizmos.Configuration\EtherGizmos.Configuration.csproj", "{EA3592A3-7951-4ABC-96B6-64893980FF55}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Common.Configuration", "src\EtherGizmos.Common.Configuration\EtherGizmos.Common.Configuration.csproj", "{EA3592A3-7951-4ABC-96B6-64893980FF55}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.Worker", "src\EtherGizmos.Shipyard.Worker\EtherGizmos.Shipyard.Worker.csproj", "{41BB7B80-31D9-4F7E-AFAA-D8F61BFB98B6}"
 EndProject
@@ -32,7 +30,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.Models
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.Database", "src\EtherGizmos.Shipyard.Database\EtherGizmos.Shipyard.Database.csproj", "{7044DA17-A7D2-4C0A-90A4-A18DC9CFC80F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.Utilities", "src\EtherGizmos.Shipyard.Utilities\EtherGizmos.Shipyard.Utilities.csproj", "{8710B7E8-6A52-47AF-9BD1-5DD8883ACA9D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Common.Utilities", "src\EtherGizmos.Common.Utilities\EtherGizmos.Common.Utilities.csproj", "{8710B7E8-6A52-47AF-9BD1-5DD8883ACA9D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.OData", "src\EtherGizmos.Shipyard.OData\EtherGizmos.Shipyard.OData.csproj", "{8ACBD7CB-F94E-481E-A769-655AE12A939C}"
 EndProject
