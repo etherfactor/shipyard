@@ -37,20 +37,7 @@ internal class UspsBrowserTrackingProvider : ITrackingProvider
                 var location = match.Groups["location"].Value?.Replace("&nbsp;", " ")?.Trim() ?? "";
                 var date = match.Groups["date"].Value;
 
-                var statusTypeId = StatusTypeId.InTransit;
-
-                if (detail.Contains("Delivered", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    statusTypeId = StatusTypeId.Delivered;
-                }
-                else if (detail.Contains("Out for Delivery", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    statusTypeId = StatusTypeId.OutForDelivery;
-                }
-                else if (detail.Contains("USPS Awaiting Item", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    statusTypeId = StatusTypeId.Waiting;
-                }
+                var statusTypeId = StatusTypeId.Unknown;
 
                 return new TrackingResultDetail
                 {

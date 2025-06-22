@@ -13,10 +13,12 @@ internal class TrackingProviderFactory : ITrackingProviderFactory
     public ITrackingProvider CreateProvider(
         string slug)
     {
-        return slug switch
+        var provider = slug switch
         {
             "usps" => new UspsBrowserTrackingProvider(_serviceProvider),
             _ => throw new NotSupportedException()
         };
+
+        return new ClassifierTrackingProvider(_serviceProvider, slug, provider);
     }
 }

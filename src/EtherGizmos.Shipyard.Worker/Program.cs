@@ -87,7 +87,8 @@ builder.Services
     });
 
 builder.Services
-    .AddSingleton<ITrackingProviderFactory, TrackingProviderFactory>();
+    .AddSingleton<ITrackingProviderFactory, TrackingProviderFactory>()
+    .AddTransient<IRegexClassifier, RegexClassifier>();
 
 builder.Services.AddHostedService<QueueTrackingRequestBackgroundService>();
 

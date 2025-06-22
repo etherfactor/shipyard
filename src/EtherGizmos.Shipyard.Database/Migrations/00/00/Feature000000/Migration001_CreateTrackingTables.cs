@@ -34,6 +34,33 @@ public class Migration001_CreateTrackingTables : MigrationExtension
         Create.AuditTriggerV1("carriers", ("carrier_id", DbType.Int32));
 
         /*
+         * Create [dbo].[carrier_status_rules]
+         */
+        Create.Table("carrier_status_rules")
+            .WithColumn("carrier_status_rule_id").AsInt32().PrimaryKey().Identity()
+            .WithAuditColumns()
+            .WithColumn("carrier_id").AsInt32().NotNullable()
+            .WithColumn("pattern").AsString(int.MaxValue).NotNullable()
+            .WithColumn("status_type_id").AsInt32().NotNullable()
+            .WithColumn("priority").AsInt32().NotNullable()
+            .WithColumn("is_active").AsBoolean().NotNullable();
+
+        Create.ForeignKey("FK_carrier_status_rules_carrier_id")
+            .FromTable("carrier_status_rules").ForeignColumn("carrier_id")
+            .ToTable("carriers").PrimaryColumn("carrier_id");
+
+        Create.ForeignKey("FK_carrier_status_rules_status_type_id")
+            .FromTable("carrier_status_rules").ForeignColumn("status_type_id")
+            .ToTable("status_types").PrimaryColumn("status_type_id");
+
+        Create.Index("IX_carrier_status_rules_carrier_id_status_type_id")
+            .OnTable("carrier_status_rules")
+            .OnColumn("carrier_id")
+            .Ascending()
+            .OnColumn("status_type_id")
+            .Ascending();
+
+        /*
          * Create [dbo].[packages]
          */
         Create.Table("packages")
@@ -84,6 +111,11 @@ public class Migration001_CreateTrackingTables : MigrationExtension
          * Delete [dbo].[packages]
          */
         Delete.Table("packages");
+
+        /*
+         * Delete [dbo].[carrier_status_types]
+         */
+        Delete.Table("carrier_status_types");
 
         /*
          * Delete [dbo].[carriers]

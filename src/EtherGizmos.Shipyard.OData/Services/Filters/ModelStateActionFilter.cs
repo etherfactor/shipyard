@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.OData.Extensions;
 using System.Reflection;
 
 namespace EtherGizmos.Shipyard.OData.Services.Filters;
@@ -21,8 +20,6 @@ public class ModelStateActionFilter : IActionFilter
                 .FirstOrDefault(e =>
                     e.ParameterInfo.GetCustomAttribute<FromBodyAttribute>() is not null)
                 ?.ParameterType;
-
-            var oDataFeature = context.HttpContext.ODataFeature();
 
             //Throw an error for the type of that argument
             if (argumentType is not null)

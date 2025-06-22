@@ -2,8 +2,10 @@
 using Asp.Versioning.OData;
 using AutoMapper;
 using EtherGizmos.Extensions.DependencyInjection;
+using EtherGizmos.Shipyard.OData.Services;
 using EtherGizmos.Shipyard.OData.Services.Filters;
 using EtherGizmos.Shipyard.OData.Swagger;
+using EtherGizmos.Shipyard.Utilities.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData;
 using Microsoft.Extensions.Configuration;
@@ -80,6 +82,8 @@ public static class IServiceCollectionExtensions
                 opt.GroupNameFormat = "'v'VVV";
                 opt.SubstituteApiVersionInUrl = true;
             });
+
+        @this.AddTransient(typeof(IModelValidator<>), typeof(ValidationModelValidator<>));
 
         @this
             .AddChildContainer((child, parent) =>

@@ -9,6 +9,7 @@ using EtherGizmos.Shipyard.Models.Database;
 using EtherGizmos.Shipyard.OData;
 using EtherGizmos.Shipyard.Utilities;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -61,6 +62,8 @@ builder.Services
         opt.ExecutingAssembly = typeof(Program).Assembly;
         opt.ModelAssemblies = [typeof(Package).Assembly];
     });
+
+builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
 //**********************************************************
 // Add Middleware

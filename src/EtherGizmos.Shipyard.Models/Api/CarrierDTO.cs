@@ -20,6 +20,9 @@ public class CarrierDTO
 
     [Required]
     public string Slug { get; set; } = null!;
+
+    [Required]
+    public List<CarrierStatusRuleDTO> Rules { get; set; } = [];
 }
 
 public class CarrierDTOProfile : Profile
@@ -35,11 +38,13 @@ public class CarrierDTOProfile : Profile
         /*  End Audit  */
         toDto.MapMember(dest => dest.Name, src => src.Name);
         toDto.MapMember(dest => dest.Slug, src => src.Slug);
+        toDto.MapMember(dest => dest.Rules, src => src.Rules);
 
         var fromDto = mapper.CreateMap<CarrierDTO, Carrier>();
         fromDto.IgnoreAllMembers();
         fromDto.MapMember(dest => dest.Name, src => src.Name);
         fromDto.MapMember(dest => dest.Slug, src => src.Slug);
+        fromDto.MapMember(dest => dest.Rules, src => src.Rules);
     })
     { }
 }
@@ -54,6 +59,7 @@ public static class CarrierDTOExamples
         ModifiedAt = DateTimeOffset.UtcNow,
         Name = "USPS",
         Slug = "usps",
+        Rules = [CarrierStatusRuleDTOExamples.Get],
     };
 
     public static CarrierDTO Post { get; } = Get;

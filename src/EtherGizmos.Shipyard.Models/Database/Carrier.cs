@@ -13,4 +13,6 @@ public class Carrier : Auditable, IEntity
     /// a string id, but we can still uniquely identify them via an alternate key as needed.
     /// </summary>
     public virtual string Slug { get; set; } = null!;
+
+    public virtual List<CarrierStatusRule> Rules { get; set; } = [];
 }

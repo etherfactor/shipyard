@@ -307,15 +307,15 @@ public abstract class AutoODataController : ODataController
             var testRecord = new TDto();
             patch.Patch(testRecord);
 
-            var validator = _modelValidatorFactory.GetValidator<TDto>();
-            await validator.ValidateAsync(testRecord, cancellationToken);
-
             var record = await _controller.LoadRecordAsync(uow, Keys, cancellationToken: cancellationToken);
 
             var recordAsDto = _mapper
                 .Map<TDto>(record);
 
             patch.Patch(recordAsDto);
+
+            var validator = _modelValidatorFactory.GetValidator<TDto>();
+            await validator.ValidateAsync(recordAsDto, cancellationToken);
 
             _mapper
                 .MergeInto(record)
