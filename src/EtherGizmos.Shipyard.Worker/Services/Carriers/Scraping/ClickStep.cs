@@ -1,28 +1,17 @@
 ﻿using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using HtmlAgilityPack;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
 
-internal class NavigateStep : ScrapingStep
+internal class ClickStep : ScrapingStep
 {
     [Required]
-    public string Url { get; set; } = null!;
+    public string Selector { get; set; } = null!;
 
     public override async Task Apply(IBrowserClient client, IDictionary<string, object> variables, IDictionary<string, object> results, CancellationToken cancellationToken = default)
     {
-        var builder = new StringBuilder();
-
-        var regex = new Regex(@"(?<!{){(?<key>[^{}]+)}(?!})");
-        var newUrl = regex.Replace(Url, match =>
-        {
-            var key = match.Groups["key"].Value;
-            return variables.TryGetValue(key, out var value) ? value?.ToString() ?? "" : "";
-        });
-
-        await client.NavigateAsync(newUrl, cancellationToken: cancellationToken);
+        await client.ClickElementAsync(Selector, cancellationToken: cancellationToken);
     }
 
     protected internal override async Task Apply(HtmlNode subNode, IBrowserClient client, IDictionary<string, object> variables, IDictionary<string, object> results, CancellationToken cancellationToken = default)

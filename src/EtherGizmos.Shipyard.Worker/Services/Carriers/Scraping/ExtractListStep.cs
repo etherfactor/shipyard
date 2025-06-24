@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
 
-internal class ExtractStep : ScrapingStep, ISettableStep
+internal class ExtractListStep : ScrapingStep
 {
     [Required]
     public string Selector { get; set; } = null!;
@@ -13,7 +13,8 @@ internal class ExtractStep : ScrapingStep, ISettableStep
     [Required]
     public string Var { get; set; } = null!;
 
-    public bool Trim { get; set; } = false;
+    [Required]
+    public List<ScrapingStep> Steps { get; set; } = null!;
 
     public override async Task Apply(IBrowserClient client, IDictionary<string, object> variables, IDictionary<string, object> results, CancellationToken cancellationToken = default)
     {
@@ -25,17 +26,22 @@ internal class ExtractStep : ScrapingStep, ISettableStep
         await Apply(document.DocumentNode, client, variables, results, cancellationToken);
     }
 
-    protected internal override Task Apply(HtmlNode subNode, IBrowserClient client, IDictionary<string, object> variables, IDictionary<string, object> results, CancellationToken cancellationToken = default)
+    protected internal override async Task Apply(HtmlNode subNode, IBrowserClient client, IDictionary<string, object> variables, IDictionary<string, object> results, CancellationToken cancellationToken = default)
     {
-        var text = subNode.QuerySelector(Selector).InnerText;
+        var values = new List<object>();
 
-        if (Trim)
+        var nodes = subNode.QuerySelectorAll(Selector);
+        foreach (var node in nodes)
         {
-            text = text.Trim();
+            var subVariables = new Dictionary<string, object>();
+            values.Add(subVariables);
+
+            foreach (var step in Steps)
+            {
+                await step.Apply(node, client, subVariables, results, cancellationToken);
+            }
         }
 
-        variables[Var] = text;
-
-        return Task.CompletedTask;
+        variables[Var] = values;
     }
 }

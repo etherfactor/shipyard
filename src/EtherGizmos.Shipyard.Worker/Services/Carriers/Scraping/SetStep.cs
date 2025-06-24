@@ -16,11 +16,7 @@ internal class SetStep : ScrapingStep, ISettableStep
 
     public bool Trim { get; set; } = false;
 
-    public HtmlDocument Document { get; set; } = null!;
-
-    public Dictionary<string, object> Variables { get; set; } = null!;
-
-    public override Task Apply(IBrowserClient client, CancellationToken cancellationToken = default)
+    public override Task Apply(IBrowserClient client, IDictionary<string, object> variables, IDictionary<string, object> results, CancellationToken cancellationToken = default)
     {
         var builder = new StringBuilder();
 
@@ -28,11 +24,16 @@ internal class SetStep : ScrapingStep, ISettableStep
         var newValue = regex.Replace(Value, match =>
         {
             var key = match.Groups["key"].Value;
-            return Variables.TryGetValue(key, out var value) ? value?.ToString() ?? "" : "";
+            return variables.TryGetValue(key, out var value) ? value?.ToString() ?? "" : "";
         });
 
-        Variables[Var] = newValue;
+        variables[Var] = newValue;
 
         return Task.CompletedTask;
+    }
+
+    protected internal override async Task Apply(HtmlNode subNode, IBrowserClient client, IDictionary<string, object> variables, IDictionary<string, object> results, CancellationToken cancellationToken = default)
+    {
+        await Apply(client, variables, results, cancellationToken);
     }
 }

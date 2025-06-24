@@ -2,6 +2,7 @@
 
 public enum ScrapingStepType
 {
+    Click,
     Extract,
     Navigate,
     Return,
