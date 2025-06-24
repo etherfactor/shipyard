@@ -15,8 +15,8 @@ internal class TrackingProviderFactory : ITrackingProviderFactory
     {
         var provider = slug switch
         {
-            "usps" => new UspsBrowserTrackingProvider(_serviceProvider),
-            _ => throw new NotSupportedException()
+            //"usps" => new UspsBrowserTrackingProvider(_serviceProvider),
+            _ => new RunbookBrowserTrackingProvider(_serviceProvider, slug)
         };
 
         return new ClassifierTrackingProvider(_serviceProvider, slug, provider);

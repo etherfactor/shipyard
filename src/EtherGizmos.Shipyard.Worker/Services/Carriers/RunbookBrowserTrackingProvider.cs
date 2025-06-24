@@ -4,7 +4,6 @@ using EtherGizmos.Shipyard.Models.Database.Enums;
 using EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
 using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Immutable;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
@@ -48,76 +47,98 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider
         var runbookJson = """
             [
                 {
-                    "type": "navigate",
+                    "type": "Navigate",
                     "url": "https://tools.usps.com/go/TrackAction?tLabels={trackingNumber}"
                 },
                 {
-                    "type": "waitFor",
+                    "type": "WaitFor",
                     "selector": "span.tracking-number"
                 },
                 {
-                    "type": "click",
+                    "type": "Click",
                     "selector": "div.toggle-history-container"
                 },
                 {
-                    "type": "waitFor",
+                    "type": "WaitFor",
                     "selector": "span.tracking-number"
                 },
                 {
-                    "type": "extract",
+                    "type": "Extract",
                     "selector": "strong.date",
-                    "var" :"etaDay"
+                    "var" :"etaDay",
+                    "trim": true
                 },
                 {
-                    "type": "extract",
+                    "type": "Extract",
                     "selector": "span.month_year > span:first-child",
-                    "var": "etaMonth"
+                    "var": "etaMonth",
+                    "trim": true
                 },
                 {
-                    "type": "extract",
+                    "type": "Extract",
                     "selector": "span.month_year",
-                    "var": "etaYear"
+                    "var": "etaYear",
+                    "trim": true
                 },
                 {
-                    "type": "extract",
+                    "type": "Extract",
                     "selector": "strong.time",
-                    "var": "etaTime"
+                    "var": "etaTime",
+                    "trim": true
                 },
                 {
-                    "type": "set",
+                    "type": "Set",
                     "var": "estimatedAt",
-                    "value": "{etaMonth} {etaDay}, {etaYear} {etaTime}"
+                    "value": "{etaMonth} {etaDay}, {etaYear} {etaTime}",
+                    "trim": true
                 },
                 {
-                    "type": "extractList",
+                    "type": "ExtractList",
                     "selector": "div.tb-step",
                     "var": "details",
                     "steps": [
                         {
                             "type": "extract",
                             "selector": ".tb-status-detail",
-                            "var": "description"
+                            "var": "description",
+                            "trim": true
+                        },
+                        {
+                            "type": "replace",
+                            "var": "description",
+                            "from": "&nbsp;",
+                            "to": " ",
+                            "trim": true
                         },
                         {
                             "type": "extract",
                             "selector": ".tb-location",
-                            "var": "location"
+                            "var": "location",
+                            "trim": true
+                        },
+                        {
+                            "type": "replace",
+                            "var": "location",
+                            "from": "&nbsp;",
+                            "to": " ",
+                            "trim": true
                         },
                         {
                             "type": "extract",
                             "selector": ".tb-date",
-                            "var": "occurredAt"
+                            "var": "occurredAt",
+                            "trim": true
                         }
                     ]
                 },
                 {
-                    "type": "return",
-                    "value": "estimatedAt",
+                    "type": "Return",
+                    "name": "estimatedAt",
                     "var": "estimatedAt"
                 },
                 {
-                    "type": "return",
-                    "value": "details",
+                    "type": "Return",
+                    "name": "details",
                     "var": "details"
                 }
             ]
@@ -172,11 +193,14 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider
             })
             : [] : [];
 
+        details = details
+            .Where(e => e.OccurredAt != DateTimeOffset.MinValue);
+
         var result = new TrackingResult()
         {
             TrackingNumber = trackingNumber,
             EstimatedDeliveryAt = estimatedAt,
-            Details = details.ToImmutableList(),
+            Details = [.. details],
         };
 
         return result;

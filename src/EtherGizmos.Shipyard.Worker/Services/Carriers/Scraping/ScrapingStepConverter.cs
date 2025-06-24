@@ -16,12 +16,14 @@ public class ScrapingStepConverter : JsonConverter<ScrapingStep>
         var type = typeProp.GetString();
         return type?.ToLowerInvariant() switch
         {
-            nameof(ScrapingStepType.Click) => JsonSerializer.Deserialize<ClickStep>(ref reader, options),
-            nameof(ScrapingStepType.Extract) => JsonSerializer.Deserialize<ExtractStep>(ref reader, options),
-            nameof(ScrapingStepType.Navigate) => JsonSerializer.Deserialize<NavigateStep>(ref reader, options),
-            nameof(ScrapingStepType.Return) => JsonSerializer.Deserialize<ReturnStep>(ref reader, options),
-            nameof(ScrapingStepType.Set) => JsonSerializer.Deserialize<SetStep>(ref reader, options),
-            nameof(ScrapingStepType.WaitFor) => JsonSerializer.Deserialize<WaitForStep>(ref reader, options),
+            "click" => JsonSerializer.Deserialize<ClickStep>(root.GetRawText(), options),
+            "extract" => JsonSerializer.Deserialize<ExtractStep>(root.GetRawText(), options),
+            "extractlist" => JsonSerializer.Deserialize<ExtractListStep>(root.GetRawText(), options),
+            "navigate" => JsonSerializer.Deserialize<NavigateStep>(root.GetRawText(), options),
+            "replace" => JsonSerializer.Deserialize<ReplaceStep>(root.GetRawText(), options),
+            "return" => JsonSerializer.Deserialize<ReturnStep>(root.GetRawText(), options),
+            "set" => JsonSerializer.Deserialize<SetStep>(root.GetRawText(), options),
+            "waitfor" => JsonSerializer.Deserialize<WaitForStep>(root.GetRawText(), options),
             _ => throw new JsonException($"Unknown step type '{type}'.")
         };
 

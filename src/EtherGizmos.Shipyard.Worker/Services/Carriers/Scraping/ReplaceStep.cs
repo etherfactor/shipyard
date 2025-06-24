@@ -6,26 +6,38 @@ using System.Text.RegularExpressions;
 
 namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
 
-internal class SetStep : ScrapingStep, ISettableStep
+internal class ReplaceStep : ScrapingStep, ISettableStep
 {
     [Required]
     public string Var { get; set; } = null!;
 
     [Required]
-    public string Value { get; set; } = null!;
+    public string From { get; set; } = null!;
 
-    public bool Trim { get; set; } = false;
+    [Required]
+    public string To { get; set; } = null!;
+
+    public bool Trim { get; set; }
 
     public override Task Apply(IBrowserClient client, IDictionary<string, object> variables, IDictionary<string, object> results, CancellationToken cancellationToken = default)
     {
         var builder = new StringBuilder();
 
         var regex = new Regex(@"(?<!{){(?<key>[^{}]+)}(?!})");
-        var newValue = regex.Replace(Value, match =>
+        var newFrom = regex.Replace(From, match =>
         {
             var key = match.Groups["key"].Value;
             return variables.TryGetValue(key, out var value) ? value?.ToString() ?? "" : "";
         });
+
+        var newTo = regex.Replace(To, match =>
+        {
+            var key = match.Groups["key"].Value;
+            return variables.TryGetValue(key, out var value) ? value?.ToString() ?? "" : "";
+        });
+
+        var newValue = variables.TryGetValue(Var, out var value) ? value?.ToString() ?? "" : "";
+        newValue = newValue.Replace(newFrom, newTo);
 
         if (Trim)
         {

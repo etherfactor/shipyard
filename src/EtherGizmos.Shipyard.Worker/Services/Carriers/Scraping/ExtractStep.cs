@@ -27,7 +27,7 @@ internal class ExtractStep : ScrapingStep, ISettableStep
 
     protected internal override Task Apply(HtmlNode subNode, IBrowserClient client, IDictionary<string, object> variables, IDictionary<string, object> results, CancellationToken cancellationToken = default)
     {
-        var text = subNode.QuerySelector(Selector).InnerText;
+        var text = subNode.QuerySelector(Selector)?.InnerText ?? "";
 
         if (Trim)
         {
