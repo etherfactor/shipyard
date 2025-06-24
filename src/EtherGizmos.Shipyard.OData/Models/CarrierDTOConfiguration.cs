@@ -30,6 +30,7 @@ public class CarrierDTOConfiguration : IModelConfiguration
             /*  End Audit  */
             entity.Property(e => e.Name);
             entity.Property(e => e.Slug);
+            entity.CollectionProperty(e => e.Steps);
             entity.CollectionProperty(e => e.Rules);
         }
     }

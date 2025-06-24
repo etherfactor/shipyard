@@ -14,5 +14,7 @@ public class Carrier : Auditable, IEntity
     /// </summary>
     public virtual string Slug { get; set; } = null!;
 
+    public virtual List<CarrierRunbookStep> Steps { get; set; } = [];
+
     public virtual List<CarrierStatusRule> Rules { get; set; } = [];
 }

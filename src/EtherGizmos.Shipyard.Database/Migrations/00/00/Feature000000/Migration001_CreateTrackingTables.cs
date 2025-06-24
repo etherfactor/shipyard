@@ -23,6 +23,17 @@ public class Migration001_CreateTrackingTables : MigrationExtension
         Create.AuditTriggerV1("status_types", ("status_type_id", DbType.Int32));
 
         /*
+         * Create [dbo].[step_types]
+         */
+        Create.Table("step_types")
+            .WithColumn("step_type_id").AsInt32().PrimaryKey()
+            .WithAuditColumns()
+            .WithColumn("name").AsString(200).NotNullable()
+            .WithColumn("description").AsString(int.MaxValue).Nullable();
+
+        Create.AuditTriggerV1("step_types", ("step_type_id", DbType.Int32));
+
+        /*
          * Create [dbo].[carriers]
          */
         Create.Table("carriers")
@@ -45,6 +56,8 @@ public class Migration001_CreateTrackingTables : MigrationExtension
             .WithColumn("priority").AsInt32().NotNullable()
             .WithColumn("is_active").AsBoolean().NotNullable();
 
+        Create.AuditTriggerV1("carrier_status_rules", ("carrier_status_rule_id", DbType.Int32));
+
         Create.ForeignKey("FK_carrier_status_rules_carrier_id")
             .FromTable("carrier_status_rules").ForeignColumn("carrier_id")
             .ToTable("carriers").PrimaryColumn("carrier_id");
@@ -58,6 +71,33 @@ public class Migration001_CreateTrackingTables : MigrationExtension
             .OnColumn("carrier_id")
             .Ascending()
             .OnColumn("status_type_id")
+            .Ascending();
+
+        /*
+         * Create [dbo].[carrier_runbook_steps]
+         */
+        Create.Table("carrier_runbook_steps")
+            .WithColumn("carrier_runbook_step_id").AsInt32().PrimaryKey().Identity()
+            .WithAuditColumns()
+            .WithColumn("carrier_id").AsInt32().NotNullable()
+            .WithColumn("step_type_id").AsInt32().NotNullable()
+            .WithColumn("payload").AsString(int.MaxValue).NotNullable();
+
+        Create.AuditTriggerV1("carrier_runbook_steps", ("carrier_runbook_step_id", DbType.Int32));
+
+        Create.ForeignKey("FK_carrier_runbook_steps_carrier_id")
+            .FromTable("carrier_runbook_steps").ForeignColumn("carrier_id")
+            .ToTable("carriers").PrimaryColumn("carrier_id");
+
+        Create.ForeignKey("FK_carrier_runbook_steps_step_type_id")
+            .FromTable("carrier_runbook_steps").ForeignColumn("step_type_id")
+            .ToTable("step_types").PrimaryColumn("step_type_id");
+
+        Create.Index("IX_carrier_runbook_steps_carrier_id_step_type_id")
+            .OnTable("carrier_runbook_steps")
+            .OnColumn("carrier_id")
+            .Ascending()
+            .OnColumn("step_type_id")
             .Ascending();
 
         /*
