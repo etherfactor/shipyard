@@ -25,25 +25,9 @@ public class CarrierRunbookStepConfiguration : IEntityTypeConfiguration<CarrierR
         entity.Property(e => e.StepType)
             .HasColumnName("step_type_id");
 
-        entity.Property(e => e.Payload)
+        entity.Property(e => e.PayloadJson)
             .HasColumnName("payload");
 
-        entity.Ignore(e => e.From);
-
-        entity.Ignore(e => e.Name);
-
-        entity.Ignore(e => e.Selector);
-
-        entity.Ignore(e => e.Steps);
-
-        entity.Ignore(e => e.To);
-
-        entity.Ignore(e => e.Trim);
-
-        entity.Ignore(e => e.Url);
-
-        entity.Ignore(e => e.Value);
-
-        entity.Ignore(e => e.Var);
+        entity.Ignore(e => e.Payload);
     }
 }

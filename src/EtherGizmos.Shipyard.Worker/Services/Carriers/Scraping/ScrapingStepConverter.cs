@@ -10,8 +10,8 @@ public class ScrapingStepConverter : JsonConverter<ScrapingStep>
         using var doc = JsonDocument.ParseValue(ref reader);
         var root = doc.RootElement;
 
-        if (!root.TryGetProperty("type", out var typeProp))
-            throw new JsonException("Missing 'type' property.");
+        if (!root.TryGetProperty("stepType", out var typeProp))
+            throw new JsonException("Missing 'stepType' property.");
 
         var type = typeProp.GetString();
         return type?.ToLowerInvariant() switch

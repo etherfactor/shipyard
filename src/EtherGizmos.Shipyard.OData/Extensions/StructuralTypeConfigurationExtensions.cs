@@ -22,6 +22,10 @@ internal static class StructuralTypeConfigurationExtensions
 
         foreach (var property in typeof(TModel).GetProperties())
         {
+            //Due to a bug, we don't want to ignore dynamic properties. Adding them back kicks an error
+            if (property.PropertyType.IsAssignableTo(typeof(IDictionary<string, object>)))
+                continue;
+
             var genericMethod = method.MakeGenericMethod(typeof(TModel), property.PropertyType);
             genericMethod.Invoke(null, [@this, property]);
         }

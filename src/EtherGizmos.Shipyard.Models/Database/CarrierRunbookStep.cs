@@ -1,4 +1,5 @@
-﻿using EtherGizmos.Shipyard.Models.Database.Enums;
+﻿using EtherGizmos.Common.Utilities.Converters;
+using EtherGizmos.Shipyard.Models.Database.Enums;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -15,12 +16,11 @@ public class CarrierRunbookStep
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };
         _jsonOptions.Converters.Add(new JsonStringEnumConverter());
+        _jsonOptions.Converters.Add(new ObjectToInferredTypesConverter());
     }
 
-    [JsonIgnore]
     public virtual int Id { get; set; }
 
-    [JsonIgnore]
     public virtual int CarrierId { get; set; }
 
     [JsonIgnore]
@@ -28,43 +28,18 @@ public class CarrierRunbookStep
 
     public virtual StepType StepType { get; set; }
 
-    public virtual string? From { get; set; }
-
-    public virtual string? Name { get; set; }
-
-    public virtual string? Selector { get; set; }
-
-    public virtual List<CarrierRunbookStep>? Steps { get; set; }
-
-    public virtual string? To { get; set; }
-
-    public virtual bool? Trim { get; set; }
-
-    public virtual string? Url { get; set; }
-
-    public virtual string? Value { get; set; }
-
-    public virtual string? Var { get; set; }
+    public virtual IDictionary<string, object> Payload { get; set; } = new Dictionary<string, object>();
 
     [JsonIgnore]
-    public virtual string Payload
+    public virtual string PayloadJson
     {
         get
         {
-            return JsonSerializer.Serialize(this, _jsonOptions);
+            return JsonSerializer.Serialize(Payload, _jsonOptions);
         }
         set
         {
-            var inner = JsonSerializer.Deserialize<CarrierRunbookStep>(value, _jsonOptions)!;
-            From = inner.From;
-            Name = inner.Name;
-            Selector = inner.Selector;
-            Steps = inner.Steps;
-            To = inner.To;
-            Trim = inner.Trim;
-            Url = inner.Url;
-            Value = inner.Value;
-            Var = inner.Var;
+            Payload = JsonSerializer.Deserialize<Dictionary<string, object>>(value, _jsonOptions)!;
         }
     }
 }

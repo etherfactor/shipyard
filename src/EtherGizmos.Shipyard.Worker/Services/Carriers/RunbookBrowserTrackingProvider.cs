@@ -3,6 +3,7 @@ using EtherGizmos.Shipyard.Models.Database;
 using EtherGizmos.Shipyard.Models.Database.Enums;
 using EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
 using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -44,106 +45,16 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider
         using var uow = _uowFactory.Create();
         var carrierRepo = uow.Repository<Carrier>();
 
-        var runbookJson = """
-            [
-                {
-                    "type": "Navigate",
-                    "url": "https://tools.usps.com/go/TrackAction?tLabels={trackingNumber}"
-                },
-                {
-                    "type": "WaitFor",
-                    "selector": "span.tracking-number"
-                },
-                {
-                    "type": "Click",
-                    "selector": "div.toggle-history-container"
-                },
-                {
-                    "type": "WaitFor",
-                    "selector": "span.tracking-number"
-                },
-                {
-                    "type": "Extract",
-                    "selector": "strong.date",
-                    "var" :"etaDay",
-                    "trim": true
-                },
-                {
-                    "type": "Extract",
-                    "selector": "span.month_year > span:first-child",
-                    "var": "etaMonth",
-                    "trim": true
-                },
-                {
-                    "type": "Extract",
-                    "selector": "span.month_year",
-                    "var": "etaYear",
-                    "trim": true
-                },
-                {
-                    "type": "Extract",
-                    "selector": "strong.time",
-                    "var": "etaTime",
-                    "trim": true
-                },
-                {
-                    "type": "Set",
-                    "var": "estimatedAt",
-                    "value": "{etaMonth} {etaDay}, {etaYear} {etaTime}",
-                    "trim": true
-                },
-                {
-                    "type": "ExtractList",
-                    "selector": "div.tb-step",
-                    "var": "details",
-                    "steps": [
-                        {
-                            "type": "extract",
-                            "selector": ".tb-status-detail",
-                            "var": "description",
-                            "trim": true
-                        },
-                        {
-                            "type": "replace",
-                            "var": "description",
-                            "from": "&nbsp;",
-                            "to": " ",
-                            "trim": true
-                        },
-                        {
-                            "type": "extract",
-                            "selector": ".tb-location",
-                            "var": "location",
-                            "trim": true
-                        },
-                        {
-                            "type": "replace",
-                            "var": "location",
-                            "from": "&nbsp;",
-                            "to": " ",
-                            "trim": true
-                        },
-                        {
-                            "type": "extract",
-                            "selector": ".tb-date",
-                            "var": "occurredAt",
-                            "trim": true
-                        }
-                    ]
-                },
-                {
-                    "type": "Return",
-                    "name": "estimatedAt",
-                    "var": "estimatedAt"
-                },
-                {
-                    "type": "Return",
-                    "name": "details",
-                    "var": "details"
-                }
-            ]
-            """;
+        var carrier = await carrierRepo.Data.SingleAsync(e => e.Slug == _slug, cancellationToken: cancellationToken);
 
+        var runbookRaw = carrier
+            .Steps
+            .Select(e => e.Payload
+                .Prepend(new("stepType", e.StepType))
+                .ToDictionary())
+            .ToList();
+
+        var runbookJson = JsonSerializer.Serialize(runbookRaw, _jsonOptions);
         var runbook = JsonSerializer.Deserialize<List<ScrapingStep>>(runbookJson, _jsonOptions) ?? [];
 
         var variables = new Dictionary<string, object>()

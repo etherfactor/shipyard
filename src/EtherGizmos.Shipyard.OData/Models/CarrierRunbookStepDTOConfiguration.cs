@@ -23,15 +23,9 @@ public class CarrierRunbookStepDTOConfiguration : IModelConfiguration
             /* Begin Audit */
             /*  End Audit  */
             complex.EnumProperty(e => e.StepType);
-            complex.Property(e => e.From);
-            complex.Property(e => e.Name);
-            complex.Property(e => e.Selector);
-            complex.CollectionProperty(e => e.Steps);
-            complex.Property(e => e.To);
-            complex.Property(e => e.Trim);
-            complex.Property(e => e.Url);
-            complex.Property(e => e.Value);
-            complex.Property(e => e.Var);
+            //Due to a bug, we have to omit this and allow the convention builder to add it. This has been patched for when
+            //the next OData model builder package release
+            //complex.HasDynamicProperties(e => e.Payload);
         }
     }
 }
