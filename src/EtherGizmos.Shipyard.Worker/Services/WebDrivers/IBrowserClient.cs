@@ -1,6 +1,6 @@
 ﻿namespace EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 
-public interface IBrowserClient
+public interface IBrowserClient : IDisposable
 {
     Task ClickElementAsync(string selector, TimeSpan? timeout = null, CancellationToken cancellationToken = default);
 

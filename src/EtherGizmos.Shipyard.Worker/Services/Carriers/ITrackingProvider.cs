@@ -1,6 +1,6 @@
 ﻿namespace EtherGizmos.Shipyard.Worker.Services.Carriers;
 
-public interface ITrackingProvider
+public interface ITrackingProvider : IDisposable
 {
     Task<TrackingResult> TrackAsync(string trackingNumber, CancellationToken cancellationToken = default);
 }

@@ -7,9 +7,11 @@ using System.Web;
 
 namespace EtherGizmos.Shipyard.Worker.Services.Carriers;
 
-internal class UspsBrowserTrackingProvider : ITrackingProvider
+internal class UspsBrowserTrackingProvider : ITrackingProvider, IDisposable
 {
     private readonly IBrowserClient _client;
+
+    private bool _disposed;
 
     public UspsBrowserTrackingProvider(
         IServiceProvider serviceProvider)
@@ -81,5 +83,27 @@ internal class UspsBrowserTrackingProvider : ITrackingProvider
     private string? NullIfEmpty(string? input)
     {
         return !string.IsNullOrWhiteSpace(input) ? input : null;
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _client.Dispose();
+            }
+
+            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+            // TODO: set large fields to null
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }

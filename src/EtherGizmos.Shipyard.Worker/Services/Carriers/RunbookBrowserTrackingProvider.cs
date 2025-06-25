@@ -11,7 +11,7 @@ using System.Web;
 
 namespace EtherGizmos.Shipyard.Worker.Services.Carriers;
 
-internal class RunbookBrowserTrackingProvider : ITrackingProvider
+internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
 {
     private static readonly JsonSerializerOptions _jsonOptions;
 
@@ -19,6 +19,8 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider
     private readonly IUnitOfWorkFactory _uowFactory;
     private readonly IBrowserClient _browserClient;
     private readonly string _slug;
+
+    private bool _disposed;
 
     static RunbookBrowserTrackingProvider()
     {
@@ -120,5 +122,27 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider
     private string? NullIfEmpty(string? input)
     {
         return !string.IsNullOrWhiteSpace(input) ? input : null;
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _browserClient.Dispose();
+            }
+
+            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+            // TODO: set large fields to null
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }

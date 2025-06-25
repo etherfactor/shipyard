@@ -26,7 +26,7 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
         var message = context.Message;
         _logger.LogInformation("Received request message {@Message}", message);
 
-        var tracker = _trackingProviderFactory.CreateProvider(message.CarrierSlug);
+        using var tracker = _trackingProviderFactory.CreateProvider(message.CarrierSlug);
 
         var result = await tracker.TrackAsync(message.TrackingNumber, context.CancellationToken);
 

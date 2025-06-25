@@ -2,11 +2,13 @@
 
 namespace EtherGizmos.Shipyard.Worker.Services.Carriers;
 
-internal class ClassifierTrackingProvider : ITrackingProvider
+internal class ClassifierTrackingProvider : ITrackingProvider, IDisposable
 {
     private readonly IRegexClassifier _classifier;
     private readonly string _slug;
     private readonly ITrackingProvider _inner;
+
+    private bool _disposed;
 
     public ClassifierTrackingProvider(
         IServiceProvider serviceProvider,
@@ -42,5 +44,27 @@ internal class ClassifierTrackingProvider : ITrackingProvider
         }
 
         return result with { Details = newStatuses };
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _inner.Dispose();
+            }
+
+            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+            // TODO: set large fields to null
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }
