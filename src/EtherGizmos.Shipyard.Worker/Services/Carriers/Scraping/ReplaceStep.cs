@@ -1,5 +1,6 @@
 ﻿using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using HtmlAgilityPack;
+using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -37,12 +38,16 @@ internal class ReplaceStep : ScrapingStep, ISettableStep
         });
 
         var newValue = variables.TryGetValue(Var, out var value) ? value?.ToString() ?? "" : "";
+
+        Logger.LogInformation("Replacing {From} with {To} in value {Value}", newFrom, newTo, newValue);
         newValue = newValue.Replace(newFrom, newTo);
 
         if (Trim)
         {
             newValue = newValue.Trim();
         }
+
+        Logger.LogInformation("Setting variable {Variable} to value {Value}", Var, newValue);
 
         variables[Var] = newValue;
 

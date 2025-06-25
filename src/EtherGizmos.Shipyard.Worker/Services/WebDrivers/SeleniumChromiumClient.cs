@@ -74,7 +74,11 @@ internal class SeleniumChromiumClient : IBrowserClient, IDisposable
             await Task.Delay(100, cancellationToken);
         }
 
+        _logger.LogInformation("Navigating to url {RequestUri}", requestUrl);
+
         await _driver.Navigate().GoToUrlAsync(requestUrl);
+
+        _logger.LogInformation("Navigated to url {RequestUri}", requestUrl);
 
         var wait = new WebDriverWait(_driver, timeout ?? TimeSpan.FromSeconds(5));
         wait.Until(d =>
@@ -92,9 +96,12 @@ internal class SeleniumChromiumClient : IBrowserClient, IDisposable
             await Task.Delay(100, cancellationToken);
         }
 
-        var wait = new WebDriverWait(_driver, timeout ?? TimeSpan.FromSeconds(5));
+        _logger.LogInformation("Waiting until element {CssSelector} is loaded", selector);
 
+        var wait = new WebDriverWait(_driver, timeout ?? TimeSpan.FromSeconds(5));
         wait.Until(d => d.FindElement(By.CssSelector(selector)).Displayed);
+
+        _logger.LogInformation("Element {CssSelector} is loaded", selector);
     }
 
     public async Task ClickElementAsync(
@@ -107,7 +114,11 @@ internal class SeleniumChromiumClient : IBrowserClient, IDisposable
             await Task.Delay(100, cancellationToken);
         }
 
+        _logger.LogInformation("Clicking element {CssSelector}", selector);
+
         _driver.FindElement(By.CssSelector(selector)).Click();
+
+        _logger.LogInformation("Clicked element {CssSelector}", selector);
     }
 
     public async Task<string> GetHtmlAsync(
@@ -131,7 +142,11 @@ internal class SeleniumChromiumClient : IBrowserClient, IDisposable
             await Task.Delay(100, cancellationToken);
         }
 
+        _logger.LogInformation("Sending element {CssSelector} content {Content}", selector, content);
+
         _driver.FindElement(By.CssSelector(selector)).SendKeys(content);
+
+        _logger.LogInformation("Sent element {CssSelector} content {Content}", selector, content);
     }
 
     protected virtual void Dispose(bool disposing)

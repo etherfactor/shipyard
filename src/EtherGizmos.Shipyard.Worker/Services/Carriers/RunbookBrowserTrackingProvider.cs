@@ -5,6 +5,7 @@ using EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
 using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
@@ -15,6 +16,7 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
 {
     private static readonly JsonSerializerOptions _jsonOptions;
 
+    private readonly ILogger _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly IUnitOfWorkFactory _uowFactory;
     private readonly IBrowserClient _browserClient;
@@ -37,6 +39,7 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
         string slug)
     {
         _serviceProvider = serviceProvider;
+        _logger = serviceProvider.GetRequiredService<ILogger<RunbookBrowserTrackingProvider>>();
         _uowFactory = serviceProvider.GetRequiredService<IUnitOfWorkFactory>();
         _browserClient = serviceProvider.GetRequiredService<IBrowserClient>();
         _slug = slug;
@@ -67,6 +70,7 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
         var results = new Dictionary<string, object>();
         foreach (var step in runbook)
         {
+            step.Logger = _logger;
             await step.Apply(_browserClient, variables, results, cancellationToken);
         }
 

@@ -1,5 +1,6 @@
 ﻿using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using HtmlAgilityPack;
+using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 
 namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
@@ -15,6 +16,8 @@ internal class ReturnStep : ScrapingStep
     public override Task Apply(IBrowserClient client, IDictionary<string, object> variables, IDictionary<string, object> results, CancellationToken cancellationToken = default)
     {
         var useValue = variables.TryGetValue(Var, out var value) ? value ?? "" : "";
+
+        Logger.LogInformation("Setting return value {Return} to value {@Value}", Name, useValue);
 
         results[Name] = useValue;
 

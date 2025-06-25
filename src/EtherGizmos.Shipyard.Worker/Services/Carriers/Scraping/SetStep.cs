@@ -1,7 +1,7 @@
 ﻿using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using HtmlAgilityPack;
+using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
@@ -18,8 +18,6 @@ internal class SetStep : ScrapingStep, ISettableStep
 
     public override Task Apply(IBrowserClient client, IDictionary<string, object> variables, IDictionary<string, object> results, CancellationToken cancellationToken = default)
     {
-        var builder = new StringBuilder();
-
         var regex = new Regex(@"(?<!{){(?<key>[^{}]+)}(?!})");
         var newValue = regex.Replace(Value, match =>
         {
@@ -31,6 +29,8 @@ internal class SetStep : ScrapingStep, ISettableStep
         {
             newValue = newValue.Trim();
         }
+
+        Logger.LogInformation("Setting variable {Variable} to value {Value}", Var, newValue);
 
         variables[Var] = newValue;
 
