@@ -28,19 +28,13 @@ public class Migration002_LoadTrackingTables : MigrationExtension
             .Row(new { step_type_id = 1, name = "Navigate" })
             .Row(new { step_type_id = 10, name = "Wait for" })
             .Row(new { step_type_id = 20, name = "Click" })
+            .Row(new { step_type_id = 21, name = "Send" })
             .Row(new { step_type_id = 30, name = "Extract" })
             .Row(new { step_type_id = 31, name = "Extract list" })
             .Row(new { step_type_id = 40, name = "Set" })
             .Row(new { step_type_id = 41, name = "Replace" })
             .Row(new { step_type_id = 100, name = "Return" })
             .Match(e => new { e.step_type_id });
-
-        /*
-         * Load [dbo].[carriers]
-         */
-        Merge.IntoTable("carriers")
-            .Row(new { name = "USPS", slug = "usps" })
-            .Match(e => new { e.slug });
     }
 
     public override void Down()

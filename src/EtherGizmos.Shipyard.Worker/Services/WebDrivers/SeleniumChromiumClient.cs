@@ -121,6 +121,19 @@ internal class SeleniumChromiumClient : IBrowserClient, IDisposable
         return _driver.PageSource;
     }
 
+    public async Task SendAsync(
+        string selector,
+        string content,
+        CancellationToken cancellationToken = default)
+    {
+        while (_driver is null)
+        {
+            await Task.Delay(100, cancellationToken);
+        }
+
+        _driver.FindElement(By.CssSelector(selector)).SendKeys(content);
+    }
+
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposed)

@@ -68,8 +68,8 @@ public class TrackingResponseConsumer : IMessageConsumer<TrackingResponse>
         package.LastStatusTypeId = package
             .TrackingUpdates
             .OrderBy(e => e.OccurredAt)
-            .Select(e => e.StatusTypeId)
-            .Last();
+            .Select(e => e.StatusTypeId as int?)
+            .LastOrDefault() ?? StatusTypeId.Unknown;
 
         package.IsDelivered = package.LastStatusTypeId == StatusTypeId.Delivered;
 
