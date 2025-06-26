@@ -1,4 +1,4 @@
-using EtherGizmos.Common;
+﻿using EtherGizmos.Common;
 using EtherGizmos.Common.Configuration;
 using EtherGizmos.Common.Messaging;
 using EtherGizmos.Common.Messaging.Configuration;
@@ -32,18 +32,20 @@ builder.Configuration
         (new(@"(?<=[^_]):_(?=[^_])"), " "),
         (new(@"^ConnectionStrings:(?=[^_:])"), ""));
 
+builder.Services
+    .AddOptions<DatabaseReferenceOptions>()
+    .Configure<IConfiguration>((opt, conf) =>
+    {
+        conf.GetSection("Database")
+            .Bind(opt);
+    })
+    .ValidateOnStart()
+    .ValidateDataAnnotations();
+
 //************************************************************
 // Services
 
-builder.Services
-    .AddOptions<PostgreSqlOptions>()
-    .Configure<IConfiguration>((opt, conf) =>
-    {
-        conf.GetSection("PostgreSql")
-            .Bind(opt);
-    })
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+builder.Services.AddServiceConnections();
 
 builder.Services
     .AddOptions<SeleniumDriverOptions>()

@@ -1,14 +1,18 @@
-﻿using EtherGizmos.Shipyard.Utilities.Abstractions;
-using EtherGizmos.Shipyard.Utilities.Services;
+﻿using EtherGizmos.Common.Utilities.Abstractions;
+using EtherGizmos.Common.Utilities.Configuration;
+using EtherGizmos.Common.Utilities.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Reflection;
 
-namespace EtherGizmos.Shipyard.Utilities;
+namespace EtherGizmos.Common.Utilities;
 
 public static class IServiceCollectionExtensions
 {
-    public static IServiceCollection AddModelValidators(this IServiceCollection @this, Assembly? rootAssembly = null)
+    public static IServiceCollection AddModelValidators(
+        this IServiceCollection @this,
+        Assembly? rootAssembly = null)
     {
         @this.TryAddScoped<IModelValidatorFactory, ModelValidatorFactory>();
 
@@ -29,7 +33,23 @@ public static class IServiceCollectionExtensions
         return @this;
     }
 
-    private static IEnumerable<Assembly> GetAssemblies(Assembly root)
+    public static IServiceCollection AddServiceConnections(
+        this IServiceCollection @this)
+    {
+        @this.TryAddSingleton<IConnectionResolver, ConnectionResolver>();
+
+        @this.AddOptions<Dictionary<string, ConnectionOptions>>()
+            .Configure<IConfiguration>((opt, conf) =>
+            {
+                conf.GetSection("Connections")
+                    .Bind(opt);
+            });
+
+        return @this;
+    }
+
+    private static IEnumerable<Assembly> GetAssemblies(
+        Assembly root)
     {
         var assemblies = new Dictionary<string, Assembly>();
 

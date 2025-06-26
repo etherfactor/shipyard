@@ -25,20 +25,22 @@ builder.Configuration
         (new(@"^ConnectionStrings:(?=[^_:])"), ""));
 
 builder.Services
-    .AddOptions<PostgreSqlOptions>()
+    .AddOptions<DatabaseReferenceOptions>()
     .Configure<IConfiguration>((opt, conf) =>
     {
-        conf.GetSection("PostgreSql")
+        conf.GetSection("Database")
             .Bind(opt);
     })
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+    .ValidateOnStart()
+    .ValidateDataAnnotations();
 
 //**********************************************************
 // Add Services
 
 // General
 builder.AddServiceDefaults();
+
+builder.Services.AddServiceConnections();
 
 // Database
 builder.Services

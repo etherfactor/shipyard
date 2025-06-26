@@ -2,8 +2,8 @@
 
 namespace EtherGizmos.Shipyard.Database.Configuration;
 
-public class PostgreSqlOptions
+public class DatabaseReferenceOptions
 {
     [Required]
-    public string ConnectionString { get; set; } = null!;
+    public string ConnectionId { get; set; } = null!;
 }
