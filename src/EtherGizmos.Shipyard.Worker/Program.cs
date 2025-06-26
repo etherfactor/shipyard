@@ -6,6 +6,7 @@ using EtherGizmos.Common.Utilities;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Configuration;
 using EtherGizmos.Shipyard.Database.Services;
+using EtherGizmos.Shipyard.Notifications.Configuration;
 using EtherGizmos.Shipyard.Worker.Configuration;
 using EtherGizmos.Shipyard.Worker.Services.Carriers;
 using EtherGizmos.Shipyard.Worker.Services.HostedServices;
@@ -16,8 +17,6 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 
 var builder = Host.CreateApplicationBuilder(args);
-
-builder.AddServiceDefaults();
 
 builder.Services.AddSerilog((services, logger) =>
     logger.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>()));
@@ -42,10 +41,15 @@ builder.Services
     .ValidateOnStart()
     .ValidateDataAnnotations();
 
-//************************************************************
-// Services
-
-builder.Services.AddServiceConnections();
+builder.Services
+    .AddOptions<NotificationOptions>()
+    .Configure<IConfiguration>((opt, conf) =>
+    {
+        conf.GetSection("Notifications")
+            .Bind(opt);
+    })
+    .ValidateOnStart()
+    .ValidateDataAnnotations();
 
 builder.Services
     .AddOptions<SeleniumDriverOptions>()
@@ -57,6 +61,15 @@ builder.Services
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
+//************************************************************
+// Services
+
+// General
+builder.AddServiceDefaults();
+
+builder.Services.AddServiceConnections();
+
+// Database
 builder.Services
     .AddDatabase()
     .AddUnitOfWork(opt =>
@@ -64,6 +77,7 @@ builder.Services
         opt.BindDbContext<ApplicationContext>();
     });
 
+// Messaging
 builder.Services
     .AddMessaging((opt, conf) =>
     {
@@ -72,6 +86,12 @@ builder.Services
 
         opt.Listeners.AddQueue("tracking-poll-response", "tracking.poll.response");
         opt.Publishers.AddQueue("tracking-poll-response", "tracking.poll.response");
+
+        opt.Listeners.AddTopic("notification-package-outfordelivery", "notification.package.outfordelivery", subscription: "email");
+        opt.Publishers.AddTopic("notification-package-outfordelivery", "notification.package.outfordelivery");
+
+        opt.Listeners.AddTopic("notification-package-delivered", "notification.package.delivered", subscription: "email");
+        opt.Publishers.AddTopic("notification-package-delivered", "notification.package.delivered");
     })
     .UseRabbitMQ((opt, conf) =>
     {
@@ -80,6 +100,7 @@ builder.Services
     })
     .AddConsumersFromAssemblies(typeof(Program).Assembly);
 
+// Tracking
 builder.Services
     .AddTransient<SeleniumChromiumClient>()
     .AddTransient<IBrowserClient>(e =>
@@ -94,6 +115,7 @@ builder.Services
     .AddSingleton<ITrackingProviderFactory, TrackingProviderFactory>()
     .AddTransient<IRegexClassifier, RegexClassifier>();
 
+// Hosted Services
 builder.Services.AddHostedService<QueueTrackingRequestBackgroundService>();
 
 //************************************************************

@@ -38,6 +38,7 @@
     <ProjectReference Include="..\EtherGizmos.Common.Messaging.RabbitMQ\EtherGizmos.Common.RabbitMQ.csproj" />
     <ProjectReference Include="..\EtherGizmos.Common.ServiceDefaults\EtherGizmos.Common.ServiceDefaults.csproj" />
     <ProjectReference Include="..\EtherGizmos.Shipyard.Database\EtherGizmos.Shipyard.Database.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Shipyard.Notifications\EtherGizmos.Shipyard.Notifications.csproj" />
   </ItemGroup>
 
 </Project>

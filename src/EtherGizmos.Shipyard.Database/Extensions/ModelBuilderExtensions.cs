@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EtherGizmos.Shipyard.Database.Extensions;
@@ -15,8 +16,12 @@ public static class ModelBuilderExtensions
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <param name="this">Itself.</param>
     /// <param name="converter">The converter to use.</param>
+    /// <param name="comparer">Determines if two values are equivalent.</param>
     /// <returns>Itself.</returns>
-    public static ModelBuilder AddGlobalValueConverter<TProvider, TModel>(this ModelBuilder @this, ValueConverter<TModel, TProvider> converter)
+    public static ModelBuilder AddGlobalValueConverter<TProvider, TModel>(
+        this ModelBuilder @this,
+        ValueConverter<TModel, TProvider> converter,
+        ValueComparer<TModel>? comparer = null)
     {
         foreach (var entityType in @this.Model.GetEntityTypes())
         {
@@ -25,6 +30,11 @@ public static class ModelBuilderExtensions
                 if (property.ClrType == typeof(TModel))
                 {
                     property.SetValueConverter(converter);
+
+                    if (comparer is not null)
+                    {
+                        property.SetValueComparer(comparer);
+                    }
                 }
             }
         }

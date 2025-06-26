@@ -35,7 +35,7 @@ public static class IServiceCollectionExtensions
                 var connection = resolver.GetDatabaseConnection(connectionId);
 
                 connection.Match(
-                    _ => throw new InvalidOperationException($"The database connection {connectionId} is not a valid database connection."),
+                    _ => throw new InvalidOperationException($"The connection {connectionId} is not a valid database connection."),
                     postgreSql =>
                     {
                         return opt.UseNpgsql(
@@ -63,7 +63,7 @@ public static class IServiceCollectionExtensions
                             .WithVersionTable(new PostgresVersionTableMetadata());
 
                         connection.Match(
-                            _ => throw new InvalidOperationException($"The database connection {connectionId} is not a valid database connection."),
+                            _ => throw new InvalidOperationException($"The connection {connectionId} is not a valid database connection."),
                             postgreSql => opt.AddPostgres()
                                 .WithGlobalConnectionString(postgreSql.ConnectionString)
                         );

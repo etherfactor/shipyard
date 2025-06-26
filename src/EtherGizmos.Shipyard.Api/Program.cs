@@ -11,8 +11,12 @@ using EtherGizmos.Shipyard.OData;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSerilog((services, logger) =>
+    logger.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>()));
 
 //**********************************************************
 // Configuration
@@ -35,7 +39,7 @@ builder.Services
     .ValidateDataAnnotations();
 
 //**********************************************************
-// Add Services
+// Services
 
 // General
 builder.AddServiceDefaults();
@@ -68,7 +72,7 @@ builder.Services
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
 //**********************************************************
-// Add Middleware
+// Pipeline
 
 var app = builder.Build();
 

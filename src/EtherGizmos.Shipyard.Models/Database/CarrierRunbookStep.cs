@@ -29,17 +29,4 @@ public class CarrierRunbookStep
     public virtual StepType StepType { get; set; }
 
     public virtual IDictionary<string, object> Payload { get; set; } = new Dictionary<string, object>();
-
-    [JsonIgnore]
-    public virtual string PayloadJson
-    {
-        get
-        {
-            return JsonSerializer.Serialize(Payload, _jsonOptions);
-        }
-        set
-        {
-            Payload = JsonSerializer.Deserialize<Dictionary<string, object>>(value, _jsonOptions)!;
-        }
-    }
 }

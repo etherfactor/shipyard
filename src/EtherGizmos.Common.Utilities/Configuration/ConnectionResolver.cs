@@ -32,7 +32,14 @@ internal class ConnectionResolver : IConnectionResolver
     public OneOfEmailConnection GetEmailConnection(
         string connectionId)
     {
-        return GetConnection<EmailConnectionOptions>(connectionId);
+        var connection = GetConnection<EmailConnectionOptions>(connectionId);
+        var result = connection switch
+        {
+            SmtpOptions smtp => (OneOfEmailConnection)smtp,
+            _ => connection
+        };
+
+        return result;
     }
 
     private TOptions GetConnection<TOptions>(
