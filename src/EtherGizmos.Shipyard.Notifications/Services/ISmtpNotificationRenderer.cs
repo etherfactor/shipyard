@@ -1,9 +1,10 @@
-﻿using System.Net.Mail;
+﻿using EtherGizmos.Shipyard.Notifications.Models;
+using MimeKit;
 
 namespace EtherGizmos.Shipyard.Notifications.Services;
 
 public interface ISmtpNotificationRenderer<in TEvent>
-    where TEvent : class
+    where TEvent : NotificationEvent
 {
-    Task<MailMessage> RenderAsync(TEvent notification, CancellationToken cancellationToken = default);
+    Task<MimeMessage> RenderAsync(TEvent notification, CancellationToken cancellationToken = default);
 }

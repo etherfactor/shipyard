@@ -1,5 +1,5 @@
 ﻿using EtherGizmos.Shipyard.Notifications.Services;
-using System.Net.Mail;
+using MimeKit;
 using System.Text;
 
 namespace EtherGizmos.Shipyard.Notifications.Models;
@@ -27,7 +27,7 @@ public record PackageDeliveredEvent : NotificationEvent
 
 public class PackageDeliveredRenderer : INotificationRenderer<PackageDeliveredEvent>
 {
-    public Task<MailMessage> RenderAsync(
+    public Task<MimeMessage> RenderAsync(
         PackageDeliveredEvent notification,
         CancellationToken cancellationToken = default)
     {
@@ -50,13 +50,20 @@ public class PackageDeliveredRenderer : INotificationRenderer<PackageDeliveredEv
         sb.AppendLine();
         sb.AppendLine("If you can't locate your package, please check around your delivery location or contact the carrier for help.");
 
-        var message = new MailMessage
+        var message = new MimeMessage
         {
             Subject = subject,
-            Body = sb.ToString(),
-            IsBodyHtml = false
+            Body = new TextPart("plain")
+            {
+                Text = sb.ToString(),
+            },
         };
 
         return Task.FromResult(message);
+    }
+
+    public async Task<object> RenderAsync(NotificationEvent notification, CancellationToken cancellationToken = default)
+    {
+        return await RenderAsync((PackageDeliveredEvent)notification, cancellationToken);
     }
 }

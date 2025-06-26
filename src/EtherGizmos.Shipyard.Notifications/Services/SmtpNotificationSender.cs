@@ -1,20 +1,21 @@
 ﻿using EtherGizmos.Shipyard.Notifications.Configuration;
 using EtherGizmos.Shipyard.Notifications.Models;
+using MailKit.Net.Smtp;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using System.Net.Mail;
+using MimeKit;
 
 namespace EtherGizmos.Shipyard.Notifications.Services;
 
 internal class SmtpNotificationSender : IEmailNotificationSender
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly IOptionsMonitor<EmailNotificationOptions> _notificationOptions;
+    private readonly IOptionsMonitor<NotificationOptions> _notificationOptions;
     private readonly SmtpClient _smtpClient;
 
     public SmtpNotificationSender(
         IServiceProvider serviceProvider,
-        IOptionsMonitor<EmailNotificationOptions> notificationOptions,
+        IOptionsMonitor<NotificationOptions> notificationOptions,
         SmtpClient smtpClient)
     {
         _serviceProvider = serviceProvider;
@@ -28,30 +29,28 @@ internal class SmtpNotificationSender : IEmailNotificationSender
     {
         var options = _notificationOptions.CurrentValue;
 
-        var rendererObj = _serviceProvider
+        var renderer = (INotificationRenderer)_serviceProvider
             .GetRequiredService(typeof(ISmtpNotificationRenderer<>).MakeGenericType(notification.GetType()));
 
-        var test = rendererObj.GetType().IsAssignableTo(typeof(ISmtpNotificationRenderer<NotificationEvent>));
+        var message = (MimeMessage)await renderer.RenderAsync(notification, cancellationToken);
 
-        var renderer = (ISmtpNotificationRenderer<NotificationEvent>)rendererObj;
+        message.Sender = new MailboxAddress("", options.Email.From);
 
-        var message = await renderer.RenderAsync(notification, cancellationToken);
-
-        foreach (var recipient in options.To)
+        foreach (var recipient in options.Email.To)
         {
-            message.To.Add(new MailAddress(recipient));
+            message.To.Add(new MailboxAddress("", recipient));
         }
 
-        foreach (var recipient in options.Cc)
+        foreach (var recipient in options.Email.Cc)
         {
-            message.CC.Add(new MailAddress(recipient));
+            message.Cc.Add(new MailboxAddress("", recipient));
         }
 
-        foreach (var recipient in options.Bcc)
+        foreach (var recipient in options.Email.Bcc)
         {
-            message.Bcc.Add(new MailAddress(recipient));
+            message.Bcc.Add(new MailboxAddress("", recipient));
         }
 
-        await _smtpClient.SendMailAsync(message, cancellationToken);
+        await _smtpClient.SendAsync(message, cancellationToken);
     }
 }

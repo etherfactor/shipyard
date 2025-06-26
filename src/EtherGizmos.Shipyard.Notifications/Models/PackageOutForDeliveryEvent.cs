@@ -1,5 +1,5 @@
 ﻿using EtherGizmos.Shipyard.Notifications.Services;
-using System.Net.Mail;
+using MimeKit;
 using System.Text;
 
 namespace EtherGizmos.Shipyard.Notifications.Models;
@@ -27,7 +27,7 @@ public record PackageOutForDeliveryEvent : NotificationEvent
 
 public class PackageOutForDeliveryRenderer : INotificationRenderer<PackageOutForDeliveryEvent>
 {
-    public Task<MailMessage> RenderAsync(
+    public Task<MimeMessage> RenderAsync(
         PackageOutForDeliveryEvent notification,
         CancellationToken cancellationToken = default)
     {
@@ -53,13 +53,20 @@ public class PackageOutForDeliveryRenderer : INotificationRenderer<PackageOutFor
         sb.AppendLine();
         sb.AppendLine("You can track your package for the latest updates.");
 
-        var message = new MailMessage
+        var message = new MimeMessage
         {
             Subject = subject,
-            Body = sb.ToString(),
-            IsBodyHtml = false
+            Body = new TextPart("plain")
+            {
+                Text = sb.ToString(),
+            },
         };
 
         return Task.FromResult(message);
+    }
+
+    public async Task<object> RenderAsync(NotificationEvent notification, CancellationToken cancellationToken = default)
+    {
+        return await RenderAsync((PackageOutForDeliveryEvent)notification, cancellationToken);
     }
 }

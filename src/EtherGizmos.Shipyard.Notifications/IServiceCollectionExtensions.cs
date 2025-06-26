@@ -2,10 +2,9 @@
 using EtherGizmos.Shipyard.Notifications.Configuration;
 using EtherGizmos.Shipyard.Notifications.Models;
 using EtherGizmos.Shipyard.Notifications.Services;
+using MailKit.Net.Smtp;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using System.Net;
-using System.Net.Mail;
 
 namespace EtherGizmos.Shipyard.Notifications;
 
@@ -42,13 +41,11 @@ public static class IServiceCollectionExtensions
 
                 var smtp = connection.AsT1;
 
-                return new SmtpClient()
-                {
-                    Host = smtp.Host,
-                    Port = smtp.Port,
-                    EnableSsl = smtp.UseTls,
-                    Credentials = new NetworkCredential(smtp.Username, smtp.Password),
-                };
+                var client = new SmtpClient();
+                client.Connect(smtp.Host, smtp.Port, smtp.UseTls);
+                client.Authenticate(smtp.Username, smtp.Password);
+
+                return client;
             });
 
         @this.AddScoped<INotificationRenderer<PackageOutForDeliveryEvent>, PackageOutForDeliveryRenderer>();

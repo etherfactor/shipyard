@@ -1,5 +1,5 @@
 ﻿namespace EtherGizmos.Common.Utilities.Configuration;
 
-public class DatabaseConnectionOptions 
+public class DatabaseConnectionOptions
 {
 }
