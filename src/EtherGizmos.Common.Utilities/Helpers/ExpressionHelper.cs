@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 
-namespace EtherGizmos.Shipyard.Utilities.Helpers;
+namespace EtherGizmos.Common.Utilities.Helpers;
 
 public static class ExpressionHelper
 {

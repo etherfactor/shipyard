@@ -1,6 +1,6 @@
-﻿using EtherGizmos.Messaging.Abstractions;
+﻿using EtherGizmos.Common.Messaging.Abstractions;
 
-namespace EtherGizmos.Messaging.Services;
+namespace EtherGizmos.Common.Messaging.Services;
 
 internal class MessageSender : IMessageSender
 {

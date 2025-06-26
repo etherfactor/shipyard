@@ -1,4 +1,5 @@
-using EtherGizmos.Configuration;
+using EtherGizmos.Common.Configuration;
+using EtherGizmos.Common.Utilities;
 using EtherGizmos.Shipyard.Api.Services.Middleware;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Configuration;
@@ -7,7 +8,6 @@ using EtherGizmos.Shipyard.Models;
 using EtherGizmos.Shipyard.Models.Api.Errors;
 using EtherGizmos.Shipyard.Models.Database;
 using EtherGizmos.Shipyard.OData;
-using EtherGizmos.Shipyard.Utilities;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData;

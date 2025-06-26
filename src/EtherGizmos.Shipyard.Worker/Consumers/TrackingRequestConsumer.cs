@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Messaging.Abstractions;
+﻿using EtherGizmos.Common.Messaging.Abstractions;
 using EtherGizmos.Shipyard.Worker.Services.Carriers;
 using Microsoft.Extensions.Logging;
 

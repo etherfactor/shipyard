@@ -1,6 +1,6 @@
-﻿using EtherGizmos.Messaging.Abstractions;
+﻿using EtherGizmos.Common.Messaging.Abstractions;
 
-namespace EtherGizmos.Messaging.Services;
+namespace EtherGizmos.Common.Services;
 
 internal class RabbitMQTransport : IMessageListenerFactory, IMessagePublisherFactory
 {

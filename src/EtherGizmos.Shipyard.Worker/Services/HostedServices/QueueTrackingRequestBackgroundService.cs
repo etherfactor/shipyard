@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Messaging.Abstractions;
+﻿using EtherGizmos.Common.Messaging.Abstractions;
 using EtherGizmos.Shipyard.Database.Services;
 using EtherGizmos.Shipyard.Models.Database;
 using EtherGizmos.Shipyard.Worker.Consumers;

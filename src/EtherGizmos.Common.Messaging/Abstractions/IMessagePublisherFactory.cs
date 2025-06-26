@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Messaging.Abstractions;
+﻿namespace EtherGizmos.Common.Messaging.Abstractions;
 
 public interface IMessagePublisherFactory
 {

@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Utilities.Extensions;
+﻿using EtherGizmos.Common.Utilities.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Net;

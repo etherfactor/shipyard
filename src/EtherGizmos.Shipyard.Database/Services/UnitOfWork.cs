@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Utilities.Abstractions;
+﻿using EtherGizmos.Common.Utilities.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
