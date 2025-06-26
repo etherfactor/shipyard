@@ -28,8 +28,12 @@ internal class SmtpNotificationSender : IEmailNotificationSender
     {
         var options = _notificationOptions.CurrentValue;
 
-        var renderer = (ISmtpNotificationRenderer<NotificationEvent>)_serviceProvider
+        var rendererObj = _serviceProvider
             .GetRequiredService(typeof(ISmtpNotificationRenderer<>).MakeGenericType(notification.GetType()));
+
+        var test = rendererObj.GetType().IsAssignableTo(typeof(ISmtpNotificationRenderer<NotificationEvent>));
+
+        var renderer = (ISmtpNotificationRenderer<NotificationEvent>)rendererObj;
 
         var message = await renderer.RenderAsync(notification, cancellationToken);
 

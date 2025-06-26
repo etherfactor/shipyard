@@ -56,7 +56,7 @@ internal class RabbitMQPublisher : IMessagePublisher
         }
         else
         {
-            await _rmqChannel.ExchangeDeclareAsync(_topic!, ExchangeType.Topic, durable: true, autoDelete: false, arguments: null, cancellationToken: cancellationToken);
+            await _rmqChannel.ExchangeDeclareAsync(_topic!, ExchangeType.Fanout, durable: true, autoDelete: false, arguments: null, cancellationToken: cancellationToken);
         }
 
         _publishCts = new();

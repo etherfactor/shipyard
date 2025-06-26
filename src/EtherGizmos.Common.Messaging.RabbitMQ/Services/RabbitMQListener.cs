@@ -58,7 +58,7 @@ internal class RabbitMQListener : IMessageListener
         }
         else
         {
-            await _rmqChannel.ExchangeDeclareAsync(_topic!, ExchangeType.Topic, durable: true, autoDelete: false, cancellationToken: cancellationToken);
+            await _rmqChannel.ExchangeDeclareAsync(_topic!, ExchangeType.Fanout, durable: true, autoDelete: false, cancellationToken: cancellationToken);
             await _rmqChannel.QueueDeclareAsync($"{_topic}:{_subscription}", durable: true, exclusive: false, autoDelete: false, cancellationToken: cancellationToken);
             await _rmqChannel.QueueBindAsync($"{_topic}:{_subscription}", exchange: _topic!, routingKey: _subscription!, cancellationToken: cancellationToken);
         }

@@ -19,7 +19,7 @@ internal class ConnectionResolver : IConnectionResolver
     public OneOfDatabaseConnection GetDatabaseConnection(
         string connectionId)
     {
-        var connection = GetConnection<DatabaseConnectionOptions>(connectionId);
+        var connection = GetConnection<DatabaseConnectionOptions>(connectionId, ConnectionType.Database);
         var result = connection switch
         {
             PostgreSqlOptions postgreSql => (OneOfDatabaseConnection)postgreSql,
@@ -32,7 +32,7 @@ internal class ConnectionResolver : IConnectionResolver
     public OneOfEmailConnection GetEmailConnection(
         string connectionId)
     {
-        var connection = GetConnection<EmailConnectionOptions>(connectionId);
+        var connection = GetConnection<EmailConnectionOptions>(connectionId, ConnectionType.Email);
         var result = connection switch
         {
             SmtpOptions smtp => (OneOfEmailConnection)smtp,
@@ -43,14 +43,15 @@ internal class ConnectionResolver : IConnectionResolver
     }
 
     private TOptions GetConnection<TOptions>(
-        string connectionId)
+        string connectionId,
+        ConnectionType expectedType)
         where TOptions : new()
     {
         var options = _options.CurrentValue;
 
         if (options.TryGetValue(connectionId, out var connection))
         {
-            if (connection.Type == ConnectionType.Database)
+            if (connection.Type == expectedType)
             {
                 var properties = connection.GetType().GetProperties()
                     .Where(e => e.PropertyType.IsAssignableTo(typeof(TOptions)))
