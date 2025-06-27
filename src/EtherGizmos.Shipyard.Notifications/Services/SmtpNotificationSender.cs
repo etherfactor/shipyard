@@ -34,7 +34,7 @@ internal class SmtpNotificationSender : IEmailNotificationSender
 
         var message = (MimeMessage)await renderer.RenderAsync(notification, cancellationToken);
 
-        message.Sender = new MailboxAddress("", options.Email.From);
+        message.Sender = new MailboxAddress("Shipyard Notifications", options.Email.From);
 
         foreach (var recipient in options.Email.To)
         {

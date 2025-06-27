@@ -13,6 +13,7 @@ public static class IServiceCollectionExtensions
     public static IServiceCollection AddNotifications(
         this IServiceCollection @this)
     {
+        //Register senders and the generic
         @this.AddScoped<SmtpNotificationSender>()
             .AddScoped<IEmailNotificationSender>(services =>
             {
@@ -28,7 +29,10 @@ public static class IServiceCollectionExtensions
                     _ => throw new InvalidOperationException($"The connection {connectionId} is not a valid email connection."),
                     smtp => services.GetRequiredService<SmtpNotificationSender>()
                 );
-            })
+            });
+
+        //Register sender dependencies
+        @this
             .AddScoped(services =>
             {
                 var notifOptions = services.GetRequiredService<IOptions<NotificationOptions>>()
@@ -48,11 +52,20 @@ public static class IServiceCollectionExtensions
                 return client;
             });
 
-        @this.AddScoped<INotificationRenderer<PackageOutForDeliveryEvent>, PackageOutForDeliveryRenderer>();
-        @this.AddScoped<ISmtpNotificationRenderer<PackageOutForDeliveryEvent>>(provider => provider.GetRequiredService<INotificationRenderer<PackageOutForDeliveryEvent>>());
+        //Register event renderers
+        @this.AddNotificationRenderer<PackageOutForDeliveryEvent, PackageOutForDeliveryRenderer>();
+        @this.AddNotificationRenderer<PackageDeliveredEvent, PackageDeliveredRenderer>();
 
-        @this.AddScoped<INotificationRenderer<PackageDeliveredEvent>, PackageDeliveredRenderer>();
-        @this.AddScoped<ISmtpNotificationRenderer<PackageDeliveredEvent>>(provider => provider.GetRequiredService<INotificationRenderer<PackageDeliveredEvent>>());
+        return @this;
+    }
+
+    private static IServiceCollection AddNotificationRenderer<TEvent, TRenderer>(
+        this IServiceCollection @this)
+        where TEvent : NotificationEvent
+        where TRenderer : class, INotificationRenderer<TEvent>
+    {
+        @this.AddScoped<INotificationRenderer<TEvent>, TRenderer>();
+        @this.AddScoped<ISmtpNotificationRenderer<TEvent>>(provider => provider.GetRequiredService<INotificationRenderer<TEvent>>());
 
         return @this;
     }
