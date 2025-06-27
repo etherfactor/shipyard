@@ -9,11 +9,11 @@ namespace EtherGizmos.Shipyard.Worker.Consumers;
 public class PackageOutForDeliveryConsumer : IMessageConsumer<PackageOutForDelivery>
 {
     private readonly IOptionsMonitor<NotificationOptions> _notificationOptions;
-    private readonly IEmailNotificationSender _emailSender;
+    private readonly IEmailNotificationSender<PackageOutForDelivery> _emailSender;
 
     public PackageOutForDeliveryConsumer(
         IOptionsMonitor<NotificationOptions> notificationOptions,
-        IEmailNotificationSender emailSender)
+        IEmailNotificationSender<PackageOutForDelivery> emailSender)
     {
         _notificationOptions = notificationOptions;
         _emailSender = emailSender;

@@ -7,7 +7,7 @@ using MimeKit;
 
 namespace EtherGizmos.Shipyard.Notifications.Services;
 
-internal class SmtpNotificationSender : IEmailNotificationSender
+internal class SmtpNotificationSender<TEvent> : IEmailNotificationSender<TEvent>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IOptionsMonitor<NotificationOptions> _notificationOptions;

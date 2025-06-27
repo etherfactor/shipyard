@@ -2,7 +2,7 @@
 
 namespace EtherGizmos.Shipyard.Notifications.Services;
 
-public interface INotificationSender
+public interface INotificationSender<in TEvent>
 {
     Task NotifyAsync(NotificationEvent notification, CancellationToken cancellationToken = default);
 }
