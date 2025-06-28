@@ -1,0 +1,17 @@
+@import './_base.scss';
+
+.ng-invalid.ng-touched {
+  border-color: var(--bs-danger);
+
+  &.ng-select {
+    .ng-select-container {
+      border-color: var(--bs-danger) !important;
+    }
+  }
+
+  &.accordion:has(> .accordion-item > .accordion-header.collapsed) {
+    .accordion-item {
+      border-color: var(--bs-danger);
+    }
+  }
+}

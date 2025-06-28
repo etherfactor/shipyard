@@ -36,6 +36,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.OData"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.Notifications", "src\EtherGizmos.Shipyard.Notifications\EtherGizmos.Shipyard.Notifications.csproj", "{58303B68-0A73-4950-A9DA-9BBD9D05DC43}"
 EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "EtherGizmos.Shipyard.Web", "src\EtherGizmos.Shipyard.Web\EtherGizmos.Shipyard.Web.esproj", "{9E2845F6-C4F7-2829-5542-9AAE492EF301}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,6 +92,12 @@ Global
 		{58303B68-0A73-4950-A9DA-9BBD9D05DC43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58303B68-0A73-4950-A9DA-9BBD9D05DC43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58303B68-0A73-4950-A9DA-9BBD9D05DC43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E2845F6-C4F7-2829-5542-9AAE492EF301}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E2845F6-C4F7-2829-5542-9AAE492EF301}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E2845F6-C4F7-2829-5542-9AAE492EF301}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{9E2845F6-C4F7-2829-5542-9AAE492EF301}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E2845F6-C4F7-2829-5542-9AAE492EF301}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E2845F6-C4F7-2829-5542-9AAE492EF301}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -107,6 +115,7 @@ Global
 		{8710B7E8-6A52-47AF-9BD1-5DD8883ACA9D} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 		{8ACBD7CB-F94E-481E-A769-655AE12A939C} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 		{58303B68-0A73-4950-A9DA-9BBD9D05DC43} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
+		{9E2845F6-C4F7-2829-5542-9AAE492EF301} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FDAA95A9-84A5-47E0-85A2-730CDD821DD7}

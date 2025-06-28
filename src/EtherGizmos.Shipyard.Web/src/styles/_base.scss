@@ -1,0 +1,13 @@
+@import '../../node_modules/bootstrap/scss/_functions.scss';
+
+$primary: #0d6efd;
+
+$custom-colors: (
+  "primary": $primary,
+);
+
+$grid-gutter-width: 1rem;
+
+@import "../../node_modules/bootstrap/scss/_variables.scss";
+
+$theme-colors: map-merge($theme-colors, $custom-colors);
