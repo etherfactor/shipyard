@@ -1,0 +1,41 @@
+<nav class="navbar navbar-main bg-body-tertiary sticky-top">
+  <div class="container-fluid">
+    <div class="navbar-grow d-flex flex-row align-items-center">
+      <button class="navbar-toggler" type="button" aria-label="Toggle navigation">
+        <!--(click)="openSidebar()"-->
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand ms-3" style="font-size: 1.25rem;" routerLink="/">(Logo)</a>
+    </div>
+    <input type="text" style="width: 400px;" class="form-control d-none d-md-block" id="exampleInputEmail1">
+    <button type="button" class="btn btn-link d-sm-block d-md-none"><span class="bi bi-search"></span></button>
+    <div class="navbar-grow d-flex flex-row-reverse align-items-center">
+      <ul class="navbar-nav mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0);"><span class="bi bi-box-arrow-in-right"></span> Sign In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<nav class="navbar navbar-sub bg-body-tertiary sticky-top" aria-expanded="true" data-testid="navbar-sub">
+
+  <div class="container-fluid" style="min-height: 32px;">
+
+    <app-navbar-breadcrumb></app-navbar-breadcrumb>
+
+    <div class="d-none d-md-block" data-testid="actions">
+      <app-navbar-action></app-navbar-action>
+    </div>
+
+  </div>
+
+  <div class="container-fluid flex-row-reverse">
+
+    <div class="d-md-none" data-testid="actions">
+      <app-navbar-action></app-navbar-action>
+    </div>
+
+  </div>
+</nav>
