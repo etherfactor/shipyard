@@ -1,4 +1,4 @@
-import { Component, computed, Signal, signal } from '@angular/core';
+import { Component, computed, OnInit, Signal, signal } from '@angular/core';
 import { ActivatedRouteSnapshot, ActivationEnd, NavigationEnd, Router, RouterModule, RoutesRecognized } from '@angular/router';
 import { filter, map, tap } from 'rxjs';
 
@@ -10,7 +10,7 @@ import { filter, map, tap } from 'rxjs';
   templateUrl: './navbar-breadcrumb.component.html',
   styleUrl: './navbar-breadcrumb.component.scss'
 })
-export class NavbarBreadcrumbComponent {
+export class NavbarBreadcrumbComponent implements OnInit {
 
   private $router: Router;
 
@@ -21,8 +21,11 @@ export class NavbarBreadcrumbComponent {
     $router: Router,
   ) {
     this.$router = $router;
+  }
 
-    $router.events.pipe(
+  ngOnInit(): void {
+
+    this.$router.events.pipe(
       filter(event => event instanceof RoutesRecognized),
       map(event => event as RoutesRecognized),
     ).subscribe(event => {
@@ -38,7 +41,7 @@ export class NavbarBreadcrumbComponent {
     });
 
     let snapshot: ActivatedRouteSnapshot;
-    $router.events.pipe(
+    this.$router.events.pipe(
       tap(event => {
         if (event instanceof ActivationEnd) {
           snapshot = event.snapshot.root;
@@ -62,8 +65,8 @@ export class NavbarBreadcrumbComponent {
           throw new Error(`Missing breadcrumbs at page ${snapshot.pathFromRoot}`);
         }
 
-        newBreadcrumb = saturateBreadcrub(newBreadcrumb, snapshot);
-        newParentBreadcrumbs = newParentBreadcrumbs.map(item => saturateBreadcrub(item, snapshot));
+        newBreadcrumb = saturateBreadcrumb(newBreadcrumb, snapshot);
+        newParentBreadcrumbs = newParentBreadcrumbs.map(item => saturateBreadcrumb(item, snapshot));
 
         const canonicalBreadcrumbs = [...newParentBreadcrumbs, newBreadcrumb];
         if (canonicalBreadcrumbs[0]?.link !== "/") {
@@ -128,7 +131,7 @@ export interface NavbarBreadcrumb {
   link: string | Signal<string>;
 }
 
-function saturateBreadcrub(breadcrumb: NavbarBreadcrumb, snapshot: ActivatedRouteSnapshot): NavbarBreadcrumb {
+function saturateBreadcrumb(breadcrumb: NavbarBreadcrumb, snapshot: ActivatedRouteSnapshot): NavbarBreadcrumb {
   const result: NavbarBreadcrumb = {
     label: computed(() => {
       const label = typeof breadcrumb.label === "function" ? breadcrumb.label() : breadcrumb.label;
