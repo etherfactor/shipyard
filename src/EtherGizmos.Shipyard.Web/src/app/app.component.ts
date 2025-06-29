@@ -14,5 +14,6 @@ import { NavbarComponent } from './features/app/components/navbar/navbar.compone
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
+
   title = 'EtherGizmos.Shipyard.Web';
 }
