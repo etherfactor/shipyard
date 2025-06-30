@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { NgbActiveOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-import { OffcanvasReturn } from '../../util/offcanvas/offcanvas.util';
+import { OffcanvasReturn } from '../../utilities/offcanvas/offcanvas.util';
 
 export abstract class InitializeOffcanvas<
   TArgs extends Array<any>,

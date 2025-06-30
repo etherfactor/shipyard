@@ -4,7 +4,11 @@ import { NavbarBreadcrumb } from "./features/app/components/navbar-breadcrumb/na
 export const APP_ROUTES: ExtendedRoute[] = [
   {
     path: "",
-    loadChildren: () => import("./features/home/home.routes.ts").then(m => m.HOME_ROUTES),
+    loadChildren: () => import("./features/home/home.routes").then(m => m.HOME_ROUTES),
+  },
+  {
+    path: "packages",
+    loadChildren: () => import("./features/package/package.routes").then(m => m.PACKAGE_ROUTES),
   },
 ];
 

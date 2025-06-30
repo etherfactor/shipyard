@@ -1,0 +1,50 @@
+<div class="position-relative overflow-scroll">
+  <table class="table table-transparent table-striped table-hover mb-0">
+    <thead>
+      <tr>
+        <ng-container *ngTemplateOutlet="
+                    headers || defaultHeaders;
+                    context: { $implicit: data }"></ng-container>
+      </tr>
+    </thead>
+    <tbody class="table-group-divider">
+      <ng-container *ngTemplateOutlet="!isLoading ? rowsData : rowsLoading"></ng-container>
+    </tbody>
+  </table>
+  <div *ngIf="isLoading" class="position-absolute" style="top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+    <div class="position-absolute" style="top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%);">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #defaultHeaders>
+  <th *ngFor="let header of getDefaultHeaders()">
+    {{header}}
+  </th>
+</ng-template>
+
+<ng-template #defaultRows let-datum>
+  <td *ngFor="let header of getDefaultHeaders()">
+    {{datum[header]}}
+  </td>
+</ng-template>
+
+<ng-template #rowsData>
+  <tr *ngFor="let datum of data">
+    <ng-container *ngTemplateOutlet="
+                rows || defaultRows;
+                context: { $implicit: datum }"></ng-container>
+  </tr>
+  <tr *ngFor="let n of minRows - data.length | iterate">
+    <td colspan="999" class="unselectable">&nbsp;</td>
+  </tr>
+</ng-template>
+
+<ng-template #rowsLoading>
+  <tr *ngFor="let n of minRows | iterate">
+    <td colspan="999" class="unselectable">&nbsp;</td>
+  </tr>
+</ng-template>

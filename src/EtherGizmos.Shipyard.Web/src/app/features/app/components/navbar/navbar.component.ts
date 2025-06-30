@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-import { openOffcanvas } from '../../../../shared/util/offcanvas/offcanvas.util';
+import { openOffcanvas } from '../../../../shared/utilities/offcanvas/offcanvas.util';
 import { NavbarActionComponent } from '../navbar-action/navbar-action.component';
 import { NavbarBreadcrumbComponent } from '../navbar-breadcrumb/navbar-breadcrumb.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';

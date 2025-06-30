@@ -1,0 +1,5 @@
+{
+  "production": false,
+  "resourceServer": "https://localhost:7265",
+  "version": "dev"
+}

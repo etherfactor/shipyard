@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ModalReturn } from '../../util/modal/modal.util';
+import { ModalReturn } from '../../utilities/modal/modal.util';
 
 export abstract class InitializeModal<
   TArgs extends Array<any>,
