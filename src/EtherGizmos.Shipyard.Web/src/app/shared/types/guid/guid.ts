@@ -1,7 +1,8 @@
+import { Guid as GuidType } from '@ethergizmos/odata-fluent-client';
 import { v4 as uuidv4, validate } from 'uuid';
 import { z } from 'zod';
 
-export type Guid = string & { __guidTag: true };
+export type Guid = GuidType;
 
 export function generateGuid(): Guid {
   return uuidv4() as Guid;

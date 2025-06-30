@@ -1,5 +1,5 @@
 {
   "production": false,
-  "resourceServer": "https://localhost:7265",
+  "resourceServer": "https://localhost:7265/api/v1",
   "version": "dev"
 }

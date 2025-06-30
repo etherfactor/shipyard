@@ -1,4 +1,4 @@
-import { ControlConfig, FormArray, FormBuilder, FormControl, FormGroup, Validators, ɵElement } from "@angular/forms";
+import { AbstractControl, ControlConfig, FormArray, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators, ɵElement } from "@angular/forms";
 import { DateTime, Duration, Interval } from "luxon";
 import { Guid } from "../../types/guid/guid";
 
@@ -104,5 +104,17 @@ function isFormGroupLike(value: unknown): value is FormGroup {
 }
 
 export class AppValidators extends Validators {
+  static minArrayLength(length: number): ValidatorFn {
+    return (control: AbstractControl) => {
+      if (!Array.isArray(control.value) || control.value.length < length) {
+        return { value: `Must contain at least ${length} elements` };
+      }
 
+      if (control.value.some((value: unknown) => !value)) {
+        return { value: `All values must not be falsy` };
+      }
+
+      return null;
+    };
+  }
 }

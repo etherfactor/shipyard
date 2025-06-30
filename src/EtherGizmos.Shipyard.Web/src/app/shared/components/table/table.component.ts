@@ -98,7 +98,7 @@ export class TableComponent<TData extends object> implements OnInit, OnDestroy {
   setFilterCondition(column: string, filter: FilterColumnCondition | undefined) {
     const maybeIndex = this.filter?.findIndex(e => e.column === column);
     const maybeFilter = maybeIndex >= 0 ? this.filter[maybeIndex] : undefined;
-    
+
     if (maybeIndex >= 0 && filter) {
       this.filter[maybeIndex] = filter;
     } else if (filter) {
@@ -106,8 +106,8 @@ export class TableComponent<TData extends object> implements OnInit, OnDestroy {
     } else if (maybeIndex >= 0) {
       this.filter.splice(maybeIndex, 1);
     }
-    
-    if (maybeFilter !== filter || maybeFilter?.operator !== filter?.operator || maybeFilter?.value !== filter?.value) {
+
+    if (maybeFilter !== filter || maybeFilter?.operator !== filter?.operator || maybeFilter?.values?.some((value, i) => value !== filter?.values?.[i])) {
       this.filterChange.emit([...this.filter]);
     }
   }

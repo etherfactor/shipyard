@@ -1,15 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit, Optional } from '@angular/core';
-import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SortDirection } from '@ethergizmos/odata-fluent-client';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxMaskDirective } from 'ngx-mask';
-import { Subscription, debounceTime } from 'rxjs';
+import { debounceTime, Subscription } from 'rxjs';
+import { IteratePipe } from '../../pipes/iterate/iterate.pipe';
 import { SortTableService } from '../../services/sort-table/sort-table.service';
 import { generateGuid } from '../../types/guid/guid';
-import { FilterCondition, FilterPropertyOperator, FilterType, defaultOperators, displayText, filterConditionForm, showInput } from '../../utilities/filter/filter.util';
-import { DefaultControlTypes, TypedFormGroup } from '../../utilities/form/form.util';
+import { FilterCondition, filterConditionForm, FilterFlag, FilterOperator, FilterOperatorLabel, FilterTypeLabel, FilterValue, OPERATORS } from '../../utilities/filter/filter.util';
+import { TypedFormGroup } from '../../utilities/form/form.util';
 import { InputLuxonDatetimeComponent } from '../input-luxon-datetime/input-luxon-datetime.component';
 import { TableComponent } from '../table/table.component';
 
@@ -20,6 +21,7 @@ import { TableComponent } from '../table/table.component';
     CommonModule,
     FormsModule,
     InputLuxonDatetimeComponent,
+    IteratePipe,
     NgbDropdownModule,
     NgSelectModule,
     NgxMaskDirective,
@@ -37,7 +39,10 @@ export class TableHeaderComponent<TData extends object> implements OnInit, OnDes
 
   @Input({ alias: 'app-table-header', required: true }) name!: string;
 
-  @Input() type?: FilterType;
+  @Input() type?: FilterTypeLabel;
+  @Input() operators: FilterOperatorLabel[] = [];
+  @Input() flags: FilterFlag[] = [];
+  @Input() enumValues: FilterValue[] = [];
 
   @Input() sortable: boolean = false;
 
@@ -49,7 +54,7 @@ export class TableHeaderComponent<TData extends object> implements OnInit, OnDes
 
   private id = generateGuid();
 
-  filterForm: TypedFormGroup<FilterCondition, DefaultControlTypes>;
+  filterForm: TypedFormGroup<FilterCondition>;
   filterSubscriptions: Subscription[] = [];
 
   get direction() {
@@ -91,7 +96,10 @@ export class TableHeaderComponent<TData extends object> implements OnInit, OnDes
     this.$sortTable = $sortTable;
     this.table = table;
 
-    this.filterForm = filterConditionForm(this.$form, { operator: undefined!, value: undefined });
+    this.filterForm = filterConditionForm(this.$form, {
+      operator: undefined!,
+      values: [],
+    });
   }
 
   ngOnInit(): void {
@@ -101,16 +109,25 @@ export class TableHeaderComponent<TData extends object> implements OnInit, OnDes
 
     const condition = this.filterForm;
     const operatorSub = condition.controls.operator.valueChanges.subscribe(operator => {
-      const value = condition.controls.value;
-      value.setValue(undefined);
+      const values = condition.controls.values;
+      values.clear();
 
-      if (operator && showInput[operator]) {
-        value.setValidators([Validators.required]);
-      } else {
-        value.setValidators([]);
+      if (operator) {
+        const operatorDef = OPERATORS[operator];
+        for (let i = 0; i < operatorDef.arguments; i++) {
+          values.push(
+            new FormControl(
+              undefined!,
+              {
+                nonNullable: true,
+                validators: [Validators.required],
+              }
+            )
+          );
+        }
       }
 
-      value.updateValueAndValidity();
+      values.updateValueAndValidity();
     });
 
     this.filterSubscriptions.push(operatorSub);
@@ -156,17 +173,24 @@ export class TableHeaderComponent<TData extends object> implements OnInit, OnDes
     console.log('leave');
   }
 
-  getOperators(): FilterPropertyOperator[] {
-    return defaultOperators[this.type ?? 'string'];
+  getOperators(): { id: FilterOperatorLabel, value: FilterOperator }[] {
+    const type = this.type ?? "string";
+    const operators = Object.entries(OPERATORS).filter(o => o[1].types.some(t => t.type === type));
+    const withFlags = operators.filter(o => o[1].requiresFlags.every(f => this.flags.indexOf(f) >= 0));
+    const withLimit = this.operators.length === 0 ? withFlags : withFlags.filter(o => this.operators.indexOf(o[0] as FilterOperatorLabel) >= 0);
+    return withLimit.map(o => ({ id: o[0] as FilterOperatorLabel, value: o[1] }));
   }
 
-  getOperatorDisplayName(operator: FilterPropertyOperator) {
-    return displayText[this.type ?? 'string'][operator];
+  getOperatorDisplayName(operator: FilterOperator) {
+    const type = this.type ?? "string";
+    const operatorType = operator.types.find(t => t.type === type);
+    return operatorType?.labelOverride ?? operator.label;
   }
 
-  showOperatorValue() {
-    const condition = this.filterForm;
-    return showInput[condition?.controls?.operator?.value ?? '' as FilterPropertyOperator] ?? false;
+  countOperatorValues() {
+    const operator = this.filterForm?.controls?.operator?.value ?? "null";
+    const operatorDef = OPERATORS[operator];
+    return operatorDef.arguments;
   }
 
   getFilterCondition() {

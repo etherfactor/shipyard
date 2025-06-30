@@ -18,7 +18,7 @@ export const PackageZ = z.object({
   nextPollAt: DateTimeZ,
   lastStatusType: z.nativeEnum(StatusType),
   isDelivered: z.boolean(),
-  trackingUpdates: z.array(TrackingUpdateZ),
+  trackingUpdates: z.array(TrackingUpdateZ).nullish(),
 });
 
 export interface PackageF extends z.infer<typeof PackageZ> { }

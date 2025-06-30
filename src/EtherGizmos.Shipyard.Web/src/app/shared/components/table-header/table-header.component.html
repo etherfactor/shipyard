@@ -1,38 +1,68 @@
 <div class="container-fluid p-0">
-  <div class="row">
-    <div class="col-auto" *ngIf="filterable" ngbDropdown placement="bottom-start" autoClose="outside" style="margin-right: -7.5px;">
-      <a href="javascript:void(0);" class="bi" [class]="getFilterCondition() ? 'bi-funnel-fill' : 'bi-funnel'" ngbDropdownToggle (click)="stopPropagation($event)" data-bs-toggle="dropdown"></a>
+
+  <div class="row flex-nowrap me-1">
+
+    <div class="col" style="display: inline-block;">
+      @if (sortable) {
+      <a href="javascript:void(0);" (click)="onClick()" class="d-inline-block w-100">
+        <ng-container *ngTemplateOutlet="content"></ng-container>
+      </a>
+      } @else {
+      <ng-container *ngTemplateOutlet="content"></ng-container>
+      }
+    </div>
+    @if (sortable) {
+    <div class="col-auto" style="display: inline-block">
+      <span class="bi" [class]="direction === 'asc' ? 'bi-caret-up-fill' : 'bi-caret-down-fill'" [style]="direction ? { opacity: 1 } : { opacity : 0 }"></span>
+    </div>
+    }
+
+    @if (filterable) {
+    <div class="col-auto" ngbDropdown [placement]="['bottom-end', 'bottom-start', 'top-end', 'top-start']" autoClose="outside" style="margin-right: -7.5px; display: inline-block;">
+      <a href="javascript: void(0);" class="bi" [class]="getFilterCondition() ? 'bi-funnel-fill' : 'bi-funnel'" ngbDropdownToggle (click)="stopPropagation($event)" data-bs-toggle="dropdown"></a>
       <div ngbDropdownMenu aria-labelledby="dropdownBasic1" (click)="stopPropagation($event)" [formGroup]="filterForm">
         <div class="dropdown-item" style="width: 240px;" tabindex="-1">
           <ng-select formControlName="operator"
                      [selectOnTab]="true">
-            <ng-option *ngFor="let operator of getOperators()" [value]="operator">{{getOperatorDisplayName(operator)}}</ng-option>
+            @for (operator of getOperators(); track operator.id) {
+            <ng-option [value]="operator.id">{{getOperatorDisplayName(operator.value)}}</ng-option>
+            }
           </ng-select>
         </div>
-        <div class="dropdown-item" style="width: 240px;" *ngIf="showOperatorValue()" tabindex="-1">
-          <ng-container [ngSwitch]="type ?? 'string'">
-            <input-luxon-datetime *ngSwitchCase="'datetime'" formControlName="value"></input-luxon-datetime>
-            <input *ngSwitchCase="'guid'" type="text" mask="XXXXXXXX-XXXX-4XXX-8XXX-XXXXXXXXXXXX" [patterns]="guidPatterns" class="form-control" formControlName="value" />
-            <input *ngSwitchCase="'number'" type="number" class="form-control" formControlName="value" />
-            <input *ngSwitchCase="'string'" type="text" class="form-control" formControlName="value" />
-          </ng-container>
+        @for (i of countOperatorValues() | iterate; track i; let index = $index) {
+        @let control = filterForm.controls.values.controls[index];
+        <div class="dropdown-item" style="width: 240px;" tabindex="-1">
+          @if (enumValues.length > 0) {
+          <ng-select [formControl]="control"
+                     [selectOnTab]="true">
+            @for (enumValue of enumValues; track enumValue) {
+            <ng-option [value]="enumValue">{{enumValue}}</ng-option>
+            }
+          </ng-select>
+          } @else {
+          @switch (type ?? 'string') {
+          @case ('datetime') {
+          <luxon-datetime-input id="filter{{i}}" [formControl]="control"></luxon-datetime-input>
+          }
+          @case ('guid') {
+          <input type="text" mask="XXXXXXXX-XXXX-4XXX-8XXX-XXXXXXXXXXXX" [patterns]="guidPatterns" class="form-control" [formControl]="control" />
+          }
+          @case ('number') {
+          <input type="number" class="form-control" [formControl]="control" />
+          }
+          @case ('string') {
+          <input type="text" class="form-control" [formControl]="control" />
+          }
+          }
+          }
         </div>
+        }
       </div>
     </div>
-    <div class="col">
-      <ng-container *ngIf="sortable; else notSortableContent">
-        <a href="javascript:void(0);" (click)="onClick()" class="d-inline-block w-100">
-          <ng-container *ngTemplateOutlet="content"></ng-container>
-        </a>
-      </ng-container>
-      <ng-template #notSortableContent>
-        <ng-container *ngTemplateOutlet="content"></ng-container>
-      </ng-template>
-    </div>
-    <div class="col-auto" *ngIf="sortable">
-      <span class="bi" [class]="direction === 'asc' ? 'bi-caret-up-fill' : 'bi-caret-down-fill'" [style]="direction ? { opacity: 1 } : { opacity: 0 }"></span>
-    </div>
+    }
+
   </div>
+
 </div>
 
 <ng-template #content>

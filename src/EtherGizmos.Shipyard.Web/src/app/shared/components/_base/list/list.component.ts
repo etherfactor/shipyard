@@ -6,7 +6,7 @@ import { isEqual } from 'moderndash';
 import { Subject, debounceTime, filter } from 'rxjs';
 import { NavbarAction } from '../../../../features/app/components/navbar-action/navbar-action.component';
 import { NavbarActionService } from '../../../services/navbar-action/navbar-action.service';
-import { FilterColumnCondition, FilterType, evaluateSearch } from '../../../utilities/filter/filter.util';
+import { FilterColumnCondition, FilterTypeLabel, evaluateSearch } from '../../../utilities/filter/filter.util';
 import { SortColumn } from '../../../utilities/sort/sort.util';
 
 @Component({
@@ -108,5 +108,5 @@ export abstract class ListComponent<TEntity> implements OnInit {
 export interface TableColumn {
   name: string;
   displayName: string;
-  type: FilterType;
+  type: FilterTypeLabel;
 }

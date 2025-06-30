@@ -51,16 +51,7 @@ export class PackageListComponent extends ListComponent<Package> {
   }
 
   protected override get columns(): TableColumn[] {
-    const columns: TableColumn[] = [
-      { name: 'id', displayName: 'Id', type: 'guid' },
-      { name: 'name', displayName: 'Name', type: 'string' },
-      { name: 'description', displayName: 'Description', type: 'string' },
-      { name: 'isActive', displayName: 'Is active', type: 'boolean' },
-      { name: 'createdAt', displayName: 'Created at', type: 'datetime' },
-      { name: 'createdByUserId', displayName: 'Created by user id', type: 'guid' },
-      { name: 'modifiedAt', displayName: 'Modified at', type: 'datetime' },
-      { name: 'modifiedByUserId', displayName: 'Modified by user id', type: 'guid' },
-    ];
+    const columns: TableColumn[] = [];
 
     return columns;
   }
