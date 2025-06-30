@@ -13,4 +13,21 @@ export const PACKAGE_ROUTES: ExtendedRoute[] = [
       parentBreadcrumbs: [],
     },
   },
+  {
+    path: ":packageId",
+    pathMatch: "full",
+    loadComponent: () => import("./pages/package-detail/package-detail.component").then(m => m.PackageDetailComponent),
+    data: {
+      breadcrumb: {
+        label: "Package #{packageId}",
+        link: "/packages/{packageId}",
+      },
+      parentBreadcrumbs: [
+        {
+          label: "Package List",
+          link: "/packages",
+        },
+      ],
+    },
+  },
 ];

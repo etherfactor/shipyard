@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { ODataClient } from '@ethergizmos/odata-fluent-client';
 import { narrowValidator, o } from '../../../../shared/utilities/odata/odata.util';
-import { Package, PackageZ } from '../../models/package';
+import { Package, PackageF, PackageZ } from '../../models/package';
 
 @Injectable({
   providedIn: 'root'
@@ -38,11 +38,11 @@ export class PackageService {
     return this.$set.read(id);
   }
 
-  create(record: Partial<Package>) {
+  create(record: Partial<PackageF>) {
     return this.$set.create(record);
   }
 
-  update(id: number, record: Partial<Package>) {
+  update(id: number, record: Partial<PackageF>) {
     return this.$set.update(id, record);
   }
 

@@ -21,11 +21,11 @@ export const PackageZ = z.object({
   trackingUpdates: z.array(TrackingUpdateZ).nullish(),
 });
 
-export interface PackageF extends z.infer<typeof PackageZ> { }
+export interface Package extends z.infer<typeof PackageZ> { }
 
-export type Package = Omit<PackageF, "carrier" | "trackingUpdates">;
+export type PackageF = Omit<Package, "carrier" | "trackingUpdates">;
 
-export const packageForm = formFactoryForModel<Package>(($form, model) => ({
+export const packageForm = formFactoryForModel<PackageF>(($form, model) => ({
   id: [model.id],
   createdAt: [model.createdAt],
   modifiedAt: [model.modifiedAt],

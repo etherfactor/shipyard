@@ -1,1 +1,92 @@
-<p>package-detail works!</p>
+@let record = package$$();
+<!-- Header -->
+<div class="row">
+  <div class="col-12 mt-3">
+
+    <detail-header [text]="'Package Details'"
+                   [subtext]="'Tracking ' + (record?.carrier?.name ?? 'Unknown') + ' package #' + record?.trackingNumber" />
+
+  </div>
+</div>
+
+@if (record) {
+<!-- Summary / Metadata -->
+<div class="row">
+  <div class="col-12 mt-3">
+
+    <detail-box icon="bi-clipboard" text="Package Summary">
+      <div class="row">
+        <div class="col-md-6 mt-3">
+          <strong>Tracking Number:</strong><br />
+          {{record.trackingNumber}}
+        </div>
+        <div class="col-md-6 mt-3">
+          <strong>Carrier:</strong><br />
+          {{record.carrier?.name ?? 'Unknown'}}
+        </div>
+        @let statusMeta = getStatusMetadata(record.lastStatusType);
+        <div class="col-md-6 mt-3">
+          <strong>Status:</strong><br />
+          <span class="bi me-1" [class]="[statusMeta.icon, statusMeta.color]"></span>
+          {{statusMeta.label}}
+        </div>
+        <div class="col-md-6 mt-3">
+          <strong>Last Update:</strong><br />
+          {{record.modifiedAt.toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}}
+        </div>
+        <div class="col-md-6 mt-3">
+          <strong>ETA:</strong><br />
+          {{record.estimatedDeliveryAt?.toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) ?? '—'}}
+        </div>
+        <div class="col-md-6 mt-3">
+          <strong>Contents:</strong><br />
+          {{record.contents ?? '—'}}
+        </div>
+      </div>
+    </detail-box>
+
+  </div>
+</div>
+
+<!-- Tracking History -->
+<div class="row">
+  <div class="col-12 mt-3">
+
+    <detail-box icon="bi-clock-history" text="Tracking History">
+      <div class="table-responsive mt-3">
+        <table class="table table-sm table-transparent table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th scope="col">Time</th>
+              <th scope="col">Status</th>
+              <th scope="col">Description</th>
+              <th scope="col">Location</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (update of record.trackingUpdates ?? []; track update) {
+            @let statusMeta = getStatusMetadata(update.statusType);
+            <tr>
+              <td class="text-nowrap">
+                {{update.occurredAt.toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}}
+              </td>
+              <td class="text-nowrap">
+                <span class="bi" [class]="[statusMeta.icon, statusMeta.color]"></span>
+                {{statusMeta.label}}
+              </td>
+              <td class="text-nowrap">
+                {{update.description ?? '-'}}
+              </td>
+              <td class="text-nowrap">
+                {{update.location ?? '—'}}
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </detail-box>
+
+  </div>
+</div>
+}

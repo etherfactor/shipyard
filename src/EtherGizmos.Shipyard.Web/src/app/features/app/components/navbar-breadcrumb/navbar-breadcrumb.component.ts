@@ -135,7 +135,9 @@ function saturateBreadcrumb(breadcrumb: NavbarBreadcrumb, snapshot: ActivatedRou
   const result: NavbarBreadcrumb = {
     label: computed(() => {
       const label = typeof breadcrumb.label === "function" ? breadcrumb.label() : breadcrumb.label;
-      return label;
+      const params = collectRouteParams(snapshot);
+      const saturatedLabel = label.replace(/{(\w+)}/g, (_, key) => params[key] || "");
+      return saturatedLabel;
     }),
     link: computed(() => {
       const link = typeof breadcrumb.link === "function" ? breadcrumb.link() : breadcrumb.link;

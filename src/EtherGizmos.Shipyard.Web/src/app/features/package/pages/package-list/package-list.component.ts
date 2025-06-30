@@ -9,6 +9,7 @@ import { TableComponent } from '../../../../shared/components/table/table.compon
 import { Bound } from '../../../../shared/utilities/bound/bound.util';
 import { NavbarAction } from '../../../app/components/navbar-action/navbar-action.component';
 import { Package } from '../../models/package';
+import { getStatusTypeMetadata, StatusType } from '../../models/status-type';
 import { PackageService } from '../../services/package/package.service';
 
 @Component({
@@ -62,5 +63,9 @@ export class PackageListComponent extends ListComponent<Package> {
 
   @Bound new() {
     this.$router.navigate(["/packages", "new"]);
+  }
+
+  getStatusMetadata(statusType: StatusType) {
+    return getStatusTypeMetadata(statusType);
   }
 }
