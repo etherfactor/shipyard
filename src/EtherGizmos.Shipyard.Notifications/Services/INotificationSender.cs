@@ -1,8 +1,6 @@
-﻿using EtherGizmos.Shipyard.Notifications.Models;
-
-namespace EtherGizmos.Shipyard.Notifications.Services;
+﻿namespace EtherGizmos.Shipyard.Notifications.Services;
 
 public interface INotificationSender<in TEvent>
 {
-    Task NotifyAsync(NotificationEvent notification, CancellationToken cancellationToken = default);
+    Task NotifyAsync(TEvent notification, CancellationToken cancellationToken = default);
 }

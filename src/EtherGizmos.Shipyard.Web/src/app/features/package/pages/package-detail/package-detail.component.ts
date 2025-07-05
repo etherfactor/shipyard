@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { EntitySingle } from '@ethergizmos/odata-fluent-client';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { DetailBoxComponent } from '../../../../shared/components/detail-box/detail-box.component';
@@ -38,6 +38,7 @@ export class PackageDetailComponent implements OnInit {
   private readonly $form = inject(FormBuilder);
   private readonly $navbarAction = inject(NavbarActionService);
   private readonly $route = inject(ActivatedRoute);
+  private readonly $router = inject(Router);
 
   readonly id$$ = signal<number | undefined>(undefined);
   readonly package$$ = signal<Package | undefined>(undefined);
@@ -56,7 +57,7 @@ export class PackageDetailComponent implements OnInit {
     const record = this.package$$();
 
     if (!this.isLoading$$()) {
-      if (!record?.isDelivered) {
+      if (this.id$$() && !record?.isDelivered) {
         actions.push({
           icon: "bi-arrow-repeat",
           label: "Repoll",
@@ -106,10 +107,18 @@ export class PackageDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const id = parseInt(this.$route.snapshot.paramMap.get("packageId")!);
-    this.id$$.set(id);
+    const packageId = this.$route.snapshot.paramMap.get("packageId");
+    if (packageId) {
+      const id = parseInt(packageId);
+      this.id$$.set(id);
 
-    this.load();
+      this.load();
+    } else {
+      this.package$$.set({ lastStatusType: StatusType.Unknown } as Package);
+      this.form$$.set(packageForm(this.$form, {} as Package));
+
+      this.onEdit();
+    }
   }
 
   getStatusMetadata(statusType: StatusType) {
@@ -171,7 +180,7 @@ export class PackageDetailComponent implements OnInit {
   }
 
   @Bound onDelete() {
-
+    
   }
 
   @Bound async onSave() {
@@ -181,17 +190,34 @@ export class PackageDetailComponent implements OnInit {
     if (!record || !form)
       return;
 
-    if (form.invalid)
+    if (form.invalid) {
+      form.markAllAsTouched();
       return;
+    }
 
-    const patch = getDirtyFormValues(form);
-    const single = this.$package.update(record.id, patch);
-    await this.load(single);
-    this.onCancel();
+    this.isLoadingStack$$.set(this.isLoadingStack$$() + 1);
+    try {
+      const data = getDirtyFormValues(form);
+      if (this.id$$()) {
+        const single = this.$package.update(record.id, data);
+        await this.load(single);
+        this.onCancel();
+      } else {
+        const create = this.$package.create(data).execute();
+        const created = await create.data;
+        this.$router.navigate(["/packages", created.id]);
+      }
+    } finally {
+      this.isLoadingStack$$.set(this.isLoadingStack$$() - 1);
+    }
   }
 
   @Bound onCancel() {
-    this.isEditing$$.set(false);
-    this.init();
+    if (this.id$$()) {
+      this.isEditing$$.set(false);
+      this.init();
+    } else {
+      this.$router.navigate(["/packages"]);
+    }
   }
 }

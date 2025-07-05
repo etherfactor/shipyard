@@ -1,8 +1,6 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.OData;
-using AutoMapper;
 using EtherGizmos.Common.Utilities.Abstractions;
-using EtherGizmos.Extensions.DependencyInjection;
 using EtherGizmos.Shipyard.OData.Services;
 using EtherGizmos.Shipyard.OData.Services.Filters;
 using EtherGizmos.Shipyard.OData.Swagger;
@@ -85,18 +83,10 @@ public static class IServiceCollectionExtensions
 
         @this.AddTransient(typeof(IModelValidator<>), typeof(ValidationModelValidator<>));
 
-        @this
-            .AddChildContainer((child, parent) =>
-            {
-                var options = parent.GetRequiredService<IOptions<ODataOptions>>()
-                    .Value;
-
-                child.AddAutoMapper(options.ModelAssemblies);
-            })
-            .ForwardTransient<IMapper>();
-
         var fakeOptions = new ODataOptions();
         configureOptions(fakeOptions, new ConfigurationManager());
+
+        @this.AddAutoMapper(fakeOptions.ModelAssemblies);
 
         @this.AddEndpointsApiExplorer();
         @this.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();

@@ -4,8 +4,13 @@
 <div class="row">
   <div class="col-12 mt-3">
 
+    @if (id$$()) {
     <detail-header [text]="'Package Details'"
                    [subtext]="'Tracking ' + (record?.carrier?.name ?? 'Unknown') + ' package #' + record?.trackingNumber" />
+    } @else {
+    <detail-header [text]="'Package Details'"
+                   [subtext]="'Creating new package'" />
+    }
 
   </div>
 </div>
@@ -132,6 +137,12 @@
               </td>
               <td class="text-nowrap">
                 {{update.location ?? '—'}}
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td class="text-nowrap text-center" colspan="999">
+                No updates available
               </td>
             </tr>
             }

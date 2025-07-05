@@ -8,6 +8,7 @@ using MimeKit;
 namespace EtherGizmos.Shipyard.Notifications.Services;
 
 internal class SmtpNotificationSender<TEvent> : IEmailNotificationSender<TEvent>
+    where TEvent : NotificationEvent
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IOptionsMonitor<NotificationOptions> _notificationOptions;
@@ -24,7 +25,7 @@ internal class SmtpNotificationSender<TEvent> : IEmailNotificationSender<TEvent>
     }
 
     public async Task NotifyAsync(
-        NotificationEvent notification,
+        TEvent notification,
         CancellationToken cancellationToken = default)
     {
         var options = _notificationOptions.CurrentValue;

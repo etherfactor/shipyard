@@ -8,6 +8,7 @@ using EtherGizmos.Shipyard.Database.Configuration;
 using EtherGizmos.Shipyard.Database.Services;
 using EtherGizmos.Shipyard.Notifications;
 using EtherGizmos.Shipyard.Notifications.Configuration;
+using EtherGizmos.Shipyard.Notifications.Models;
 using EtherGizmos.Shipyard.Worker.Configuration;
 using EtherGizmos.Shipyard.Worker.Services.Carriers;
 using EtherGizmos.Shipyard.Worker.Services.HostedServices;
@@ -117,7 +118,7 @@ builder.Services
     .AddTransient<IRegexClassifier, RegexClassifier>();
 
 // Notifications
-builder.Services.AddNotifications();
+builder.Services.AddNotifications(typeof(Program).Assembly, typeof(NotificationEvent).Assembly);
 
 // Hosted Services
 builder.Services.AddHostedService<QueueTrackingRequestBackgroundService>();
