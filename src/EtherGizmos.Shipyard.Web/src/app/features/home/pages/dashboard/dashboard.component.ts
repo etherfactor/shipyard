@@ -1,5 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { DateTime, Duration } from 'luxon';
 import { DetailBoxButton, DetailBoxComponent } from '../../../../shared/components/detail-box/detail-box.component';
 import { DetailHeaderComponent } from '../../../../shared/components/detail-header/detail-header.component';
@@ -14,6 +14,7 @@ import { TrackingUpdateService } from '../../../package/services/tracking-update
   imports: [
     DetailBoxComponent,
     DetailHeaderComponent,
+    RouterModule,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
@@ -39,8 +40,8 @@ export class DashboardComponent implements OnInit {
   delivered = 0;
   errors = 0;
   stale = 0;
-  nextPolls: { contents?: string, carrier: string, interval: string, icon: string, color: string }[] = [];
-  recentUpdates: { message: string, icon: string, color: string }[] = [];
+  nextPolls: { contents?: string, carrier: string, interval: string, icon: string, color: string, packageId: number }[] = [];
+  recentUpdates: { message: string, icon: string, color: string, packageId: number }[] = [];
 
   ngOnInit(): void {
     this.loadInTransit();
@@ -167,6 +168,7 @@ export class DashboardComponent implements OnInit {
           color: duration.toMillis() <= 1000 * 60 * 5 ? "text-danger"
             : duration.toMillis() <= 1000 * 60 * 30 ? "text-warning"
               : "text-muted",
+          packageId: item.id,
         };
       });
     } finally {
@@ -210,66 +212,68 @@ export class DashboardComponent implements OnInit {
         switch (status) {
           case (StatusType.Delivered):
             if (location) {
-              message = `Delivered at ${location} — ${time}`;
+              message = `${time} — Delivered at ${location}`;
             } else {
-              message = `Delivered — ${time}`;
+              message = `${time} — Delivered`;
             }
             break;
 
           case (StatusType.Expired):
-            message = `Expired — ${time}`;
+            message = `${time} — Expired`;
             break;
 
           case (StatusType.FailedAttempt):
             if (location) {
-              message = `Failed attempt at ${location} — ${time}`;
+              message = `${time} — Failed attempt at ${location}`;
             } else {
-              message = `Failed attempt — ${time}`;
+              message = `${time} — Failed attempt`;
             }
             break;
 
           case (StatusType.InTransit):
             if (location) {
-              message = `In transit from ${location} — ${time}`;
+              message = `${time} — In transit from ${location}`;
             } else {
-              message = `In transit — ${time}`;
+              message = `${time} — In transit`;
             }
             break;
 
           case (StatusType.OutForDelivery):
             if (location) {
-              message = `Out for delivery to ${location} — ${time}`;
+              message = `${time} — Out for delivery to ${location}`;
             } else {
-              message = `Out for delivery — ${time}`;
+              message = `${time} — Out for delivery`;
             }
             break;
 
           case (StatusType.Returned):
             if (location) {
-              message = `Returned from ${location} — ${time}`;
+              message = `${time} — Returned from ${location}`;
             } else {
-              message = `Returned — ${time}`;
+              message = `${time} — Returned`;
             }
             break;
 
           case (StatusType.Waiting):
             if (location) {
-              message = `Waiting for pickup from ${location} — ${time}`;
+              message = `${time} — Waiting for pickup from ${location}`;
             } else {
-              message = `Waiting for pickup — ${time}`;
+              message = `${time} — Waiting for pickup`;
             }
             break;
 
           case (StatusType.Unknown):
-            message = `Unknown — ${time}`;
+            message = `${time} — Unknown`;
             break;
         }
 
+
         const metadata = getStatusTypeMetadata(status);
         return {
-          message: `${contents} — ${message}`,
+          message: `${message} — ${contents}`,
           icon: metadata.icon,
           color: metadata.color,
+          packageId: item.id,
         };
       });
     } finally {

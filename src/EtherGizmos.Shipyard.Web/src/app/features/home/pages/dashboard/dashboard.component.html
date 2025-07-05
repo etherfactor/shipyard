@@ -57,6 +57,7 @@
         <li>
           <span class="bi" [class]="[update.icon, update.color]"></span>
           {{update.message}}
+          (<a [routerLink]="['/packages', update.packageId]">view</a>)
         </li>
         }
       </ul>
@@ -71,6 +72,7 @@
         <li>
           <span class="bi" [class]="[poll.icon, poll.color]"></span>
           {{poll.interval}}: “{{poll.contents}}” ({{poll.carrier}})
+          (<a [routerLink]="['/packages', poll.packageId]">view</a>)
         </li>
         }
       </ul>

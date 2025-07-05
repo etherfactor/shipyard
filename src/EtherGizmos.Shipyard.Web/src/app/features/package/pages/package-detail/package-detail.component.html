@@ -1,4 +1,5 @@
 @let record = package$$();
+@let form = form$$();
 <!-- Header -->
 <div class="row">
   <div class="col-12 mt-3">
@@ -9,38 +10,84 @@
   </div>
 </div>
 
-@if (record) {
+@if (record && form) {
 <!-- Summary / Metadata -->
-<div class="row">
+<div class="row" [formGroup]="form">
   <div class="col-12 mt-3">
 
     <detail-box icon="bi-clipboard" text="Package Summary">
       <div class="row">
-        <div class="col-md-6 mt-3">
-          <strong>Tracking Number:</strong><br />
-          {{record.trackingNumber}}
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="contents" class="col-sm-4 col-form-label">
+              Contents
+            </label>
+            <div class="col-sm-8">
+              <textarea id="contents" rows="3" formControlName="contents" [readonlyForm]="!isEditing$$()"></textarea>
+            </div>
+          </div>
         </div>
-        <div class="col-md-6 mt-3">
-          <strong>Carrier:</strong><br />
-          {{record.carrier?.name ?? 'Unknown'}}
-        </div>
+
         @let statusMeta = getStatusMetadata(record.lastStatusType);
-        <div class="col-md-6 mt-3">
-          <strong>Status:</strong><br />
-          <span class="bi me-1" [class]="[statusMeta.icon, statusMeta.color]"></span>
-          {{statusMeta.label}}
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="status" class="col-sm-4 col-form-label">
+              Status
+            </label>
+            <div class="col-sm-8">
+              <ng-select id="status" [ngModel]="1" [ngModelOptions]="{ standalone: true }" [readonly]="true" [readonlyForm]="true">
+                <ng-option [value]="1">
+                  <span class="bi me-1" [class]="[statusMeta.icon, statusMeta.color]"></span>
+                  {{statusMeta.label}}
+                </ng-option>
+              </ng-select>
+            </div>
+          </div>
         </div>
-        <div class="col-md-6 mt-3">
-          <strong>Last Update:</strong><br />
-          {{record.modifiedAt.toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}}
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="trackingNumber" class="col-sm-4 col-form-label">
+              Tracking number
+            </label>
+            <div class="col-sm-8">
+              <input id="trackingNumber" type="text" formControlName="trackingNumber" [readonlyForm]="!isEditing$$()" />
+            </div>
+          </div>
         </div>
-        <div class="col-md-6 mt-3">
-          <strong>ETA:</strong><br />
-          {{record.estimatedDeliveryAt?.toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) ?? '—'}}
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="carrierName" class="col-sm-4 col-form-label">
+              Carrier
+            </label>
+            <div class="col-sm-8">
+              <input id="carrierName" type="text" [value]="record.carrier?.name ?? 'Unknown'" [readonlyForm]="true" />
+            </div>
+          </div>
         </div>
-        <div class="col-md-6 mt-3">
-          <strong>Contents:</strong><br />
-          {{record.contents ?? '—'}}
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="lastUpdate" class="col-sm-4 col-form-label">
+              Last update
+            </label>
+            <div class="col-sm-8">
+              <input id="lastUpdate" type="text" [value]="record.trackingUpdates?.[record.trackingUpdates!.length - 1]?.occurredAt?.toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) ?? '—'" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="estimatedDeliveryAt" class="col-sm-4 col-form-label">
+              ETA
+            </label>
+            <div class="col-sm-8">
+              <input id="estimatedDeliveryAt" type="text" [value]="record.estimatedDeliveryAt?.toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) ?? '—'" [readonlyForm]="true" />
+            </div>
+          </div>
         </div>
       </div>
     </detail-box>
