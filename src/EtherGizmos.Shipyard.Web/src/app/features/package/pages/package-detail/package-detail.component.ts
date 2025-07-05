@@ -11,6 +11,8 @@ import { NavbarActionService } from '../../../../shared/services/navbar-action/n
 import { Bound } from '../../../../shared/utilities/bound/bound.util';
 import { getDirtyFormValues, TypedFormGroup } from '../../../../shared/utilities/form/form.util';
 import { NavbarAction } from '../../../app/components/navbar-action/navbar-action.component';
+import { Carrier } from '../../../carrier/models/carrier';
+import { CarrierService } from '../../../carrier/services/carrier/carrier.service';
 import { Package, PackageF, packageForm } from '../../models/package';
 import { getStatusTypeMetadata, StatusType } from '../../models/status-type';
 import { PackageService } from '../../services/package/package.service';
@@ -32,13 +34,17 @@ import { PackageService } from '../../services/package/package.service';
 export class PackageDetailComponent implements OnInit {
 
   private readonly $package = inject(PackageService);
-  private readonly $navbarAction = inject(NavbarActionService);
+  private readonly $carrier = inject(CarrierService);
   private readonly $form = inject(FormBuilder);
+  private readonly $navbarAction = inject(NavbarActionService);
   private readonly $route = inject(ActivatedRoute);
 
   readonly id$$ = signal<number | undefined>(undefined);
   readonly package$$ = signal<Package | undefined>(undefined);
   readonly form$$ = signal<TypedFormGroup<PackageF> | undefined>(undefined);
+
+  readonly carriers$$ = signal<Carrier[]>([]);
+  private carriersLoaded = false;
 
   readonly isLoading$$ = computed(() => this.isLoadingStack$$() > 0);
   private readonly isLoadingStack$$ = signal(0);
@@ -123,25 +129,45 @@ export class PackageDetailComponent implements OnInit {
     try {
       const exec = single
         .expand("carrier", e =>
-          e.select("name")
+          e.select("id", "name")
         )
         .expand("trackingUpdates")
         .execute();
       const data = await exec.data;
 
       this.package$$.set(data);
-      this.form$$.set(packageForm(this.$form, data));
+      this.init();
+
+      if (this.carriers$$().length === 0) {
+        this.carriers$$.set([data.carrier!]);
+      }
     } finally {
       this.isLoadingStack$$.set(this.isLoadingStack$$() - 1);
     }
+  }
+
+  private init() {
+    this.form$$.set(packageForm(this.$form, this.package$$()));
   }
 
   @Bound onRepoll() {
 
   }
 
-  @Bound onEdit() {
+  @Bound async onEdit() {
     this.isEditing$$.set(true);
+
+    if (!this.carriersLoaded) {
+      this.carriersLoaded = true;
+      const result = this.$carrier
+        .search()
+        .execute();
+
+      const data = await result.data;
+      data.sort((a, b) => a.name.localeCompare(b.name));
+
+      this.carriers$$.set(data);
+    }
   }
 
   @Bound onDelete() {
@@ -166,5 +192,6 @@ export class PackageDetailComponent implements OnInit {
 
   @Bound onCancel() {
     this.isEditing$$.set(false);
+    this.init();
   }
 }

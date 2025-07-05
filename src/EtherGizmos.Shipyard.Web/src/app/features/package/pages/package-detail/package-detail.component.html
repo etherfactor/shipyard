@@ -59,11 +59,17 @@
 
         <div class="col-md-6">
           <div class="row mt-3">
-            <label for="carrierName" class="col-sm-4 col-form-label">
+            <label for="carrierId" class="col-sm-4 col-form-label">
               Carrier
             </label>
             <div class="col-sm-8">
-              <input id="carrierName" type="text" [value]="record.carrier?.name ?? 'Unknown'" [readonlyForm]="true" />
+              <ng-select id="carrierId" formControlName="carrierId" [readonly]="!isEditing$$()" [readonlyForm]="!isEditing$$()">
+                @for (carrier of carriers$$(); track carrier.id) {
+                <ng-option [value]="carrier.id">
+                  {{carrier.name}}
+                </ng-option>
+                }
+              </ng-select>
             </div>
           </div>
         </div>

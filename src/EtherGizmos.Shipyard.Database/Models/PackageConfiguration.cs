@@ -14,7 +14,7 @@ public class PackageConfiguration : IEntityTypeConfiguration<Package>
 
         entity.HasKey(e => e.Id);
 
-        entity.HasAlternateKey(e => new { e.CarrierId, e.TrackingNumber });
+        //entity.HasAlternateKey(e => new { e.CarrierId, e.TrackingNumber });
 
         entity.Property(e => e.Id)
             .HasColumnName("package_id");
