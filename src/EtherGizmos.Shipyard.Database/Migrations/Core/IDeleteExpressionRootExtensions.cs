@@ -24,7 +24,7 @@ public static class IDeleteExpressionRootExtensions
         mySql.Execute
             .Sql($"drop trigger {MySqlHelper.Escape($"TR_{table}_audit_update")};");
 
-        var postgres = new IfDatabaseExpressionRoot(context, ProcessorIdConstants.Postgres);
+        var postgres = new IfDatabaseExpressionRoot(context, ProcessorIdConstants.PostgreSQL);
 
         postgres.Execute
             .Sql($"drop function {PostgreSqlHelper.Escape($"TR_{table}_audit")}() cascade;");

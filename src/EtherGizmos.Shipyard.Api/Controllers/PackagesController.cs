@@ -1,10 +1,14 @@
 ﻿using Asp.Versioning;
+using AutoMapper;
+using EtherGizmos.Shipyard.Database.Services;
 using EtherGizmos.Shipyard.Models.Api;
 using EtherGizmos.Shipyard.Models.Database;
+using EtherGizmos.Shipyard.OData.Extensions;
 using EtherGizmos.Shipyard.OData.Swagger;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace EtherGizmos.Shipyard.Api.Controllers;
@@ -13,10 +17,17 @@ public class PackagesController : AutoODataController
 {
     private const string BaseRoute = "api/v{version:apiVersion}/packages";
 
+    private readonly IUnitOfWorkFactory _uowFactory;
+    private readonly IMapper _mapper;
+
     public PackagesController(
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        IUnitOfWorkFactory uowFactory,
+        IMapper mapper)
         : base(serviceProvider)
     {
+        _uowFactory = uowFactory;
+        _mapper = mapper;
     }
 
     [ApiVersion(1.0)]
@@ -70,6 +81,31 @@ public class PackagesController : AutoODataController
         CancellationToken cancellationToken = default)
         => ForItem(id)
             .DeleteAsync(cancellationToken);
+
+    [ApiVersion(1.0)]
+    [HttpGet("api/v{version:apiVersion}/findUpdatedPackages")]
+    [ProducesResponseSet]
+    [ProducesResponseType(200, Type = typeof(PackageDTO)), SwaggerResponseExample(200, typeof(PackageDTOExampleGet))]
+    public async Task<IActionResult> FindUpdatedPackages(
+        ODataQueryOptions<PackageDTO> queryOptions,
+        CancellationToken cancellationToken = default)
+    {
+        using var uow = _uowFactory.Create(useRequestScope: true);
+        var packageRepo = uow.Repository<Package>();
+
+        var dbData = await packageRepo.Data
+            .Include(e => e.TrackingUpdates)
+            .OrderByDescending(package => package.TrackingUpdates.OrderByDescending(update => update.OccurredAt).Last().OccurredAt)
+            .Take(queryOptions.Top.Value)
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        var data = await _mapper.MapExplicitly(dbData.AsQueryable())
+            .To<PackageDTO>()
+            .ApplyQueryOptions(queryOptions)
+            .ExecuteAsync(cancellationToken);
+
+        return Ok(data);
+    }
 
     private IKeylessRequestBuilder<Package, PackageDTO> ForSet()
         => ForSet<Package, PackageDTO>();

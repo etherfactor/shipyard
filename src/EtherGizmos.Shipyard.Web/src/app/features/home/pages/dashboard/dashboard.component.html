@@ -6,35 +6,44 @@
 </div>
 
 <!-- Basic Information -->
-<detail-box icon="bi-box-seam" text="Package Summary" class="mt-3">
+<detail-box icon="bi-box-seam" text="Package Summary" class="mt-3"
+            [buttons]="packageButtons">
   <div class="row text-center">
     <div class="col mt-3">
       <h5>
         <span class="bi bi-truck text-info"></span>
         In Transit
       </h5>
-      <p class="fs-4 mb-0">4</p>
-    </div>
-    <div class="col mt-3">
-      <h5>
-        <span class="bi bi-check-circle text-success"></span>
-        Delivered
-      </h5>
-      <p class="fs-4 mb-0">2</p>
-    </div>
-    <div class="col mt-3">
-      <h5>
-        <span class="bi bi-x-circle text-danger"></span>
-        Errors
-      </h5>
-      <p class="fs-4 mb-0">1</p>
+      <p class="fs-4 mb-0">
+        {{inTransit}}
+      </p>
     </div>
     <div class="col mt-3">
       <h5>
         <span class="bi bi-hourglass-split text-warning"></span>
         Stale
       </h5>
-      <p class="fs-4 mb-0">3</p>
+      <p class="fs-4 mb-0">
+        {{stale}}
+      </p>
+    </div>
+    <div class="col mt-3">
+      <h5>
+        <span class="bi bi-check-circle text-success"></span>
+        Delivered
+      </h5>
+      <p class="fs-4 mb-0">
+        {{delivered}}
+      </p>
+    </div>
+    <div class="col mt-3">
+      <h5>
+        <span class="bi bi-x-circle text-danger"></span>
+        Errors
+      </h5>
+      <p class="fs-4 mb-0">
+        {{errors}}
+      </p>
     </div>
   </div>
 </detail-box>
@@ -44,18 +53,12 @@
     <!-- Recent Activity -->
     <detail-box icon="bi-clock-history" text="Recent Activity" class="h-100">
       <ul class="mb-0 mt-3">
+        @for (update of recentUpdates; track update) {
         <li>
-          <span class="bi bi-check-circle text-success"></span>
-          Delivered “Keyboard” at Madison, WI — 10:15 AM
+          <span class="bi" [class]="[update.icon, update.color]"></span>
+          {{update.message}}
         </li>
-        <li>
-          <span class="bi bi-truck text-info"></span>
-          Departed “LED Kit” from Phoenix, AZ — 9:02 AM
-        </li>
-        <li>
-          <span class="bi bi-truck text-info"></span>
-          “Screws” arrived at Hebron, KY — 6:30 AM
-        </li>
+        }
       </ul>
     </detail-box>
   </div>
@@ -64,18 +67,12 @@
     <!-- Upcoming Polls -->
     <detail-box icon="bi-clock" text="Upcoming Polls" class="h-100">
       <ul class="mb-0 mt-3">
+        @for (poll of nextPolls; track poll) {
         <li>
-          <span class="bi bi-hourglass-bottom text-danger"></span>
-          In 2m: “Filter Set” (USPS)
+          <span class="bi" [class]="[poll.icon, poll.color]"></span>
+          {{poll.interval}}: “{{poll.contents}}” ({{poll.carrier}})
         </li>
-        <li>
-          <span class="bi bi-hourglass-split text-warning"></span>
-          In 8m: “Screws” (UPS)
-        </li>
-        <li>
-          <span class="bi bi-hourglass-top text-muted"></span>
-          In 15m: “Glass Bottles” (FedEx)
-        </li>
+        }
       </ul>
     </detail-box>
   </div>
@@ -85,13 +82,17 @@
 <detail-box icon="bi-exclamation-triangle" text="System Notices" class="mt-3">
   <ul class="mb-0 mt-3">
     <li>
-      <span class="bi bi-exclamation-triangle text-warning"></span>
-      Carrier “UPS” failed 4 times in the last 24h
+      <span class="bi bi-exclamation-triangle text-muted"></span>
+      To be implemented
     </li>
-    <li>
-      <span class="bi bi-x-circle text-danger"></span>
-      SMTP test failed — notifications not being sent
-    </li>
+    <!--<li>
+    <span class="bi bi-exclamation-triangle text-warning"></span>
+    Carrier “UPS” failed 4 times in the last 24h
+  </li>
+  <li>
+    <span class="bi bi-x-circle text-danger"></span>
+    SMTP test failed — notifications not being sent
+  </li>-->
   </ul>
 </detail-box>
 

@@ -11,7 +11,7 @@ public class Migration002_LoadTrackingTables : MigrationExtension
          * Load [dbo].[status_types]
          */
         Merge.IntoTable("status_types")
-            .Row(new { status_type_id = 0, name = "Unknown", polling_factor = 4m, is_final = false })
+            .Row(new { status_type_id = 0, name = "Unknown", polling_factor = 1m, is_final = false })
             .Row(new { status_type_id = 1, name = "Waiting", polling_factor = 2m, is_final = false })
             .Row(new { status_type_id = 10, name = "In transit", polling_factor = 1m, is_final = false })
             .Row(new { status_type_id = 20, name = "Out for delivery", polling_factor = 0.167m, is_final = false })

@@ -38,6 +38,9 @@ public class PackageDTOConfiguration : IModelConfiguration
             entity.EnumProperty(e => e.LastStatusType);
             entity.Property(e => e.IsDelivered);
             entity.HasMany(e => e.TrackingUpdates);
+
+            builder.Function("findUpdatedPackages")
+                .ReturnsFromEntitySet<PackageDTO>("packages");
         }
     }
 }

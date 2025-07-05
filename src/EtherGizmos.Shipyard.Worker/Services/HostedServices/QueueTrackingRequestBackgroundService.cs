@@ -34,6 +34,7 @@ public class QueueTrackingRequestBackgroundService : PeriodicBackgroundService
 
         var ready = packageRepo.Data
             .Where(e => e.NextPollAt < DateTimeOffset.UtcNow)
+            .Include(e => e.Carrier)
             .Include(e => e.LastStatusType)
             .AsAsyncEnumerable();
 

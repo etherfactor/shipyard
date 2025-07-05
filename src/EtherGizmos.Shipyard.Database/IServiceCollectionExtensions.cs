@@ -69,6 +69,7 @@ public static class IServiceCollectionExtensions
                         );
                     });
             })
+            .ImportLogging()
             .ForwardScoped<IMigrationRunner>();
 
         return @this;

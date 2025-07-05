@@ -228,7 +228,15 @@ public static class IMapperExtensions
                 queryable1 = (IQueryable<TTo>)queryOptions.ApplyTo(queryable1, ignoreQueryOptions: SelectExpand);
             }
 
-            var queryable2 = (await queryable1.ToListAsync(cancellationToken: cancellationToken)).AsQueryable() as IQueryable;
+            IQueryable queryable2;
+            if (queryable1.GetType().GetInterfaces().Any(@interface => @interface.IsGenericType && @interface.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>)))
+            {
+                queryable2 = (await queryable1.ToListAsync(cancellationToken: cancellationToken)).AsQueryable();
+            }
+            else
+            {
+                queryable2 = queryable1.ToList().AsQueryable();
+            }
 
             foreach (var queryOptions in QueryOptions)
             {

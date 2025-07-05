@@ -23,11 +23,29 @@ export class PackageService {
       .withDelete("DELETE")
       .withValidator((value, selectExpand) => {
         const validator = narrowValidator(PackageZ, selectExpand);
-        return validator.parse(value);
+        const parsed = validator.parse(value);
+        parsed.trackingUpdates?.sort((a, b) => a.occurredAt.toMillis() - b.occurredAt.toMillis());
+        return parsed;
       })
       .build();
 
-    this.$set = set;
+    const findUpdatedPackages = this.$odata
+      .function("findUpdatedPackages")
+      .withDefaultMethod()
+      .withParameters({})
+      .withCollectionResponse<Package>()
+      .withValidator((value, selectExpand) => {
+        const validator = narrowValidator(PackageZ, selectExpand);
+        const parsed = validator.parse(value);
+        parsed.trackingUpdates?.sort((a, b) => a.occurredAt.toMillis() - b.occurredAt.toMillis());
+        return parsed;
+      })
+      .build();
+
+    const set1 = this.$odata.bind
+      .function(set, { findUpdatedPackages });
+
+    this.$set = set1;
   }
 
   search() {
@@ -48,5 +66,11 @@ export class PackageService {
 
   delete(id: number) {
     return this.$set.delete(id);
+  }
+
+  findUpdatedPackages(quantity: number) {
+    return this.$set.functions
+      .findUpdatedPackages.invoke({})
+      .top(quantity);
   }
 }

@@ -7,6 +7,7 @@ import { DetailHeaderComponent } from '../../../../shared/components/detail-head
 import { TableHeaderComponent } from '../../../../shared/components/table-header/table-header.component';
 import { TableComponent } from '../../../../shared/components/table/table.component';
 import { Bound } from '../../../../shared/utilities/bound/bound.util';
+import { SortColumn } from '../../../../shared/utilities/sort/sort.util';
 import { NavbarAction } from '../../../app/components/navbar-action/navbar-action.component';
 import { Package } from '../../models/package';
 import { getStatusTypeMetadata, StatusType } from '../../models/status-type';
@@ -30,6 +31,11 @@ export class PackageListComponent extends ListComponent<Package> {
   private readonly $router = inject(Router);
 
   override readonly perPage: number = 10;
+
+  override activeSort: SortColumn = {
+    column: "modifiedAt",
+    direction: "desc",
+  };
 
   protected override get actions(): NavbarAction[] {
     const actions: NavbarAction[] = [

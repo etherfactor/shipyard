@@ -55,6 +55,15 @@ export class PackageDetailComponent implements OnInit {
     return actions;
   });
 
+  get trackingUpdates() {
+    const record = this.package$$();
+    if (!record)
+      return [];
+
+    const updates = record.trackingUpdates ?? [];
+    return [...updates].reverse();
+  }
+
   constructor() {
     effect(() => this.$navbarAction.setActions(this.actions$$()));
   }

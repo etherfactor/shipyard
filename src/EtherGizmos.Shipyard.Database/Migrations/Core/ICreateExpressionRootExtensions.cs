@@ -36,7 +36,7 @@ begin
     set new.`modified_at_utc` = utc_timestamp;
 end;");
 
-        var postgres = new IfDatabaseExpressionRoot(context, ProcessorIdConstants.Postgres);
+        var postgres = new IfDatabaseExpressionRoot(context, ProcessorIdConstants.PostgreSQL);
 
         postgres.Execute
             .Sql($@"create or replace function {PostgreSqlHelper.Escape($"TR_{table}_audit")}()
