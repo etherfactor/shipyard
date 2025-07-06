@@ -10,12 +10,11 @@ import { TableComponent } from '../../../../shared/components/table/table.compon
 import { Bound } from '../../../../shared/utilities/bound/bound.util';
 import { SortColumn } from '../../../../shared/utilities/sort/sort.util';
 import { NavbarAction } from '../../../app/components/navbar-action/navbar-action.component';
-import { Package } from '../../models/package';
-import { getStatusTypeMetadata, StatusType } from '../../models/status-type';
-import { PackageService } from '../../services/package/package.service';
+import { Carrier } from '../../models/carrier';
+import { CarrierService } from '../../services/carrier/carrier.service';
 
 @Component({
-  selector: 'app-package-list',
+  selector: 'app-carrier-list',
   imports: [
     DetailBoxComponent,
     DetailHeaderComponent,
@@ -24,19 +23,19 @@ import { PackageService } from '../../services/package/package.service';
     TableComponent,
     TableHeaderComponent,
   ],
-  templateUrl: './package-list.component.html',
-  styleUrl: './package-list.component.scss'
+  templateUrl: './carrier-list.component.html',
+  styleUrl: './carrier-list.component.scss'
 })
-export class PackageListComponent extends ListComponent<Package> {
+export class CarrierListComponent extends ListComponent<Carrier> {
 
-  private readonly $package = inject(PackageService);
+  private readonly $carrier = inject(CarrierService);
   private readonly $router = inject(Router);
 
   override readonly perPage: number = 10;
 
   override activeSort: SortColumn = {
-    column: "modifiedAt",
-    direction: "desc",
+    column: "name",
+    direction: "asc",
   };
 
   protected override get actions(): NavbarAction[] {
@@ -65,15 +64,11 @@ export class PackageListComponent extends ListComponent<Package> {
     return columns;
   }
 
-  protected override getEntitySet(): EntitySet<Package> {
-    return this.$package.search();
+  protected override getEntitySet(): EntitySet<Carrier> {
+    return this.$carrier.search();
   }
 
   @Bound new() {
-    this.$router.navigate(["/packages", "new"]);
-  }
-
-  getStatusMetadata(statusType: StatusType) {
-    return getStatusTypeMetadata(statusType);
+    this.$router.navigate(["/carriers", "new"]);
   }
 }

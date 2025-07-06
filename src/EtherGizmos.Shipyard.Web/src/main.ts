@@ -1,3 +1,5 @@
+/// <reference types="@angular/localize" />
+
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { InjectionToken, Provider } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';

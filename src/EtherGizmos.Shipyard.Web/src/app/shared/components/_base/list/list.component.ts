@@ -27,6 +27,8 @@ export abstract class ListComponent<TEntity> implements OnInit {
   readonly isLoading = computed(() => this.isLoadingStack() > 0);
   private readonly isLoadingStack = signal(0);
 
+  page: number = 1;
+  count: number = 0;
   protected records: TEntity[] = [];
 
   constructor() { }
@@ -70,7 +72,14 @@ export abstract class ListComponent<TEntity> implements OnInit {
     this.isLoadingStack.set(this.isLoadingStack() + 1);
 
     try {
-      this.records = await set.execute().data;
+      const result = set
+        .skip((this.page - 1) * this.perPage)
+        .top(this.perPage)
+        .count()
+        .execute();
+
+      this.records = await result.data;
+      this.count = await result.count;
     } finally {
       this.isLoadingStack.set(this.isLoadingStack() - 1);
     }

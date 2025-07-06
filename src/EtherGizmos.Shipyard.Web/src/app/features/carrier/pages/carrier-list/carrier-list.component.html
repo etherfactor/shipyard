@@ -2,8 +2,8 @@
 <div class="row">
   <div class="col-12 mt-3">
 
-    <detail-header text="Packages"
-                   subtext="Track and manage your deliveries." />
+    <detail-header text="Carriers"
+                   subtext="View and configure carrier connections." />
 
   </div>
 </div>
@@ -12,24 +12,18 @@
 <div class="row">
   <div class="col-12 mt-3">
 
-    <detail-box icon="bi-box-seam"
-                text="Packages List">
+    <detail-box icon="bi-truck"
+                text="Carriers List">
       <div class="mt-3">
         <app-table [data]="records" [minRows]="perPage" [isLoading]="isLoading()"
                    [sort]="activeSort" (sortChange)="onSortChange($event)"
                    (filterChange)="onFilterChange($event)">
           <ng-template #headers>
-            <th app-table-header="trackingNumber" class="text-nowrap"
+            <th app-table-header="name" class="text-nowrap"
                 type="string"
                 [sortable]="true"
                 [filterable]="true">
-              Tracking number
-            </th>
-            <th app-table-header="contents" class="text-nowrap"
-                type="string"
-                [sortable]="true"
-                [filterable]="true">
-              Contents
+              Name
             </th>
             <th app-table-header="createdAt" class="text-nowrap"
                 type="datetime"
@@ -43,26 +37,14 @@
                 [filterable]="true">
               Modified at
             </th>
-            <th app-table-header="lastStatusType" class="text-nowrap"
-                type="string"
-                [sortable]="true"
-                [filterable]="true"
-                [operators]="['equals', 'not_equals']"
-                [enumValues]="['Waiting', 'InTransit', 'OutForDelivery', 'Delivered', 'FailedAttempt', 'Returned', 'Expired', 'Unknown']">
-              Status
-            </th>
             <th class="text-nowrap">
               Actions
             </th>
           </ng-template>
 
           <ng-template #rows let-row>
-            @let statusMeta = getStatusMetadata(row.lastStatusType);
             <td class="text-nowrap">
-              {{row.trackingNumber}}
-            </td>
-            <td>
-              {{row.contents}}
+              {{row.name}}
             </td>
             <td class="text-nowrap">
               {{row.createdAt.startOf('minute').toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}}
@@ -71,11 +53,7 @@
               {{row.modifiedAt.startOf('minute').toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}}
             </td>
             <td class="text-nowrap">
-              <span class="bi" [class]="[statusMeta.icon, statusMeta.color]"></span>
-              {{statusMeta.label}}
-            </td>
-            <td class="text-nowrap">
-              <a [routerLink]="['/packages/', row.id]">View</a>
+              <a [routerLink]="['/carriers/', row.id]">View</a>
             </td>
           </ng-template>
         </app-table>

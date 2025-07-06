@@ -10,6 +10,10 @@ export const APP_ROUTES: ExtendedRoute[] = [
     path: "packages",
     loadChildren: () => import("./features/package/package.routes").then(m => m.PACKAGE_ROUTES),
   },
+  {
+    path: "carriers",
+    loadChildren: () => import("./features/carrier/carrier.routes").then(m => m.CARRIER_ROUTES),
+  },
 ];
 
 export type ExtendedRoute = ParentRoute | BreadedRoute;
