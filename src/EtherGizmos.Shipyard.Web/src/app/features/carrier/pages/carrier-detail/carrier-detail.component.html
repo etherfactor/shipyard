@@ -1,1 +1,123 @@
-<p>carrier-detail works!</p>
+@let record = carrier$$();
+@let form = form$$();
+
+<!-- Header -->
+<div class="row">
+  <div class="col-12 mt-3">
+    @if (id$$()) {
+    <detail-header [text]="'Carrier Details'"
+                   [subtext]="record?.name + ' (' + record?.slug + ')'" />
+    } @else {
+    <detail-header [text]="'Carrier Details'"
+                   [subtext]="'Creating new carrier'" />
+    }
+  </div>
+</div>
+
+@if (record && form) {
+<!-- Summary -->
+<div class="row" [formGroup]="form">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-truck" text="Carrier Summary">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="name" class="col-sm-4 col-form-label">Name</label>
+            <div class="col-sm-8">
+              <input id="name" type="text" formControlName="name" [readonlyForm]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="slug" class="col-sm-4 col-form-label">Slug</label>
+            <div class="col-sm-8">
+              <input id="slug" type="text" formControlName="slug" [readonlyForm]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </detail-box>
+  </div>
+</div>
+
+<!-- Steps -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-list-task" text="Tracking Steps">
+      <div class="table-responsive mt-3">
+        <table class="table table-sm table-transparent table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Step Type</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (step of record.steps; track step) {
+            <tr>
+              <td class="text-nowrap">{{step.stepType}}</td>
+              <td>
+                <pre class="mb-0">{{step | json}}</pre>
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="2" class="text-center">No steps defined</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </detail-box>
+  </div>
+</div>
+
+<!-- Rules -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-filter-circle" text="Tracking Rules">
+      <div class="table-responsive mt-3">
+        <table class="table table-sm table-transparent table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Pattern</th>
+              <th>Status Type</th>
+              <th>Priority</th>
+              <th>Active</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (rule of record.rules; track rule.pattern) {
+            <tr>
+              <td><pre class="mb-0">{{rule.pattern}}</pre></td>
+              <td>{{rule.statusType}}</td>
+              <td>{{rule.priority}}</td>
+              <td>
+                <span class="bi" [class]="rule.isActive ? 'bi-check-circle text-success' : 'bi-x-circle text-danger'"></span>
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="4" class="text-center">No rules defined</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </detail-box>
+  </div>
+</div>
+}
+
+<!-- Loading Overlay -->
+@if (isLoading$$()) {
+<div style="position: fixed; top: 0; left: 0; height: 100%; width: 100%; background-color: color-mix(in srgb, var(--bs-body-bg) 50%, transparent); z-index: 100;">
+</div>
+<div style="position: fixed; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%); z-index: 100;">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+}
