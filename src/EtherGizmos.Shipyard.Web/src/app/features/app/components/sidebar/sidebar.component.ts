@@ -1,9 +1,12 @@
 import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { InitializeOffcanvas } from '../../../../shared/components/initialize-offcanvas/initialize-offcanvas.component';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [],
+  imports: [
+    RouterModule,
+  ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
