@@ -59,6 +59,10 @@
           {{update.message}}
           (<a [routerLink]="['/packages', update.packageId]">view</a>)
         </li>
+        } @empty {
+        <li>
+          No recent updates
+        </li>
         }
       </ul>
     </detail-box>
@@ -73,6 +77,10 @@
           <span class="bi" [class]="[poll.icon, poll.color]"></span>
           {{poll.interval}}: “{{poll.contents}}” ({{poll.carrier}})
           (<a [routerLink]="['/packages', poll.packageId]">view</a>)
+        </li>
+        } @empty {
+        <li>
+          No upcoming polls
         </li>
         }
       </ul>

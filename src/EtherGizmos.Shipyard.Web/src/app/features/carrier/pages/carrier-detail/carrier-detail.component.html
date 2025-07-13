@@ -42,42 +42,10 @@
   </div>
 </div>
 
-<!-- Steps -->
-<div class="row">
-  <div class="col-12 mt-3">
-    <detail-box icon="bi-list-task" text="Tracking Steps">
-      <div class="table-responsive mt-3">
-        <table class="table table-sm table-transparent table-striped table-hover mb-0">
-          <thead>
-            <tr>
-              <th>Step Type</th>
-              <th>Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (step of record.steps; track step) {
-            <tr>
-              <td class="text-nowrap">{{step.stepType}}</td>
-              <td>
-                <pre class="mb-0">{{step | json}}</pre>
-              </td>
-            </tr>
-            } @empty {
-            <tr>
-              <td colspan="2" class="text-center">No steps defined</td>
-            </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </detail-box>
-  </div>
-</div>
-
 <!-- Rules -->
 <div class="row">
   <div class="col-12 mt-3">
-    <detail-box icon="bi-filter-circle" text="Tracking Rules">
+    <detail-box icon="bi-filter-circle" text="Tracking Rules" [buttons]="ruleButtons$$()">
       <div class="table-responsive mt-3">
         <table class="table table-sm table-transparent table-striped table-hover mb-0">
           <thead>
@@ -89,23 +57,65 @@
             </tr>
           </thead>
           <tbody>
-            @for (rule of record.rules; track rule.pattern) {
-            <tr>
-              <td><pre class="mb-0">{{rule.pattern}}</pre></td>
-              <td>{{rule.statusType}}</td>
-              <td>{{rule.priority}}</td>
+            @for (rule of form.controls.rules.controls; let i = $index; track i) {
+            <tr [formGroup]="rule">
+              <!-- Pattern -->
               <td>
-                <span class="bi" [class]="rule.isActive ? 'bi-check-circle text-success' : 'bi-x-circle text-danger'"></span>
+                <input type="text" class="font-monospace" style="min-width: 500px;" formControlName="pattern" [readonlyForm]="!isEditing$$()" formSize="small" />
               </td>
-            </tr>
-            } @empty {
-            <tr>
-              <td colspan="4" class="text-center">No rules defined</td>
+
+              <!-- Status Type -->
+              <td>
+                <ng-select formControlName="statusType" [clearable]="false" [selectOnTab]="true" [appendTo]="'body'"
+                           [readonlyForm]="!isEditing$$()" formSize="small">
+                  <ng-option [value]="StatusType.Waiting">Waiting</ng-option>
+                  <ng-option [value]="StatusType.InTransit">In transit</ng-option>
+                  <ng-option [value]="StatusType.OutForDelivery">Out for delivery</ng-option>
+                  <ng-option [value]="StatusType.Delivered">Delivered</ng-option>
+                  <ng-option [value]="StatusType.FailedAttempt">Failed attempt</ng-option>
+                  <ng-option [value]="StatusType.Returned">Returned</ng-option>
+                  <ng-option [value]="StatusType.Expired">Expired</ng-option>
+                </ng-select>
+              </td>
+
+              <!-- Priority -->
+              <td>
+                <input type="number" formControlName="priority" [readonlyForm]="!isEditing$$()" formSize="small" />
+              </td>
+
+              <!-- Active -->
+              <td>
+                <div class="form-check mt-1">
+                  <input id="rule{{i}}Active" class="form-check-input" type="checkbox" formControlName="isActive" />
+                  <label for="rule{{i}}Active" class="form-check-label">Yes</label>
+                </div>
+              </td>
             </tr>
             }
           </tbody>
+
         </table>
       </div>
+    </detail-box>
+  </div>
+</div>
+
+<!-- Steps -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-list-task" text="Tracking Steps" [buttons]="stepButtons$$()">
+      @for (step of form.controls.steps.controls; let i = $index; track i) {
+      <div class="row">
+        <div class="col-12 mt-3">
+          <app-runbook-step [form]="step" [index]="i" [total]="form.controls.steps.controls.length"
+                            (onMoveUp)="onMoveUp(i)"
+                            (onMoveDown)="onMoveDown(i)"
+                            (onRemove)="onRemove(i)"></app-runbook-step>
+        </div>
+      </div>
+      } @empty {
+      No steps defined
+      }
     </detail-box>
   </div>
 </div>

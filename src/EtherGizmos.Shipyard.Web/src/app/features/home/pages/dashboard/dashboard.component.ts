@@ -179,7 +179,10 @@ export class DashboardComponent implements OnInit {
   private async loadUpdates() {
     this.isLoadingStack$$.set(this.isLoadingStack$$() + 1);
     const result = this.$package.findUpdatedPackages(5)
-      .expand("trackingUpdates")
+      .expand("trackingUpdates", b => b
+        .orderBy("occurredAt", "desc")
+        .top(1)
+      )
       .execute();
 
     try {

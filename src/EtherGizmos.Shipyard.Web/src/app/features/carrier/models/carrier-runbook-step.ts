@@ -1,11 +1,12 @@
+import { FormBuilder } from "@angular/forms";
 import { z } from "zod";
 import { formFactoryForModel, TypedFormGroup } from "../../../shared/utilities/form/form.util";
 import { StepType } from "./step-type";
-import { FormBuilder } from "@angular/forms";
 
 const CarrierRunbookStepZ_base = z.object({
   stepType: z.nativeEnum(StepType),
   from: z.string().nullish(),
+  name: z.string().nullish(),
   selector: z.string().nullish(),
   to: z.string().nullish(),
   trim: z.boolean().nullish(),
@@ -28,6 +29,7 @@ let form: ($form: FormBuilder, model: CarrierRunbookStep) => TypedFormGroup<Carr
 export const carrierRunbookStepForm = formFactoryForModel<CarrierRunbookStep>(($form, model) => ({
   stepType: [model.stepType],
   from: [model.from],
+  name: [model.name],
   selector: [model.selector],
   steps: model.steps ? $form.nonNullable.array(model.steps.map(item => form($form, item))) : undefined,
   to: [model.to],
@@ -38,3 +40,104 @@ export const carrierRunbookStepForm = formFactoryForModel<CarrierRunbookStep>(($
 }));
 
 form = carrierRunbookStepForm;
+
+export const fieldsByStepType: Record<StepType, { field: keyof CarrierRunbookStep, required: boolean }[]> = {
+  Click: [
+    {
+      field: "selector",
+      required: true,
+    },
+  ],
+  ExtractList: [
+    {
+      field: "selector",
+      required: true,
+    },
+    {
+      field: "var",
+      required: true,
+    },
+    {
+      field: "steps",
+      required: true,
+    },
+  ],
+  Extract: [
+    {
+      field: "selector",
+      required: true,
+    },
+    {
+      field: "var",
+      required: true,
+    },
+    {
+      field: "trim",
+      required: false,
+    },
+  ],
+  Navigate: [
+    {
+      field: "url",
+      required: true,
+    },
+  ],
+  Replace: [
+    {
+      field: "var",
+      required: true,
+    },
+    {
+      field: "from",
+      required: true,
+    },
+    {
+      field: "to",
+      required: true,
+    },
+    {
+      field: "trim",
+      required: false,
+    },
+  ],
+  Return: [
+    {
+      field: "name",
+      required: true,
+    },
+    {
+      field: "var",
+      required: true,
+    },
+  ],
+  Send: [
+    {
+      field: "selector",
+      required: true,
+    },
+    {
+      field: "value",
+      required: true,
+    },
+  ],
+  Set: [
+    {
+      field: "var",
+      required: true,
+    },
+    {
+      field: "value",
+      required: true,
+    },
+    {
+      field: "trim",
+      required: false,
+    },
+  ],
+  WaitFor: [
+    {
+      field: "selector",
+      required: true,
+    },
+  ],
+};

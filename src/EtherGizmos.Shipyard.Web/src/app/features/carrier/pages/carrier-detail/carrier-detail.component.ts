@@ -4,7 +4,7 @@ import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EntitySingle } from '@ethergizmos/odata-fluent-client';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { DetailBoxComponent } from '../../../../shared/components/detail-box/detail-box.component';
+import { DetailBoxButton, DetailBoxComponent } from '../../../../shared/components/detail-box/detail-box.component';
 import { DetailHeaderComponent } from '../../../../shared/components/detail-header/detail-header.component';
 import { ReadonlyFormDirective } from '../../../../shared/directives/readonly-form/readonly-form.directive';
 import { NavbarActionService } from '../../../../shared/services/navbar-action/navbar-action.service';
@@ -12,7 +12,10 @@ import { Bound } from '../../../../shared/utilities/bound/bound.util';
 import { TypedFormGroup, getDirtyFormValues } from '../../../../shared/utilities/form/form.util';
 import { NavbarAction } from '../../../app/components/navbar-action/navbar-action.component';
 import { StatusType, getStatusTypeMetadata } from '../../../package/models/status-type';
+import { RunbookStepComponent } from '../../components/runbook-step/runbook-step.component';
 import { Carrier, carrierForm } from '../../models/carrier';
+import { CarrierRunbookStep, carrierRunbookStepForm } from '../../models/carrier-runbook-step';
+import { CarrierStatusRule, carrierStatusRuleForm } from '../../models/carrier-status-rule';
 import { CarrierService } from '../../services/carrier/carrier.service';
 
 @Component({
@@ -25,6 +28,7 @@ import { CarrierService } from '../../services/carrier/carrier.service';
     NgSelectModule,
     ReactiveFormsModule,
     ReadonlyFormDirective,
+    RunbookStepComponent,
   ],
   templateUrl: './carrier-detail.component.html',
   styleUrl: './carrier-detail.component.scss'
@@ -81,6 +85,34 @@ export class CarrierDetailComponent {
     return actions;
   });
 
+  readonly ruleButtons$$ = computed<DetailBoxButton[]>(() => {
+    const buttons: DetailBoxButton[] = [];
+
+    if (this.isEditing$$()) {
+      buttons.push({
+        color: "primary",
+        text: "Add rule",
+        callback: this.addRule,
+      });
+    }
+
+    return buttons;
+  });
+
+  readonly stepButtons$$ = computed<DetailBoxButton[]>(() => {
+    const buttons: DetailBoxButton[] = [];
+
+    if (this.isEditing$$()) {
+      buttons.push({
+        color: "primary",
+        text: "Add step",
+        callback: this.addStep,
+      });
+    }
+
+    return buttons;
+  });
+
   constructor() {
     effect(() => this.$navbarAction.setActions(this.actions$$()));
   }
@@ -119,6 +151,8 @@ export class CarrierDetailComponent {
         .execute();
       const data = await exec.data;
 
+      data.rules.sort((a, b) => a.priority - b.priority);
+
       this.carrier$$.set(data);
       this.init();
     } finally {
@@ -128,10 +162,16 @@ export class CarrierDetailComponent {
 
   private init() {
     this.form$$.set(carrierForm(this.$form, this.carrier$$()));
+    if (this.isEditing$$()) {
+      this.form$$()?.enable();
+    } else {
+      this.form$$()?.disable();
+    }
   }
 
   @Bound async onEdit() {
     this.isEditing$$.set(true);
+    this.form$$()?.enable();
   }
 
   @Bound onDelete() {
@@ -153,6 +193,10 @@ export class CarrierDetailComponent {
     this.isLoadingStack$$.set(this.isLoadingStack$$() + 1);
     try {
       const data = getDirtyFormValues(form);
+      for (const step of data.steps ?? []) {
+        this.clean(step);
+      }
+
       if (this.id$$()) {
         const single = this.$carrier.update(record.id, data);
         await this.load(single);
@@ -175,4 +219,83 @@ export class CarrierDetailComponent {
       this.$router.navigate(["/carriers"]);
     }
   }
+
+  @Bound addRule() {
+    const form = this.form$$();
+    if (!form)
+      return;
+
+    const newForm = carrierStatusRuleForm(this.$form, {} as CarrierStatusRule);
+    if (form.disabled) {
+      newForm.disable();
+    }
+
+    form.controls.rules.push(newForm);
+  }
+
+  @Bound addStep() {
+    const form = this.form$$();
+    if (!form)
+      return;
+
+    const newForm = carrierRunbookStepForm(this.$form, {} as CarrierRunbookStep);
+    if (form.disabled) {
+      newForm.disable();
+    }
+
+    form.controls.steps.push(newForm);
+  }
+
+
+  onMoveUp(index: number) {
+    const form = this.form$$();
+    if (!form)
+      return;
+
+    if (index <= 0)
+      return;
+
+    const first = form.controls.steps.controls[index];
+    const second = form.controls.steps.controls[index - 1];
+
+    form.controls.steps.controls[index - 1] = first;
+    form.controls.steps.controls[index] = second;
+  }
+
+  onMoveDown(index: number) {
+    const form = this.form$$();
+    if (!form)
+      return;
+
+    if (index >= form.controls.steps.controls.length - 1)
+      return;
+
+    const first = form.controls.steps.controls[index];
+    const second = form.controls.steps.controls[index + 1];
+
+    form.controls.steps.controls[index + 1] = first;
+    form.controls.steps.controls[index] = second;
+  }
+
+  onRemove(index: number) {
+    const form = this.form$$();
+    if (!form)
+      return;
+
+    form.controls.steps.removeAt(index);
+  }
+
+  private clean(step: CarrierRunbookStep) {
+    for (const key of Object.keys(step)) {
+      if (step[key as keyof typeof step] === undefined || step[key as keyof typeof step] === null) {
+        delete step[key as keyof typeof step];
+      }
+    }
+
+    for (const subStep of step.steps ?? []) {
+      this.clean(subStep);
+    }
+  }
+
+  StatusType = StatusType;
 }
