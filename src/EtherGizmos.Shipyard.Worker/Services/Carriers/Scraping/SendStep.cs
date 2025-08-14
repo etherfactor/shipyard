@@ -1,5 +1,6 @@
 ﻿using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using HtmlAgilityPack;
+using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
@@ -22,7 +23,14 @@ internal class SendStep : ScrapingStep
             return variables.TryGetValue(key, out var value) ? value?.ToString() ?? "" : "";
         });
 
-        await client.SendAsync(Selector, newValue, cancellationToken);
+        try
+        {
+            await client.SendAsync(Selector, newValue, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "Failed to send {Content} to element matching {Selector}", newValue, Selector);
+        }
     }
 
     protected internal override async Task Apply(HtmlNode subNode, IBrowserClient client, IDictionary<string, object> variables, IDictionary<string, object> results, CancellationToken cancellationToken = default)

@@ -1,10 +1,10 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { DetailBoxComponent } from '../../../../shared/components/detail-box/detail-box.component';
 import { ReadonlyFormDirective } from '../../../../shared/directives/readonly-form/readonly-form.directive';
 import { AppValidators, TypedFormGroup } from '../../../../shared/utilities/form/form.util';
-import { CarrierRunbookStep, fieldsByStepType } from '../../models/carrier-runbook-step';
+import { CarrierRunbookStep, carrierRunbookStepForm, fieldsByStepType } from '../../models/carrier-runbook-step';
 import { StepType } from '../../models/step-type';
 
 @Component({
@@ -19,6 +19,8 @@ import { StepType } from '../../models/step-type';
   styleUrl: './runbook-step.component.scss'
 })
 export class RunbookStepComponent implements OnInit {
+
+  private readonly $form = inject(FormBuilder);
 
   @Input({ required: true }) form!: TypedFormGroup<CarrierRunbookStep>;
   @Input({ required: true }) index!: number;
@@ -58,6 +60,19 @@ export class RunbookStepComponent implements OnInit {
       }
       this.form.controls[key as keyof typeof this.form.controls].updateValueAndValidity();
     }
+  }
+
+  addStep() {
+    const form = this.form;
+    if (!form)
+      return;
+
+    const newForm = carrierRunbookStepForm(this.$form, {} as CarrierRunbookStep);
+    if (form.disabled) {
+      newForm.disable();
+    }
+
+    form.controls.steps.push(newForm);
   }
 
   onMoveUpFn(index: number) {

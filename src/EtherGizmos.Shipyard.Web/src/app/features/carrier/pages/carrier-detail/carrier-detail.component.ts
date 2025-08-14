@@ -246,7 +246,6 @@ export class CarrierDetailComponent {
     form.controls.steps.push(newForm);
   }
 
-
   onMoveUp(index: number) {
     const form = this.form$$();
     if (!form)
