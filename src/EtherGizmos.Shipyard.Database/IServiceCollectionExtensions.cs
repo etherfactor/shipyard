@@ -25,6 +25,7 @@ public static class IServiceCollectionExtensions
             .AddDbContext<ApplicationContext>((services, opt) =>
             {
                 opt.UseLazyLoadingProxies();
+                opt.EnableSensitiveDataLogging();
 
                 var dbOptions = services.GetRequiredService<IOptions<DatabaseReferenceOptions>>()
                     .Value;

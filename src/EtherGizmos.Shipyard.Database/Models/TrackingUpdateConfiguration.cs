@@ -37,9 +37,11 @@ public class TrackingUpdateConfiguration : IEntityTypeConfiguration<TrackingUpda
             .HasForeignKey(e => e.StatusTypeId);
 
         entity.Property(e => e.Location)
-            .HasColumnName("location");
+            .HasColumnName("location")
+            .HasMaxLength(200);
 
         entity.Property(e => e.Description)
-            .HasColumnName("description");
+            .HasColumnName("description")
+            .HasMaxLength(200);
     }
 }

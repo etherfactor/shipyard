@@ -68,9 +68,10 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
             { "entryUrl", $"https://tools.usps.com/go/TrackAction?tLabels={HttpUtility.UrlEncode(trackingNumber)}" },
         };
         var results = new Dictionary<string, object>();
+
+        ApplyLogger(runbook);
         foreach (var step in runbook)
         {
-            step.Logger = _logger;
             await step.Apply(_browserClient, variables, results, cancellationToken);
         }
 
@@ -121,6 +122,20 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
         };
 
         return result;
+    }
+
+    private void ApplyLogger(
+        IEnumerable<ScrapingStep> steps)
+    {
+        foreach (var step in steps)
+        {
+            step.Logger = _logger;
+
+            if (step is ExtractListStep extractStep)
+            {
+                ApplyLogger(extractStep.Steps);
+            }
+        }
     }
 
     private string? NullIfEmpty(string? input)

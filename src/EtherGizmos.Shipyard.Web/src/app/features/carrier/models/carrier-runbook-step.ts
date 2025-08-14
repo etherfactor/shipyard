@@ -6,6 +6,7 @@ import { StepType } from "./step-type";
 const CarrierRunbookStepZ_base = z.object({
   stepType: z.nativeEnum(StepType),
   from: z.string().nullish(),
+  isRegex: z.boolean().nullish(),
   name: z.string().nullish(),
   selector: z.string().nullish(),
   to: z.string().nullish(),
@@ -29,6 +30,7 @@ let form: ($form: FormBuilder, model: CarrierRunbookStep) => TypedFormGroup<Carr
 export const carrierRunbookStepForm = formFactoryForModel<CarrierRunbookStep>(($form, model) => ({
   stepType: [model.stepType],
   from: [model.from],
+  isRegex: [model.isRegex],
   name: [model.name],
   selector: [model.selector],
   steps: $form.nonNullable.array(model.steps?.map(item => form($form, item)) ?? []),
@@ -94,6 +96,10 @@ export const fieldsByStepType: Record<StepType, { field: keyof CarrierRunbookSte
     {
       field: "to",
       required: true,
+    },
+    {
+      field: "isRegex",
+      required: false,
     },
     {
       field: "trim",

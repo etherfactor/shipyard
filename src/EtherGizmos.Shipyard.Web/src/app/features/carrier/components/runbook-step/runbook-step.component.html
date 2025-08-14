@@ -144,6 +144,21 @@
         }
 
         <!-- Trim -->
+        @if (isFieldVisible('isRegex')) {
+        <div class="col-md-6 mt-3">
+          <div class="row">
+            <label for="isRegex" class="col-sm-4 col-form-label">Is Regex?</label>
+            <div class="col-sm-8 d-flex align-items-center">
+              <div class="form-check">
+                <input id="isRegex" type="checkbox" class="form-check-input" formControlName="isRegex" />
+                <label for="isRegex" class="form-check-label">Yes</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+
+        <!-- Trim -->
         @if (isFieldVisible('trim')) {
         <div class="col-md-6 mt-3">
           <div class="row">

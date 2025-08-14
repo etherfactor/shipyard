@@ -2,7 +2,6 @@
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
@@ -18,29 +17,37 @@ internal class ReplaceStep : ScrapingStep, ISettableStep
     [Required]
     public string To { get; set; } = null!;
 
+    public bool IsRegex { get; set; }
+
     public bool Trim { get; set; }
 
     public override Task Apply(IBrowserClient client, IDictionary<string, object> variables, IDictionary<string, object> results, CancellationToken cancellationToken = default)
     {
-        var builder = new StringBuilder();
-
-        var regex = new Regex(@"(?<!{){(?<key>[^{}]+)}(?!})");
-        var newFrom = regex.Replace(From, match =>
-        {
-            var key = match.Groups["key"].Value;
-            return variables.TryGetValue(key, out var value) ? value?.ToString() ?? "" : "";
-        });
-
-        var newTo = regex.Replace(To, match =>
-        {
-            var key = match.Groups["key"].Value;
-            return variables.TryGetValue(key, out var value) ? value?.ToString() ?? "" : "";
-        });
-
         var newValue = variables.TryGetValue(Var, out var value) ? value?.ToString() ?? "" : "";
 
-        Logger.LogInformation("Replacing {From} with {To} in value {Value}", newFrom, newTo, newValue);
-        newValue = newValue.Replace(newFrom, newTo);
+        if (IsRegex)
+        {
+            Logger.LogInformation("Replacing {From} with {To} in value {Value}", From, To, newValue);
+            newValue = new Regex(From, RegexOptions.None).Replace(newValue, To);
+        }
+        else
+        {
+            var regex = new Regex(@"(?<!{){(?<key>[^{}]+)}(?!})");
+            var newFrom = regex.Replace(From, match =>
+            {
+                var key = match.Groups["key"].Value;
+                return variables.TryGetValue(key, out var value) ? value?.ToString() ?? "" : "";
+            });
+
+            var newTo = regex.Replace(To, match =>
+            {
+                var key = match.Groups["key"].Value;
+                return variables.TryGetValue(key, out var value) ? value?.ToString() ?? "" : "";
+            });
+
+            Logger.LogInformation("Replacing {From} with {To} in value {Value}", newFrom, newTo, newValue);
+            newValue = newValue.Replace(newFrom, newTo);
+        }
 
         if (Trim)
         {
