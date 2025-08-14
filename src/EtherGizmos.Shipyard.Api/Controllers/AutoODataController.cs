@@ -226,6 +226,8 @@ public abstract class AutoODataController : ODataController
 
             await uow.SaveChangesAsync(cancellationToken: cancellationToken);
 
+            record = await repository.ReloadAsync(record, cancellationToken);
+
             var finished = _mapper
                 .MapExplicitly(record)
                 .To<TDto>()

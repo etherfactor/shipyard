@@ -31,7 +31,7 @@ export const carrierRunbookStepForm = formFactoryForModel<CarrierRunbookStep>(($
   from: [model.from],
   name: [model.name],
   selector: [model.selector],
-  steps: model.steps ? $form.nonNullable.array(model.steps.map(item => form($form, item))) : undefined,
+  steps: $form.nonNullable.array(model.steps?.map(item => form($form, item)) ?? []),
   to: [model.to],
   trim: [model.trim],
   url: [model.url],

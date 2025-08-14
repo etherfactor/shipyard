@@ -18,6 +18,10 @@ $navbar-sub-height-m: 62px;
   --navbar-sub-height: #{$navbar-sub-height};
 }
 
+body {
+  position: relative;
+}
+
 .navbar {
   height: var(--navbar-height);
   padding-top: 4px;

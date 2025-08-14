@@ -11,9 +11,9 @@ namespace EtherGizmos.Shipyard.Models.Api;
 
 public class CarrierStatusRuleDTO
 {
-    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset? CreatedAt { get; set; }
 
-    public DateTimeOffset ModifiedAt { get; set; }
+    public DateTimeOffset? ModifiedAt { get; set; }
 
     [Required, Regex]
     public string Pattern { get; set; } = null!;

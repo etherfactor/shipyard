@@ -80,7 +80,7 @@ public static class IServiceCollectionExtensions
         Action<UnitOfWorkOptions> configureOptions)
     {
         @this.AddSingleton<IUnitOfWorkFactory, UnitOfWorkFactory>()
-            .AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
+            .AddScoped(typeof(IRepository<>), typeof(EfCoreRepository<>));
 
         @this.AddOptions<UnitOfWorkOptions>()
             .Configure(configureOptions);
@@ -94,7 +94,7 @@ public static class IServiceCollectionExtensions
             var contextType = pair.Value;
             var serviceType = typeof(DbSet<>).MakeGenericType(entityType);
 
-            @this
+            @this.AddKeyedScoped(typeof(DbContext), entityType, contextType)
                 .AddScoped(serviceType, provider =>
                 {
                     var context = (DbContext)provider.GetRequiredService(contextType);

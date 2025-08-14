@@ -16,4 +16,6 @@ public interface IRepository<TEntity> : IRepository
     void Delete(TEntity entity);
 
     void Detach(TEntity entity);
+
+    Task<TEntity> ReloadAsync(TEntity entity, CancellationToken cancellationToken = default);
 }
