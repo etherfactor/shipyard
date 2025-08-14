@@ -54,6 +54,7 @@
               <th>Status Type</th>
               <th>Priority</th>
               <th>Active</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -89,6 +90,13 @@
                   <input id="rule{{i}}Active" class="form-check-input" type="checkbox" formControlName="isActive" />
                   <label for="rule{{i}}Active" class="form-check-label">Yes</label>
                 </div>
+              </td>
+
+              <!-- Actions -->
+              <td>
+                <button class="btn btn-sm btn-danger" (click)="removeRule(i)" [disabled]="form.disabled">
+                  <span class="bi bi-x"></span>
+                </button>
               </td>
             </tr>
             }

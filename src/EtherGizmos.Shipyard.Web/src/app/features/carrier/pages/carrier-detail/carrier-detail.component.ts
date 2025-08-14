@@ -231,6 +231,16 @@ export class CarrierDetailComponent {
     }
 
     form.controls.rules.push(newForm);
+    form.controls.rules.markAsDirty();
+  }
+
+  removeRule(index: number) {
+    const form = this.form$$();
+    if (!form)
+      return;
+
+    form.controls.rules.removeAt(index);
+    form.controls.rules.markAsDirty();
   }
 
   @Bound addStep() {
