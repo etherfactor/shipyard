@@ -81,6 +81,11 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
             ? estimatedAtDt as DateTimeOffset?
             : null : null : null;
 
+        estimatedAt = runbook
+            .Select(e => e.Eta)
+            .Where(e => e is not null).Min()
+            ?? estimatedAt;
+
         var details = results.TryGetValue("details", out object? detailsObj)
             ? detailsObj is List<object> detailsList
             ? detailsList.OfType<IDictionary<string, object>>().Cast<IDictionary<string, object>>().Select(subResults =>
@@ -110,6 +115,8 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
                 };
             })
             : [] : [];
+
+        details = details.Concat(runbook.SelectMany(e => e.Steps));
 
         details = details
             .Where(e => e.OccurredAt != DateTimeOffset.MinValue);

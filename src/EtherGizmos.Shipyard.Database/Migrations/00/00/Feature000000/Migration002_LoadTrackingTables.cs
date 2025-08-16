@@ -34,6 +34,7 @@ public class Migration002_LoadTrackingTables : MigrationExtension
             .Row(new { step_type_id = 40, name = "Set" })
             .Row(new { step_type_id = 41, name = "Replace" })
             .Row(new { step_type_id = 100, name = "Return" })
+            .Row(new { step_type_id = 1000, name = "Script" })
             .Match(e => new { e.step_type_id });
     }
 

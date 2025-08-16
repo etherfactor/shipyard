@@ -8,6 +8,7 @@ const CarrierRunbookStepZ_base = z.object({
   from: z.string().nullish(),
   isRegex: z.boolean().nullish(),
   name: z.string().nullish(),
+  script: z.string().nullish(),
   selector: z.string().nullish(),
   to: z.string().nullish(),
   trim: z.boolean().nullish(),
@@ -32,6 +33,7 @@ export const carrierRunbookStepForm = formFactoryForModel<CarrierRunbookStep>(($
   from: [model.from],
   isRegex: [model.isRegex],
   name: [model.name],
+  script: [model.script],
   selector: [model.selector],
   steps: $form.nonNullable.array(model.steps?.map(item => form($form, item)) ?? []),
   to: [model.to],
@@ -113,6 +115,12 @@ export const fieldsByStepType: Record<StepType, { field: keyof CarrierRunbookSte
     },
     {
       field: "var",
+      required: true,
+    },
+  ],
+  Script: [
+    {
+      field: "script",
       required: true,
     },
   ],
