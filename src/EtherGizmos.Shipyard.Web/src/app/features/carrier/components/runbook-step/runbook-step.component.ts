@@ -1,6 +1,7 @@
 import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 import { DetailBoxComponent } from '../../../../shared/components/detail-box/detail-box.component';
 import { ReadonlyFormDirective } from '../../../../shared/directives/readonly-form/readonly-form.directive';
 import { AppValidators, TypedFormGroup } from '../../../../shared/utilities/form/form.util';
@@ -11,6 +12,7 @@ import { StepType } from '../../models/step-type';
   selector: 'app-runbook-step',
   imports: [
     DetailBoxComponent,
+    MonacoEditorModule,
     NgSelectModule,
     ReactiveFormsModule,
     ReadonlyFormDirective,

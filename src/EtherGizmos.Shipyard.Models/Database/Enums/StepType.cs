@@ -8,6 +8,7 @@ public enum StepType
     Navigate = 1,
     Replace = 41,
     Return = 100,
+    Script = 1000,
     Send = 21,
     Set = 40,
     WaitFor = 10,

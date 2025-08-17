@@ -4,6 +4,7 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { InjectionToken, Provider } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
+import { provideMonacoEditor } from 'ngx-monaco-editor-v2';
 import { AppComponent } from './app/app.component';
 import { APP_ROUTES } from './app/app.routes';
 import { APP_CONFIG, fetchConfig } from './app/shared/utilities/config/config.util';
@@ -20,6 +21,9 @@ import { provideODataClient } from './app/shared/utilities/odata/odata.util';
         provideRouter(APP_ROUTES),
         provideHttpClient(withFetch(), withInterceptors([])),
         provideODataClient(),
+        provideMonacoEditor({
+          baseUrl: window.location.origin + "/assets/monaco/min/vs",
+        }),
       ]
     })
     .catch(err => console.error(err));

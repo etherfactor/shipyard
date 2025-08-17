@@ -51,6 +51,7 @@
             <ng-option [value]="StepType.Navigate">Navigate</ng-option>
             <ng-option [value]="StepType.Replace">Replace</ng-option>
             <ng-option [value]="StepType.Return">Return</ng-option>
+            <ng-option [value]="StepType.Script">Script</ng-option>
             <ng-option [value]="StepType.Send">Send</ng-option>
             <ng-option [value]="StepType.Set">Set</ng-option>
             <ng-option [value]="StepType.WaitFor">Wait for</ng-option>
@@ -175,17 +176,14 @@
 
         <!-- Script -->
         @if (isFieldVisible('script')) {
-        <!--<div class="col-md-6 mt-3">
+        <div class="col-12 mt-3">
           <div class="row">
-            <label for="trim" class="col-sm-4 col-form-label">Trim</label>
-            <div class="col-sm-8 d-flex align-items-center">
-              <div class="form-check">
-                <input id="trim" type="checkbox" class="form-check-input" formControlName="trim" />
-                <label for="trim" class="form-check-label">Yes</label>
-              </div>
+            <label for="script" class="col-sm-2 col-form-label">Script Text</label>
+            <div class="col-sm-10" style="height: 500px">
+              <ngx-monaco-editor style="height: 100%;" [options]="{ theme: 'vs-dark', language: 'javascript', readOnly: form.disabled }" formControlName="script" readonly="true"></ngx-monaco-editor>
             </div>
           </div>
-        </div>-->
+        </div>
         }
       </div>
 

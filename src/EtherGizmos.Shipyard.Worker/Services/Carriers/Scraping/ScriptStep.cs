@@ -79,10 +79,10 @@ internal class ScriptStep : ScrapingStep
             doc.LoadHtml(html);
             doc.OptionEmptyCollection = true;
 
-            foreach (var n in doc.DocumentNode.SelectNodes("//script|//style|//comment()")!)
-            {
-                n.Remove();
-            }
+            //foreach (var n in doc.DocumentNode.SelectNodes("//script|//style|//comment()")!)
+            //{
+            //    n.Remove();
+            //}
 
             var id = 0;
             var nodes = new Dictionary<int, HtmlNode>();
@@ -114,10 +114,14 @@ internal class ScriptStep : ScrapingStep
 
         public HapHost(
             HapSnapshot snapshot,
-            ILogger logger)
+            ILogger logger,
+            int maxResults = 1000,
+            int maxCalls = 2000)
         {
             _snapshot = snapshot;
             _logger = logger;
+            _maxResults = maxResults;
+            _maxCalls = maxCalls;
         }
 
         public NodeHandle[] QAllCss(string selector)
@@ -166,7 +170,7 @@ internal class ScriptStep : ScrapingStep
 
             DateTimeOffset? eta = null;
             var events = new List<TrackingResultDetail>();
-            var engine = new Engine(o => o.Strict().LimitMemory(16_000_000).TimeoutInterval(TimeSpan.FromSeconds(1)));
+            var engine = new Engine(o => o.Strict().LimitMemory(16_000_000).TimeoutInterval(TimeSpan.FromSeconds(600)));
 
             var nodeProto = engine.Intrinsics.Object.Construct(Arguments.Empty);
 
@@ -199,6 +203,14 @@ internal class ScriptStep : ScrapingStep
                 var handle = Unbox(thisObj);
                 var name = args.At(0).AsString();
                 return JsValue.FromObject(engine, host.Attr(handle, name));
+            }), true);
+
+            nodeProto.Set("qOne", new ClrFunction(engine, "qOne", (thisObj, args) =>
+            {
+                var handle = Unbox(thisObj);
+                var selector = args.At(0).AsString();
+                var all = host.SubQAllCss(handle, selector);
+                return all.Length == 0 ? JsValue.Null : Box(all[0]);
             }), true);
 
             nodeProto.Set("qAll", new ClrFunction(engine, "qAll", (thisObj, args) =>
@@ -261,6 +273,8 @@ internal class ScriptStep : ScrapingStep
             }), true);
 
             engine.SetValue("console", console);
+
+            engine.Execute(js);
 
             return new()
             {
