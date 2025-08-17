@@ -80,7 +80,7 @@ internal class SeleniumChromiumClient : IBrowserClient, IDisposable
 
         _logger.LogInformation("Navigated to url {RequestUri}", requestUrl);
 
-        var wait = new WebDriverWait(_driver, timeout ?? TimeSpan.FromSeconds(5));
+        var wait = new WebDriverWait(_driver, timeout ?? TimeSpan.FromSeconds(30));
         wait.Until(d =>
             ((IJavaScriptExecutor)d)
               .ExecuteScript("return document.readyState") as string == "complete");
@@ -98,7 +98,7 @@ internal class SeleniumChromiumClient : IBrowserClient, IDisposable
 
         _logger.LogInformation("Waiting until element {CssSelector} is loaded", selector);
 
-        var wait = new WebDriverWait(_driver, timeout ?? TimeSpan.FromSeconds(5));
+        var wait = new WebDriverWait(_driver, timeout ?? TimeSpan.FromSeconds(30));
         wait.Until(d => d.FindElement(By.CssSelector(selector)).Displayed);
 
         _logger.LogInformation("Element {CssSelector} is loaded", selector);

@@ -4,6 +4,7 @@ using HtmlAgilityPack.CssSelectors.NetCore;
 using Jint;
 using Jint.Native;
 using Jint.Runtime;
+using Jint.Runtime.Descriptors;
 using Jint.Runtime.Interop;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
@@ -44,23 +45,6 @@ internal class ScriptStep : ScrapingStep
         public NodeHandle(int id) => Id = id;
     }
 
-    //public sealed record TrackingEvent
-    //{
-    //    public DateTimeOffset OccurredAt { get; init; }
-
-    //    public string? Location { get; init; }
-
-    //    [Required]
-    //    public string Description { get; init; } = null!;
-    //}
-
-    //public sealed record TrackingResult
-    //{
-    //    public DateTimeOffset? EstimatedAt { get; set; }
-
-    //    public IList<TrackingEvent> Events { get; set; } = [];
-    //}
-
     public sealed class HapSnapshot
     {
         public HtmlDocument Document { get; init; }
@@ -79,10 +63,10 @@ internal class ScriptStep : ScrapingStep
             doc.LoadHtml(html);
             doc.OptionEmptyCollection = true;
 
-            //foreach (var n in doc.DocumentNode.SelectNodes("//script|//style|//comment()")!)
-            //{
-            //    n.Remove();
-            //}
+            foreach (var n in doc.DocumentNode.SelectNodes("//script|//style|//comment()")!)
+            {
+                n.Remove();
+            }
 
             var id = 0;
             var nodes = new Dictionary<int, HtmlNode>();
@@ -124,7 +108,7 @@ internal class ScriptStep : ScrapingStep
             _maxCalls = maxCalls;
         }
 
-        public NodeHandle[] QAllCss(string selector)
+        public NodeHandle[] SelectAll(string selector)
             => QAllCssInner(_snapshot.Document.DocumentNode, selector);
 
         public NodeHandle[] SubQAllCss(NodeHandle h, string selector)
@@ -136,8 +120,28 @@ internal class ScriptStep : ScrapingStep
         public string Text(NodeHandle h)
             => Normalize(NodeOf(h).InnerText);
 
-        public string Attr(NodeHandle h, string name)
+        public string Html(NodeHandle h)
+            => Normalize(NodeOf(h).InnerHtml);
+
+        public bool HasAttribute(NodeHandle h, string name)
+            => NodeOf(h).Attributes
+                .FirstOrDefault(e => string.Equals(e.Name, name, StringComparison.OrdinalIgnoreCase)) is not null;
+
+        public string Attribute(NodeHandle h, string name)
             => NodeOf(h).Attributes[name]?.Value ?? "";
+
+        public IReadOnlyDictionary<string, string> Attributes(NodeHandle h)
+            => NodeOf(h).Attributes
+                .ToDictionary(e => e.Name.ToLowerInvariant(), e => e.Value ?? "");
+
+        public bool HasClass(NodeHandle h, string name)
+            => NodeOf(h).HasClass(name);
+
+        public string[] Classes(NodeHandle h)
+            => [.. NodeOf(h).GetClasses()];
+
+        public NodeHandle Parent(NodeHandle h)
+            => HandleOf(NodeOf(h).ParentNode);
 
         private NodeHandle HandleOf(HtmlNode n)
             => new(_snapshot.NodeToId[n]);
@@ -198,14 +202,56 @@ internal class ScriptStep : ScrapingStep
                 return JsValue.FromObject(engine, host.Text(handle));
             }), true);
 
-            nodeProto.Set("attr", new ClrFunction(engine, "attr", (thisObj, args) =>
+            nodeProto.Set("html", new ClrFunction(engine, "html", (thisObj, args) =>
+            {
+                var handle = Unbox(thisObj);
+                return JsValue.FromObject(engine, host.Html(handle));
+            }), true);
+
+            nodeProto.Set("hasAttribute", new ClrFunction(engine, "hasAttribute", (thisObj, args) =>
             {
                 var handle = Unbox(thisObj);
                 var name = args.At(0).AsString();
-                return JsValue.FromObject(engine, host.Attr(handle, name));
+                return JsValue.FromObject(engine, host.HasAttribute(handle, name));
             }), true);
 
-            nodeProto.Set("qOne", new ClrFunction(engine, "qOne", (thisObj, args) =>
+            nodeProto.Set("attribute", new ClrFunction(engine, "attribute", (thisObj, args) =>
+            {
+                var handle = Unbox(thisObj);
+                var name = args.At(0).AsString();
+                return JsValue.FromObject(engine, host.Attribute(handle, name));
+            }), true);
+
+            nodeProto.Set("attributes", new ClrFunction(engine, "attributes", (thisObj, args) =>
+            {
+                var handle = Unbox(thisObj);
+                var attributes = host.Attributes(handle);
+                var obj = engine.Intrinsics.Object.Construct(Arguments.Empty);
+                foreach (var (key, value) in attributes)
+                    obj.DefineOwnProperty(JsValue.FromObject(engine, key), new PropertyDescriptor(JsValue.FromObject(engine, value), writable: false, enumerable: true, configurable: false));
+                return obj;
+            }), true);
+
+            nodeProto.Set("hasClass", new ClrFunction(engine, "hasClass", (thisObj, args) =>
+            {
+                var handle = Unbox(thisObj);
+                var name = args.At(0).AsString();
+                return JsValue.FromObject(engine, host.HasClass(handle, name));
+            }), true);
+
+            nodeProto.Set("classes", new ClrFunction(engine, "classes", (thisObj, args) =>
+            {
+                var handle = Unbox(thisObj);
+                return JsValue.FromObject(engine, host.Classes(handle));
+            }), true);
+
+            nodeProto.Set("parent", new ClrFunction(engine, "parent", (thisObj, args) =>
+            {
+                var handle = Unbox(thisObj);
+                return Box(host.Parent(handle));
+            }), true);
+
+            nodeProto.Set("selectOne", new ClrFunction(engine, "selectOne", (thisObj, args) =>
             {
                 var handle = Unbox(thisObj);
                 var selector = args.At(0).AsString();
@@ -213,30 +259,30 @@ internal class ScriptStep : ScrapingStep
                 return all.Length == 0 ? JsValue.Null : Box(all[0]);
             }), true);
 
-            nodeProto.Set("qAll", new ClrFunction(engine, "qAll", (thisObj, args) =>
+            nodeProto.Set("selectAll", new ClrFunction(engine, "selectAll", (thisObj, args) =>
             {
                 var handle = Unbox(thisObj);
                 var selector = args.At(0).AsString();
-                return BoxMany(host.QAllCss(selector));
+                return BoxMany(host.SelectAll(selector));
             }), true);
 
-            engine.SetValue("qAll", (Func<string, JsValue>)(selector => BoxMany(host.QAllCss(selector))));
-
-            engine.SetValue("qOne", (Func<string, JsValue>)(selector =>
+            engine.SetValue("selectOne", (Func<string, JsValue>)(selector =>
             {
-                var all = host.QAllCss(selector);
+                var all = host.SelectAll(selector);
                 return all.Length == 0 ? JsValue.Null : Box(all[0]);
             }));
 
-            engine.SetValue("eta", (Action<string>)(etaStr =>
+            engine.SetValue("selectAll", (Func<string, JsValue>)(selector => BoxMany(host.SelectAll(selector))));
+
+            engine.SetValue("setEta", (Action<string>)(etaStr =>
             {
                 eta = DateTimeOffset.Parse(etaStr);
             }));
 
-            engine.SetValue("addEvent", (Action<JsValue>)(o =>
+            engine.SetValue("recordEvent", (Action<JsValue>)(o =>
             {
                 var obj = o.AsObject();
-                var when = DateTimeOffset.Parse(obj.Get("occurredAt").AsString());
+                var when = DateTimeOffset.Parse(obj.Get("at").AsString());
                 var result = new TrackingResultDetail
                 {
                     StatusTypeId = 0,

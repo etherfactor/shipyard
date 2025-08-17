@@ -56,9 +56,15 @@ export class DashboardComponent implements OnInit {
     this.isLoadingStack$$.set(this.isLoadingStack$$() + 1);
     const result = this.$package.search()
       .filter(e =>
-        o.eq(
-          e.prop("lastStatusType"),
-          o.string(StatusType.InTransit),
+        o.or(
+          o.eq(
+            e.prop("lastStatusType"),
+            o.string(StatusType.InTransit),
+          ),
+          o.eq(
+            e.prop("lastStatusType"),
+            o.string(StatusType.OutForDelivery),
+          ),
         ),
       )
       .select("id")
@@ -149,11 +155,20 @@ export class DashboardComponent implements OnInit {
 
     try {
       const data = await result.data;
+      data.sort((a, b) => a.nextPollAt.toMillis() - b.nextPollAt.toMillis());
 
       const now = DateTime.now().toMillis();
       this.nextPolls = data.map(item => {
-        const duration = Duration.fromMillis(item.nextPollAt.toMillis() - now)
+        let duration = Duration.fromMillis(item.nextPollAt.toMillis() - now)
           .shiftTo("hours", "minutes", "seconds");
+
+        if (duration.hours === 0) {
+          duration = duration.shiftTo("minutes", "seconds");
+
+          if (duration.minutes === 0) {
+            duration = duration.shiftTo("seconds");
+          }
+        }
 
         const text = duration.toHuman({ unitDisplay: "short" }).split(",")[0];
         return {

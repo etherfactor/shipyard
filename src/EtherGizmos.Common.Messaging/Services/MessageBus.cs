@@ -250,5 +250,7 @@ internal class MessageBus : IMessageBus
                 await Task.Delay(2000, cancellationToken);
             }
         }
+
+        _logger.LogWarning("Listener pump terminated. Cancellation requested? {CancellationRequested}", cancellationToken.IsCancellationRequested);
     }
 }
