@@ -43,6 +43,9 @@ public static class IMessagingBuilderRabbitMQExtensions
                     factory.Port = options.Port;
                 }
 
+                factory.AutomaticRecoveryEnabled = true;
+                factory.TopologyRecoveryEnabled = true;
+
                 return factory;
             });
 
