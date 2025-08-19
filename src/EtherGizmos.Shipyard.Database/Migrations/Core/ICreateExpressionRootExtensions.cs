@@ -5,7 +5,7 @@ using FluentMigrator.Infrastructure;
 using System.Data;
 using System.Reflection;
 
-namespace EtherGizmos.Shipyard.Database.Migrations.Core;
+namespace EtherGizmos.Shipyard.Migrations.Core;
 
 public static class ICreateExpressionRootExtensions
 {

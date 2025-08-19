@@ -1,6 +1,6 @@
-﻿using EtherGizmos.Common.Utilities.Abstractions;
+﻿using EtherGizmos.Common.Abstractions;
 
-namespace EtherGizmos.Shipyard.Models.Database;
+namespace EtherGizmos.Shipyard.Database;
 
 /// <summary>
 /// Normally, this would be an enum, but we also want additional metadata, so we have to settle for a class. Doesn't change

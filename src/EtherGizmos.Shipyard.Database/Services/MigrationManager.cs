@@ -1,7 +1,7 @@
 ﻿using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EtherGizmos.Shipyard.Database.Services;
+namespace EtherGizmos.Shipyard.Services;
 
 internal class MigrationManager : IMigrationManager
 {

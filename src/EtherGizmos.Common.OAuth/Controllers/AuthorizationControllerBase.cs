@@ -1,5 +1,5 @@
-﻿using EtherGizmos.Common.ViewModels;
-using EtherGizmos.Shipyard.Api.Extensions;
+﻿using EtherGizmos.Common.Extensions;
+using EtherGizmos.Common.ViewModels;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;

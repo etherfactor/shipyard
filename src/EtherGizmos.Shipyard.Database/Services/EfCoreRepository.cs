@@ -1,8 +1,8 @@
-﻿using EtherGizmos.Common.Utilities.Abstractions;
+﻿using EtherGizmos.Common.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EtherGizmos.Shipyard.Database.Services;
+namespace EtherGizmos.Shipyard.Services;
 
 internal class EfCoreRepository<TEntity> : IRepository<TEntity>
     where TEntity : class, IEntity

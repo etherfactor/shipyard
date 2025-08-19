@@ -1,6 +1,6 @@
 ﻿using EtherGizmos.Common.Controllers;
-using EtherGizmos.Shipyard.Database.Services;
-using EtherGizmos.Shipyard.Models.Database;
+using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

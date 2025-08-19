@@ -1,7 +1,6 @@
 ﻿using Asp.Versioning;
-using EtherGizmos.Shipyard.Models.Api;
-using EtherGizmos.Shipyard.Models.Database;
-using EtherGizmos.Shipyard.OData.Swagger;
+using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Swashbuckle.AspNetCore.Filters;

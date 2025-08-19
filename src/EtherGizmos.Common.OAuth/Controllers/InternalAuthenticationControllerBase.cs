@@ -1,6 +1,6 @@
 ﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Common.Extensions;
 using EtherGizmos.Common.ViewModels;
-using EtherGizmos.Shipyard.Api.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;

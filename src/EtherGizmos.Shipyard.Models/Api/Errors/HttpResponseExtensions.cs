@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 
-namespace EtherGizmos.Shipyard.Models.Api.Errors;
+namespace EtherGizmos.Shipyard.Api.Errors;
 
 public static class HttpResponseExtensions
 {

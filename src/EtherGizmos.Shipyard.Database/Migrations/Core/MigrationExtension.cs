@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Reflection;
 
-namespace EtherGizmos.Shipyard.Database.Migrations.Core;
+namespace EtherGizmos.Shipyard.Migrations.Core;
 
 //See https://github.com/fluentmigrator/fluentmigrator/issues/640
 

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace EtherGizmos.Common.Messaging.Configuration;
+namespace EtherGizmos.Common.Configuration;
 
 public class MessagePublisherOptions
 {

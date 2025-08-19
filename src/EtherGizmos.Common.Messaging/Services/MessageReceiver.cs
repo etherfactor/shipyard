@@ -1,10 +1,10 @@
-﻿using EtherGizmos.Common.Messaging.Abstractions;
-using EtherGizmos.Common.Messaging.Configuration;
+﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Common.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Reflection;
 
-namespace EtherGizmos.Common.Messaging.Services;
+namespace EtherGizmos.Common.Services;
 
 internal class MessageReceiver : IMessageReceiver
 {

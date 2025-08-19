@@ -1,10 +1,10 @@
-﻿using EtherGizmos.Common.Messaging.Abstractions;
+﻿using EtherGizmos.Common.Abstractions;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks.Dataflow;
 
-namespace EtherGizmos.Common.Messaging.Services;
+namespace EtherGizmos.Common.Services;
 
 internal class MessageBus : IMessageBus
 {

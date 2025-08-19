@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Common.Utilities.Extensions;
+﻿namespace EtherGizmos.Common.Extensions;
 
 public static class DateTimeOffsetExtensions
 {

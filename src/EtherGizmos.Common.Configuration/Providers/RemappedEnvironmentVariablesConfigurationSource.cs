@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.Text.RegularExpressions;
 
-namespace EtherGizmos.Common.Configuration.Providers;
+namespace EtherGizmos.Common.Providers;
 
 internal sealed class RemappedEnvironmentVariablesConfigurationSource : IConfigurationSource
 {

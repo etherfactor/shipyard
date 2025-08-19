@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
-using EtherGizmos.Common.Utilities.Abstractions;
-using EtherGizmos.Shipyard.Database.Services;
+using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Models.Api.Errors;
-using EtherGizmos.Shipyard.OData.Extensions;
+using EtherGizmos.Shipyard.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Extensions;

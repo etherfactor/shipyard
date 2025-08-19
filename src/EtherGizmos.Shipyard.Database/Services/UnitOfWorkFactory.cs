@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace EtherGizmos.Shipyard.Database.Services;
+namespace EtherGizmos.Shipyard.Services;
 
 internal class UnitOfWorkFactory : IUnitOfWorkFactory
 {

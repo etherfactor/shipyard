@@ -1,6 +1,6 @@
 ﻿using System.Threading.Channels;
 
-namespace EtherGizmos.Common.Messaging.Abstractions;
+namespace EtherGizmos.Common.Abstractions;
 
 public interface IMessagePublisher : IDisposable
 {

@@ -1,7 +1,7 @@
-﻿using EtherGizmos.Common.Messaging.Abstractions;
-using EtherGizmos.Shipyard.Database.Services;
-using EtherGizmos.Shipyard.Models.Database;
-using EtherGizmos.Shipyard.Models.Database.Enums;
+﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Database.Enums;
+using EtherGizmos.Shipyard.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

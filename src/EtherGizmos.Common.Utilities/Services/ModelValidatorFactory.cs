@@ -1,7 +1,7 @@
-﻿using EtherGizmos.Common.Utilities.Abstractions;
+﻿using EtherGizmos.Common.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EtherGizmos.Common.Utilities.Services;
+namespace EtherGizmos.Common.Services;
 
 internal class ModelValidatorFactory : IModelValidatorFactory
 {

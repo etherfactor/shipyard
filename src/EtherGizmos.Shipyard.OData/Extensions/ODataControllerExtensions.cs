@@ -5,7 +5,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using System.Diagnostics.CodeAnalysis;
 
-namespace EtherGizmos.Shipyard.OData.Extensions;
+namespace EtherGizmos.Shipyard.Extensions;
 
 public static class ODataControllerExtensions
 {

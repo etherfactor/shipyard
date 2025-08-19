@@ -1,8 +1,8 @@
-using EtherGizmos.Common.Utilities.Abstractions;
+using EtherGizmos.Common.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace EtherGizmos.Shipyard.Database.Extensions;
+namespace EtherGizmos.Shipyard.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="EntityTypeBuilder{TEntity}"/>.

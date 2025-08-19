@@ -1,6 +1,6 @@
 ﻿using Asp.Versioning;
 
-namespace EtherGizmos.Shipyard.Models;
+namespace EtherGizmos.Shipyard;
 
 public static class ApiVersions
 {

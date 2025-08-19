@@ -1,5 +1,5 @@
-﻿using EtherGizmos.Common.Models;
-using EtherGizmos.Shipyard.Database.Extensions;
+﻿using EtherGizmos.Common.Extensions;
+using EtherGizmos.Common.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 

@@ -1,6 +1,6 @@
-﻿using EtherGizmos.Common.Utilities.Abstractions;
+﻿using EtherGizmos.Common.Abstractions;
 
-namespace EtherGizmos.Shipyard.Database.Services;
+namespace EtherGizmos.Shipyard.Services;
 
 public interface IRepository { }
 

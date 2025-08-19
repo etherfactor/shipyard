@@ -1,7 +1,6 @@
 ﻿using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Common.Utilities.Abstractions;
 
-namespace EtherGizmos.Shipyard.Models.Database;
+namespace EtherGizmos.Shipyard.Database;
 
 public class User : InternalUser<Guid>, IEntity
 {

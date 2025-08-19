@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Models.Api.Enums;
+﻿namespace EtherGizmos.Shipyard.Api.Enums;
 
 public enum StatusTypeDTO
 {

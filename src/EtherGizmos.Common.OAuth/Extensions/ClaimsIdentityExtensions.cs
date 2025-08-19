@@ -1,7 +1,7 @@
 ﻿using OpenIddict.Abstractions;
 using System.Security.Claims;
 
-namespace EtherGizmos.Shipyard.Api.Extensions;
+namespace EtherGizmos.Common.Extensions;
 
 public static class ClaimsIdentityExtensions
 {

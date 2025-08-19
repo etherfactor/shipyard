@@ -1,7 +1,7 @@
-﻿using EtherGizmos.Common.Messaging.Abstractions;
+﻿using EtherGizmos.Common.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EtherGizmos.Common.Messaging.Services;
+namespace EtherGizmos.Common.Services;
 
 internal class MessagingBuilder : IMessagingBuilder
 {

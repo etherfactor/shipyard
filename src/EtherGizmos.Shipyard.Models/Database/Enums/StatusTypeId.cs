@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Models.Database.Enums;
+﻿namespace EtherGizmos.Shipyard.Database.Enums;
 
 public static class StatusTypeId
 {

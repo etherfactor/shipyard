@@ -1,8 +1,8 @@
-﻿using EtherGizmos.Common.Utilities.Configuration;
+﻿using EtherGizmos.Common.Configuration;
 using EtherGizmos.Extensions.DependencyInjection;
-using EtherGizmos.Shipyard.Database.Configuration;
-using EtherGizmos.Shipyard.Database.Migrations.Core;
-using EtherGizmos.Shipyard.Database.Services;
+using EtherGizmos.Shipyard.Configuration;
+using EtherGizmos.Shipyard.Migrations.Core;
+using EtherGizmos.Shipyard.Services;
 using FluentMigrator.Runner;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Reflection;
 
-namespace EtherGizmos.Shipyard.Database;
+namespace EtherGizmos.Shipyard;
 
 public static class IServiceCollectionExtensions
 {

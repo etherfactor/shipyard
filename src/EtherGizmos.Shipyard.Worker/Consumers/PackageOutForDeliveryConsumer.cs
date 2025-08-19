@@ -1,7 +1,7 @@
-﻿using EtherGizmos.Common.Messaging.Abstractions;
-using EtherGizmos.Shipyard.Notifications.Configuration;
-using EtherGizmos.Shipyard.Notifications.Models;
-using EtherGizmos.Shipyard.Notifications.Services;
+﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Configuration;
+using EtherGizmos.Shipyard.Models;
+using EtherGizmos.Shipyard.Services;
 using Microsoft.Extensions.Options;
 
 namespace EtherGizmos.Shipyard.Worker.Consumers;

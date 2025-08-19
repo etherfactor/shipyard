@@ -1,11 +1,11 @@
-﻿using EtherGizmos.Shipyard.Notifications.Configuration;
-using EtherGizmos.Shipyard.Notifications.Models;
+﻿using EtherGizmos.Shipyard.Configuration;
+using EtherGizmos.Shipyard.Models;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MimeKit;
 
-namespace EtherGizmos.Shipyard.Notifications.Services;
+namespace EtherGizmos.Shipyard.Services;
 
 internal class SmtpNotificationSender<TEvent> : IEmailNotificationSender<TEvent>
     where TEvent : NotificationEvent

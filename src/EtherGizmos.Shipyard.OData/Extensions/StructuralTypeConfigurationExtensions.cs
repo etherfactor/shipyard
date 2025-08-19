@@ -1,8 +1,8 @@
-﻿using EtherGizmos.Common.Utilities.Helpers;
+﻿using EtherGizmos.Common.Helpers;
 using Microsoft.OData.ModelBuilder;
 using System.Reflection;
 
-namespace EtherGizmos.Shipyard.OData.Extensions;
+namespace EtherGizmos.Shipyard.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="StructuralTypeConfiguration{TEntityType}"/>.

@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
-using EtherGizmos.Shipyard.Models.Extensions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
 
-namespace EtherGizmos.Shipyard.OData.Extensions;
+namespace EtherGizmos.Shipyard.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="IMapper"/>.

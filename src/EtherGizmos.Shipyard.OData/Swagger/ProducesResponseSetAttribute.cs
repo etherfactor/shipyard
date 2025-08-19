@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.OData.Swagger;
+﻿namespace EtherGizmos.Shipyard.Swagger;
 
 [AttributeUsage(AttributeTargets.Method)]
 public class ProducesResponseSetAttribute : Attribute

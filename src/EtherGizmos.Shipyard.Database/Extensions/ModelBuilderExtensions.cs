@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace EtherGizmos.Shipyard.Database.Extensions;
+namespace EtherGizmos.Shipyard.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="ModelBuilder"/>.

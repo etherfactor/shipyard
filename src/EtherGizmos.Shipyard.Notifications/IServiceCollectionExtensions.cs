@@ -1,13 +1,14 @@
-﻿using EtherGizmos.Common.Utilities.Configuration;
-using EtherGizmos.Shipyard.Notifications.Configuration;
-using EtherGizmos.Shipyard.Notifications.Models;
-using EtherGizmos.Shipyard.Notifications.Services;
+﻿using EtherGizmos.Common.Configuration;
+using EtherGizmos.Common.Utilities.Configuration;
+using EtherGizmos.Shipyard.Configuration;
+using EtherGizmos.Shipyard.Models;
+using EtherGizmos.Shipyard.Services;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Reflection;
 
-namespace EtherGizmos.Shipyard.Notifications;
+namespace EtherGizmos.Shipyard;
 
 public static class IServiceCollectionExtensions
 {

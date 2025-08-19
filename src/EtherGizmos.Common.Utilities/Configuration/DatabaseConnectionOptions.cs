@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Common.Utilities.Configuration;
+﻿namespace EtherGizmos.Common.Configuration;
 
 public class DatabaseConnectionOptions
 {

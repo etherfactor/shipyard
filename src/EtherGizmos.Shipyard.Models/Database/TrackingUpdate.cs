@@ -1,8 +1,8 @@
-﻿using EtherGizmos.Common.Utilities.Abstractions;
-using EtherGizmos.Common.Utilities.Extensions;
+﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Common.Extensions;
 using System.Diagnostics.CodeAnalysis;
 
-namespace EtherGizmos.Shipyard.Models.Database;
+namespace EtherGizmos.Shipyard.Database;
 
 public class TrackingUpdate : Auditable, IEntity
 {

@@ -1,10 +1,9 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
-using EtherGizmos.Shipyard.Database.Services;
-using EtherGizmos.Shipyard.Models.Api;
-using EtherGizmos.Shipyard.Models.Database;
-using EtherGizmos.Shipyard.OData.Extensions;
-using EtherGizmos.Shipyard.OData.Swagger;
+using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Extensions;
+using EtherGizmos.Shipyard.Services;
+using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;

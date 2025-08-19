@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Database.Migrations.Core;
+﻿using EtherGizmos.Shipyard.Migrations.Core;
 
 namespace EtherGizmos.Shipyard.Database.Migrations._00._00.Feature000000;
 
@@ -11,7 +11,7 @@ public class Migration004_LoadOAuthTables : MigrationExtension
          * Load [oauth2].[application_types]  (enum OAuth2ApplicationType)
          */
         Merge.IntoTable("application_types").InSchema("oauth2")
-            .Row(new 
+            .Row(new
             {
                 application_type_id = 10,
                 name = "Native",

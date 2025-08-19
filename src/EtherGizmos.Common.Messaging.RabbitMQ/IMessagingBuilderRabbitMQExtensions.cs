@@ -1,5 +1,5 @@
-﻿using EtherGizmos.Common.Configuration;
-using EtherGizmos.Common.Messaging.Abstractions;
+﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Common.Configuration;
 using EtherGizmos.Common.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

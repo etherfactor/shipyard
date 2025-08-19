@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 
-namespace EtherGizmos.Common.Messaging.Abstractions;
+namespace EtherGizmos.Common.Abstractions;
 
 public record SentMessage
 {

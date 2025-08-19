@@ -1,12 +1,12 @@
-﻿using EtherGizmos.Common.Utilities.Converters;
-using EtherGizmos.Shipyard.Database.Extensions;
-using EtherGizmos.Shipyard.Models.Database;
+﻿using EtherGizmos.Common.Converters;
+using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System.Text.Json;
 
-namespace EtherGizmos.Shipyard.Database.Services;
+namespace EtherGizmos.Shipyard.Services;
 
 public class ApplicationContext : DbContext
 {

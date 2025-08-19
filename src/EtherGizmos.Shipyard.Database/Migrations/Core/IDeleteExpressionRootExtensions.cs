@@ -4,7 +4,7 @@ using FluentMigrator.Builders.IfDatabase;
 using FluentMigrator.Infrastructure;
 using System.Reflection;
 
-namespace EtherGizmos.Shipyard.Database.Migrations.Core;
+namespace EtherGizmos.Shipyard.Migrations.Core;
 
 public static class IDeleteExpressionRootExtensions
 {

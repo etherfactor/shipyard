@@ -1,9 +1,10 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.OData;
-using EtherGizmos.Common.Utilities.Abstractions;
-using EtherGizmos.Shipyard.OData.Services;
-using EtherGizmos.Shipyard.OData.Services.Filters;
-using EtherGizmos.Shipyard.OData.Swagger;
+using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard;
+using EtherGizmos.Shipyard.Services;
+using EtherGizmos.Shipyard.Services.Filters;
+using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData;
 using Microsoft.Extensions.Configuration;
@@ -12,9 +13,9 @@ using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text.Json.Serialization;
-using ODataOptions = EtherGizmos.Shipyard.OData.Configuration.ODataOptions;
+using ODataOptions = EtherGizmos.Shipyard.Configuration.ODataOptions;
 
-namespace EtherGizmos.Shipyard.OData;
+namespace EtherGizmos.Shipyard;
 
 public static class IServiceCollectionExtensions
 {

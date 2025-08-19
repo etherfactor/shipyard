@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Database.Services;
+﻿namespace EtherGizmos.Shipyard.Services;
 
 public interface IMigrationManager
 {

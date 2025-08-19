@@ -11,8 +11,8 @@ public abstract class InternalUser<TId> : IInternalUser
     public virtual string PasswordHash { get; set; } = null!;
 
     public virtual string? GivenName { get; set; }
-    
+
     public virtual string? FamilyName { get; set; }
-    
+
     public virtual string? FullName { get; set; }
 }

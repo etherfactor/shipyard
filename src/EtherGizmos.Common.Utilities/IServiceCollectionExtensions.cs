@@ -1,12 +1,12 @@
-﻿using EtherGizmos.Common.Utilities.Abstractions;
-using EtherGizmos.Common.Utilities.Configuration;
-using EtherGizmos.Common.Utilities.Services;
+﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Common.Configuration;
+using EtherGizmos.Common.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Reflection;
 
-namespace EtherGizmos.Common.Utilities;
+namespace EtherGizmos.Common;
 
 public static class IServiceCollectionExtensions
 {

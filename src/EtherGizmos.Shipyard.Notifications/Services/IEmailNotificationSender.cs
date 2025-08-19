@@ -1,6 +1,6 @@
-﻿using EtherGizmos.Shipyard.Notifications.Models;
+﻿using EtherGizmos.Shipyard.Models;
 
-namespace EtherGizmos.Shipyard.Notifications.Services;
+namespace EtherGizmos.Shipyard.Services;
 
 public interface IEmailNotificationSender<in TEvent> : INotificationSender<TEvent>
     where TEvent : NotificationEvent;

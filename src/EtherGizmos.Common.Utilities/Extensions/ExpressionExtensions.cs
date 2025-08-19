@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 
-namespace EtherGizmos.Common.Utilities.Extensions;
+namespace EtherGizmos.Common.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="Expression{TDelegate}"/>.
