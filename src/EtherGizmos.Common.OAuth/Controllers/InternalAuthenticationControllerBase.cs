@@ -24,7 +24,7 @@ public abstract class InternalAuthenticationControllerBase<TUser> : Controller
     }
 
     [IgnoreAntiforgeryToken]
-    [HttpGet(AuthorizationConstants.Cookie.Internal.LoginPath)]
+    [HttpGet(AuthorizationConstants.Cookie.LoginPath)]
     public virtual Task<IActionResult> Login(
         [FromQuery(Name = AuthorizationConstants.Cookie.ReturnUrlParameter)]
         string? returnUrl = null,
@@ -40,7 +40,7 @@ public abstract class InternalAuthenticationControllerBase<TUser> : Controller
     }
 
     [ValidateAntiForgeryToken]
-    [HttpPost(AuthorizationConstants.Cookie.Internal.LoginPath)]
+    [HttpPost(AuthorizationConstants.Cookie.LoginPath)]
     public virtual async Task<IActionResult> Login(
         LoginViewModel model,
         CancellationToken cancellationToken = default)
@@ -70,7 +70,7 @@ public abstract class InternalAuthenticationControllerBase<TUser> : Controller
     }
 
     [IgnoreAntiforgeryToken]
-    [HttpGet(AuthorizationConstants.Cookie.Internal.LogoutPath)]
+    [HttpGet(AuthorizationConstants.Cookie.LogoutPath)]
     public virtual async Task<IActionResult> Logout(
         [FromQuery(Name = AuthorizationConstants.Cookie.ReturnUrlParameter)]
         string? returnUrl = null,

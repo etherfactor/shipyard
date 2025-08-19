@@ -1,5 +1,8 @@
+using EtherGizmos.Common;
 using EtherGizmos.Common.Configuration;
+using EtherGizmos.Common.Services;
 using EtherGizmos.Common.Utilities;
+using EtherGizmos.Shipyard.Api.Services.HostedServices;
 using EtherGizmos.Shipyard.Api.Services.Middleware;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Configuration;
@@ -47,6 +50,14 @@ builder.AddServiceDefaults();
 
 builder.Services.AddServiceConnections();
 
+// Security
+builder.UseOAuth2()
+    .AsAuthorizationServer<AuthorizationContext>(opt =>
+    {
+        opt.Cookie.LoginUrl = "/account/login";
+        opt.Cookie.LogoutUrl = "/account/logout";
+    });
+
 // Database
 builder.Services
     .AddDatabase()
@@ -72,6 +83,8 @@ builder.Services
 
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
+
+builder.Services.AddHostedService<OAuth2Seeder>();
 
 //**********************************************************
 // Pipeline

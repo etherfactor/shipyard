@@ -13,12 +13,9 @@ internal static class AuthorizationConstants
 
         public const string ReturnUrlParameter = "returnUrl";
 
-        public static class Internal
-        {
-            public const string LoginPath = "login";
+        public const string LoginPath = "login";
 
-            public const string LogoutPath = "logout";
-        }
+        public const string LogoutPath = "logout";
     }
 
     public static class OAuth2
@@ -27,8 +24,12 @@ internal static class AuthorizationConstants
 
         public const string ControllerPath = "oauth/v2.0";
 
-        public const string AuthorizePath = ControllerPath + "/authorize";
+        public const string AuthorizePath = "authorize";
 
-        public const string TokenPath = ControllerPath + "/token";
+        public const string TokenPath = "token";
+
+        public const string IntrospectPath = "introspect";
+
+        public const string RevokePath = "revoke";
     }
 }
