@@ -39,29 +39,17 @@ public abstract class AuthorizationControllerBase : Controller
     public virtual async Task<IActionResult> Authorize(
         CancellationToken cancellationToken)
     {
-        var request = HttpContext.GetOpenIddictServerRequest()
-            ?? throw new InvalidOperationException("No OpenIddict request could be retrieved.");
+        var result = await LoadOAuth2Async(cancellationToken);
+        if (result.Error is not null)
+            return result.Error;
 
-        var result = await HttpContext.AuthenticateAsync(LoginScheme);
+        var clientId = result.ClientId;
+        var application = result.Application;
+        var requestedScopes = result.Scopes.OrderBy(e => e).ToArray();
 
-        var hasPromptLogin = request.HasPromptValue(PromptValues.Login);
-        var hasPromptNone = request.HasPromptValue(PromptValues.None);
-        var hasPromptConsent = request.HasPromptValue(PromptValues.Consent);
-
-        if (hasPromptLogin || !(result?.Principal?.Identity?.IsAuthenticated ?? false))
-            TryChallenge(hasPromptNone);
-
-        HttpContext.User = result!.Principal!;
-
-        var clientId = request.ClientId;
-        if (!Guid.TryParse(clientId, out var clientIdGuid))
-            return ForbidWithError(Errors.InvalidClient, $"The client id '{clientId}' is not valid.");
-
-        clientId = clientIdGuid.ToString().ToLower();
-
-        var application = await _applicationManager.FindByClientIdAsync(clientId, cancellationToken);
-        if (application is null)
-            return ForbidWithError(Errors.InvalidClient, $"The client id '{clientId}' is not valid.");
+        var hasPromptLogin = result.Prompts.Contains(PromptValues.Login);
+        var hasPromptNone = result.Prompts.Contains(PromptValues.None);
+        var hasPromptConsent = result.Prompts.Contains(PromptValues.Consent);
 
         var applicationId = (await _applicationManager.GetIdAsync(application, cancellationToken))!;
 
@@ -83,8 +71,6 @@ public abstract class AuthorizationControllerBase : Controller
 
         var consentIsImplicit = consentType is ConsentTypes.Implicit or ConsentTypes.External;
         var consentIsForced = !consentIsImplicit && hasPromptConsent;
-
-        var requestedScopes = request.GetScopes().OrderBy(e => e).ToArray();
 
         var existingAuthorization = consentIsImplicit
             ? null
@@ -109,6 +95,43 @@ public abstract class AuthorizationControllerBase : Controller
         return View(viewModel);
     }
 
+    protected virtual async Task<OAuth2Result> LoadOAuth2Async(
+        CancellationToken cancellationToken = default)
+    {
+        var request = HttpContext.GetOpenIddictServerRequest()
+            ?? throw new InvalidOperationException("No OpenIddict request could be retrieved.");
+
+        var result = await HttpContext.AuthenticateAsync(LoginScheme);
+
+        var hasPromptLogin = request.HasPromptValue(PromptValues.Login);
+        var hasPromptNone = request.HasPromptValue(PromptValues.None);
+        var hasPromptConsent = request.HasPromptValue(PromptValues.Consent);
+
+        if (hasPromptLogin || !(result?.Principal?.Identity?.IsAuthenticated ?? false))
+            return new() { Error = TryChallenge(hasPromptNone) };
+
+        HttpContext.User = result!.Principal!;
+
+        var clientId = request.ClientId;
+        if (!Guid.TryParse(clientId, out var clientIdGuid))
+            return new() { Error = ForbidWithError(Errors.InvalidClient, $"The client id '{clientId}' is not valid.") };
+
+        clientId = clientIdGuid.ToString().ToLower();
+
+        var application = await _applicationManager.FindByClientIdAsync(clientId, cancellationToken);
+        if (application is null)
+            return new() { Error = ForbidWithError(Errors.InvalidClient, $"The client id '{clientId}' is not valid.") };
+
+        return new()
+        {
+            Principal = result.Principal,
+            Application = application,
+            ClientId = clientId,
+            Prompts = request.GetPromptValues(),
+            Scopes = request.GetScopes(),
+        };
+    }
+
     protected virtual IActionResult TryChallenge(
         bool hasPromptNone)
     {
@@ -125,7 +148,7 @@ public abstract class AuthorizationControllerBase : Controller
             parameters.Add(KeyValuePair.Create(Parameters.Prompt, new StringValues(prompts)));
 
             return Challenge(
-                authenticationSchemes: ServerScheme,
+                authenticationSchemes: LoginScheme,
                 properties: new()
                 {
                     RedirectUri = Request.PathBase + Request.Path
@@ -158,25 +181,12 @@ public abstract class AuthorizationControllerBase : Controller
         ConsentViewModel model,
         CancellationToken cancellationToken)
     {
-        var request = HttpContext.GetOpenIddictServerRequest()
-            ?? throw new InvalidOperationException("No OpenIddict request could be retrieved.");
+        var result = await LoadOAuth2Async(cancellationToken);
+        if (result.Error is not null)
+            return result.Error;
 
-        var result = await HttpContext.AuthenticateAsync(LoginScheme);
-
-        if (!(result?.Principal?.Identity?.IsAuthenticated ?? false))
-            TryChallenge(hasPromptNone: false);
-
-        HttpContext.User = result!.Principal!;
-
-        var clientId = request.ClientId;
-        if (!Guid.TryParse(clientId, out var clientIdGuid))
-            return ForbidWithError(Errors.InvalidClient, $"The client id '{clientId}' is not valid.");
-
-        clientId = clientIdGuid.ToString().ToLower();
-
-        var application = await _applicationManager.FindByClientIdAsync(clientId, cancellationToken);
-        if (application is null)
-            return ForbidWithError(Errors.InvalidClient, $"The client id '{clientId}' is not valid.");
+        var clientId = result.ClientId;
+        var application = result.Application;
 
         var applicationId = (await _applicationManager.GetIdAsync(application, cancellationToken))!;
 
@@ -314,5 +324,20 @@ public abstract class AuthorizationControllerBase : Controller
             ClientId = clientId,
             Scopes = scopes,
         };
+    }
+
+    protected sealed record OAuth2Result
+    {
+        public ClaimsPrincipal Principal { get; init; } = null!;
+
+        public IActionResult? Error { get; init; }
+
+        public object Application { get; init; } = null!;
+
+        public string ClientId { get; init; } = null!;
+
+        public ImmutableArray<string> Prompts { get; init; }
+
+        public ImmutableArray<string> Scopes { get; init; }
     }
 }
