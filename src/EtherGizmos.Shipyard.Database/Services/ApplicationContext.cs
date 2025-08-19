@@ -1,4 +1,5 @@
 ﻿using EtherGizmos.Common.Converters;
+using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +23,9 @@ public class ApplicationContext : DbContext
         DbContextOptions<ApplicationContext> options,
         IMigrationManager migrationManager) : base(options)
     {
-        migrationManager.EnsureMigrated();
+        migrationManager.EnsureMigratedAsync()
+            .GetAwaiter()
+            .GetResult();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

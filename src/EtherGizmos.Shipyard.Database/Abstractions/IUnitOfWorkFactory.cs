@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Services;
+﻿namespace EtherGizmos.Shipyard.Abstractions;
 
 public interface IUnitOfWorkFactory
 {

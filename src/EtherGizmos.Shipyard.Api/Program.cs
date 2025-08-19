@@ -1,4 +1,5 @@
 using EtherGizmos.Common;
+using EtherGizmos.Common.Configuration;
 using EtherGizmos.Common.Services;
 using EtherGizmos.Shipyard;
 using EtherGizmos.Shipyard.Api.Errors;
@@ -11,6 +12,8 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,6 +60,29 @@ builder.UseOAuth2()
 // Database
 builder.Services
     .AddDatabase()
+    .AddDbContext<AuthorizationContext>((services, opt) =>
+    {
+        opt.UseLazyLoadingProxies();
+        opt.EnableSensitiveDataLogging();
+
+        var dbOptions = services.GetRequiredService<IOptions<DatabaseReferenceOptions>>()
+            .Value;
+
+        var connectionId = dbOptions.ConnectionId;
+
+        var resolver = services.GetRequiredService<IConnectionResolver>();
+        var connection = resolver.GetDatabaseConnection(connectionId);
+
+        connection.Match(
+            _ => throw new InvalidOperationException($"The connection {connectionId} is not a valid database connection."),
+            postgreSql =>
+            {
+                return opt.UseNpgsql(
+                    postgreSql.ConnectionString,
+                    o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
+            }
+        );
+    })
     .AddUnitOfWork(opt =>
     {
         opt.BindDbContext<ApplicationContext>();

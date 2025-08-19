@@ -1,6 +1,6 @@
 ﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
-using EtherGizmos.Shipyard.Services;
 using EtherGizmos.Shipyard.Worker.Consumers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

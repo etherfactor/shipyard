@@ -1,5 +1,7 @@
-﻿using EtherGizmos.Common.Configuration;
+﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Common.Configuration;
 using EtherGizmos.Extensions.DependencyInjection;
+using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Migrations.Core;
 using EtherGizmos.Shipyard.Services;
@@ -22,6 +24,7 @@ public static class IServiceCollectionExtensions
             .ValidateDataAnnotations();
 
         @this.AddSingleton<IMigrationManager, MigrationManager>()
+            .AddSingleton<IOAuth2MigrationManager, MigrationManager>()
             .AddDbContext<ApplicationContext>((services, opt) =>
             {
                 opt.UseLazyLoadingProxies();

@@ -4,6 +4,7 @@ using EtherGizmos.Common.Extensions;
 using EtherGizmos.Common.Models;
 using EtherGizmos.Common.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace EtherGizmos.Common;
@@ -69,8 +70,7 @@ public static class IOAuth2BuilderExtensions
                 opt.SlidingExpiration = tempOptions.Cookie.SlidingExpiration;
             });
 
-        var isIntegration = false;
-        if (isIntegration)
+        if (@this.Builder.Environment.IsEnvironment("Integration"))
         {
             @this.Builder.Services.AddAuthentication()
                 .AddJwtBearer(opt =>
