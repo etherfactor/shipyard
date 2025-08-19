@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EtherGizmos.Shipyard.Api.Controllers;
 
-public class InternalUsersController : InternalAuthenticationControllerBase<User>
+public class InternalAuthenticationController : InternalAuthenticationControllerBase<User>
 {
     private readonly IUnitOfWorkFactory _uowFactory;
     private readonly IPasswordHasher<User> _passwordHasher;
 
-    public InternalUsersController(
+    public InternalAuthenticationController(
         IServiceProvider serviceProvider,
         IUnitOfWorkFactory uowFactory,
         IPasswordHasher<User> passwordHasher)
