@@ -33,6 +33,12 @@ public class AuthorizationServerOptions
         public Type DbContextType { get; set; } = null!;
 
         [Required]
+        public CertificateOptions SigningCertificate { get; set; } = new();
+
+        [Required]
+        public CertificateOptions EncryptionCertificate { get; set; } = new();
+
+        [Required]
         public string AuthorizationEndpointUrl { get; set; } =
             AuthorizationConstants.OAuth2.ControllerPath + "/" + AuthorizationConstants.OAuth2.AuthorizePath;
 
@@ -58,5 +64,11 @@ public class AuthorizationServerOptions
         public TimeSpan RefreshTokenLifetime { get; set; } = TimeSpan.FromDays(90);
 
         public bool DisableTransportSecurityRequirement { get; set; } = false;
+    }
+
+    public class CertificateOptions
+    {
+        [Required]
+        public string CertificateId { get; set; } = null!;
     }
 }

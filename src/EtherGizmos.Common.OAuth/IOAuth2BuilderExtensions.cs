@@ -3,8 +3,10 @@ using EtherGizmos.Common.Configuration;
 using EtherGizmos.Common.Extensions;
 using EtherGizmos.Common.Models;
 using EtherGizmos.Common.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace EtherGizmos.Common;
@@ -20,6 +22,19 @@ public static class IOAuth2BuilderExtensions
         configureOptions(tempOptions);
         tempOptions.OAuth2.DbContextType = typeof(TContext);
 
+        var tempServices = new ServiceCollection()
+            .AddSingleton<IConfiguration>(@this.Builder.Configuration)
+            .AddCertificates();
+
+        using var provider = tempServices.BuildServiceProvider();
+        var resolver = provider.GetRequiredService<ICertificateResolver>();
+
+        var encryptionId = tempOptions.OAuth2.EncryptionCertificate.CertificateId;
+        var encryption = resolver.LoadCertificate(encryptionId);
+
+        var signingId = tempOptions.OAuth2.SigningCertificate.CertificateId;
+        var signing = resolver.LoadCertificate(signingId);
+
         @this.Builder.Services.AddOpenIddict()
             .AddCore(opt =>
             {
@@ -33,6 +48,9 @@ public static class IOAuth2BuilderExtensions
                     .RequireProofKeyForCodeExchange();
 
                 opt.AllowRefreshTokenFlow();
+
+                opt.AddEncryptionCertificate(encryption);
+                opt.AddSigningCertificate(signing);
 
                 opt.SetAuthorizationEndpointUris(tempOptions.OAuth2.AuthorizationEndpointUrl);
                 opt.SetTokenEndpointUris(tempOptions.OAuth2.TokenEndpointUrl);
@@ -79,10 +97,10 @@ public static class IOAuth2BuilderExtensions
 
                     opt.TokenValidationParameters = new()
                     {
-                        TokenDecryptionKey = null,
+                        TokenDecryptionKey = new X509SecurityKey(encryption),
 
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = null,
+                        IssuerSigningKey = new X509SecurityKey(signing),
 
                         ValidateIssuer = false,
                         ValidateAudience = false,

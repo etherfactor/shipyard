@@ -1,5 +1,4 @@
 ﻿using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Common.Utilities.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using System.Security.Cryptography.X509Certificates;
@@ -19,20 +18,32 @@ internal class CertificateResolver : ICertificateResolver
         _configuration = configuration;
     }
 
-    public X509Certificate2 GetCertificate(string certificateId)
+    public OneOfCertificateReference GetCertificate(string certificateId)
     {
-        var connection = GetConnection<CertificateReferenceOptions>(certificateId);
+        var connection = GetConnection<CertificateReferenceOptions>(certificateId, CertificateType.Certificate);
         var result = connection switch
         {
-            PostgreSqlOptions postgreSql => (OneOfDatabaseConnection)postgreSql,
+            FileCertificateOptions file => (OneOfCertificateReference)file,
+            TextCertificateOptions text => text,
             _ => connection
         };
 
         return result;
     }
 
+    public X509Certificate2 LoadCertificate(string certificateId)
+    {
+        var certificate = GetCertificate(certificateId);
+        return certificate.Match(
+            _ => throw new InvalidOperationException($"The certificate {certificateId} is not a valid certificate."),
+            file => LoadFromPfx(file),
+            text => LoadFromRaw(text)
+        );
+    }
+
     private TOptions GetConnection<TOptions>(
-        string connectionId)
+        string connectionId,
+        CertificateType expectedType)
         where TOptions : new()
     {
         var options = _options.CurrentValue;
@@ -54,5 +65,20 @@ internal class CertificateResolver : ICertificateResolver
         }
 
         return new TOptions();
+    }
+
+    private X509Certificate2 LoadFromPfx(
+        FileCertificateOptions file)
+    {
+        var certificate = X509CertificateLoader.LoadPkcs12FromFile(file.Path, file.Password);
+        return certificate;
+    }
+
+    private X509Certificate2 LoadFromRaw(
+        TextCertificateOptions text)
+    {
+        X509Certificate2.CreateFromPem(text.PublicKey);
+        var certificate = X509Certificate2.CreateFromPem(text.PublicKey, text.PrivateKey);
+        return certificate;
     }
 }

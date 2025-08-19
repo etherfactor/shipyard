@@ -2,7 +2,5 @@
 
 public enum CertificateType
 {
-    File = 1,
-    CertificateStore = 2,
-    Text = 3,
+    Certificate = 1,
 }

@@ -53,6 +53,10 @@ builder.Services.AddServiceConnections();
 builder.UseOAuth2()
     .AsAuthorizationServer<AuthorizationContext>(opt =>
     {
+        builder.Configuration
+            .GetSection("Security")
+            .Bind(opt);
+
         opt.Cookie.LoginUrl = "/account/login";
         opt.Cookie.LogoutUrl = "/account/logout";
     });

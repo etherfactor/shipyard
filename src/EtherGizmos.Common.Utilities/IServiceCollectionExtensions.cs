@@ -33,6 +33,21 @@ public static class IServiceCollectionExtensions
         return @this;
     }
 
+    public static IServiceCollection AddCertificates(
+        this IServiceCollection @this)
+    {
+        @this.TryAddSingleton<ICertificateResolver, CertificateResolver>();
+
+        @this.AddOptions<Dictionary<string, CertificateOptions>>()
+            .Configure<IConfiguration>((opt, conf) =>
+            {
+                conf.GetSection("Security:Certificates")
+                    .Bind(opt);
+            });
+
+        return @this;
+    }
+
     public static IServiceCollection AddServiceConnections(
         this IServiceCollection @this)
     {

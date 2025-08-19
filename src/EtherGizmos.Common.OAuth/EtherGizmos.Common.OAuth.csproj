@@ -15,4 +15,8 @@
     <PackageReference Include="OpenIddict.Validation.ServerIntegration" Version="7.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\EtherGizmos.Common.Utilities\EtherGizmos.Common.Utilities.csproj" />
+  </ItemGroup>
+
 </Project>
