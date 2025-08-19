@@ -14,7 +14,7 @@ public abstract class ScrapingStep
 
     internal DateTimeOffset? Eta => _eta;
 
-    internal IReadOnlyList<TrackingResultDetail> Steps => _steps.AsReadOnly();
+    internal IReadOnlyList<TrackingResultDetail> Updates => _steps.AsReadOnly();
 
     protected void SetEta(DateTimeOffset eta)
     {

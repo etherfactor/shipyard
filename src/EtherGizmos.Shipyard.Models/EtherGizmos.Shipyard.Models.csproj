@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EtherGizmos.Common.OAuth\EtherGizmos.Common.OAuth.csproj" />
     <ProjectReference Include="..\EtherGizmos.Common.Utilities\EtherGizmos.Common.Utilities.csproj" />
   </ItemGroup>
 

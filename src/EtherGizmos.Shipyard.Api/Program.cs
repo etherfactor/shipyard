@@ -9,6 +9,7 @@ using EtherGizmos.Shipyard.Models.Api.Errors;
 using EtherGizmos.Shipyard.Models.Database;
 using EtherGizmos.Shipyard.OData;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData;
 using Serilog;
@@ -70,6 +71,7 @@ builder.Services
     });
 
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
 
 //**********************************************************
 // Pipeline

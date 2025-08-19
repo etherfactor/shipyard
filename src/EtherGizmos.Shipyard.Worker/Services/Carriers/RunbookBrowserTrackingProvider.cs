@@ -116,7 +116,7 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
             })
             : [] : [];
 
-        details = details.Concat(runbook.SelectMany(e => e.Steps));
+        details = details.Concat(runbook.SelectMany(e => e.Updates));
 
         details = details
             .Where(e => e.OccurredAt != DateTimeOffset.MinValue);

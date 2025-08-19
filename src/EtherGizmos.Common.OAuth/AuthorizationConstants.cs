@@ -8,6 +8,17 @@ internal static class AuthorizationConstants
     public static class Cookie
     {
         public const string AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+        public const string ControllerPath = "accounts";
+
+        public const string ReturnUrlParameter = "returnUrl";
+
+        public static class Internal
+        {
+            public const string LoginPath = "login";
+
+            public const string LogoutPath = "logout";
+        }
     }
 
     public static class OAuth2

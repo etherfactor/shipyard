@@ -1,8 +1,10 @@
 ﻿using EtherGizmos.Common.ViewModels;
+using EtherGizmos.Shipyard.Api.Extensions;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
@@ -25,13 +27,11 @@ public abstract class AuthorizationControllerBase : Controller
     protected virtual string LoginScheme => AuthorizationConstants.Cookie.AuthenticationScheme;
 
     public AuthorizationControllerBase(
-        IOpenIddictApplicationManager applicationManager,
-        IOpenIddictAuthorizationManager authorizationManager,
-        IOpenIddictScopeManager scopeManager)
+        IServiceProvider serviceProvider)
     {
-        _applicationManager = applicationManager;
-        _authorizationManager = authorizationManager;
-        _scopeManager = scopeManager;
+        _applicationManager = serviceProvider.GetRequiredService<IOpenIddictApplicationManager>();
+        _authorizationManager = serviceProvider.GetRequiredService<IOpenIddictAuthorizationManager>();
+        _scopeManager = serviceProvider.GetRequiredService<IOpenIddictScopeManager>();
     }
 
     [IgnoreAntiforgeryToken]
@@ -52,16 +52,22 @@ public abstract class AuthorizationControllerBase : Controller
         var hasPromptConsent = result.Prompts.Contains(PromptValues.Consent);
 
         var applicationId = (await _applicationManager.GetIdAsync(application, cancellationToken))!;
-
         var applicationName = (await _applicationManager.GetDisplayNameAsync(application, cancellationToken))!;
-
         var applicationPermissions = await _applicationManager.GetPermissionsAsync(application, cancellationToken);
 
         var applicationScopes = applicationPermissions
             .Where(e => e.StartsWith(Permissions.Prefixes.Scope))
             .Select(e => e.Substring(Permissions.Prefixes.Scope.Length))
             .OrderBy(e => e)
-            .ToList();
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var allowedScopes = (await _applicationManager.GetPermissionsAsync(application, cancellationToken))
+            .Where(p => p.StartsWith(Permissions.Prefixes.Scope))
+            .Select(p => p.Substring(Permissions.Prefixes.Scope.Length))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        if (!requestedScopes.All(scope => allowedScopes.Contains(scope, StringComparer.OrdinalIgnoreCase)))
+            return ForbidWithError(Errors.InvalidScope, "One or more scopes are not permitted for this client.");
 
         var userId = result.Principal!.GetClaim(Claims.Subject)?.ToLower();
         if (userId is null)
@@ -74,11 +80,17 @@ public abstract class AuthorizationControllerBase : Controller
 
         var existingAuthorization = consentIsImplicit
             ? null
-            : FindExistingAuthorizationAsync(userId, clientId, requestedScopes, cancellationToken);
+            : await FindExistingAuthorizationAsync(userId, clientId, requestedScopes, cancellationToken);
 
         if (consentIsImplicit || (!consentIsForced && existingAuthorization is not null))
         {
-            var identity = await CreateUserPrincipalAsync(result.Principal!, request, cancellationToken);
+            var identity = await CreateOAuth2PrincipalAsync(
+                user: result.Principal!,
+                request: result.Request,
+                applicationName: applicationName,
+                scopes: requestedScopes,
+                cancellationToken: cancellationToken);
+
             identity.SetScopes(requestedScopes);
 
             if (existingAuthorization is not null)
@@ -93,6 +105,92 @@ public abstract class AuthorizationControllerBase : Controller
 
         var viewModel = await BuildConsentViewModelAsync(applicationName, clientId, requestedScopes, cancellationToken);
         return View(viewModel);
+    }
+
+    [ValidateAntiForgeryToken]
+    [FormValueRequired("submit.Accept")]
+    [HttpPost(AuthorizationConstants.OAuth2.AuthorizePath)]
+    public virtual async Task<IActionResult> Accept(
+        ConsentViewModel model,
+        CancellationToken cancellationToken)
+    {
+        var result = await LoadOAuth2Async(cancellationToken);
+        if (result.Error is not null)
+            return result.Error;
+
+        var clientId = result.ClientId;
+        var application = result.Application;
+
+        var applicationId = (await _applicationManager.GetIdAsync(application, cancellationToken))!;
+        var applicationName = (await _applicationManager.GetDisplayNameAsync(application, cancellationToken))!;
+
+        var acceptedScopes = model.Scopes
+            .Where(e => e.IsApproved)
+            .Select(e => e.Name)
+            .ToImmutableArray();
+
+        var principal = await CreateOAuth2PrincipalAsync(
+            user: result.Principal!,
+            request: result.Request,
+            applicationName: applicationName,
+            scopes: acceptedScopes,
+            cancellationToken: cancellationToken);
+
+        principal.SetScopes(acceptedScopes);
+        principal.SetDestinations(GetDestinations);
+
+        var consentType = await _applicationManager.GetConsentTypeAsync(application, cancellationToken);
+        var subject = result.Principal!.GetClaim(Claims.Subject)!;
+
+        if (consentType is ConsentTypes.Explicit or ConsentTypes.Systematic)
+        {
+            if (consentType is ConsentTypes.Explicit)
+            {
+                var existing = await FindExistingAuthorizationAsync(subject, clientId, acceptedScopes, cancellationToken);
+                var authorization = existing ?? await _authorizationManager.CreateAsync(
+                    principal: principal,
+                    subject: subject,
+                    client: clientId,
+                    type: AuthorizationTypes.Permanent,
+                    scopes: acceptedScopes,
+                    cancellationToken: cancellationToken);
+
+                principal.SetAuthorizationId(await _authorizationManager.GetIdAsync(authorization, cancellationToken));
+            }
+        }
+
+        return SignIn(principal, ServerScheme);
+    }
+
+    [ValidateAntiForgeryToken]
+    [FormValueRequired("submit.Deny")]
+    [HttpPost(AuthorizationConstants.OAuth2.AuthorizePath)]
+    public virtual Task<IActionResult> Deny(
+        CancellationToken cancellationToken)
+    {
+        return Task.FromResult(
+            ForbidWithError(Errors.AccessDenied, "User denied consent."));
+    }
+
+    [HttpPost(AuthorizationConstants.OAuth2.TokenPath)]
+    public virtual async Task<IActionResult> Token(
+        CancellationToken cancellationToken)
+    {
+        var request = HttpContext.GetOpenIddictServerRequest()
+            ?? throw new InvalidOperationException("No OpenIddict request could be retrieved.");
+
+        if (request.IsAuthorizationCodeGrantType() || request.IsRefreshTokenGrantType())
+        {
+            var result = await HttpContext.AuthenticateAsync(ServerScheme);
+            if (!result.Succeeded)
+                return Forbid(ServerScheme);
+
+            var principal = result.Principal!;
+            await EnrichOAuth2PrincipalAsync(principal, request, cancellationToken);
+            return SignIn(principal, ServerScheme);
+        }
+
+        return ForbidWithError(Errors.UnsupportedGrantType, "This grant type is not supported.");
     }
 
     protected virtual async Task<OAuth2Result> LoadOAuth2Async(
@@ -124,6 +222,7 @@ public abstract class AuthorizationControllerBase : Controller
 
         return new()
         {
+            Request = request,
             Principal = result.Principal,
             Application = application,
             ClientId = clientId,
@@ -169,88 +268,9 @@ public abstract class AuthorizationControllerBase : Controller
             authenticationSchemes: ServerScheme,
             properties: new(new Dictionary<string, string?>()
             {
-                [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.LoginRequired,
+                [OpenIddictServerAspNetCoreConstants.Properties.Error] = errorCode,
                 [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = errorMessage,
             }));
-    }
-
-    [ValidateAntiForgeryToken]
-    [FormValueRequired("submit.Accept")]
-    [HttpPost(AuthorizationConstants.OAuth2.AuthorizePath)]
-    public virtual async Task<IActionResult> Accept(
-        ConsentViewModel model,
-        CancellationToken cancellationToken)
-    {
-        var result = await LoadOAuth2Async(cancellationToken);
-        if (result.Error is not null)
-            return result.Error;
-
-        var clientId = result.ClientId;
-        var application = result.Application;
-
-        var applicationId = (await _applicationManager.GetIdAsync(application, cancellationToken))!;
-
-        var acceptedScopes = model.Scopes
-            .Where(e => e.IsApproved)
-            .Select(e => e.Name)
-            .ToImmutableArray();
-
-        var principal = await CreateUserPrincipalAsync(result.Principal!, request, cancellationToken);
-        principal.SetScopes(acceptedScopes);
-        principal.SetDestinations(GetDestinations);
-
-        var consentType = await _applicationManager.GetConsentTypeAsync(application, cancellationToken);
-        var subject = result.Principal!.GetClaim(Claims.Subject)!;
-
-        if (consentType is ConsentTypes.Explicit or ConsentTypes.Systematic)
-        {
-            if (consentType is ConsentTypes.Explicit)
-            {
-                var existing = await FindExistingAuthorizationAsync(subject, clientId, acceptedScopes, cancellationToken);
-                var authorization = existing ?? await _authorizationManager.CreateAsync(
-                    principal: principal,
-                    subject: subject,
-                    client: clientId,
-                    type: AuthorizationTypes.Permanent,
-                    scopes: acceptedScopes,
-                    cancellationToken: cancellationToken);
-
-                principal.SetAuthorizationId(await _authorizationManager.GetIdAsync(authorization, cancellationToken));
-            }
-        }
-
-        return SignIn(principal, ServerScheme);
-    }
-
-    [ValidateAntiForgeryToken]
-    [FormValueRequired("submit.Deny")]
-    [HttpPost(AuthorizationConstants.OAuth2.AuthorizePath)]
-    public virtual Task<IActionResult> Deny(
-        CancellationToken cancellationToken)
-    {
-        return Task.FromResult<IActionResult>(
-            Forbid(ServerScheme));
-    }
-
-    [HttpPost(AuthorizationConstants.OAuth2.TokenPath)]
-    public virtual async Task<IActionResult> Token(
-        CancellationToken cancellationToken)
-    {
-        var request = HttpContext.GetOpenIddictServerRequest()
-            ?? throw new InvalidOperationException("No OpenIddict request could be retrieved.");
-
-        if (request.IsAuthorizationCodeGrantType() || request.IsRefreshTokenGrantType())
-        {
-            var result = await HttpContext.AuthenticateAsync(ServerScheme);
-            if (!result.Succeeded)
-                Forbid(ServerScheme);
-
-            var principal = result.Principal!;
-            await EnrichPrincipalAsync(principal, request, cancellationToken);
-            return SignIn(principal, ServerScheme);
-        }
-
-        return ForbidWithError(Errors.UnsupportedGrantType, "This grant type is not supported.");
     }
 
     protected virtual async Task<object?> FindExistingAuthorizationAsync(
@@ -271,10 +291,39 @@ public abstract class AuthorizationControllerBase : Controller
         return null;
     }
 
-    protected abstract Task<ClaimsPrincipal> CreateUserPrincipalAsync(
-        ClaimsPrincipal user, OpenIddictRequest request, CancellationToken ct);
+    protected virtual Task<ClaimsPrincipal> CreateOAuth2PrincipalAsync(
+        ClaimsPrincipal user,
+        OpenIddictRequest request,
+        string applicationName,
+        IEnumerable<string> scopes,
+        CancellationToken cancellationToken = default)
+    {
+        var identity = new ClaimsIdentity(
+            authenticationType: ServerScheme,
+            nameType: Claims.Name,
+            roleType: Claims.Role);
 
-    protected virtual Task EnrichPrincipalAsync(ClaimsPrincipal principal, OpenIddictRequest request, CancellationToken ct)
+        identity.AddClaim(Claims.Subject, user.GetClaim(Claims.Subject)!);
+        identity.TryAddClaim(Claims.Name, user.GetClaim(Claims.Name));
+        identity.TryAddClaim(Claims.GivenName, user.GetClaim(Claims.GivenName));
+        identity.TryAddClaim(Claims.FamilyName, user.GetClaim(Claims.FamilyName));
+        identity.TryAddClaim(Claims.Email, user.GetClaim(Claims.Email));
+        identity.TryAddClaim("client_name", applicationName);
+
+        identity.SetScopes(scopes);
+
+        //identity.SetAuthorizationId(user.GetAuthorizationId());
+
+        identity.SetDestinations(GetDestinations);
+
+        var principal = new ClaimsPrincipal(identity);
+        return Task.FromResult(principal);
+    }
+
+    protected virtual Task EnrichOAuth2PrincipalAsync(
+        ClaimsPrincipal principal,
+        OpenIddictRequest request,
+        CancellationToken ct)
         => Task.CompletedTask;
 
     protected virtual IEnumerable<string> GetDestinations(Claim claim)
@@ -328,6 +377,8 @@ public abstract class AuthorizationControllerBase : Controller
 
     protected sealed record OAuth2Result
     {
+        public OpenIddictRequest Request { get; init; } = null!;
+
         public ClaimsPrincipal Principal { get; init; } = null!;
 
         public IActionResult? Error { get; init; }
