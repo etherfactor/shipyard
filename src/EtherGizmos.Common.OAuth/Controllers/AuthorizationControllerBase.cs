@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore;
+﻿using EtherGizmos.Common.ViewModels;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,7 @@ public abstract class AuthorizationControllerBase : Controller
 {
     private readonly IOpenIddictApplicationManager _applicationManager;
     private readonly IOpenIddictAuthorizationManager _authorizationManager;
+    private readonly IOpenIddictScopeManager _scopeManager;
 
     protected virtual string ServerScheme => OpenIddictServerAspNetCoreDefaults.AuthenticationScheme;
 
@@ -24,10 +26,12 @@ public abstract class AuthorizationControllerBase : Controller
 
     public AuthorizationControllerBase(
         IOpenIddictApplicationManager applicationManager,
-        IOpenIddictAuthorizationManager authorizationManager)
+        IOpenIddictAuthorizationManager authorizationManager,
+        IOpenIddictScopeManager scopeManager)
     {
         _applicationManager = applicationManager;
         _authorizationManager = authorizationManager;
+        _scopeManager = scopeManager;
     }
 
     [IgnoreAntiforgeryToken]
@@ -51,13 +55,13 @@ public abstract class AuthorizationControllerBase : Controller
 
         var clientId = request.ClientId;
         if (!Guid.TryParse(clientId, out var clientIdGuid))
-            return ForbidWithError($"The client id '{clientId}' is not valid.");
+            return ForbidWithError(Errors.InvalidClient, $"The client id '{clientId}' is not valid.");
 
         clientId = clientIdGuid.ToString().ToLower();
 
         var application = await _applicationManager.FindByClientIdAsync(clientId, cancellationToken);
         if (application is null)
-            return ForbidWithError($"The client id '{clientId}' is not valid.");
+            return ForbidWithError(Errors.InvalidClient, $"The client id '{clientId}' is not valid.");
 
         var applicationId = (await _applicationManager.GetIdAsync(application, cancellationToken))!;
 
@@ -85,6 +89,7 @@ public abstract class AuthorizationControllerBase : Controller
         var existingAuthorization = consentIsImplicit
             ? null
             : FindExistingAuthorizationAsync(userId, clientId, requestedScopes, cancellationToken);
+
         if (consentIsImplicit || (!consentIsForced && existingAuthorization is not null))
         {
             var identity = await CreateUserPrincipalAsync(result.Principal!, request, cancellationToken);
@@ -98,9 +103,9 @@ public abstract class AuthorizationControllerBase : Controller
         }
 
         if (hasPromptNone)
-            return ForbidWithError("User consent is required, but prompt=none was specified.");
+            return ForbidWithError(Errors.ConsentRequired, "User consent is required, but prompt=none was specified.");
 
-        var viewModel = await BuildConsentViewModelAsync();
+        var viewModel = await BuildConsentViewModelAsync(applicationName, clientId, requestedScopes, cancellationToken);
         return View(viewModel);
     }
 
@@ -129,11 +134,12 @@ public abstract class AuthorizationControllerBase : Controller
         }
         else
         {
-            return ForbidWithError("The user is not logged in, and prompt=none was specified.");
+            return ForbidWithError(Errors.LoginRequired, "The user is not logged in, and prompt=none was specified.");
         }
     }
 
     protected virtual IActionResult ForbidWithError(
+        string errorCode,
         string errorMessage)
     {
         return Forbid(
@@ -149,9 +155,61 @@ public abstract class AuthorizationControllerBase : Controller
     [FormValueRequired("submit.Accept")]
     [HttpPost(AuthorizationConstants.OAuth2.AuthorizePath)]
     public virtual async Task<IActionResult> Accept(
+        ConsentViewModel model,
         CancellationToken cancellationToken)
     {
-        
+        var request = HttpContext.GetOpenIddictServerRequest()
+            ?? throw new InvalidOperationException("No OpenIddict request could be retrieved.");
+
+        var result = await HttpContext.AuthenticateAsync(LoginScheme);
+
+        if (!(result?.Principal?.Identity?.IsAuthenticated ?? false))
+            TryChallenge(hasPromptNone: false);
+
+        HttpContext.User = result!.Principal!;
+
+        var clientId = request.ClientId;
+        if (!Guid.TryParse(clientId, out var clientIdGuid))
+            return ForbidWithError(Errors.InvalidClient, $"The client id '{clientId}' is not valid.");
+
+        clientId = clientIdGuid.ToString().ToLower();
+
+        var application = await _applicationManager.FindByClientIdAsync(clientId, cancellationToken);
+        if (application is null)
+            return ForbidWithError(Errors.InvalidClient, $"The client id '{clientId}' is not valid.");
+
+        var applicationId = (await _applicationManager.GetIdAsync(application, cancellationToken))!;
+
+        var acceptedScopes = model.Scopes
+            .Where(e => e.IsApproved)
+            .Select(e => e.Name)
+            .ToImmutableArray();
+
+        var principal = await CreateUserPrincipalAsync(result.Principal!, request, cancellationToken);
+        principal.SetScopes(acceptedScopes);
+        principal.SetDestinations(GetDestinations);
+
+        var consentType = await _applicationManager.GetConsentTypeAsync(application, cancellationToken);
+        var subject = result.Principal!.GetClaim(Claims.Subject)!;
+
+        if (consentType is ConsentTypes.Explicit or ConsentTypes.Systematic)
+        {
+            if (consentType is ConsentTypes.Explicit)
+            {
+                var existing = await FindExistingAuthorizationAsync(subject, clientId, acceptedScopes, cancellationToken);
+                var authorization = existing ?? await _authorizationManager.CreateAsync(
+                    principal: principal,
+                    subject: subject,
+                    client: clientId,
+                    type: AuthorizationTypes.Permanent,
+                    scopes: acceptedScopes,
+                    cancellationToken: cancellationToken);
+
+                principal.SetAuthorizationId(await _authorizationManager.GetIdAsync(authorization, cancellationToken));
+            }
+        }
+
+        return SignIn(principal, ServerScheme);
     }
 
     [ValidateAntiForgeryToken]
@@ -182,7 +240,7 @@ public abstract class AuthorizationControllerBase : Controller
             return SignIn(principal, ServerScheme);
         }
 
-        return Forbid(ServerScheme);
+        return ForbidWithError(Errors.UnsupportedGrantType, "This grant type is not supported.");
     }
 
     protected virtual async Task<object?> FindExistingAuthorizationAsync(
@@ -213,13 +271,48 @@ public abstract class AuthorizationControllerBase : Controller
     {
         switch (claim.Type)
         {
-            case OpenIddictConstants.Claims.Name:
-            case OpenIddictConstants.Claims.Email:
-                yield return OpenIddictConstants.Destinations.AccessToken;
-                yield return OpenIddictConstants.Destinations.IdentityToken;
+            case Claims.Name:
+            case Claims.Email:
+                yield return Destinations.AccessToken;
+                yield return Destinations.IdentityToken;
                 yield break;
         }
 
-        yield return OpenIddictConstants.Destinations.AccessToken;
+        yield return Destinations.AccessToken;
+    }
+
+    protected virtual async Task<ConsentViewModel> BuildConsentViewModelAsync(
+        string applicationName,
+        string clientId,
+        IReadOnlyCollection<string> requestedScopes,
+        CancellationToken ct)
+    {
+        var scopes = new List<ConsentScopeViewModel>();
+
+        foreach (var scopeName in requestedScopes)
+        {
+            var scope = await _scopeManager.FindByNameAsync(scopeName, ct);
+            var displayName = scope is null
+                ? scopeName
+                : await _scopeManager.GetDisplayNameAsync(scope, ct) ?? scopeName;
+
+            var description = scope is null
+                ? null
+                : await _scopeManager.GetDescriptionAsync(scope, ct);
+
+            scopes.Add(new()
+            {
+                Name = scopeName,
+                DisplayName = displayName,
+                Description = description
+            });
+        }
+
+        return new()
+        {
+            ApplicationName = applicationName,
+            ClientId = clientId,
+            Scopes = scopes,
+        };
     }
 }
