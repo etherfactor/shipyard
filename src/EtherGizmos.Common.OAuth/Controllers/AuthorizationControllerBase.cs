@@ -104,7 +104,7 @@ public abstract class AuthorizationControllerBase : Controller
             return ForbidWithError(Errors.ConsentRequired, "User consent is required, but prompt=none was specified.");
 
         var viewModel = await BuildConsentViewModelAsync(applicationName, clientId, requestedScopes, cancellationToken);
-        return View(viewModel);
+        return View("Authorize", viewModel);
     }
 
     [ValidateAntiForgeryToken]

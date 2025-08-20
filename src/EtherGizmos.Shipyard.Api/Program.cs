@@ -8,6 +8,8 @@ using EtherGizmos.Shipyard.Api.Services.Middleware;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Services;
+using JavaScriptEngineSwitcher.Extensions.MsDependencyInjection;
+using JavaScriptEngineSwitcher.V8;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -96,7 +98,7 @@ builder.Services
 builder.Services.AddModelValidators();
 
 // Controllers
-builder.Services.AddControllers();
+builder.Services.AddControllersWithViews();
 
 builder.Services
     .AddOData((opt, conf) =>
@@ -112,12 +114,29 @@ builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
 
 builder.Services.AddHostedService<OAuth2Seeder>();
 
+// Rendering
+builder.Services
+    .AddJsEngineSwitcher(opt => opt.DefaultEngineName = V8JsEngine.EngineName)
+    .AddV8();
+
+builder.Services
+    .AddWebOptimizer(opt =>
+    {
+        opt.CompileScssFiles();
+        opt.MinifyCssFiles();
+        opt.MinifyJsFiles();
+    });
+
 //**********************************************************
 // Pipeline
 
 var app = builder.Build();
 
 app.UseHttpsRedirection();
+
+app.UseWebOptimizer();
+app.UseStaticFiles();
+
 app.UseRouting();
 
 app.

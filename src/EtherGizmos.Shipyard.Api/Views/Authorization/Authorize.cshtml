@@ -1,0 +1,50 @@
+﻿@model ConsentViewModel
+@{
+    ViewData["Title"] = "Authorize application";
+}
+
+<h1>@Model.ApplicationName</h1>
+<p>This application is requesting access to your account with the following permissions:</p>
+
+<form asp-action="Accept" asp-controller="Authorization" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="ClientId" value="@Model.ClientId" />
+
+    <ul class="list-unstyled">
+        @for (var i = 0; i < Model.Scopes.Count; i++)
+        {
+            <li class="mb-2">
+                <!-- Important: preserve the Name so the binder maps back -->
+                <input type="hidden" name="Scopes[@i].Name" value="@Model.Scopes[i].Name" />
+                <input type="hidden" name="Scopes[@i].DisplayName" value="@Model.Scopes[i].DisplayName" />
+                <input type="hidden" name="Scopes[@i].Description" value="@Model.Scopes[i].Description" />
+
+                <div class="form-check">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           name="Scopes[@i].IsApproved"
+                           value="true"
+                           @(Model.Scopes[i].IsApproved ? "checked" : "") />
+                    <label class="form-check-label">
+                        <strong>@Model.Scopes[i].DisplayName</strong>
+                        <small class="text-muted">@Model.Scopes[i].Name</small>
+                    </label>
+                    @if (!string.IsNullOrWhiteSpace(Model.Scopes[i].Description))
+                    {
+                        <div class="text-muted">@Model.Scopes[i].Description</div>
+                    }
+                </div>
+            </li>
+        }
+    </ul>
+
+    <div class="mt-3">
+        <!-- FormValueRequired("submit.Accept") / ("submit.Deny") -->
+        <button name="submit.Accept" type="submit" class="btn btn-primary">Allow</button>
+        <button name="submit.Deny" formaction="@(Url.Action("Deny", "Authorization"))" formmethod="post"
+                class="btn btn-outline-secondary">
+            Deny
+        </button>
+    </div>
+</form>

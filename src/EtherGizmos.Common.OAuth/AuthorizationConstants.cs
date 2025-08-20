@@ -9,7 +9,7 @@ internal static class AuthorizationConstants
     {
         public const string AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
-        public const string ControllerPath = "accounts";
+        public const string ControllerPath = "account";
 
         public const string ReturnUrlParameter = "returnUrl";
 
