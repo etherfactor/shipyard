@@ -4,6 +4,11 @@ import { z } from "zod";
 const AppConfigZ = z.object({
   production: z.boolean(),
   resourceServer: z.string(),
+  oauth: z.object({
+    authority: z.string(),
+    clientId: z.string(),
+    scope: z.string(),
+  }),
   version: z.string(),
 });
 

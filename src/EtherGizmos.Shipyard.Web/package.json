@@ -23,6 +23,7 @@
     "@ng-select/ng-select": "^14.9.0",
     "@popperjs/core": "^2.11.8",
     "@tkrotoff/bootstrap-floating-label": "^0.12.2",
+    "angular-auth-oidc-client": "^19.0.2",
     "bootstrap": "^5.3.7",
     "bootstrap-icons": "^1.13.1",
     "jest-editor-support": "*",

@@ -4,6 +4,7 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { InjectionToken, Provider } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
+import { authInterceptor, LogLevel, provideAuth } from 'angular-auth-oidc-client';
 import { provideMonacoEditor } from 'ngx-monaco-editor-v2';
 import { AppComponent } from './app/app.component';
 import { APP_ROUTES } from './app/app.routes';
@@ -19,8 +20,34 @@ import { provideODataClient } from './app/shared/utilities/odata/odata.util';
       providers: [
         provideSimpleConfig(APP_CONFIG, config),
         provideRouter(APP_ROUTES),
-        provideHttpClient(withFetch(), withInterceptors([])),
+        provideHttpClient(
+          withFetch(),
+          withInterceptors([
+            authInterceptor(),
+          ])
+        ),
         provideODataClient(),
+        provideAuth({
+          config: {
+            configId: "webui",
+            authority: config.oauth.authority,
+            postLoginRoute: "login/callback",
+            clientId: config.oauth.clientId,
+            scope: config.oauth.scope,
+            responseType: "code",
+            silentRenew: true,
+            useRefreshToken: true,
+            autoUserInfo: false,
+            secureRoutes: [config.resourceServer],
+            logLevel: LogLevel.Warn,
+            silentRenewTimeoutInSeconds: 30,
+            tokenRefreshInSeconds: 15,
+            ignoreNonceAfterRefresh: true,
+            disableIatOffsetValidation: true,
+            disableIdTokenValidation: true,
+            renewTimeBeforeTokenExpiresInSeconds: 300,
+          },
+        }),
         provideMonacoEditor({
           baseUrl: window.location.origin + "/assets/monaco/min/vs",
           onMonacoLoad: () => {
