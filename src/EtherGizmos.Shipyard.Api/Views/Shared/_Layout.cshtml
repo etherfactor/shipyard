@@ -3,8 +3,8 @@
   Basic layout for Login/Consent pages (and anything else).
 *@
 @{
-    var appName = (string?)ViewData["AppName"] ?? "Auth Server";
-    var title = (string?)ViewData["Title"] ?? appName;
+  var appName = (string?)ViewData["AppName"] ?? "Auth Server";
+  var title = (string?)ViewData["Title"] ?? appName;
 }
 
 <!DOCTYPE html>
@@ -28,7 +28,7 @@
 
         <div class="collapse navbar-collapse" id="mainNav">
           <ul class="navbar-nav me-auto mb-2 mb-md-0">
-              @* Add links if needed *@
+            @* Add links if needed *@
           </ul>
 
           <ul class="navbar-nav ms-auto">
@@ -36,13 +36,13 @@
             {
               <li class="nav-item">
                 <span class="navbar-text me-2">
-                    @User.Identity!.Name
+                  @User.Identity!.Name
                 </span>
               </li>
               <li class="nav-item">
                 <form class="d-inline" asp-controller="Account" asp-action="Logout" method="post">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-outline-light btn-sm">Sign out</button>
+                  @Html.AntiForgeryToken()
+                  <button type="submit" class="btn btn-outline-light btn-sm">Sign out</button>
                 </form>
               </li>
             }
