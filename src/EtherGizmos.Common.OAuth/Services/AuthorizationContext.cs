@@ -44,6 +44,6 @@ public class AuthorizationContext : DbContext
 
         modelBuilder.AddGlobalValueConverter(new ValueConverter<DateTimeOffset?, DateTime?>(
             app => app != null ? app.Value.UtcDateTime : null,
-            db => db != null ? new DateTimeOffset(db.Value, TimeSpan.Zero) : null));
+            db => db != null ? new DateTimeOffset((DateTime)db, TimeSpan.Zero) : null));
     }
 }

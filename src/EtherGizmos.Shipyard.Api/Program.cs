@@ -117,6 +117,7 @@ builder.Services
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
 
+builder.Services.AddHostedService<InitialConfigSeeder>();
 builder.Services.AddHostedService<OAuth2Seeder>();
 
 // Rendering

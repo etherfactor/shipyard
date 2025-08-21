@@ -19,6 +19,8 @@ public class ApplicationContext : DbContext
 
     public virtual DbSet<TrackingUpdate> TrackingUpdates { get; set; }
 
+    public virtual DbSet<User> Users { get; set; }
+
     public ApplicationContext(
         DbContextOptions<ApplicationContext> options,
         IMigrationManager migrationManager) : base(options)

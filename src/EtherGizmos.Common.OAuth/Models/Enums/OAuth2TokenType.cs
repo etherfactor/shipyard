@@ -17,11 +17,11 @@ public static class OAuth2TokenTypeConverter
     private static Dictionary<OAuth2TokenType, string?> Mappings { get; } = new()
     {
         [OAuth2TokenType.Bearer] = TokenTypes.Bearer,
-        [OAuth2TokenType.AccessToken] = "access_token",
-        [OAuth2TokenType.IdentityToken] = "id_token",
-        [OAuth2TokenType.RefreshToken] = "refresh_token",
-        [OAuth2TokenType.StateToken] = "state_token",
-        [OAuth2TokenType.AuthorizationCode] = "authorization_code",
+        [OAuth2TokenType.AccessToken] = "urn:ietf:params:oauth:token-type:access_token",
+        [OAuth2TokenType.IdentityToken] = "urn:ietf:params:oauth:token-type:id_token",
+        [OAuth2TokenType.RefreshToken] = "urn:ietf:params:oauth:token-type:refresh_token",
+        [OAuth2TokenType.StateToken] = "urn:openiddict:params:oauth:token-type:state_token",
+        [OAuth2TokenType.AuthorizationCode] = "urn:openiddict:params:oauth:token-type:authorization_code",
     };
 
     public static OAuth2TokenType FromString(

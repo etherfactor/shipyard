@@ -64,6 +64,8 @@ public abstract class AuthorizationControllerBase : Controller
         var allowedScopes = (await _applicationManager.GetPermissionsAsync(application, cancellationToken))
             .Where(p => p.StartsWith(Permissions.Prefixes.Scope))
             .Select(p => p.Substring(Permissions.Prefixes.Scope.Length))
+            .Append("openid")
+            .Append("offline_access")
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         if (!requestedScopes.All(scope => allowedScopes.Contains(scope, StringComparer.OrdinalIgnoreCase)))
