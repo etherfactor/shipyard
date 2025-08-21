@@ -7,11 +7,14 @@ namespace EtherGizmos.Shipyard.Api.Services.HostedServices;
 public class OAuth2Seeder : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly IConfiguration _configuration;
 
     public OAuth2Seeder(
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        IConfiguration configuration)
     {
         _serviceProvider = serviceProvider;
+        _configuration = configuration;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -95,7 +98,16 @@ public class OAuth2Seeder : IHostedService
                 Permissions.Prefixes.Scope + "app",
             },
         };
-        application.RedirectUris.Add(new Uri("https://localhost"));
+
+        var urls = _configuration
+            .GetSection("Security:OAuth2:WebUIRedirectUrls")
+            .Get<string[]>() ?? [];
+
+        foreach (var url in urls)
+        {
+            application.RedirectUris.Add(new Uri(url));
+        }
+
         await CreateOrUpdateApplicationAsync(applicationManager, application, cancellationToken);
     }
 

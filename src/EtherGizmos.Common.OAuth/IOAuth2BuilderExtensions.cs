@@ -79,9 +79,13 @@ public static class IOAuth2BuilderExtensions
                 if (login[0] != '/')
                     login = '/' + login;
 
+                opt.LoginPath = login;
+
                 var logout = tempOptions.Cookie.LogoutUrl;
                 if (logout[0] != '/')
                     logout = '/' + logout;
+
+                opt.LogoutPath = logout;
 
                 opt.ReturnUrlParameter = tempOptions.Cookie.ReturnUrlParameter;
                 opt.ExpireTimeSpan = tempOptions.Cookie.CookieLifetime;

@@ -4,11 +4,15 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { InjectionToken, Provider } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
+import { buildUrl } from '@ethergizmos/odata-fluent-client/dist/src/utils/http';
 import { authInterceptor, LogLevel, provideAuth } from 'angular-auth-oidc-client';
 import { provideMonacoEditor } from 'ngx-monaco-editor-v2';
 import { AppComponent } from './app/app.component';
 import { APP_ROUTES } from './app/app.routes';
+import { provideOAuth2Service } from './app/shared/services/oauth2/oauth2.service.concrete';
 import { APP_CONFIG, fetchConfig } from './app/shared/utilities/config/config.util';
+import { ConsoleSink, SourceContextEnricher } from './app/shared/utilities/logger/logger.extra.util';
+import { LoggerConfiguration, provideLogger } from './app/shared/utilities/logger/logger.util';
 import { provideODataClient } from './app/shared/utilities/odata/odata.util';
 
 (async () => {
@@ -27,10 +31,20 @@ import { provideODataClient } from './app/shared/utilities/odata/odata.util';
           ])
         ),
         provideODataClient(),
+        provideLogger(
+          [ConsoleSink, SourceContextEnricher] as const,
+          (consoleSink, sourceContextEnricher) =>
+            new LoggerConfiguration()
+              .writeTo.sink(consoleSink)
+              .enrich.with(sourceContextEnricher)
+              .createLogger()
+        ),
+        provideOAuth2Service(),
         provideAuth({
           config: {
             configId: "webui",
             authority: config.oauth.authority,
+            redirectUrl: buildUrl(window.location.href, "/login/callback"),
             postLoginRoute: "login/callback",
             clientId: config.oauth.clientId,
             scope: config.oauth.scope,

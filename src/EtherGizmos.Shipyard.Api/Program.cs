@@ -98,7 +98,12 @@ builder.Services
 builder.Services.AddModelValidators();
 
 // Controllers
-builder.Services.AddControllersWithViews();
+builder.Services
+    .AddRouting(opt =>
+    {
+        opt.LowercaseUrls = true;
+    })
+    .AddControllersWithViews();
 
 builder.Services
     .AddOData((opt, conf) =>
