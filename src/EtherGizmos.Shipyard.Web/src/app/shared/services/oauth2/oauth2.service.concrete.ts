@@ -20,7 +20,9 @@ export class ConcreteOAuth2Service extends OAuth2Service {
 
   constructor() {
     super();
-    this.$oidc.checkAuth().subscribe();
+    this.$oidc.checkAuth().subscribe(() => {
+      this.onReadyResolve();
+    });
 
     effect(() => {
       const auth = this.$oidc.authenticated();
@@ -28,7 +30,6 @@ export class ConcreteOAuth2Service extends OAuth2Service {
       this.$oidc.getIdToken().subscribe(token => this.idToken$$.set(token));
       if (auth.isAuthenticated) {
         this.$oidc.getPayloadFromIdToken().subscribe(token => this.idTokenData$$.set(token));
-        this.onReadyResolve();
       } else {
         this.idTokenData$$.set({});
       }
