@@ -1,7 +1,7 @@
-<nav class="navbar navbar-main bg-body-tertiary">
+<nav class="navbar navbar-expand-md navbar-main bg-body-tertiary">
   <div class="container-fluid">
     <div class="navbar-grow d-flex flex-row align-items-center">
-      <button class="navbar-toggler" type="button" aria-label="Toggle navigation"
+      <button class="navbar-toggler d-block" type="button" aria-label="Toggle navigation"
               (click)="openSidebar()">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -11,9 +11,22 @@
     <button type="button" class="btn btn-link d-sm-block d-md-none"><span class="bi bi-search"></span></button>
     <div class="navbar-grow d-flex flex-row-reverse align-items-center">
       <ul class="navbar-nav mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link" href="javascript:void(0);" (click)="login()"><span class="bi bi-box-arrow-in-right"></span> Sign In</a>
+        @if (isSignedIn$$()) {
+        <li ngbDropdown class="nav-item dropdown">
+          <a ngbDropdownToggle class="nav-link dropdown-toggle" href="javascript:void(0);">
+            {{name$$()}}
+          </a>
+          <ul ngbDropdownMenu class="dropdown-menu dropdown-menu-end">
+            <li><a ngbDropdownItem class="dropdown-item" href="javascript:void(0);" (click)="logout()">Sign out</a></li>
+          </ul>
         </li>
+        } @else {
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0);" (click)="login()">
+            <span class="bi bi-box-arrow-in-right"></span> Sign In
+          </a>
+        </li>
+        }
       </ul>
     </div>
   </div>

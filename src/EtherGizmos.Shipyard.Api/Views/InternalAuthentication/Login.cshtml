@@ -4,31 +4,26 @@
   ViewData["Title"] = "Sign in";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h3 style="text-align: center;">Sign in to Shipyard</h3>
 
-<form asp-action="Login" asp-controller="Account" method="post">
+<form asp-action="Login" asp-controller="InternalAuthentication" method="post">
   @Html.AntiForgeryToken()
 
   <input type="hidden" asp-for="ReturnUrl" />
 
   <div class="validation-summary" asp-validation-summary="ModelOnly"></div>
 
-  <div class="form-group">
+  <div class="floating-label mt-3">
+    <input asp-for="Username" class="form-control" autocomplete="username" placeholder=" " />
     <label asp-for="Username"></label>
-    <input asp-for="Username" class="form-control" autocomplete="username" />
     <span asp-validation-for="Username" class="text-danger"></span>
   </div>
 
-  <div class="form-group">
+  <div class="floating-label mt-3">
+    <input asp-for="Password" class="form-control" autocomplete="current-password" placeholder=" " />
     <label asp-for="Password"></label>
-    <input asp-for="Password" class="form-control" autocomplete="current-password" />
     <span asp-validation-for="Password" class="text-danger"></span>
   </div>
 
-  @* <div class="form-group form-check">
-        <input asp-for="RememberMe" class="form-check-input" />
-        <label asp-for="RememberMe" class="form-check-label"></label>
-    </div> *@
-
-  <button type="submit" class="btn btn-primary">Sign in</button>
+  <button type="submit" class="btn btn-primary w-100 mt-3">Sign in</button>
 </form>

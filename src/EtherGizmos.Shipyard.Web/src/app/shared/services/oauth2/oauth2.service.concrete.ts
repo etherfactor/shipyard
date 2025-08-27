@@ -9,6 +9,10 @@ export class ConcreteOAuth2Service extends OAuth2Service {
 
   private readonly $oidc = inject(OidcSecurityService);
 
+  private onReadyResolve!: () => void;
+  readonly onReady = new Promise<void>((resolve, reject) => {
+    this.onReadyResolve = resolve;
+  });
   readonly isReady$$ = signal(false);
   readonly accessToken$$ = signal("");
   readonly idToken$$ = signal("");
@@ -19,9 +23,15 @@ export class ConcreteOAuth2Service extends OAuth2Service {
     this.$oidc.checkAuth().subscribe();
 
     effect(() => {
-      this.$oidc.authenticated();
+      const auth = this.$oidc.authenticated();
       this.$oidc.getAccessToken().subscribe(token => this.accessToken$$.set(token));
       this.$oidc.getIdToken().subscribe(token => this.idToken$$.set(token));
+      if (auth.isAuthenticated) {
+        this.$oidc.getPayloadFromIdToken().subscribe(token => this.idTokenData$$.set(token));
+        this.onReadyResolve();
+      } else {
+        this.idTokenData$$.set({});
+      }
     });
   }
 
@@ -31,6 +41,7 @@ export class ConcreteOAuth2Service extends OAuth2Service {
 
   logout(): void {
     this.$oidc.logoffAndRevokeTokens().subscribe();
+    this.$oidc.logoffLocal();
   }
 }
 

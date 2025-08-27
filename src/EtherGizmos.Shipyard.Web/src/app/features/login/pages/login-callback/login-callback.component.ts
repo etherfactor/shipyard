@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login-callback',
@@ -6,6 +7,11 @@ import { Component } from '@angular/core';
   templateUrl: './login-callback.component.html',
   styleUrl: './login-callback.component.scss'
 })
-export class LoginCallbackComponent {
+export class LoginCallbackComponent implements OnInit {
 
+  private readonly $router = inject(Router);
+
+  ngOnInit(): void {
+    this.$router.navigate(["/"]);
+  }
 }

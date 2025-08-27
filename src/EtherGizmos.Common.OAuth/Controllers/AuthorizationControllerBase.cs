@@ -333,6 +333,8 @@ public abstract class AuthorizationControllerBase : Controller
         switch (claim.Type)
         {
             case Claims.Name:
+            case Claims.GivenName:
+            case Claims.FamilyName:
             case Claims.Email:
                 yield return Destinations.AccessToken;
                 yield return Destinations.IdentityToken;

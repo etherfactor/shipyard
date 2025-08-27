@@ -5,7 +5,7 @@ import { InjectionToken, Provider } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { buildUrl } from '@ethergizmos/odata-fluent-client/dist/src/utils/http';
-import { authInterceptor, LogLevel, provideAuth } from 'angular-auth-oidc-client';
+import { AbstractSecurityStorage, authInterceptor, DefaultLocalStorageService, LogLevel, provideAuth } from 'angular-auth-oidc-client';
 import { provideMonacoEditor } from 'ngx-monaco-editor-v2';
 import { AppComponent } from './app/app.component';
 import { APP_ROUTES } from './app/app.routes';
@@ -60,8 +60,12 @@ import { provideODataClient } from './app/shared/utilities/odata/odata.util';
             disableIatOffsetValidation: true,
             disableIdTokenValidation: true,
             renewTimeBeforeTokenExpiresInSeconds: 300,
+            customParamsAuthRequest: {
+              prompt: "login",
+            },
           },
         }),
+        { provide: AbstractSecurityStorage, useClass: DefaultLocalStorageService },
         provideMonacoEditor({
           baseUrl: window.location.origin + "/assets/monaco/min/vs",
           onMonacoLoad: () => {
