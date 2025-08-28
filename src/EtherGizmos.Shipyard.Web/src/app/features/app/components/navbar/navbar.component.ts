@@ -1,4 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { NgbDropdownModule, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { Options } from '@popperjs/core';
 import { OAuth2Service } from '../../../../shared/services/oauth2/oauth2.service';
@@ -14,6 +15,7 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
     NavbarActionComponent,
     NavbarBreadcrumbComponent,
     NgbDropdownModule,
+    RouterModule,
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'

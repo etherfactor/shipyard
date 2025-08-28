@@ -5,9 +5,9 @@
 }
 
 <!-- Brand -->
-<div class="d-flex align-items-center gap-3 mb-4">
+<div class="box-title d-flex align-items-center gap-3 pb-4 mb-4">
   <div class="rounded-circle d-flex align-items-center justify-content-center"
-       style="width: 48px; height: 48px; background: rgba(13,110,253,.08);">
+       style="width: 48px; height: 48px; background: rgba(13, 110, 253, .12);">
     <i class="bi bi-box-seam-fill fs-4 text-primary" aria-hidden="true"></i>
   </div>
   <div>
@@ -35,5 +35,8 @@
     <span asp-validation-for="Password" class="text-danger"></span>
   </div>
 
-  <button type="submit" class="btn btn-primary w-100 mt-3">Sign in</button>
+  <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">
+    <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
+    <span>Sign in</span>
+  </button>
 </form>
