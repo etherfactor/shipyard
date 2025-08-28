@@ -14,7 +14,7 @@ export class NavbarBreadcrumbComponent implements OnInit {
 
   private $router: Router;
 
-  private routeData: any;
+  private routeData: any = {};
   breadcrumbs: NavbarBreadcrumb[] = [];
 
   constructor(
@@ -59,11 +59,8 @@ export class NavbarBreadcrumbComponent implements OnInit {
           queryParams = queryParamsNoAppend;
         }
 
-        let newBreadcrumb = this.routeData["breadcrumb"] as NavbarBreadcrumb | undefined;
-        let newParentBreadcrumbs = this.routeData["parentBreadcrumbs"] as NavbarBreadcrumb[] | undefined;
-        if (!newBreadcrumb || !newParentBreadcrumbs) {
-          throw new Error(`Missing breadcrumbs at page ${snapshot.pathFromRoot}`);
-        }
+        let newBreadcrumb = this.routeData["breadcrumb"] as NavbarBreadcrumb | undefined ?? { link: "/", label: "Home" };
+        let newParentBreadcrumbs = this.routeData["parentBreadcrumbs"] as NavbarBreadcrumb[] | undefined ?? [];
 
         newBreadcrumb = saturateBreadcrumb(newBreadcrumb, snapshot);
         newParentBreadcrumbs = newParentBreadcrumbs.map(item => saturateBreadcrumb(item, snapshot));

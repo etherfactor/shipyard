@@ -15,11 +15,20 @@
   <title>@title - @appName</title>
 
   <link rel="stylesheet" href="~/css/styles.scss" asp-append-version="true" />
+
+  <script>
+    const isDark = window.matchMedia("(prefers-color-scheme: dark)");
+    if (isDark.matches) {
+      document.documentElement.setAttribute("data-bs-theme", "dark");
+    } else {
+      document.documentElement.setAttribute("data-bs-theme", "light");
+    }
+  </script>
 </head>
 <body class="bg-body-tertiary">
   <main class="min-vh-100 d-flex align-items-center justify-content-center">
-    <div class="card shadow-sm" style="max-width: 460px; width: 100%;">
-      <div class="card-body p-4">
+    <div class="card shadow-sm rounded-4" style="max-width: 460px; width: 100%; border-color: var(--bs-primary);">
+      <div class="card-body p-4 p-md-5">
         @RenderBody()
       </div>
     </div>

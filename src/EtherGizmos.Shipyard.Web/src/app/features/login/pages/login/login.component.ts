@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { OAuth2Service } from '../../../../shared/services/oauth2/oauth2.service';
 
 @Component({
   selector: 'app-login',
@@ -8,4 +9,9 @@ import { Component } from '@angular/core';
 })
 export class LoginComponent {
 
+  private readonly $oauth2 = inject(OAuth2Service);
+
+  login() {
+    this.$oauth2.login();
+  }
 }

@@ -1,6 +1,6 @@
 import { Component, effect, Signal, signal } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { filter } from 'rxjs';
+import { filter, timer } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { NavbarActionService } from '../../../../shared/services/navbar-action/navbar-action.service';
 import { NavbarSearchActionDirective } from '../../directives/navbar-search-action.directive';
@@ -30,11 +30,17 @@ export class NavbarActionComponent {
     $router.events.pipe(
       filter(event => event instanceof NavigationEnd),
     ).subscribe(() => {
-      this.actions = [];
+      this.delaySetActions([]);
     });
 
     effect(() => {
-      this.actions = this.$navbarAction.actions$$();
+      this.delaySetActions(this.$navbarAction.actions$$());
+    });
+  }
+
+  private delaySetActions(actions: NavbarAction[]) {
+    timer(0).subscribe(() => {
+      this.actions = actions;
     });
   }
 
