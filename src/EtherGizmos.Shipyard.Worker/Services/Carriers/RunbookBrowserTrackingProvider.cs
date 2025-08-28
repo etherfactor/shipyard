@@ -69,9 +69,11 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
         };
         var results = new Dictionary<string, object>();
 
+        var index = 0;
         ApplyLogger(runbook);
         foreach (var step in runbook)
         {
+            step.Index = ++index;
             await step.Apply(_browserClient, variables, results, cancellationToken);
         }
 

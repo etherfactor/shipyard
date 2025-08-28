@@ -26,7 +26,7 @@ public abstract class AutoODataController : ODataController
         _serviceProvider = serviceProvider;
     }
 
-    private async Task<TEntity> LoadRecordAsync<TEntity, TDto, TKey>(
+    protected async Task<TEntity> LoadRecordAsync<TEntity, TDto, TKey>(
         IUnitOfWork uow,
         IEnumerable<KeyMapping<TEntity, TDto, TKey>> keys,
         string target = ErrorConstants.RequestTarget.Uri,

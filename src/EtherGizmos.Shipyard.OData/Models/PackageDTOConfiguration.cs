@@ -40,6 +40,8 @@ public class PackageDTOConfiguration : IModelConfiguration
 
             builder.Function("findUpdatedPackages")
                 .ReturnsFromEntitySet<PackageDTO>("packages");
+
+            builder.Action("schedulePoll");
         }
     }
 }

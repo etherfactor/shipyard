@@ -34,9 +34,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EtherGizmos.Common.Configuration\EtherGizmos.Common.Configuration.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Common.Messaging.RabbitMQ\EtherGizmos.Common.RabbitMQ.csproj" />
     <ProjectReference Include="..\EtherGizmos.Common.OAuth\EtherGizmos.Common.OAuth.csproj" />
     <ProjectReference Include="..\EtherGizmos.Common.ServiceDefaults\EtherGizmos.Common.ServiceDefaults.csproj" />
     <ProjectReference Include="..\EtherGizmos.Shipyard.Database\EtherGizmos.Shipyard.Database.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Shipyard.Messaging\EtherGizmos.Shipyard.Messaging.csproj" />
     <ProjectReference Include="..\EtherGizmos.Shipyard.OData\EtherGizmos.Shipyard.OData.csproj" />
   </ItemGroup>
 

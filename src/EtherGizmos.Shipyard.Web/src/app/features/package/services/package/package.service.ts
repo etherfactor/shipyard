@@ -42,10 +42,20 @@ export class PackageService {
       })
       .build();
 
+    const schedulePoll = this.$odata
+      .action(set, "schedulePoll")
+      .withDefaultMethod()
+      .withParameters({})
+      .withSingleResponse<undefined>()
+      .build();
+
     const set1 = this.$odata.bind
       .function(set, { findUpdatedPackages });
 
-    this.$set = set1;
+    const set2 = this.$odata.bind
+      .action(set1, { schedulePoll });
+
+    this.$set = set2;
   }
 
   search() {
@@ -72,5 +82,10 @@ export class PackageService {
     return this.$set.functions
       .findUpdatedPackages.invoke({})
       .top(quantity);
+  }
+
+  schedulePoll(id: number) {
+    return this.$set.actions
+      .schedulePoll.invoke(id, {});
   }
 }

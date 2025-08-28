@@ -94,6 +94,19 @@ builder.Services
         opt.BindDbContext<ApplicationContext>();
     });
 
+// Messaging
+builder.Services
+    .AddMessaging((opt, conf) =>
+    {
+        opt.Publishers.AddQueue("tracking-poll-request", "tracking.poll.request");
+    })
+    .UseRabbitMQ((opt, conf) =>
+    {
+        conf.GetSection("RabbitMq")
+            .Bind(opt);
+    })
+    .AddConsumersFromAssemblies(typeof(Program).Assembly);
+
 // Models
 builder.Services.AddModelValidators();
 

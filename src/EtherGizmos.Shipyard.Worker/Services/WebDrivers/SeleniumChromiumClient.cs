@@ -116,7 +116,15 @@ internal class SeleniumChromiumClient : IBrowserClient, IDisposable
 
         _logger.LogInformation("Clicking element {CssSelector}", selector);
 
-        _driver.FindElement(By.CssSelector(selector)).Click();
+        var element = _driver.FindElement(By.CssSelector(selector));
+        try
+        {
+            element.Click();
+        }
+        catch (ElementClickInterceptedException)
+        {
+            ((IJavaScriptExecutor)_driver).ExecuteScript("arguments[0].click();", element);
+        }
 
         _logger.LogInformation("Clicked element {CssSelector}", selector);
     }

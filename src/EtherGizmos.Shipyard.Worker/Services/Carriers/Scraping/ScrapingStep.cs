@@ -10,6 +10,8 @@ public abstract class ScrapingStep
     private readonly IList<TrackingResultDetail> _steps = [];
     private DateTimeOffset? _eta;
 
+    internal int Index { get; set; }
+
     internal ILogger Logger { get; set; } = NullLogger.Instance;
 
     internal DateTimeOffset? Eta => _eta;

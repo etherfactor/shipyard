@@ -159,8 +159,18 @@ export class PackageDetailComponent implements OnInit {
     this.form$$.set(packageForm(this.$form, this.package$$()));
   }
 
-  @Bound onRepoll() {
+  @Bound async onRepoll() {
+    const id = this.id$$();
+    if (!id)
+      return;
 
+    this.isLoadingStack$$.set(this.isLoadingStack$$() + 1);
+    const poll = this.$package.schedulePoll(id)
+      .execute();
+
+    await poll.result;
+
+    this.isLoadingStack$$.set(this.isLoadingStack$$() - 1);
   }
 
   @Bound async onEdit() {

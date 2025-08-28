@@ -1,5 +1,6 @@
 ﻿using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Configuration;
+using EtherGizmos.Shipyard.Messages;
 using EtherGizmos.Shipyard.Models;
 using EtherGizmos.Shipyard.Services;
 using Microsoft.Extensions.Options;
@@ -45,25 +46,4 @@ public class PackageOutForDeliveryConsumer : IMessageConsumer<PackageOutForDeliv
             EstimatedDeliveryAt = message.EstimatedDeliveryAt,
         }, cancellationToken: context.CancellationToken);
     }
-}
-
-public record PackageOutForDelivery
-{
-    public int PackageId { get; init; }
-
-    public int CarrierId { get; init; }
-
-    public string CarrierName { get; init; } = null!;
-
-    public string TrackingNumber { get; init; } = null!;
-
-    public string? Contents { get; init; }
-
-    public DateTimeOffset OccurredAt { get; init; }
-
-    public string? Location { get; init; }
-
-    public string? Description { get; init; }
-
-    public DateTimeOffset? EstimatedDeliveryAt { get; init; }
 }
