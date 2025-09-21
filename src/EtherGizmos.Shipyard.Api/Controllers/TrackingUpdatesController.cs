@@ -1,12 +1,14 @@
 ﻿using Asp.Versioning;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Swagger;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace EtherGizmos.Shipyard.Api.Controllers;
 
+[Authorize]
 public class TrackingUpdatesController : AutoODataController
 {
     private const string BaseRoute = "api/v{version:apiVersion}/trackingUpdates";

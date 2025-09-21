@@ -8,6 +8,7 @@ using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Messages;
 using EtherGizmos.Shipyard.Models.Api.Errors;
 using EtherGizmos.Shipyard.Swagger;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
@@ -16,6 +17,7 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace EtherGizmos.Shipyard.Api.Controllers;
 
+[Authorize]
 public class PackagesController : AutoODataController
 {
     private const string BaseRoute = "api/v{version:apiVersion}/packages";

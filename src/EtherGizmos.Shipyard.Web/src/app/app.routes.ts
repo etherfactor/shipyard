@@ -13,6 +13,11 @@ export const APP_ROUTES: ExtendedRoute[] = [
     loadChildren: () => import("./features/login/login.routes").then(m => m.LOGIN_ROUTES),
   },
   {
+    path: "logout",
+    loadChildren: () => import("./features/login/logout.routes").then(m => m.LOGOUT_ROUTES),
+    canActivate: [authenticationGuard],
+  },
+  {
     path: "packages",
     loadChildren: () => import("./features/package/package.routes").then(m => m.PACKAGE_ROUTES),
     canActivate: [authenticationGuard],

@@ -56,6 +56,8 @@ export class ConcreteOAuth2Service extends OAuth2Service {
   }
 
   logout(): void {
+    this.$router.navigate(["/logout"]);
+
     this.$oidc.logoffAndRevokeTokens().subscribe();
     this.$oidc.logoffLocal();
 
