@@ -15,4 +15,9 @@
     <PackageReference Include="OneOf.SourceGenerator" Version="3.0.271" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(MSBuildProjectName).UnitTests" />
+    <InternalsVisibleTo Include="$(MSBuildProjectName).IntegrationTests" />
+  </ItemGroup>
+
 </Project>

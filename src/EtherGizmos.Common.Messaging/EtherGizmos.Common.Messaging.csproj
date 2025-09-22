@@ -11,4 +11,9 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(MSBuildProjectName).UnitTests" />
+    <InternalsVisibleTo Include="$(MSBuildProjectName).IntegrationTests" />
+  </ItemGroup>
+
 </Project>
