@@ -1,4 +1,5 @@
-﻿using Testcontainers.PostgreSql;
+﻿using Npgsql;
+using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
 
 namespace EtherGizmos.Shipyard.Api.IntegrationTests;
@@ -31,6 +32,18 @@ internal static class Setup
             await rmq.StartAsync();
 
             _rmqCstr = rmq.GetConnectionString();
+
+            using var conn = new NpgsqlConnection(_pgsqlCstr);
+
+            await conn.OpenAsync();
+
+            using var command = conn.CreateCommand();
+
+            command.CommandText = """
+                create extension if not exists "uuid-ossp";
+                """;
+
+            await command.ExecuteNonQueryAsync();
         }
         catch
         {

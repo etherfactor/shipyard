@@ -19,7 +19,7 @@ internal class SearchSelectOptionAspect<TEntity, TId>
 
         yield return new AspectCase(Name, async () =>
         {
-            using var client = context.Client;
+            var client = context.Client;
 
             //Grab any property, so we don't assume a property that may not exist
             var property = typeof(TEntity).GetProperties().First();
@@ -47,7 +47,7 @@ internal class GetSelectOptionAspect<TEntity, TId>
 
         yield return new AspectCase(Name, async () =>
         {
-            using var client = context.Client;
+            var client = context.Client;
 
             //Grab any property, so we don't assume a property that may not exist
             var property = typeof(TEntity).GetProperties().First();
@@ -76,7 +76,7 @@ internal class CreateSelectOptionAspect<TEntity, TId>
 
         yield return new AspectCase(Name, async () =>
         {
-            using var client = context.Client;
+            var client = context.Client;
 
             //Grab any property, so we don't assume a property that may not exist
             var property = typeof(TEntity).GetProperties().First();
@@ -105,13 +105,13 @@ internal class PatchSelectOptionAspect<TEntity, TId>
 
         yield return new AspectCase(Name, async () =>
         {
-            using var client = context.Client;
+            var client = context.Client;
 
             //Grab any property, so we don't assume a property that may not exist
             var property = typeof(TEntity).GetProperties().First();
             var propertyName = property.Name.ToFirstLower();
 
-            var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForRead);
+            var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForUpdate);
             var body = specification.Update(entity);
             var response = await client.PatchAsync(specification.BaseRoute + specification.Path(entity) + $"?$select={propertyName}", body);
 
