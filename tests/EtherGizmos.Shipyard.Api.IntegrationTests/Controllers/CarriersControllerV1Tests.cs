@@ -7,6 +7,29 @@ internal class CarriersControllerV1Tests : ODataControllerTestsBase<CarrierDTO, 
 {
     protected override IODataResourceSpec<CarrierDTO, int> Specification { get; } = new CarriersControllerV1Spec();
 
+    public static IEnumerable<AspectCase> All
+    {
+        get
+        {
+            var spec = new CarriersControllerV1Spec();
+            var aspects = new IAspect<CarrierDTO, int>[] {
+                new SearchSelectOptionAspect<CarrierDTO,int>(),
+                new GetSelectOptionAspect<CarrierDTO,int>(),
+                new CreateSelectOptionAspect<CarrierDTO,int>(),
+                new PatchSelectOptionAspect<CarrierDTO,int>(),
+                // …add more
+            };
+
+            foreach (var a in aspects)
+                foreach (var c in a.Build(spec)) // your Build ignores ctx when creating cases
+                    yield return c;
+        }
+    }
+
+
+    [TestCaseSource(nameof(All))]
+    public async Task Aspect(AspectCase c) => await c.TestAsync(new FixtureContext(Client));
+
     private class CarriersControllerV1Source : IRecordSource<CarrierDTO, int>
     {
         private readonly IODataResourceSpec<CarrierDTO, int> _specification;

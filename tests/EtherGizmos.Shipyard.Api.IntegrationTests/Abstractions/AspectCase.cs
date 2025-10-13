@@ -1,9 +1,12 @@
 ﻿namespace EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
 
-public record AspectCase(string Name, Func<Task> Test)
+public record AspectCase(string Name, Func<FixtureContext, Task> Test)
 {
-    public async Task TestAsync()
+    public async Task TestAsync(
+        FixtureContext context)
     {
-        await Test();
+        await Test(context);
     }
+
+    public override string ToString() => Name;
 }

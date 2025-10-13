@@ -1,10 +1,10 @@
 ﻿using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
-using System.Collections.Concurrent;
 using System.Net.Http.Json;
 
 namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers;
 
 internal abstract class ODataControllerTestsBase<TEntity, TId>
+    : IntegrationTestBase
     where TEntity : class, new()
 {
     protected abstract IODataResourceSpec<TEntity, TId> Specification { get; }
@@ -43,33 +43,33 @@ internal abstract class ODataControllerTestsBase<TEntity, TId>
         return created!;
     }
 
-    [Test]
-    public async Task Tests()
-    {
-        var exceptions = new ConcurrentBag<Exception>();
+    //[Test]
+    //public async Task Tests()
+    //{
+    //    var exceptions = new ConcurrentBag<Exception>();
 
-        foreach (var aspect in Aspects)
-        {
-            var tests = aspect
-                .Build(Specification, new FixtureContext(Client))
-                .ToList();
+    //    foreach (var aspect in Aspects)
+    //    {
+    //        var tests = aspect
+    //            .Build(Specification, new FixtureContext(Client))
+    //            .ToList();
 
-            foreach (var test in tests)
-            {
-                try
-                {
-                    await test.TestAsync();
-                }
-                catch (Exception ex)
-                {
-                    exceptions.Add(ex);
-                }
-            }
-        }
+    //        foreach (var test in tests)
+    //        {
+    //            try
+    //            {
+    //                await test.TestAsync();
+    //            }
+    //            catch (Exception ex)
+    //            {
+    //                exceptions.Add(ex);
+    //            }
+    //        }
+    //    }
 
-        if (!exceptions.IsEmpty)
-        {
-            throw new AggregateException(exceptions);
-        }
-    }
+    //    if (!exceptions.IsEmpty)
+    //    {
+    //        throw new AggregateException(exceptions);
+    //    }
+    //}
 }

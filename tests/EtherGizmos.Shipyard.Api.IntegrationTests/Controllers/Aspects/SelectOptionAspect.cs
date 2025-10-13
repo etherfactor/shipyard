@@ -11,13 +11,12 @@ internal class SearchSelectOptionAspect<TEntity, TId>
     public string Name => "search:$select";
 
     public IEnumerable<AspectCase> Build(
-        IODataResourceSpec<TEntity, TId> specification,
-        FixtureContext context)
+        IODataResourceSpec<TEntity, TId> specification)
     {
         if (!specification.Capabilities.Contains(ODataCapability.Search))
             yield break;
 
-        yield return new AspectCase(Name, async () =>
+        yield return new AspectCase(Name, async context =>
         {
             var client = context.Client;
 
@@ -39,13 +38,12 @@ internal class GetSelectOptionAspect<TEntity, TId>
     public string Name => "get:$select";
 
     public IEnumerable<AspectCase> Build(
-        IODataResourceSpec<TEntity, TId> specification,
-        FixtureContext context)
+        IODataResourceSpec<TEntity, TId> specification)
     {
         if (!specification.Capabilities.Contains(ODataCapability.Search))
             yield break;
 
-        yield return new AspectCase(Name, async () =>
+        yield return new AspectCase(Name, async context =>
         {
             var client = context.Client;
 
@@ -68,13 +66,12 @@ internal class CreateSelectOptionAspect<TEntity, TId>
     public string Name => "create:$select";
 
     public IEnumerable<AspectCase> Build(
-        IODataResourceSpec<TEntity, TId> specification,
-        FixtureContext context)
+        IODataResourceSpec<TEntity, TId> specification)
     {
         if (!specification.Capabilities.Contains(ODataCapability.Search))
             yield break;
 
-        yield return new AspectCase(Name, async () =>
+        yield return new AspectCase(Name, async context =>
         {
             var client = context.Client;
 
@@ -97,13 +94,12 @@ internal class PatchSelectOptionAspect<TEntity, TId>
     public string Name => "patch:$select";
 
     public IEnumerable<AspectCase> Build(
-        IODataResourceSpec<TEntity, TId> specification,
-        FixtureContext context)
+        IODataResourceSpec<TEntity, TId> specification)
     {
         if (!specification.Capabilities.Contains(ODataCapability.Search))
             yield break;
 
-        yield return new AspectCase(Name, async () =>
+        yield return new AspectCase(Name, async context =>
         {
             var client = context.Client;
 

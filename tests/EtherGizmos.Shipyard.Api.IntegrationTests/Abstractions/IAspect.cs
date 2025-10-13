@@ -6,6 +6,5 @@ public interface IAspect<TEntity, TId>
     string Name { get; }
 
     IEnumerable<AspectCase> Build(
-        IODataResourceSpec<TEntity, TId> specification,
-        FixtureContext context);
+        IODataResourceSpec<TEntity, TId> specification);
 }

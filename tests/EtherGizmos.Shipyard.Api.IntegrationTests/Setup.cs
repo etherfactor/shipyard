@@ -1,4 +1,4 @@
-﻿using Npgsql;
+﻿using System.Text;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
 
@@ -19,6 +19,11 @@ internal static class Setup
         {
             var pgsql = new PostgreSqlBuilder()
                 .WithImage("postgres:17")
+                .WithResourceMapping(
+                    Encoding.UTF8.GetBytes("""
+                        create extension if not exists "uuid-ossp";
+                        """),
+                    "docker-entrypoint-initdb.d/init.sql")
                 .Build();
 
             await pgsql.StartAsync();
@@ -32,22 +37,10 @@ internal static class Setup
             await rmq.StartAsync();
 
             _rmqCstr = rmq.GetConnectionString();
-
-            using var conn = new NpgsqlConnection(_pgsqlCstr);
-
-            await conn.OpenAsync();
-
-            using var command = conn.CreateCommand();
-
-            command.CommandText = """
-                create extension if not exists "uuid-ossp";
-                """;
-
-            await command.ExecuteNonQueryAsync();
         }
-        catch
+        catch (Exception ex)
         {
-            Assert.Ignore();
+            Assert.Ignore(ex.Message);
         }
 
         _waf = new(new Dictionary<string, string?>()
