@@ -18,13 +18,13 @@ internal class SearchSelectOptionAspect<TEntity, TId>
 
         yield return new AspectCase(Name, async context =>
         {
-            var client = context.Client;
+            var client = context.GetClientAsRole("123", 1);
 
             //Grab any property, so we don't assume a property that may not exist
             var property = typeof(TEntity).GetProperties().First();
             var propertyName = property.Name.ToFirstLower();
 
-            var response = await client.GetAsync(specification.BaseRoute + $"?$select={propertyName}");
+            var response = await client.GetAsync(specification.BaseRoute + $"?$select={propertyName}&$top=1");
 
             await SearchSet.ValidateSetAsync<TEntity, TId>(response, propertyName);
         });
@@ -40,12 +40,12 @@ internal class GetSelectOptionAspect<TEntity, TId>
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Search))
+        if (!specification.Capabilities.Contains(ODataCapability.Get))
             yield break;
 
         yield return new AspectCase(Name, async context =>
         {
-            var client = context.Client;
+            var client = context.GetClientAsRole("123", 1);
 
             //Grab any property, so we don't assume a property that may not exist
             var property = typeof(TEntity).GetProperties().First();
@@ -68,12 +68,12 @@ internal class CreateSelectOptionAspect<TEntity, TId>
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Search))
+        if (!specification.Capabilities.Contains(ODataCapability.Create))
             yield break;
 
         yield return new AspectCase(Name, async context =>
         {
-            var client = context.Client;
+            var client = context.GetClientAsRole("123", 1);
 
             //Grab any property, so we don't assume a property that may not exist
             var property = typeof(TEntity).GetProperties().First();
@@ -96,12 +96,12 @@ internal class PatchSelectOptionAspect<TEntity, TId>
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Search))
+        if (!specification.Capabilities.Contains(ODataCapability.Update))
             yield break;
 
         yield return new AspectCase(Name, async context =>
         {
-            var client = context.Client;
+            var client = context.GetClientAsRole("123", 1);
 
             //Grab any property, so we don't assume a property that may not exist
             var property = typeof(TEntity).GetProperties().First();
@@ -122,7 +122,7 @@ internal static class SearchSet
         HttpResponseMessage response,
         string propertyName)
     {
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK).Or.EqualTo(HttpStatusCode.Created));
 
         var (root, item) = await ODataReader.ReadSingleRawAsync(response);
 

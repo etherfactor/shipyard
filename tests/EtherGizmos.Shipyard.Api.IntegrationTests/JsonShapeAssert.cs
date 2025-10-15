@@ -6,7 +6,7 @@ public static class JsonShapeAssert
 {
     public static void HasOnlyProps(JsonElement obj, params string[] expected)
     {
-        var actual = obj.EnumerateObject().Select(p => p.Name).OrderBy(x => x).ToArray();
+        var actual = obj.EnumerateObject().Select(p => p.Name).Where(x => x != "@odata.context").OrderBy(x => x).ToArray();
         var exp = expected.OrderBy(x => x).ToArray();
         Assert.That(actual, Is.EquivalentTo(exp));
     }

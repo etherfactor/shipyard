@@ -1,34 +1,43 @@
 ﻿using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
+using EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Aspects;
 using System.Net.Http.Json;
 
 namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers;
 
 internal class CarriersControllerV1Tests : ODataControllerTestsBase<CarrierDTO, int>
 {
-    protected override IODataResourceSpec<CarrierDTO, int> Specification { get; } = new CarriersControllerV1Spec();
+    private static readonly IODataResourceSpec<CarrierDTO, int> _specification = new CarriersControllerV1Spec();
+    private static readonly FixtureContext _context = new(() => Setup.Client, new JwtTokenMinter());
+
+    protected override IODataResourceSpec<CarrierDTO, int> Specification => _specification;
 
     public static IEnumerable<AspectCase> All
     {
         get
         {
-            var spec = new CarriersControllerV1Spec();
             var aspects = new IAspect<CarrierDTO, int>[] {
                 new SearchSelectOptionAspect<CarrierDTO,int>(),
                 new GetSelectOptionAspect<CarrierDTO,int>(),
                 new CreateSelectOptionAspect<CarrierDTO,int>(),
                 new PatchSelectOptionAspect<CarrierDTO,int>(),
+                new AuthenticationAspect<CarrierDTO,int>(),
                 // …add more
             };
 
             foreach (var a in aspects)
-                foreach (var c in a.Build(spec)) // your Build ignores ctx when creating cases
+                foreach (var c in a.Build(_specification)) // your Build ignores ctx when creating cases
                     yield return c;
         }
     }
 
+    [SetUp]
+    public async Task SetUp()
+    {
+        await _specification.Records.AcquireAsync(_context, AcquirePurpose.ForRead);
+    }
 
     [TestCaseSource(nameof(All))]
-    public async Task Aspect(AspectCase c) => await c.TestAsync(new FixtureContext(Client));
+    public async Task Aspect(AspectCase c) => await c.TestAsync(_context);
 
     private class CarriersControllerV1Source : IRecordSource<CarrierDTO, int>
     {
@@ -45,7 +54,8 @@ internal class CarriersControllerV1Tests : ODataControllerTestsBase<CarrierDTO, 
             AcquirePurpose purpose)
         {
             var body = _specification.Create();
-            var response = await context.Client.PostAsync(_specification.BaseRoute, body);
+            var client = context.GetClientAsRole("123", 1);
+            var response = await client.PostAsync(_specification.BaseRoute, body);
 
             var entity = await response.Content.ReadFromJsonAsync<CarrierDTO>();
             return (entity!, entity!.Id);
@@ -77,12 +87,15 @@ internal class CarriersControllerV1Tests : ODataControllerTestsBase<CarrierDTO, 
 
         public Func<CarrierDTO, string> Path => carrier => $"({carrier.Id})";
 
-        public IRecordSource<CarrierDTO, int> Records => throw new NotImplementedException();
+        public IRecordSource<CarrierDTO, int> Records => new CarriersControllerV1Source(_specification);
 
         public HttpContent Create() =>
             JsonContent.Create(new
             {
                 name = "Test Carrier",
+                slug = "test" + new Random().Next(999999),
+                rules = new List<object>(),
+                steps = new List<object>(),
             });
 
         public HttpContent Update(CarrierDTO entity) =>
