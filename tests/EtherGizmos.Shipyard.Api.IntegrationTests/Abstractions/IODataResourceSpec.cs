@@ -9,7 +9,7 @@ public interface IODataResourceSpec<TEntity, TId>
 
     Func<TEntity, TId> Identity { get; }
 
-    Func<TEntity, string> Path { get; }
+    Func<TId, string> Path { get; }
 
     IRecordSource<TEntity, TId> Records { get; }
 

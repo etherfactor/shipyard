@@ -185,6 +185,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseHttpLogging();
+
 app.
     UseExceptionHandler(errorApp =>
     {
@@ -215,8 +217,6 @@ app
         context.Request.EnableBuffering();
         await next();
     });
-
-app.UseHttpLogging();
 
 app.UseSwagger()
     .UseSwaggerUI(opt =>

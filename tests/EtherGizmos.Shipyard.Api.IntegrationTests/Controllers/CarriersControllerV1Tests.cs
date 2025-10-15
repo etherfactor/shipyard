@@ -16,19 +16,27 @@ internal class CarriersControllerV1Tests : ODataControllerTestsBase<CarrierDTO, 
         get
         {
             var aspects = new IAspect<CarrierDTO, int>[] {
-                new SearchSelectOptionAspect<CarrierDTO,int>(),
-                new SearchAuthenticationAspect<CarrierDTO,int>(),
+                new SearchAuthenticationAspect<CarrierDTO, int>(),
+                new SearchConformanceAspect<CarrierDTO, int>(),
+                new SearchSelectOptionAspect<CarrierDTO, int>(),
 
-                new GetSelectOptionAspect<CarrierDTO,int>(),
-                new GetAuthenticationAspect<CarrierDTO,int>(),
+                new GetAuthenticationAspect<CarrierDTO, int>(),
+                new GetConformanceAspect<CarrierDTO, int>(),
+                new GetRecordNotFoundAspect<CarrierDTO, int>(),
+                new GetSelectOptionAspect<CarrierDTO, int>(),
 
-                new CreateSelectOptionAspect<CarrierDTO,int>(),
-                new CreateAuthenticationAspect<CarrierDTO,int>(),
+                new CreateAuthenticationAspect<CarrierDTO, int>(),
+                new CreateConformanceAspect<CarrierDTO, int>(),
+                new CreateSelectOptionAspect<CarrierDTO, int>(),
 
-                new PatchSelectOptionAspect<CarrierDTO,int>(),
-                new PatchAuthenticationAspect<CarrierDTO,int>(),
+                new PatchAuthenticationAspect<CarrierDTO, int>(),
+                new PatchConformanceAspect<CarrierDTO, int>(),
+                new PatchRecordNotFoundAspect<CarrierDTO, int>(),
+                new PatchSelectOptionAspect<CarrierDTO, int>(),
 
-                new DeleteAuthenticationAspect<CarrierDTO,int>(),
+                new DeleteAuthenticationAspect<CarrierDTO, int>(),
+                new DeleteConformanceAspect<CarrierDTO, int>(),
+                new DeleteRecordNotFoundAspect<CarrierDTO, int>(),
             };
 
             foreach (var aspect in aspects)
@@ -41,8 +49,8 @@ internal class CarriersControllerV1Tests : ODataControllerTestsBase<CarrierDTO, 
         }
     }
 
-    [SetUp]
-    public async Task SetUp()
+    [OneTimeSetUp]
+    public async Task OneTimeSetUp()
     {
         await _specification.Records.AcquireAsync(_context, AcquirePurpose.ForRead);
     }
@@ -68,7 +76,7 @@ internal class CarriersControllerV1Tests : ODataControllerTestsBase<CarrierDTO, 
             var client = context.GetClientAsRole("123", 1);
             var response = await client.PostAsync(_specification.BaseRoute, body);
 
-            var entity = await response.Content.ReadFromJsonAsync<CarrierDTO>();
+            var entity = await response.Content.ReadFromJsonAsync<CarrierDTO>(JsonOptions.Default);
             return (entity!, entity!.Id);
         }
     }
@@ -96,7 +104,7 @@ internal class CarriersControllerV1Tests : ODataControllerTestsBase<CarrierDTO, 
 
         public Func<CarrierDTO, int> Identity => carrier => carrier.Id;
 
-        public Func<CarrierDTO, string> Path => carrier => $"({carrier.Id})";
+        public Func<int, string> Path => id => $"({id})";
 
         public IRecordSource<CarrierDTO, int> Records => new CarriersControllerV1Source(_specification);
 

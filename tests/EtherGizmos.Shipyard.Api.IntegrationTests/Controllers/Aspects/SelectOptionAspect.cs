@@ -52,7 +52,7 @@ internal class GetSelectOptionAspect<TEntity, TId>
             var propertyName = property.Name.ToFirstLower();
 
             var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForRead);
-            var response = await client.GetAsync(specification.BaseRoute + specification.Path(entity) + $"?$select={propertyName}");
+            var response = await client.GetAsync(specification.BaseRoute + specification.Path(id) + $"?$select={propertyName}");
 
             await SearchSet.ValidateSingleAsync<TEntity, TId>(response, propertyName);
         });
@@ -109,7 +109,7 @@ internal class PatchSelectOptionAspect<TEntity, TId>
 
             var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForUpdate);
             var body = specification.Update(entity);
-            var response = await client.PatchAsync(specification.BaseRoute + specification.Path(entity) + $"?$select={propertyName}", body);
+            var response = await client.PatchAsync(specification.BaseRoute + specification.Path(id) + $"?$select={propertyName}", body);
 
             await SearchSet.ValidateSingleAsync<TEntity, TId>(response, propertyName);
         });

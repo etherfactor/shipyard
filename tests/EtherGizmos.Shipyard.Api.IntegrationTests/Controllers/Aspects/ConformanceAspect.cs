@@ -3,11 +3,11 @@ using System.Net;
 
 namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Aspects;
 
-internal class SearchAuthenticationAspect<TEntity, TId>
+internal class SearchConformanceAspect<TEntity, TId>
     : IAspect<TEntity, TId>
     where TEntity : class, new()
 {
-    public string Name => "authenticated";
+    public string Name => "conform";
 
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
@@ -15,7 +15,7 @@ internal class SearchAuthenticationAspect<TEntity, TId>
         if (!specification.Capabilities.Contains(ODataCapability.Search))
             yield break;
 
-        yield return new AspectCase($"search:auth:200", async context =>
+        yield return new AspectCase($"search:conform", async context =>
         {
             var client = context.GetClientAsRole("123", 1);
 
@@ -23,23 +23,14 @@ internal class SearchAuthenticationAspect<TEntity, TId>
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         });
-
-        yield return new AspectCase($"search:anon:401", async context =>
-        {
-            var client = context.GetAnonymousClient();
-
-            var response = await client.GetAsync(specification.BaseRoute);
-
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
-        });
     }
 }
 
-internal class GetAuthenticationAspect<TEntity, TId>
+internal class GetConformanceAspect<TEntity, TId>
     : IAspect<TEntity, TId>
     where TEntity : class, new()
 {
-    public string Name => "authenticated";
+    public string Name => "conform";
 
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
@@ -47,7 +38,7 @@ internal class GetAuthenticationAspect<TEntity, TId>
         if (!specification.Capabilities.Contains(ODataCapability.Get))
             yield break;
 
-        yield return new AspectCase($"get:auth:200", async context =>
+        yield return new AspectCase($"get:conform", async context =>
         {
             var client = context.GetClientAsRole("123", 1);
 
@@ -56,24 +47,14 @@ internal class GetAuthenticationAspect<TEntity, TId>
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         });
-
-        yield return new AspectCase($"get:anon:401", async context =>
-        {
-            var client = context.GetAnonymousClient();
-
-            var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForRead);
-            var response = await client.GetAsync(specification.BaseRoute + specification.Path(id));
-
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
-        });
     }
 }
 
-internal class CreateAuthenticationAspect<TEntity, TId>
+internal class CreateConformanceAspect<TEntity, TId>
     : IAspect<TEntity, TId>
     where TEntity : class, new()
 {
-    public string Name => "authenticated";
+    public string Name => "conform";
 
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
@@ -81,7 +62,7 @@ internal class CreateAuthenticationAspect<TEntity, TId>
         if (!specification.Capabilities.Contains(ODataCapability.Create))
             yield break;
 
-        yield return new AspectCase($"create:auth:201", async context =>
+        yield return new AspectCase($"create:conform", async context =>
         {
             var client = context.GetClientAsRole("123", 1);
 
@@ -90,24 +71,14 @@ internal class CreateAuthenticationAspect<TEntity, TId>
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
         });
-
-        yield return new AspectCase($"create:anon:401", async context =>
-        {
-            var client = context.GetAnonymousClient();
-
-            var body = specification.Create();
-            var response = await client.PostAsync(specification.BaseRoute, body);
-
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
-        });
     }
 }
 
-internal class PatchAuthenticationAspect<TEntity, TId>
+internal class PatchConformanceAspect<TEntity, TId>
     : IAspect<TEntity, TId>
     where TEntity : class, new()
 {
-    public string Name => "authenticated";
+    public string Name => "conform";
 
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
@@ -115,7 +86,7 @@ internal class PatchAuthenticationAspect<TEntity, TId>
         if (!specification.Capabilities.Contains(ODataCapability.Update))
             yield break;
 
-        yield return new AspectCase($"patch:auth:200", async context =>
+        yield return new AspectCase($"patch:conform", async context =>
         {
             var client = context.GetClientAsRole("123", 1);
 
@@ -125,25 +96,14 @@ internal class PatchAuthenticationAspect<TEntity, TId>
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         });
-
-        yield return new AspectCase($"patch:anon:401", async context =>
-        {
-            var client = context.GetAnonymousClient();
-
-            var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForUpdate);
-            var body = specification.Update(entity);
-            var response = await client.PatchAsync(specification.BaseRoute + specification.Path(id), body);
-
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
-        });
     }
 }
 
-internal class DeleteAuthenticationAspect<TEntity, TId>
+internal class DeleteConformanceAspect<TEntity, TId>
     : IAspect<TEntity, TId>
     where TEntity : class, new()
 {
-    public string Name => "authenticated";
+    public string Name => "conform";
 
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
@@ -151,7 +111,7 @@ internal class DeleteAuthenticationAspect<TEntity, TId>
         if (!specification.Capabilities.Contains(ODataCapability.Delete))
             yield break;
 
-        yield return new AspectCase($"delete:auth:204", async context =>
+        yield return new AspectCase($"delete:conform", async context =>
         {
             var client = context.GetClientAsRole("123", 1);
 
@@ -159,16 +119,10 @@ internal class DeleteAuthenticationAspect<TEntity, TId>
             var response = await client.DeleteAsync(specification.BaseRoute + specification.Path(id));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
-        });
 
-        yield return new AspectCase($"delete:anon:401", async context =>
-        {
-            var client = context.GetAnonymousClient();
+            response = await client.GetAsync(specification.BaseRoute + specification.Path(id));
 
-            var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForUpdate);
-            var response = await client.DeleteAsync(specification.BaseRoute + specification.Path(id));
-
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         });
     }
 }
