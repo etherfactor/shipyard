@@ -17,16 +17,27 @@ internal class CarriersControllerV1Tests : ODataControllerTestsBase<CarrierDTO, 
         {
             var aspects = new IAspect<CarrierDTO, int>[] {
                 new SearchSelectOptionAspect<CarrierDTO,int>(),
+                new SearchAuthenticationAspect<CarrierDTO,int>(),
+
                 new GetSelectOptionAspect<CarrierDTO,int>(),
+                new GetAuthenticationAspect<CarrierDTO,int>(),
+
                 new CreateSelectOptionAspect<CarrierDTO,int>(),
+                new CreateAuthenticationAspect<CarrierDTO,int>(),
+
                 new PatchSelectOptionAspect<CarrierDTO,int>(),
-                new AuthenticationAspect<CarrierDTO,int>(),
-                // …add more
+                new PatchAuthenticationAspect<CarrierDTO,int>(),
+
+                new DeleteAuthenticationAspect<CarrierDTO,int>(),
             };
 
-            foreach (var a in aspects)
-                foreach (var c in a.Build(_specification)) // your Build ignores ctx when creating cases
-                    yield return c;
+            foreach (var aspect in aspects)
+            {
+                foreach (var test in aspect.Build(_specification))
+                {
+                    yield return test;
+                }
+            }
         }
     }
 
@@ -93,7 +104,7 @@ internal class CarriersControllerV1Tests : ODataControllerTestsBase<CarrierDTO, 
             JsonContent.Create(new
             {
                 name = "Test Carrier",
-                slug = "test" + new Random().Next(999999),
+                slug = "test" + Guid.NewGuid().ToString("N").Substring(0, 16),
                 rules = new List<object>(),
                 steps = new List<object>(),
             });

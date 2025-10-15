@@ -25,7 +25,12 @@ public abstract class IntegrationTestBase
     [TearDown]
     public void ConsoleTearDown()
     {
-        string output = CurrentOutput.ToString();
+        var output = string.Empty;
+        try
+        {
+            output = CurrentOutput.ToString();
+        }
+        catch { }
 
         Console.SetOut(OriginalWriter);
         Console.Out.WriteLine(output);
