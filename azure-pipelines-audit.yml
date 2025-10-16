@@ -1,0 +1,50 @@
+trigger: none
+pr: none
+
+schedules:
+- cron: '0 6 * * *'
+  displayName: 'Daily 12AM CST'
+  branches:
+    include:
+    - main
+    - develop
+  always: false
+
+variables:
+  - group: dependency-track
+
+resources:
+  repositories:
+  - repository: sharedTemplates
+    type: git
+    name: 'Projects/PipelineTemplates'
+    ref: 'refs/heads/feature/vuln-test'
+
+stages:
+
+- stage: prep
+  displayName: 'Prepare'
+
+  jobs:
+
+  # Execute gitversion
+  - template: shared/gitversion.yml@sharedTemplates
+    parameters:
+      name: 'prep'
+
+- stage: audit
+  displayName: 'Audit'
+
+  jobs:
+
+  # Audit vulnerabilities and publish them
+  - template: node/security/dtrack.yml@sharedTemplates
+    parameters:
+      name: 'audit'
+      vmImage: 'ubuntu-22.04'
+      nodeVersion: '22.x.x'
+      pathToProject: '$(Build.SourcesDirectory)'
+      apiUrl: '$(DependencyTrack.ApiUrl)'
+      apiKey: '$(DependencyTrack.ApiKey)'
+      projectName: 'shipyard'
+      projectType: 'APPLICATION'

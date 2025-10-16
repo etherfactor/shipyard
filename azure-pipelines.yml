@@ -1,0 +1,88 @@
+trigger:
+- main
+- release/*
+- develop
+
+resources:
+  repositories:
+  - repository: sharedTemplates
+    type: git
+    name: 'Projects/PipelineTemplates'
+    ref: 'refs/heads/feature/vuln-test'
+
+stages:
+
+- stage: prep
+  displayName: 'Prepare'
+
+  jobs:
+
+  # Execute gitversion
+  - template: shared/versioning/gitversion.yml@sharedTemplates
+    parameters:
+      name: 'prep'
+
+- stage: test
+  displayName: 'Test'
+
+  jobs:
+
+  ## Perform dotnet unit tests
+  #- template: node/test/test.yml@sharedTemplates
+  #  parameters:
+  #    name: 'test_dotnet_unit'
+  #    vmImage: 'ubuntu-22.04'
+  #    testType: 'Unit'
+  #    testPattern: '*UnitTests.csproj'
+  #    codeCoverage: true
+  #    artifactName: 'test-dotnet-unit'
+
+  # Perform dotnet integration tests
+  - template: node/test/test.yml@sharedTemplates
+    parameters:
+      name: 'test_dotnet_integration'
+      vmImage: 'ubuntu-22.04'
+      testType: 'Integration'
+      testPattern: '*IntegrationTests.csproj'
+      codeCoverage: true
+      artifactName: 'test-dotnet-integration'
+
+  # Combine code coverage
+  - template: shared/test/combine-coverage.yml@sharedTemplates
+    parameters:
+      name: 'coverage'
+      artifacts:
+      - 'test-dotnet-integration'
+      dependsOn:
+      - 'test_dotnet_integration'
+
+- stage: publish
+  displayName: 'Publish'
+
+  jobs:
+
+  # Publish dotnet api
+  - template: dotnet/publish/application.yml@sharedTemplates
+    parameters:
+      name: 'publish_dotnet_api'
+      vmImage: 'ubuntu-22.04'
+      projectName: 'EtherGizmos.Shipyard.Api'
+      artifactName: 'api'
+
+  # Publish dotnet worker
+  - template: dotnet/publish/application.yml@sharedTemplates
+    parameters:
+      name: 'publish_dotnet_worker'
+      vmImage: 'ubuntu-22.04'
+      projectName: 'EtherGizmos.Shipyard.Worker'
+      artifactName: 'worker'
+
+  # Publish angular web ui
+  - template: node/publish/application.yml@sharedTemplates
+    parameters:
+      name: 'publish_node_webui'
+      vmImage: 'ubuntu-22.04'
+      nodeVersion: '22.x.x'
+      buildCommand: 'build'
+      distFolder: 'dist'
+      artifactName: 'webui'

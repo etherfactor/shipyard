@@ -6,7 +6,7 @@ namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers;
 
 internal class PackagesControllerV1Tests : ODataControllerTestsBase<PackageDTO, int>
 {
-    private static readonly IODataResourceSpec<PackageDTO, int> _specification = new CarriersControllerV1Spec();
+    private static readonly IODataResourceSpec<PackageDTO, int> _specification = new PackagesControllerV1Spec();
     private static readonly FixtureContext _context = new(() => Setup.Client, new JwtTokenMinter());
 
     protected override IODataResourceSpec<PackageDTO, int> Specification => _specification;
@@ -58,11 +58,11 @@ internal class PackagesControllerV1Tests : ODataControllerTestsBase<PackageDTO, 
     [TestCaseSource(nameof(All))]
     public async Task Aspect(AspectCase c) => await c.TestAsync(_context);
 
-    private class CarriersControllerV1Source : IRecordSource<PackageDTO, int>
+    private class PackagesControllerV1Source : IRecordSource<PackageDTO, int>
     {
         private readonly IODataResourceSpec<PackageDTO, int> _specification;
 
-        public CarriersControllerV1Source(
+        public PackagesControllerV1Source(
             IODataResourceSpec<PackageDTO, int> specification)
         {
             _specification = specification;
@@ -81,7 +81,7 @@ internal class PackagesControllerV1Tests : ODataControllerTestsBase<PackageDTO, 
         }
     }
 
-    private class CarriersControllerV1Spec : IODataResourceSpec<PackageDTO, int>
+    private class PackagesControllerV1Spec : IODataResourceSpec<PackageDTO, int>
     {
         public string BaseRoute => "api/v1/packages";
 
@@ -106,7 +106,7 @@ internal class PackagesControllerV1Tests : ODataControllerTestsBase<PackageDTO, 
 
         public Func<int, string> Path => id => $"({id})";
 
-        public IRecordSource<PackageDTO, int> Records => new CarriersControllerV1Source(_specification);
+        public IRecordSource<PackageDTO, int> Records => new PackagesControllerV1Source(_specification);
 
         public HttpContent Create() =>
             JsonContent.Create(new
