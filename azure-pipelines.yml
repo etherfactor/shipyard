@@ -28,7 +28,7 @@ stages:
   jobs:
 
   ## Perform dotnet unit tests
-  #- template: node/test/test.yml@sharedTemplates
+  #- template: dotnet/test/test.yml@sharedTemplates
   #  parameters:
   #    name: 'test_dotnet_unit'
   #    vmImage: 'ubuntu-22.04'
@@ -38,7 +38,7 @@ stages:
   #    artifactName: 'test-dotnet-unit'
 
   # Perform dotnet integration tests
-  - template: node/test/test.yml@sharedTemplates
+  - template: dotnet/test/test.yml@sharedTemplates
     parameters:
       name: 'test_dotnet_integration'
       vmImage: 'ubuntu-22.04'
