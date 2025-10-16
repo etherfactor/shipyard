@@ -4,7 +4,7 @@ WORKDIR /app
 
 RUN npm install -g pm2 serve
 
-COPY dist/ether-gizmos.shipyard.web/browser/. ./browser
+COPY deploy/web/ether-gizmos.shipyard.web/browser/. ./browser
 
 EXPOSE 8080
 

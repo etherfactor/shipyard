@@ -15,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		azure-pipelines-audit.yml = azure-pipelines-audit.yml
 		azure-pipelines.yml = azure-pipelines.yml
+		compose-prod.yml = compose-prod.yml
 		gitversion.yml = gitversion.yml
 		README.md = README.md
 	EndProjectSection
@@ -48,6 +49,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{FEDE1648-76A0-4976-A5B6-AC8028876B1F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.Api.IntegrationTests", "tests\EtherGizmos.Shipyard.Api.IntegrationTests\EtherGizmos.Shipyard.Api.IntegrationTests.csproj", "{4724B095-C1AF-48E1-B9F7-040A8C348BE6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "containers", "containers", "{8FA3D36E-AD8B-45B7-88D9-D61D4A212B96}"
+	ProjectSection(SolutionItems) = preProject
+		containers\web.dockerfile = containers\web.dockerfile
+		containers\api.dockerfile = containers\api.dockerfile
+		containers\worker.dockerfile = containers\worker.dockerfile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -142,6 +150,7 @@ Global
 		{5793D617-5F3B-4FC2-9B44-5EA76C3E337D} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 		{C332E6D7-0F33-4C09-A62D-AEF694B81235} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 		{4724B095-C1AF-48E1-B9F7-040A8C348BE6} = {FEDE1648-76A0-4976-A5B6-AC8028876B1F}
+		{8FA3D36E-AD8B-45B7-88D9-D61D4A212B96} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FDAA95A9-84A5-47E0-85A2-730CDD821DD7}
