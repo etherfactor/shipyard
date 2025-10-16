@@ -68,6 +68,20 @@ stages:
       vmImage: 'ubuntu-22.04'
       projectName: 'EtherGizmos.Shipyard.Api'
       artifactName: 'api'
+      prepTasks:
+
+      # Install a specific node version
+      - task: NodeTool@0
+        displayName: 'Use Node.js 22.x.x'
+        inputs:
+          versionSpec: '22.x.x'
+
+      # Restore npm packages
+      - task: Npm@1
+        displayName: 'Restore NPM Packages'
+        inputs:
+          command: 'ci'
+          workingDir: './src/EtherGizmos.Shipyard.Api/wwwroot/_src'
 
   # Publish dotnet worker
   - template: dotnet/publish/application.yml@sharedTemplates
@@ -83,6 +97,7 @@ stages:
       name: 'publish_node_webui'
       vmImage: 'ubuntu-22.04'
       nodeVersion: '22.x.x'
+      workingDir: './src/EtherGizmos.Shipyard.Web'
       buildCommand: 'build'
       distFolder: 'dist'
       projectName: 'EtherGizmos.Shipyard.Web'

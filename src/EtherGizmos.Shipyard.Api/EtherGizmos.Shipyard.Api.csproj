@@ -8,8 +8,8 @@
 
   <ItemGroup>
     <Content Exclude="wwwroot/_src/node_modules/bootstrap-icons/font/fonts/**" Include="wwwroot/_src/node_modules/**" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="wwwroot/_src/node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff" TargetPath="wwwroot/css/fonts/bootstrap-icons.woff" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="wwwroot/_src/node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2" TargetPath="wwwroot/css/fonts/bootstrap-icons.woff2" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="wwwroot/_src/node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff" TargetPath="wwwroot/css/fonts/bootstrap-icons.woff" CopyToOutputDirectory="PreserveNewest" Condition="Exists('wwwroot/_src/node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff')" />
+    <Content Include="wwwroot/_src/node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2" TargetPath="wwwroot/css/fonts/bootstrap-icons.woff2" CopyToOutputDirectory="PreserveNewest" Condition="Exists('wwwroot/_src/node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2')" />
   </ItemGroup>
   
   <ItemGroup>
