@@ -85,4 +85,5 @@ stages:
       nodeVersion: '22.x.x'
       buildCommand: 'build'
       distFolder: 'dist'
+      projectName: 'EtherGizmos.Shipyard.Web'
       artifactName: 'webui'
