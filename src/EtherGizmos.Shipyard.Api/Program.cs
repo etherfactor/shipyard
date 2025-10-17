@@ -3,6 +3,7 @@ using EtherGizmos.Common.Configuration;
 using EtherGizmos.Common.Services;
 using EtherGizmos.Shipyard;
 using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Api.Services.Health;
 using EtherGizmos.Shipyard.Api.Services.HostedServices;
 using EtherGizmos.Shipyard.Api.Services.Middleware;
 using EtherGizmos.Shipyard.Configuration;
@@ -11,11 +12,13 @@ using EtherGizmos.Shipyard.Services;
 using JavaScriptEngineSwitcher.Extensions.MsDependencyInjection;
 using JavaScriptEngineSwitcher.V8;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Serilog;
 
@@ -160,6 +163,14 @@ builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddHostedService<InitialConfigSeeder>();
 builder.Services.AddHostedService<OAuth2Seeder>();
 
+// Health
+builder.Services
+    .AddHealthChecks()
+    .AddCheck<DatabaseHealthCheck>(
+        name: "database",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["database"]);
+
 // Rendering
 builder.Services
     .AddJsEngineSwitcher(opt => opt.DefaultEngineName = V8JsEngine.EngineName)
@@ -233,6 +244,12 @@ app.UseSwagger()
     });
 
 app.UseODataRouteDebug();
+
+app
+    .MapHealthChecks("/health", new HealthCheckOptions()
+    {
+        ResponseWriter = HealthExtensions.WriteResponse
+    });
 
 app.UseAuthentication();
 app.UseAuthorization();
