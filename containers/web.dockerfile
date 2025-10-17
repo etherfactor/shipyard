@@ -9,7 +9,8 @@ RUN cp ./browser/assets/config.json ./browser/assets/config.base.json
 
 COPY containers/apply-config-env.js /opt/apply-config-env.js
 COPY containers/docker-entrypoint.web.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+RUN sed -i 's/\r$//' /docker-entrypoint.sh /opt/apply-config-env.js \
+  && chmod +x /docker-entrypoint.sh
 
 EXPOSE 8080
 

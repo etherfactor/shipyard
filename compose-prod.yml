@@ -14,7 +14,7 @@ services:
       restart_policy:
         condition: on-failure
     volumes:
-    - ./db_data:/var/lib/postgresql/data
+    - ./data/db:/var/lib/postgresql/data
 
   rmq:
     image: rabbitmq:4-management-alpine
@@ -99,6 +99,9 @@ services:
 
   web:
     image: ethergizmos/shipyard-web:latest
+    environment:
+      CONFIG__resourceServer: http://localhost:7448/api/v1
+      CONFIG__oauth__authority: http://localhost:7448
     ports:
     - "${SHIPYARD_WEB_PORT:-7447}:8080"
     deploy:

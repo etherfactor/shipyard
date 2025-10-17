@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euxo pipefail
+set -euo pipefail
 
 BASE="/app/browser/assets/config.base.json"
 OUT="/app/browser/assets/config.json"
