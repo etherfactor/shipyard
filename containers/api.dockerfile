@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0
 
 WORKDIR /app
 
-COPY deploy/api/. ./
+COPY containers/deploy/api/. ./
 
 EXPOSE 8080
 
