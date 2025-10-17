@@ -101,4 +101,4 @@ stages:
       buildCommand: 'build'
       distFolder: 'dist'
       projectName: 'EtherGizmos.Shipyard.Web'
-      artifactName: 'webui'
+      artifactName: 'web'
