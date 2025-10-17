@@ -48,6 +48,9 @@ services:
     image: ethergizmos/shipyard-api:latest
     environment:
       ASPNETCORE_URLS: http://+:8080
+      SHIPYARD_BOOTSTRAP_USER: "${SHIPYARD_BOOTSTRAP_USER:-admin}"
+      SHIPYARD_BOOTSTRAP_PASSWORD: "${SHIPYARD_BOOTSTRAP_PASSWORD:-passowrd}"
+      # SHIPYARD_BOOTSTRAP_FORCE: true
       Database__ConnectionId: ComposeDb
       Connections__ComposeDb__Type: Database
       Connections__ComposeDb__PostgreSql__ConnectionString: Host=db;Database=${POSTGRES_DB:-shipyard};Username=${POSTGRES_USER:-shipyard};Password=${POSTGRES_PASSWORD:-mySecure(!)Password}
