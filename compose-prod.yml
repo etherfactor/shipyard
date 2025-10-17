@@ -100,8 +100,8 @@ services:
   web:
     image: ethergizmos/shipyard-web:latest
     environment:
-      CONFIG__resourceServer: http://localhost:7448/api/v1
-      CONFIG__oauth__authority: http://localhost:7448
+      CONFIG__resourceServer: "${SHIPYARD_API_HOST:-http://localhost:7448}/api/v1"
+      CONFIG__oauth__authority: "${SHIPYARD_API_HOST:-http://localhost:7448}"
     ports:
     - "${SHIPYARD_WEB_PORT:-7447}:8080"
     deploy:
