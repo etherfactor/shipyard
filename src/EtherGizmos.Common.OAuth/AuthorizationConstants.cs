@@ -3,7 +3,7 @@ using OpenIddict.Validation.AspNetCore;
 
 namespace EtherGizmos.Common;
 
-internal static class AuthorizationConstants
+public static class AuthorizationConstants
 {
     public static class Cookie
     {
