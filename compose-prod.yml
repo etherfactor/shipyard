@@ -99,7 +99,7 @@ services:
       # Notifications__Email__ConnectionId: MySmtp
       # Notifications__Email__To__0: "${SMTP_RECIPIENT}"
     healthcheck:
-      test: ["CMD-SHELL", "pgrep -f 'EtherGizmos.Shipyard.Worker.dll' >/dev/null && (nc -z rmq 5672 || /bin/busybox nc -z rmq 5672)"]
+      test: ["CMD-SHELL", "grep -qa 'EtherGizmos.Shipyard.Worker' /proc/1/cmdline && bash -c '</dev/tcp/rmq/5672'"]
       interval: 15s
       timeout: 3s
       retries: 5
