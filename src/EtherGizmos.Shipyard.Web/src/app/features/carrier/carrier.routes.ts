@@ -5,6 +5,7 @@ export const CARRIER_ROUTES: ExtendedRoute[] = [
     path: "",
     pathMatch: "full",
     loadComponent: () => import("./pages/carrier-list/carrier-list.component").then(m => m.CarrierListComponent),
+    title: "Shipyard | Carrier List",
     data: {
       breadcrumb: {
         label: "Carrier List",
@@ -17,6 +18,7 @@ export const CARRIER_ROUTES: ExtendedRoute[] = [
     path: "new",
     pathMatch: "full",
     loadComponent: () => import("./pages/carrier-detail/carrier-detail.component").then(m => m.CarrierDetailComponent),
+    title: "Shipyard | New Carrier",
     data: {
       breadcrumb: {
         label: "New Carrier",
@@ -34,6 +36,7 @@ export const CARRIER_ROUTES: ExtendedRoute[] = [
     path: ":carrierId",
     pathMatch: "full",
     loadComponent: () => import("./pages/carrier-detail/carrier-detail.component").then(m => m.CarrierDetailComponent),
+    title: "Shipyard | Carrier #:carrierId",
     data: {
       breadcrumb: {
         label: "Carrier #{carrierId}",
