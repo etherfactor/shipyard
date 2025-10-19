@@ -64,7 +64,7 @@ internal class UnitOfWork : IUnitOfWork
     public int SaveChanges()
     {
         var total = 0;
-        var exceptions = new List<Exception>();
+        var exceptions = new ConcurrentBag<Exception>();
 
         var parallelOptions = new ParallelOptions()
         {
@@ -75,7 +75,8 @@ internal class UnitOfWork : IUnitOfWork
         {
             try
             {
-                total += context.SaveChanges();
+                var count = context.SaveChanges();
+                Interlocked.Add(ref total, count);
             }
             catch (Exception ex)
             {
@@ -115,7 +116,7 @@ internal class UnitOfWork : IUnitOfWork
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var total = 0;
-        var exceptions = new List<Exception>();
+        var exceptions = new ConcurrentBag<Exception>();
 
         var parallelOptions = new ParallelOptions()
         {
@@ -127,7 +128,8 @@ internal class UnitOfWork : IUnitOfWork
         {
             try
             {
-                total += await context.SaveChangesAsync(cancellationToken: cancellationToken);
+                var count = await context.SaveChangesAsync(cancellationToken: cancellationToken);
+                Interlocked.Add(ref total, count);
             }
             catch (Exception ex)
             {
