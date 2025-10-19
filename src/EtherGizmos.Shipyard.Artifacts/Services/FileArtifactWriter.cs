@@ -31,7 +31,13 @@ internal class FileArtifactWriter : IArtifactWriter
         var id = Guid.NewGuid();
 
         var basePath = _options.CurrentValue.BasePath;
-        var fullPath = Path.Combine(basePath, container, $"{id}-{fileName}.{type.ToExtension()}");
+        var fullPath = Path.GetFullPath(Path.Combine(basePath, container, $"{id}-{fileName}.{type.ToExtension()}"));
+
+        var directory = Path.GetDirectoryName(fullPath)!;
+        if (!Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
 
         var artifact = new Artifact()
         {

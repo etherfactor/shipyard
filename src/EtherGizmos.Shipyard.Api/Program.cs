@@ -96,6 +96,7 @@ builder.Services
     .AddUnitOfWork(opt =>
     {
         opt.BindDbContext<ApplicationContext>();
+        opt.BindDbContext<ArtifactContext>();
     });
 
 // Messaging
@@ -110,6 +111,14 @@ builder.Services
             .Bind(opt);
     })
     .AddConsumersFromAssemblies(typeof(Program).Assembly);
+
+// Storage
+builder.Services
+    .AddArtifactReader((opt, conf) =>
+    {
+        conf.GetSection("Artifacts")
+            .Bind(opt);
+    });
 
 // Models
 builder.Services.AddModelValidators();

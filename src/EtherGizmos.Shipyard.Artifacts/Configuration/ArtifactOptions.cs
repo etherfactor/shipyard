@@ -6,4 +6,7 @@ public class ArtifactOptions
 {
     [Required]
     public string BasePath { get; set; } = null!;
+
+    [Required]
+    public DatabaseReferenceOptions Database { get; set; } = null!;
 }

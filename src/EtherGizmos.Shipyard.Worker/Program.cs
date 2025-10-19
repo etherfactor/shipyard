@@ -22,6 +22,7 @@ builder.Services.AddSerilog((services, logger) =>
 // Configuration
 
 builder.Configuration
+    .AddJsonFile($"appsettings.{builder.Environment}.json", optional: true, reloadOnChange: true)
     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
     .AddRemappedEnvironmentVariables(
         (new(@"(?<=[^:_])_(?=[^_])"), "."),
@@ -72,6 +73,7 @@ builder.Services
     .AddUnitOfWork(opt =>
     {
         opt.BindDbContext<ApplicationContext>();
+        opt.BindDbContext<ArtifactContext>();
     });
 
 // Messaging
@@ -96,6 +98,14 @@ builder.Services
             .Bind(opt);
     })
     .AddConsumersFromAssemblies(typeof(Program).Assembly);
+
+// Storage
+builder.Services
+    .AddArtifactWriter((opt, conf) =>
+    {
+        conf.GetSection("Artifacts")
+            .Bind(opt);
+    });
 
 // Tracking
 builder.Services

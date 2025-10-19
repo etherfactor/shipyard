@@ -6,6 +6,7 @@ using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
@@ -69,12 +70,24 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
         };
         var results = new Dictionary<string, object>();
 
+        var runId = Guid.NewGuid();
+        var artifactWriter = _serviceProvider.GetRequiredService<IArtifactWriter>();
+
         var index = 0;
         ApplyLogger(runbook);
         foreach (var step in runbook)
         {
             step.Index = ++index;
             await step.Apply(_browserClient, variables, results, cancellationToken);
+
+            var html = await _browserClient.GetHtmlAsync(cancellationToken);
+            var webp = await _browserClient.GetScreenshotAsync(cancellationToken);
+
+            var htmlUri = await artifactWriter.WriteForRunAsync(runId, ArtifactType.Text, $"page-{index}", new MemoryStream(Encoding.UTF8.GetBytes(html)), cancellationToken: cancellationToken);
+            var webpUri = await artifactWriter.WriteForRunAsync(runId, ArtifactType.WebP, $"screenshot-{index}", webp, cancellationToken: cancellationToken);
+
+            _logger.LogInformation("Created HTML artifact {ArtifactUri}", htmlUri);
+            _logger.LogInformation("Created WebP artifact {ArtifactUri}", webpUri);
         }
 
         var estimatedAt = results.TryGetValue("estimatedAt", out object? estimatedAtObj)

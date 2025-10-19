@@ -28,7 +28,7 @@ public class ArtifactContext : DbContext
         // Add Entities
 
         modelBuilder.ApplyConfigurationsFromAssembly(
-            typeof(ApplicationContext).Assembly);
+            typeof(ArtifactContext).Assembly);
 
         //**********************************************************
         // Add Value Converters

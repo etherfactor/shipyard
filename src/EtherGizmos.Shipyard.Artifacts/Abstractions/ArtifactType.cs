@@ -3,7 +3,7 @@
 public enum ArtifactType
 {
     Text = 1,
-    Webp = 10,
+    WebP = 10,
 }
 
 public static class ArtifactTypeExtensions
@@ -14,7 +14,7 @@ public static class ArtifactTypeExtensions
         return @this switch
         {
             ArtifactType.Text => "txt",
-            ArtifactType.Webp => "webp",
+            ArtifactType.WebP => "webp",
             _ => throw new NotSupportedException()
         };
     }

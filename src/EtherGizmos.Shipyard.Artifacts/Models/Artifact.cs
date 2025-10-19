@@ -43,6 +43,9 @@ public class ArtifactConfiguration : IEntityTypeConfiguration<Artifact>
         entity.Property(e => e.Type)
             .HasColumnName("artifact_type_id");
 
+        entity.Property(e => e.FileName)
+            .HasColumnName("file_name");
+
         entity.Property(e => e.Bytes)
             .HasColumnName("bytes");
 
