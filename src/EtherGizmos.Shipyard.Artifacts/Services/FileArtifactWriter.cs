@@ -61,6 +61,8 @@ internal class FileArtifactWriter : IArtifactWriter
 
         await data.CopyToAsync(gz, cancellationToken);
 
+        gz.Dispose();
+
         var info = new FileInfo(fullPath);
         artifact.Bytes = info.Length;
 
