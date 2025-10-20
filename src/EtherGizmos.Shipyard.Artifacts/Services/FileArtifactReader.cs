@@ -1,6 +1,7 @@
 ﻿using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Models;
 using Microsoft.EntityFrameworkCore;
+using System.IO.Compression;
 
 namespace EtherGizmos.Shipyard.Services;
 
@@ -25,7 +26,8 @@ internal class FileArtifactReader : IArtifactReader
             ?? throw new InvalidOperationException($"The following artifact uri is invalid: {identifier.Uri}");
 
         var fs = new FileStream(artifact.PhysicalPath, FileMode.Open, FileAccess.Read);
+        var gz = new GZipStream(fs, CompressionMode.Decompress);
 
-        return (artifact.Type, fs);
+        return (artifact.Type, gz);
     }
 }

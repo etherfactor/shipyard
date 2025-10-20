@@ -2,6 +2,7 @@
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Models;
 using Microsoft.Extensions.Options;
+using System.IO.Compression;
 using System.Transactions;
 
 namespace EtherGizmos.Shipyard.Services;
@@ -31,7 +32,7 @@ internal class FileArtifactWriter : IArtifactWriter
         var id = Guid.NewGuid();
 
         var basePath = _options.CurrentValue.BasePath;
-        var fullPath = Path.GetFullPath(Path.Combine(basePath, container, $"{id}-{fileName}.{type.ToExtension()}"));
+        var fullPath = Path.GetFullPath(Path.Combine(basePath, container, $"{id}-{fileName}.{type.ToExtension()}.gz"));
 
         var directory = Path.GetDirectoryName(fullPath)!;
         if (!Directory.Exists(directory))
@@ -43,7 +44,7 @@ internal class FileArtifactWriter : IArtifactWriter
         {
             Uri = $"artifact://{container}/{id}",
             Type = type,
-            Bytes = data.Length,
+            Bytes = 0,
             FileName = fileName,
             PhysicalPath = fullPath,
         };
@@ -56,7 +57,14 @@ internal class FileArtifactWriter : IArtifactWriter
         await uow.SaveChangesAsync(cancellationToken);
 
         using var fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write);
-        await data.CopyToAsync(fs, cancellationToken);
+        using var gz = new GZipStream(fs, CompressionLevel.SmallestSize);
+
+        await data.CopyToAsync(gz, cancellationToken);
+
+        var info = new FileInfo(fullPath);
+        artifact.Bytes = info.Length;
+
+        await uow.SaveChangesAsync(cancellationToken);
 
         scope.Complete();
 
