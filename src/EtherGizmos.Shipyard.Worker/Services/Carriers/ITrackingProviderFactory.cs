@@ -2,5 +2,5 @@
 
 public interface ITrackingProviderFactory
 {
-    ITrackingProvider CreateProvider(string slug);
+    ITrackingProvider CreateProvider(int carrierId, int executionId);
 }

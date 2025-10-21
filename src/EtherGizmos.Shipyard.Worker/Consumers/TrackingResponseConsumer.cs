@@ -92,6 +92,22 @@ public class TrackingResponseConsumer : IMessageConsumer<TrackingResponse>
                 + TimeSpan.FromHours(6) * (double)statusType.PollingFactor;
         }
 
+        var executionRepo = uow.Repository<CarrierExecution>();
+        var execution = await executionRepo.Data.SingleOrDefaultAsync(e => e.Id == message.ExecutionId, cancellationToken: context.CancellationToken);
+        if (execution is not null)
+        {
+            execution.ExecutionStatus = ExecutionStatusType.Successful;
+            execution.Artifacts = [.. message.Artifacts.Select(e => new CarrierExecutionArtifact()
+            {
+                ArtifactUri = e.ArtifactUri,
+                StepIndex = e.StepIndex,
+            })];
+        }
+        else
+        {
+            _logger.LogWarning("Tracking response contained a non-existent execution id: {CarrierExecutionId}", message.ExecutionId);
+        }
+
         await uow.SaveChangesAsync(context.CancellationToken);
 
         if (initialStatus != package.LastStatusTypeId)

@@ -14,7 +14,7 @@ public static class IArtifactWriterExtensions
 {
     public static async Task<ArtifactUri> WriteForRunAsync(
         this IArtifactWriter @this,
-        Guid runId,
+        int runId,
         ArtifactType type,
         string fileName,
         Stream data,

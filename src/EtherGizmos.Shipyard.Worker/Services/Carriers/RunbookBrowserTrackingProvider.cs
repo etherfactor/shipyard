@@ -21,7 +21,8 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
     private readonly IServiceProvider _serviceProvider;
     private readonly IUnitOfWorkFactory _uowFactory;
     private readonly IBrowserClient _browserClient;
-    private readonly string _slug;
+    private readonly int _carrierId;
+    private readonly int _executionId;
 
     private bool _disposed;
 
@@ -37,13 +38,15 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
 
     public RunbookBrowserTrackingProvider(
         IServiceProvider serviceProvider,
-        string slug)
+        int carrierId,
+        int executionId)
     {
         _serviceProvider = serviceProvider;
         _logger = serviceProvider.GetRequiredService<ILogger<RunbookBrowserTrackingProvider>>();
         _uowFactory = serviceProvider.GetRequiredService<IUnitOfWorkFactory>();
         _browserClient = serviceProvider.GetRequiredService<IBrowserClient>();
-        _slug = slug;
+        _carrierId = carrierId;
+        _executionId = executionId;
     }
 
     public async Task<TrackingResult> TrackAsync(string trackingNumber, CancellationToken cancellationToken = default)
@@ -51,7 +54,7 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
         using var uow = _uowFactory.Create();
         var carrierRepo = uow.Repository<Carrier>();
 
-        var carrier = await carrierRepo.Data.SingleAsync(e => e.Slug == _slug, cancellationToken: cancellationToken);
+        var carrier = await carrierRepo.Data.SingleAsync(e => e.Id == _carrierId, cancellationToken: cancellationToken);
 
         var runbookRaw = carrier
             .Steps
@@ -70,8 +73,10 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
         };
         var results = new Dictionary<string, object>();
 
-        var runId = Guid.NewGuid();
+        var runId = _executionId;
         var artifactWriter = _serviceProvider.GetRequiredService<IArtifactWriter>();
+
+        var artifacts = new List<TrackingResultArtifact>();
 
         var index = 0;
         ApplyLogger(runbook);
@@ -88,6 +93,18 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
 
             _logger.LogInformation("Created HTML artifact {ArtifactUri}", htmlUri);
             _logger.LogInformation("Created WebP artifact {ArtifactUri}", webpUri);
+
+            artifacts.Add(new()
+            {
+                ArtifactUri = htmlUri.Uri,
+                StepIndex = (short)step.Index,
+            });
+
+            artifacts.Add(new()
+            {
+                ArtifactUri = webpUri.Uri,
+                StepIndex = (short)step.Index,
+            });
         }
 
         var estimatedAt = results.TryGetValue("estimatedAt", out object? estimatedAtObj)
@@ -136,11 +153,14 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
         details = details
             .Where(e => e.OccurredAt != DateTimeOffset.MinValue);
 
+        artifacts.AddRange(runbook.SelectMany(e => e.Artifacts));
+
         var result = new TrackingResult()
         {
             TrackingNumber = trackingNumber,
             EstimatedDeliveryAt = estimatedAt,
             Details = [.. details],
+            Artifacts = [.. artifacts],
         };
 
         return result;

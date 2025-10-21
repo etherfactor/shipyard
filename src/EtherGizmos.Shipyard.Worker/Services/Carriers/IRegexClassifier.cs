@@ -2,5 +2,5 @@
 
 public interface IRegexClassifier
 {
-    Task<int> ClassifyStatusAsync(string slug, string description, CancellationToken cancellationToken = default);
+    Task<int> ClassifyStatusAsync(int carrierId, string description, CancellationToken cancellationToken = default);
 }

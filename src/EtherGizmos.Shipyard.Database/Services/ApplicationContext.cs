@@ -13,6 +13,10 @@ public class ApplicationContext : DbContext
 {
     public virtual DbSet<Carrier> Carriers { get; set; }
 
+    public virtual DbSet<CarrierExecution> CarrierExecutions { get; set; }
+
+    public virtual DbSet<CarrierExecutionArtifact> CarrierExecutionArtifacts { get; set; }
+
     public virtual DbSet<Package> Packages { get; set; }
 
     public virtual DbSet<StatusType> StatusTypes { get; set; }

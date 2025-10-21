@@ -27,12 +27,13 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
         var message = context.Message;
         _logger.LogInformation("Received request message {@Message}", message);
 
-        using var tracker = _trackingProviderFactory.CreateProvider(message.CarrierSlug);
+        using var tracker = _trackingProviderFactory.CreateProvider(message.CarrierId, message.ExecutionId);
 
         var result = await tracker.TrackAsync(message.TrackingNumber, context.CancellationToken);
 
         await _sender.SendAsync("tracking-poll-response", new TrackingResponse()
         {
+            ExecutionId = message.ExecutionId,
             PackageId = message.PackageId,
             EstimatedDeliveryAt = result.EstimatedDeliveryAt,
             Details = [.. result.Details.Select(e => new TrackingResponseDetail()
@@ -41,6 +42,11 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
                 StatusTypeId = e.StatusTypeId,
                 Location = e.Location,
                 Description = e.Description,
+            })],
+            Artifacts = [.. result.Artifacts.Select(e => new TrackingResponseArtifact()
+            {
+                ArtifactUri = e.ArtifactUri,
+                StepIndex = e.StepIndex,
             })],
         }, cancellationToken: context.CancellationToken);
     }

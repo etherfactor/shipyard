@@ -19,7 +19,7 @@ internal class RegexClassifier : IRegexClassifier
     }
 
     public async Task<int> ClassifyStatusAsync(
-        string slug,
+        int carrierId,
         string description,
         CancellationToken cancellationToken = default)
     {
@@ -28,7 +28,7 @@ internal class RegexClassifier : IRegexClassifier
         var carrierRepo = uow.Repository<Carrier>();
 
         _carrier ??= await carrierRepo.Data
-            .SingleAsync(e => e.Slug == slug, cancellationToken: cancellationToken);
+            .SingleAsync(e => e.Id == carrierId, cancellationToken: cancellationToken);
 
         foreach (var rule in _carrier.Rules.OrderBy(e => e.Priority))
         {

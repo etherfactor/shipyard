@@ -4,6 +4,7 @@ using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Messages;
 using EtherGizmos.Shipyard.Models.Api.Errors;
@@ -135,10 +136,24 @@ public class PackagesController : AutoODataController
                 .Return();
         }
 
+        var executionRepo = uow.Repository<CarrierExecution>();
+
+        var execution = new CarrierExecution()
+        {
+            CarrierId = package.CarrierId,
+            ExecutionStatus = ExecutionStatusType.Queued,
+            StepCount = (short)package.Carrier.Steps.Count,
+        };
+
+        executionRepo.Create(execution);
+
+        await uow.SaveChangesAsync(cancellationToken);
+
         await _sender.SendAsync("tracking-poll-request", new TrackingRequest()
         {
+            ExecutionId = execution.Id,
             PackageId = package.Id,
-            CarrierSlug = package.Carrier.Slug,
+            CarrierId = package.CarrierId,
             TrackingNumber = package.TrackingNumber,
         }, cancellationToken: cancellationToken);
 

@@ -5,7 +5,7 @@ import { StatusType } from "../../package/models/status-type";
 
 export const CarrierStatusRuleZ = z.object({
   createdAt: DateTimeZ,
-  modifiedAt: DateTimeZ,
+  modifiedAt: DateTimeZ.nullish(),
   pattern: z.string(),
   statusType: z.nativeEnum(StatusType),
   priority: z.number().int(),

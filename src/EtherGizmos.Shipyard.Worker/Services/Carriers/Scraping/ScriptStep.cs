@@ -327,6 +327,7 @@ internal class ScriptStep : ScrapingStep
                 TrackingNumber = "",
                 EstimatedDeliveryAt = eta,
                 Details = events,
+                Artifacts = [],
             };
         }
     }

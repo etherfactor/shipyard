@@ -9,4 +9,6 @@ public record TrackingResult
     public required DateTimeOffset? EstimatedDeliveryAt { get; init; }
 
     public required IReadOnlyList<TrackingResultDetail> Details { get; init; }
+
+    public required IReadOnlyList<TrackingResultArtifact> Artifacts { get; init; }
 }
