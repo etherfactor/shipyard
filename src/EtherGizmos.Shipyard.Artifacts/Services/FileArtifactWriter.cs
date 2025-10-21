@@ -20,7 +20,7 @@ internal class FileArtifactWriter : IArtifactWriter
         _uowFactory = uowFactory;
     }
 
-    public async Task<ArtifactUri> WriteAsync(
+    public async Task<ArtifactDescriptor> WriteAsync(
         string container,
         ArtifactType type,
         string fileName,
@@ -70,6 +70,6 @@ internal class FileArtifactWriter : IArtifactWriter
 
         scope.Complete();
 
-        return new(artifact.Uri);
+        return new(new(artifact.Uri), artifact.Type, artifact.Bytes);
     }
 }

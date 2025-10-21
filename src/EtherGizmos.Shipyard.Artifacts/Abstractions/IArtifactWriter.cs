@@ -2,7 +2,7 @@
 
 public interface IArtifactWriter
 {
-    Task<ArtifactUri> WriteAsync(
+    Task<ArtifactDescriptor> WriteAsync(
         string container,
         ArtifactType type,
         string fileName,
@@ -12,7 +12,7 @@ public interface IArtifactWriter
 
 public static class IArtifactWriterExtensions
 {
-    public static async Task<ArtifactUri> WriteForRunAsync(
+    public static async Task<ArtifactDescriptor> WriteForRunAsync(
         this IArtifactWriter @this,
         int runId,
         ArtifactType type,

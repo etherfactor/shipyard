@@ -21,6 +21,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Serilog;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -111,6 +112,13 @@ builder.Services
             .Bind(opt);
     })
     .AddConsumersFromAssemblies(typeof(Program).Assembly);
+
+builder.Services
+    .AddOptions<JsonSerializerOptions>("Messaging")
+    .Configure(opt =>
+    {
+        opt.Converters.Add(new ArtifactUriConverter());
+    });
 
 // Storage
 builder.Services

@@ -29,6 +29,12 @@ public class CarrierExecutionArtifactConfiguration : IEntityTypeConfiguration<Ca
         entity.Property(e => e.ArtifactUri)
             .HasColumnName("artifact_uri");
 
+        entity.Property(e => e.ContentType)
+            .HasColumnName("content_type");
+
+        entity.Property(e => e.Bytes)
+            .HasColumnName("bytes");
+
         entity.Property(e => e.StepIndex)
             .HasColumnName("step_index");
     }

@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using System.Text.Json;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -98,6 +99,13 @@ builder.Services
             .Bind(opt);
     })
     .AddConsumersFromAssemblies(typeof(Program).Assembly);
+
+builder.Services
+    .AddOptions<JsonSerializerOptions>("Messaging")
+    .Configure(opt =>
+    {
+        opt.Converters.Add(new ArtifactUriConverter());
+    });
 
 // Storage
 builder.Services

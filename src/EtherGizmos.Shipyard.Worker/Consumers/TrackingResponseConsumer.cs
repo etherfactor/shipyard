@@ -99,7 +99,9 @@ public class TrackingResponseConsumer : IMessageConsumer<TrackingResponse>
             execution.ExecutionStatus = ExecutionStatusType.Successful;
             execution.Artifacts = [.. message.Artifacts.Select(e => new CarrierExecutionArtifact()
             {
-                ArtifactUri = e.ArtifactUri,
+                ArtifactUri = e.Uri,
+                ContentType = e.ContentType,
+                Bytes = e.Bytes,
                 StepIndex = e.StepIndex,
             })];
         }

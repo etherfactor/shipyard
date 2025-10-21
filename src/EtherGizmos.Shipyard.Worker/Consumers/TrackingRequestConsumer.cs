@@ -45,7 +45,9 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
             })],
             Artifacts = [.. result.Artifacts.Select(e => new TrackingResponseArtifact()
             {
-                ArtifactUri = e.ArtifactUri,
+                Uri = e.Uri,
+                ContentType = e.ContentType,
+                Bytes = e.Bytes,
                 StepIndex = e.StepIndex,
             })],
         }, cancellationToken: context.CancellationToken);

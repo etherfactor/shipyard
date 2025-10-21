@@ -56,6 +56,10 @@ public class ApplicationContext : DbContext
             app => app != null ? app.Value.UtcDateTime : null,
             db => db != null ? new DateTimeOffset((DateTime)db, TimeSpan.Zero) : null));
 
+        modelBuilder.AddGlobalValueConverter(new ValueConverter<ArtifactUri, string>(
+            app => app.Value,
+            db => db != null ? new ArtifactUri(db) : default));
+
         modelBuilder.AddGlobalValueConverter(new ValueConverter<IDictionary<string, object?>, string>(
             app => JsonSerializer.Serialize(app, jsonOptions),
             db => JsonSerializer.Deserialize<IDictionary<string, object?>>(db, jsonOptions)!),

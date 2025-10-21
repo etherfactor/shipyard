@@ -88,21 +88,25 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
             var html = await _browserClient.GetHtmlAsync(cancellationToken);
             var webp = await _browserClient.GetScreenshotAsync(cancellationToken);
 
-            var htmlUri = await artifactWriter.WriteForRunAsync(runId, ArtifactType.Text, $"page-{index}", new MemoryStream(Encoding.UTF8.GetBytes(html)), cancellationToken: cancellationToken);
-            var webpUri = await artifactWriter.WriteForRunAsync(runId, ArtifactType.WebP, $"screenshot-{index}", webp, cancellationToken: cancellationToken);
+            var htmlDesc = await artifactWriter.WriteForRunAsync(runId, ArtifactType.Text, $"page-{index}", new MemoryStream(Encoding.UTF8.GetBytes(html)), cancellationToken: cancellationToken);
+            var webpDesc = await artifactWriter.WriteForRunAsync(runId, ArtifactType.WebP, $"screenshot-{index}", webp, cancellationToken: cancellationToken);
 
-            _logger.LogInformation("Created HTML artifact {ArtifactUri}", htmlUri);
-            _logger.LogInformation("Created WebP artifact {ArtifactUri}", webpUri);
+            _logger.LogInformation("Created HTML artifact {ArtifactUri}", htmlDesc);
+            _logger.LogInformation("Created WebP artifact {ArtifactUri}", webpDesc);
 
             artifacts.Add(new()
             {
-                ArtifactUri = htmlUri.Uri,
+                Uri = htmlDesc.Uri,
+                ContentType = htmlDesc.ContentType,
+                Bytes = htmlDesc.Bytes,
                 StepIndex = (short)step.Index,
             });
 
             artifacts.Add(new()
             {
-                ArtifactUri = webpUri.Uri,
+                Uri = webpDesc.Uri,
+                ContentType = webpDesc.ContentType,
+                Bytes = webpDesc.Bytes,
                 StepIndex = (short)step.Index,
             });
         }

@@ -4,6 +4,8 @@ using EtherGizmos.Common.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace EtherGizmos.Common;
 
@@ -23,6 +25,13 @@ public static class IServiceCollectionExtensions
         @this.TryAddSingleton<IMessageSender, MessageSender>();
 
         @this.TryAddSingleton<IMessageSerializer, JsonMessageSerializer>();
+
+        @this.AddOptions<JsonSerializerOptions>("Messaging")
+            .Configure(opt =>
+            {
+                opt.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                opt.Converters.Add(new JsonStringEnumConverter());
+            });
 
         return new MessagingBuilder(@this);
     }

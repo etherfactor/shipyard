@@ -22,8 +22,8 @@ internal class FileArtifactReader : IArtifactReader
         using var uow = _uowFactory.Create();
         var artifactRepo = uow.Repository<Artifact>();
 
-        var artifact = await artifactRepo.Data.SingleOrDefaultAsync(e => e.Uri == identifier.Uri, cancellationToken: cancellationToken)
-            ?? throw new InvalidOperationException($"The following artifact uri is invalid: {identifier.Uri}");
+        var artifact = await artifactRepo.Data.SingleOrDefaultAsync(e => e.Uri == identifier.Value, cancellationToken: cancellationToken)
+            ?? throw new InvalidOperationException($"The following artifact uri is invalid: {identifier.Value}");
 
         var fs = new FileStream(artifact.PhysicalPath, FileMode.Open, FileAccess.Read);
         var gz = new GZipStream(fs, CompressionMode.Decompress);

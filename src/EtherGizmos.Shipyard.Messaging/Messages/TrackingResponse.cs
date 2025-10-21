@@ -1,4 +1,6 @@
-﻿namespace EtherGizmos.Shipyard.Messages;
+﻿using EtherGizmos.Shipyard.Abstractions;
+
+namespace EtherGizmos.Shipyard.Messages;
 
 public record TrackingResponse
 {
@@ -26,7 +28,11 @@ public record TrackingResponseDetail
 
 public record TrackingResponseArtifact
 {
-    public string ArtifactUri { get; init; } = null!;
+    public ArtifactUri Uri { get; init; }
+
+    public string ContentType { get; init; } = null!;
+
+    public long Bytes { get; init; }
 
     public short StepIndex { get; init; }
 }

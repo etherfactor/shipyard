@@ -1,8 +1,14 @@
-﻿namespace EtherGizmos.Shipyard.Worker.Services.Carriers;
+﻿using EtherGizmos.Shipyard.Abstractions;
+
+namespace EtherGizmos.Shipyard.Worker.Services.Carriers;
 
 public record TrackingResultArtifact
 {
-    public string ArtifactUri { get; init; } = null!;
+    public ArtifactUri Uri { get; init; }
+
+    public string ContentType { get; init; } = null!;
+
+    public long Bytes { get; init; }
 
     public short StepIndex { get; init; }
 }
