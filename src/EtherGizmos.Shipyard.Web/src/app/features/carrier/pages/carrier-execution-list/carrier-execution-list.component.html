@@ -1,0 +1,74 @@
+<!-- Header -->
+<div class="row">
+  <div class="col-12 mt-3">
+
+    <detail-header text="Carriers"
+                   subtext="View and configure carrier connections." />
+
+  </div>
+</div>
+
+<!-- Table -->
+<div class="row">
+  <div class="col-12 mt-3">
+
+    <detail-box icon="bi-truck"
+                text="Carriers List">
+      <div class="mt-3">
+        <app-table [data]="records" [minRows]="perPage" [isLoading]="isLoading()"
+                   [sort]="activeSort" (sortChange)="onSortChange($event)"
+                   (filterChange)="onFilterChange($event)">
+          <ng-template #headers>
+            <th app-table-header="carrierId" class="text-nowrap"
+                type="number"
+                [sortable]="true"
+                [filterable]="true">
+              Carrier id
+            </th>
+            <th app-table-header="startedAt" class="text-nowrap"
+                type="datetime"
+                [sortable]="true"
+                [filterable]="true">
+              Started at
+            </th>
+            <th app-table-header="finishedAt" class="text-nowrap"
+                type="datetime"
+                [sortable]="true"
+                [filterable]="true">
+              Finished at
+            </th>
+            <th class="text-nowrap">
+              Actions
+            </th>
+          </ng-template>
+
+          <ng-template #rows let-row>
+            <td class="text-nowrap">
+              {{row.carrierId}}
+            </td>
+            <td class="text-nowrap">
+              {{row.startedAt?.startOf('minute')?.toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) ?? 'Never'}}
+            </td>
+            <td class="text-nowrap">
+              {{row.completedAt?.startOf('minute')?.toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) ?? 'Never'}}
+            </td>
+            <td class="text-nowrap">
+              <a [routerLink]="['/carriers/', row.carrierId, 'executions', row.id]">View</a>
+            </td>
+          </ng-template>
+        </app-table>
+      </div>
+      <div class="mt-3 d-flex justify-content-center">
+        <ngb-pagination [collectionSize]="count"
+                        [pageSize]="perPage"
+                        [page]="page"
+                        (pageChange)="page = $event; search()"
+                        [maxSize]="5"
+                        [rotate]="true"
+                        [boundaryLinks]="true"
+                        [directionLinks]="true"></ngb-pagination>
+      </div>
+    </detail-box>
+
+  </div>
+</div>

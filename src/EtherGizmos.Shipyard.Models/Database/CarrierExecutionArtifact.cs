@@ -17,5 +17,5 @@ public class CarrierExecutionArtifact : Auditable, IEntity
 
     public virtual long Bytes { get; set; }
 
-    public virtual short StepIndex { get; set; }
+    public virtual short? StepIndex { get; set; }
 }
