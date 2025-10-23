@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Web;
 
 namespace EtherGizmos.Shipyard.Worker.Services.Carriers;
 
@@ -69,7 +68,6 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
         var variables = new Dictionary<string, object>()
         {
             { "trackingNumber", trackingNumber },
-            { "entryUrl", $"https://tools.usps.com/go/TrackAction?tLabels={HttpUtility.UrlEncode(trackingNumber)}" },
         };
         var results = new Dictionary<string, object>();
 
