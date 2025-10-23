@@ -6,6 +6,12 @@ public record TrackingResponse
 {
     public int ExecutionId { get; init; }
 
+    public bool IsSuccess { get; set; }
+
+    public DateTimeOffset StartedAt { get; set; }
+
+    public DateTimeOffset CompletedAt { get; set; }
+
     public int PackageId { get; init; }
 
     public DateTimeOffset? EstimatedDeliveryAt { get; init; }

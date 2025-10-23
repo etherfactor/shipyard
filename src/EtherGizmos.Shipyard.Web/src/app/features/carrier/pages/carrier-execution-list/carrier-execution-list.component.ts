@@ -71,9 +71,15 @@ export class CarrierExecutionListComponent extends ListComponent<CarrierExecutio
   protected override getEntitySet(): EntitySet<CarrierExecution> {
     return this.$carrierExecution.search()
       .filter(e =>
-        o.eq(
-          e.prop("carrierId"),
-          o.int(this.id)
+        o.and(
+          o.eq(
+            e.prop("carrierId"),
+            o.int(this.id)
+          ),
+          o.ne(
+            e.prop("startedAt"),
+            o.null()
+          )
         )
       );
   }

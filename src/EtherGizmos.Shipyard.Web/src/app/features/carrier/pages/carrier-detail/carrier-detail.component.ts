@@ -184,9 +184,15 @@ export class CarrierDetailComponent {
 
         const exec = await this.$carrierExecution.search()
           .filter(e =>
-            o.eq(
-              e.prop("carrierId"),
-              o.int(id)
+            o.and(
+              o.eq(
+                e.prop("carrierId"),
+                o.int(id)
+              ),
+              o.ne(
+                e.prop("startedAt"),
+                o.null()
+              )
             )
           )
           .orderBy("startedAt", "desc")

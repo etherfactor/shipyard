@@ -29,27 +29,50 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
 
         using var tracker = _trackingProviderFactory.CreateProvider(message.CarrierId, message.ExecutionId);
 
-        var result = await tracker.TrackAsync(message.TrackingNumber, context.CancellationToken);
-
-        await _sender.SendAsync("tracking-poll-response", new TrackingResponse()
+        var started = DateTimeOffset.UtcNow;
+        try
         {
-            ExecutionId = message.ExecutionId,
-            PackageId = message.PackageId,
-            EstimatedDeliveryAt = result.EstimatedDeliveryAt,
-            Details = [.. result.Details.Select(e => new TrackingResponseDetail()
+            var result = await tracker.TrackAsync(message.TrackingNumber, context.CancellationToken);
+
+            var ended = DateTimeOffset.UtcNow;
+            await _sender.SendAsync("tracking-poll-response", new TrackingResponse()
             {
-                OccurredAt = e.OccurredAt,
-                StatusTypeId = e.StatusTypeId,
-                Location = e.Location,
-                Description = e.Description,
-            })],
-            Artifacts = [.. result.Artifacts.Select(e => new TrackingResponseArtifact()
+                ExecutionId = message.ExecutionId,
+                IsSuccess = true,
+                StartedAt = started,
+                CompletedAt = ended,
+                PackageId = message.PackageId,
+                EstimatedDeliveryAt = result.EstimatedDeliveryAt,
+                Details = [.. result.Details.Select(e => new TrackingResponseDetail()
+                {
+                    OccurredAt = e.OccurredAt,
+                    StatusTypeId = e.StatusTypeId,
+                    Location = e.Location,
+                    Description = e.Description,
+                })],
+                Artifacts = [.. result.Artifacts.Select(e => new TrackingResponseArtifact()
+                {
+                    Uri = e.Uri,
+                    ContentType = e.ContentType,
+                    Bytes = e.Bytes,
+                    StepIndex = e.StepIndex,
+                })],
+            }, cancellationToken: context.CancellationToken);
+        }
+        catch
+        {
+            var ended = DateTimeOffset.UtcNow;
+            await _sender.SendAsync("tracking-poll-response", new TrackingResponse()
             {
-                Uri = e.Uri,
-                ContentType = e.ContentType,
-                Bytes = e.Bytes,
-                StepIndex = e.StepIndex,
-            })],
-        }, cancellationToken: context.CancellationToken);
+                ExecutionId = message.ExecutionId,
+                IsSuccess = false,
+                StartedAt = started,
+                CompletedAt = ended,
+                PackageId = message.PackageId,
+                EstimatedDeliveryAt = null,
+                Details = [],
+                Artifacts = [],
+            }, cancellationToken: context.CancellationToken);
+        }
     }
 }
