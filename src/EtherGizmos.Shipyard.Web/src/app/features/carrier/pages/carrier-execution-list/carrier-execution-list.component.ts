@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EntitySet } from '@ethergizmos/odata-fluent-client';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { ListComponent, TableColumn } from '../../../../shared/components/_base/list/list.component';
@@ -7,11 +7,11 @@ import { DetailBoxComponent } from '../../../../shared/components/detail-box/det
 import { DetailHeaderComponent } from '../../../../shared/components/detail-header/detail-header.component';
 import { TableHeaderComponent } from '../../../../shared/components/table-header/table-header.component';
 import { TableComponent } from '../../../../shared/components/table/table.component';
+import { o } from '../../../../shared/utilities/odata/odata.util';
 import { SortColumn } from '../../../../shared/utilities/sort/sort.util';
 import { NavbarAction } from '../../../app/components/navbar-action/navbar-action.component';
 import { CarrierExecution } from '../../models/carrier-execution';
 import { CarrierExecutionService } from '../../services/carrier-execution/carrier-execution.service';
-import { o } from '../../../../shared/utilities/odata/odata.util';
 
 @Component({
   selector: 'app-carrier-execution-list',
@@ -29,7 +29,10 @@ import { o } from '../../../../shared/utilities/odata/odata.util';
 export class CarrierExecutionListComponent extends ListComponent<CarrierExecution> {
 
   private readonly $carrierExecution = inject(CarrierExecutionService);
+  private readonly $activatedRoute = inject(ActivatedRoute);
   private readonly $router = inject(Router);
+
+  private id!: number;
 
   override readonly perPage: number = 10;
 
@@ -37,6 +40,12 @@ export class CarrierExecutionListComponent extends ListComponent<CarrierExecutio
     column: "startedAt",
     direction: "desc",
   };
+
+  override ngOnInit() {
+    this.id = parseInt(this.$activatedRoute.snapshot.paramMap.get("carrierId")!);
+
+    super.ngOnInit();
+  }
 
   protected override get actions(): NavbarAction[] {
     const actions: NavbarAction[] = [
@@ -64,7 +73,7 @@ export class CarrierExecutionListComponent extends ListComponent<CarrierExecutio
       .filter(e =>
         o.eq(
           e.prop("carrierId"),
-          o.int(5)
+          o.int(this.id)
         )
       );
   }

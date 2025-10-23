@@ -4,18 +4,23 @@ import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EntitySingle } from '@ethergizmos/odata-fluent-client';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { DateTime, Duration } from 'luxon';
 import { DetailBoxButton, DetailBoxComponent } from '../../../../shared/components/detail-box/detail-box.component';
 import { DetailHeaderComponent } from '../../../../shared/components/detail-header/detail-header.component';
 import { ReadonlyFormDirective } from '../../../../shared/directives/readonly-form/readonly-form.directive';
 import { NavbarActionService } from '../../../../shared/services/navbar-action/navbar-action.service';
 import { Bound } from '../../../../shared/utilities/bound/bound.util';
 import { TypedFormGroup, getDirtyFormValues } from '../../../../shared/utilities/form/form.util';
+import { o } from '../../../../shared/utilities/odata/odata.util';
 import { NavbarAction } from '../../../app/components/navbar-action/navbar-action.component';
 import { StatusType, getStatusTypeMetadata } from '../../../package/models/status-type';
 import { RunbookStepComponent } from '../../components/runbook-step/runbook-step.component';
 import { Carrier, carrierForm } from '../../models/carrier';
+import { CarrierExecution } from '../../models/carrier-execution';
 import { CarrierRunbookStep, carrierRunbookStepForm } from '../../models/carrier-runbook-step';
 import { CarrierStatusRule, carrierStatusRuleForm } from '../../models/carrier-status-rule';
+import { ExecutionStatusType, getExecutionStatusTypeMetadata } from '../../models/execution-status-type';
+import { CarrierExecutionService } from '../../services/carrier-execution/carrier-execution.service';
 import { CarrierService } from '../../services/carrier/carrier.service';
 
 @Component({
@@ -36,6 +41,7 @@ import { CarrierService } from '../../services/carrier/carrier.service';
 export class CarrierDetailComponent {
 
   private readonly $carrier = inject(CarrierService);
+  private readonly $carrierExecution = inject(CarrierExecutionService);
   private readonly $form = inject(FormBuilder);
   private readonly $navbarAction = inject(NavbarActionService);
   private readonly $route = inject(ActivatedRoute);
@@ -49,6 +55,11 @@ export class CarrierDetailComponent {
 
   readonly isLoading$$ = computed(() => this.isLoadingStack$$() > 0);
   private readonly isLoadingStack$$ = signal(0);
+
+  readonly exec$$ = signal<CarrierExecution | undefined>(undefined);
+
+  readonly isLoadingExec$$ = computed(() => this.isLoadingExecStack$$() > 0);
+  private readonly isLoadingExecStack$$ = signal(0);
 
   readonly isEditing$$ = signal(false);
 
@@ -113,6 +124,18 @@ export class CarrierDetailComponent {
     return buttons;
   });
 
+  readonly execButtons$$ = computed<DetailBoxButton[]>(() => {
+    const buttons: DetailBoxButton[] = [];
+
+    buttons.push({
+      color: "primary",
+      text: "View all",
+      callback: this.viewExecutions,
+    });
+
+    return buttons;
+  });
+
   constructor() {
     effect(() => this.$navbarAction.setActions(this.actions$$()));
   }
@@ -155,6 +178,25 @@ export class CarrierDetailComponent {
 
       this.carrier$$.set(data);
       this.init();
+
+      try {
+        this.isLoadingExecStack$$.set(this.isLoadingExecStack$$() + 1);
+
+        const exec = await this.$carrierExecution.search()
+          .filter(e =>
+            o.eq(
+              e.prop("carrierId"),
+              o.int(id)
+            )
+          )
+          .orderBy("startedAt", "desc")
+          .execute()
+          .data;
+
+        this.exec$$.set(exec[0]);
+      } finally {
+        this.isLoadingExecStack$$.set(this.isLoadingExecStack$$() - 1);
+      }
     } finally {
       this.isLoadingStack$$.set(this.isLoadingStack$$() - 1);
     }
@@ -294,6 +336,10 @@ export class CarrierDetailComponent {
     form.controls.steps.removeAt(index);
   }
 
+  @Bound viewExecutions() {
+    this.$router.navigate(["/carriers", this.id$$(), "executions"]);
+  }
+
   private clean(step: CarrierRunbookStep) {
     for (const key of Object.keys(step)) {
       if (step[key as keyof typeof step] === undefined || step[key as keyof typeof step] === null) {
@@ -304,6 +350,28 @@ export class CarrierDetailComponent {
     for (const subStep of step.steps ?? []) {
       this.clean(subStep);
     }
+  }
+
+  getExecutionStatusMetadata(statusType: ExecutionStatusType) {
+    return getExecutionStatusTypeMetadata(statusType);
+  }
+
+  getDiffTime(dateTime1: DateTime | null | undefined, dateTime2: DateTime | null | undefined) {
+    if (!dateTime1 || !dateTime2)
+      return "—";
+
+    let duration = Duration.fromMillis(dateTime2.toMillis() - dateTime1.toMillis())
+      .shiftTo("hours", "minutes", "seconds");
+
+    if (duration.hours === 0) {
+      duration = duration.shiftTo("minutes", "seconds");
+
+      if (duration.minutes === 0) {
+        duration = duration.shiftTo("seconds");
+      }
+    }
+
+    return duration.toHuman({ unitDisplay: "short" }).split(",")[0];
   }
 
   StatusType = StatusType;
