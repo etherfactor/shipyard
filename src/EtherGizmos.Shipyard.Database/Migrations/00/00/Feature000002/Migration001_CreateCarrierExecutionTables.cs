@@ -58,7 +58,7 @@ public class Migration001_CreateCarrierExecutionTables : MigrationExtension
             .WithColumn("artifact_uri").AsString(300).NotNullable()
             .WithColumn("content_type").AsString(50).NotNullable()
             .WithColumn("bytes").AsInt64().NotNullable()
-            .WithColumn("step_index").AsInt16().NotNullable();
+            .WithColumn("step_index").AsInt16().Nullable();
 
         Create.AuditTriggerV1("carrier_execution_artifacts", ("carrier_execution_artifact_id", DbType.Int32));
 

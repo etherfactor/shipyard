@@ -11,13 +11,19 @@ using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using System.Text.Json;
 
 var builder = Host.CreateApplicationBuilder(args);
 
+builder.Logging.ClearProviders();
+
 builder.Services.AddSerilog((services, logger) =>
-    logger.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>()));
+    logger.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>()),
+    writeToProviders: true);
+
+builder.Services.AddTeeStreamLogger();
 
 //************************************************************
 // Configuration

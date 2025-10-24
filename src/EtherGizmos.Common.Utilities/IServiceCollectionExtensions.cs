@@ -4,6 +4,7 @@ using EtherGizmos.Common.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using System.Reflection;
 
 namespace EtherGizmos.Common;
@@ -60,6 +61,14 @@ public static class IServiceCollectionExtensions
                     .Bind(opt);
             });
 
+        return @this;
+    }
+
+    public static IServiceCollection AddTeeStreamLogger(
+        this IServiceCollection @this)
+    {
+        @this.AddSingleton<ILoggerProvider, TeeStreamLoggerProvider>();
+        @this.AddSingleton<ITeeStreamScopeFactory, TeeStreamAmbient>();
         return @this;
     }
 

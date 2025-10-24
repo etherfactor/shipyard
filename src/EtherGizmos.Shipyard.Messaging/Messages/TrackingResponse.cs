@@ -40,5 +40,5 @@ public record TrackingResponseArtifact
 
     public long Bytes { get; init; }
 
-    public short StepIndex { get; init; }
+    public short? StepIndex { get; init; }
 }
