@@ -1,3 +1,4 @@
+using EtherGizmos.Common.Extensions;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
@@ -6,6 +7,7 @@ using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -81,16 +83,24 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
         foreach (var step in runbook)
         {
             step.Index = ++index;
+            using (_logger.BeginKeyedScope("FLAG", "STEP_START"))
+                _logger.LogInformation("▶ STEP_START [step={StepIndex}]", step.Index);
+
+            var stopwatch = Stopwatch.StartNew();
+
             await step.Apply(_browserClient, variables, results, cancellationToken);
 
             var html = await _browserClient.GetHtmlAsync(cancellationToken);
             var webp = await _browserClient.GetScreenshotAsync(cancellationToken);
 
-            var htmlDesc = await artifactWriter.WriteForRunAsync(runId, ArtifactFormat.Text, $"page-{index}", new MemoryStream(Encoding.UTF8.GetBytes(html)), cancellationToken: cancellationToken);
-            var webpDesc = await artifactWriter.WriteForRunAsync(runId, ArtifactFormat.WebP, $"screenshot-{index}", webp, cancellationToken: cancellationToken);
+            var htmlDesc = await artifactWriter.WriteForRunAsync(runId, ArtifactFormat.Text, $"page-{step.Index}", new MemoryStream(Encoding.UTF8.GetBytes(html)), cancellationToken: cancellationToken);
+            var webpDesc = await artifactWriter.WriteForRunAsync(runId, ArtifactFormat.WebP, $"screenshot-{step.Index}", webp, cancellationToken: cancellationToken);
 
             _logger.LogInformation("Created HTML artifact {ArtifactUri}", htmlDesc);
             _logger.LogInformation("Created WebP artifact {ArtifactUri}", webpDesc);
+
+            using (_logger.BeginKeyedScope("FLAG", "STEP_END"))
+                _logger.LogInformation("◀ STEP_END ({StepDuration}ms) [step={StepIndex}]", stopwatch.ElapsedMilliseconds, step.Index);
 
             artifacts.Add(new()
             {
