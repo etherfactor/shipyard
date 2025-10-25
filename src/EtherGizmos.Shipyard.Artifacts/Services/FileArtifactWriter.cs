@@ -22,7 +22,7 @@ internal class FileArtifactWriter : IArtifactWriter
 
     public async Task<ArtifactDescriptor> WriteAsync(
         string container,
-        ArtifactType type,
+        ArtifactFormat type,
         string fileName,
         Stream data,
         CancellationToken cancellationToken = default)
@@ -31,8 +31,16 @@ internal class FileArtifactWriter : IArtifactWriter
 
         var id = Guid.NewGuid();
 
+        var useFileName = $"{id}-{fileName}";
+
+        if (!useFileName.EndsWith(type.Extension))
+            useFileName += $".{type.Extension}";
+
+        if (type.ShouldGzip)
+            useFileName += ".gz";
+
         var basePath = _options.CurrentValue.BasePath;
-        var fullPath = Path.GetFullPath(Path.Combine(basePath, container, $"{id}-{fileName}.{type.ToExtension()}.gz"));
+        var fullPath = Path.GetFullPath(Path.Combine(basePath, container, useFileName));
 
         var directory = Path.GetDirectoryName(fullPath)!;
         if (!Directory.Exists(directory))
@@ -43,7 +51,7 @@ internal class FileArtifactWriter : IArtifactWriter
         var artifact = new Artifact()
         {
             Uri = $"artifact://{container}/{id}",
-            Type = type,
+            ContentType = type.ContentType,
             Bytes = 0,
             FileName = fileName,
             PhysicalPath = fullPath,
@@ -57,11 +65,19 @@ internal class FileArtifactWriter : IArtifactWriter
         await uow.SaveChangesAsync(cancellationToken);
 
         using var fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write);
-        using var gz = new GZipStream(fs, CompressionLevel.SmallestSize);
+        var writeToTmp = fs as Stream;
 
-        await data.CopyToAsync(gz, cancellationToken);
+        if (type.ShouldGzip)
+        {
+            var gz = new GZipStream(fs, CompressionLevel.SmallestSize);
+            writeToTmp = gz;
+        }
 
-        gz.Dispose();
+        using var writeTo = writeToTmp;
+
+        await data.CopyToAsync(writeTo, cancellationToken);
+
+        writeTo.Dispose();
 
         var info = new FileInfo(fullPath);
         artifact.Bytes = info.Length;
@@ -70,6 +86,6 @@ internal class FileArtifactWriter : IArtifactWriter
 
         scope.Complete();
 
-        return new(new(artifact.Uri), artifact.Type, artifact.Bytes);
+        return new(new(artifact.Uri), artifact.ContentType, artifact.Bytes);
     }
 }

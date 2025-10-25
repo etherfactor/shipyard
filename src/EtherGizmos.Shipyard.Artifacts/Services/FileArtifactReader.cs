@@ -15,7 +15,7 @@ internal class FileArtifactReader : IArtifactReader
         _uowFactory = uowFactory;
     }
 
-    public async Task<(ArtifactType Type, Stream Stream)> ReadAsync(
+    public async Task<(string ContentType, Stream Stream)> ReadAsync(
         ArtifactUri identifier,
         CancellationToken cancellationToken = default)
     {
@@ -26,8 +26,14 @@ internal class FileArtifactReader : IArtifactReader
             ?? throw new InvalidOperationException($"The following artifact uri is invalid: {identifier.Value}");
 
         var fs = new FileStream(artifact.PhysicalPath, FileMode.Open, FileAccess.Read);
-        var gz = new GZipStream(fs, CompressionMode.Decompress);
+        var readFrom = fs as Stream;
 
-        return (artifact.Type, gz);
+        if (artifact.FileName.EndsWith(".gz"))
+        {
+            var gz = new GZipStream(fs, CompressionMode.Decompress);
+            readFrom = gz;
+        }
+
+        return (artifact.ContentType, readFrom);
     }
 }

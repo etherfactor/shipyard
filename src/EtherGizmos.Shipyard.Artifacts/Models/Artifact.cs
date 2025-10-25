@@ -1,5 +1,4 @@
 ﻿using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -12,7 +11,7 @@ public class Artifact : Auditable, IEntity
 
     public string Uri { get; set; } = null!;
 
-    public ArtifactType Type { get; set; }
+    public string ContentType { get; set; } = null!;
 
     public string FileName { get; set; } = null!;
 
@@ -40,8 +39,8 @@ public class ArtifactConfiguration : IEntityTypeConfiguration<Artifact>
 
         entity.HasAlternateKey(e => e.Uri);
 
-        entity.Property(e => e.Type)
-            .HasColumnName("artifact_type_id");
+        entity.Property(e => e.ContentType)
+            .HasColumnName("content_type");
 
         entity.Property(e => e.FileName)
             .HasColumnName("file_name");

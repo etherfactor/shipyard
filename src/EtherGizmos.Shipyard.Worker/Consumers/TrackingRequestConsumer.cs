@@ -46,7 +46,7 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
 
             tee.Dispose();
             ndjson.Position = 0;
-            var ndjsonDesc = await _artifactWriter.WriteForRunAsync(message.ExecutionId, ArtifactType.Text, $"log", ndjson, cancellationToken: context.CancellationToken);
+            var ndjsonDesc = await _artifactWriter.WriteForRunAsync(message.ExecutionId, ArtifactFormat.NdJson, $"log", ndjson, cancellationToken: context.CancellationToken);
 
             _logger.LogInformation("Created NdJson artifact {ArtifactUri}", ndjsonDesc);
 
@@ -87,7 +87,7 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
 
             tee.Dispose();
             ndjson.Position = 0;
-            var ndjsonDesc = await _artifactWriter.WriteForRunAsync(message.ExecutionId, ArtifactType.Text, $"log", ndjson, cancellationToken: context.CancellationToken);
+            var ndjsonDesc = await _artifactWriter.WriteForRunAsync(message.ExecutionId, ArtifactFormat.NdJson, $"log", ndjson, cancellationToken: context.CancellationToken);
 
             _logger.LogInformation("Created NdJson artifact {ArtifactUri}", ndjsonDesc);
 

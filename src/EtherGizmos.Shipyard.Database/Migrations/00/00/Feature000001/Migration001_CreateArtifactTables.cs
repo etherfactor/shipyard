@@ -11,33 +11,18 @@ public class Migration001_CreateArtifactTables : MigrationExtension
     public override void Up()
     {
         /*
-         * Create [dbo].[artifact_types]
-         */
-        Create.Table("artifact_types")
-            .WithColumn("artifact_type_id").AsInt32().PrimaryKey()
-            .WithAuditColumns()
-            .WithColumn("name").AsString(200).NotNullable()
-            .WithColumn("description").AsString(int.MaxValue).Nullable();
-
-        Create.AuditTriggerV1("artifact_types", ("artifact_type_id", DbType.Int32));
-
-        /*
          * Create [dbo].[artifacts]
          */
         Create.Table("artifacts")
             .WithColumn("artifact_id").AsGuid().PrimaryKey().WithDefault(SystemMethods.NewGuid)
             .WithAuditColumns()
             .WithColumn("uri").AsString(200).NotNullable()
-            .WithColumn("artifact_type_id").AsInt32().NotNullable()
+            .WithColumn("content_type").AsString(100).NotNullable()
             .WithColumn("file_name").AsString(100).NotNullable()
             .WithColumn("bytes").AsInt64().NotNullable()
             .WithColumn("physical_path").AsString(255).NotNullable();
 
         Create.AuditTriggerV1("artifacts", ("artifact_id", DbType.Guid));
-
-        Create.ForeignKey("FK_artifacts_artifact_type_id")
-            .FromTable("artifacts").ForeignColumn("artifact_type_id")
-            .ToTable("artifact_types").PrimaryColumn("artifact_type_id");
 
         Create.Index("IX_artifacts_uri")
             .OnTable("artifacts")

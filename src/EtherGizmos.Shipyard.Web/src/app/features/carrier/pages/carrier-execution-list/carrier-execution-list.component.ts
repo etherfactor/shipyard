@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EntitySet } from '@ethergizmos/odata-fluent-client';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { DateTime, Duration } from 'luxon';
 import { ListComponent, TableColumn } from '../../../../shared/components/_base/list/list.component';
 import { DetailBoxComponent } from '../../../../shared/components/detail-box/detail-box.component';
 import { DetailHeaderComponent } from '../../../../shared/components/detail-header/detail-header.component';
@@ -11,6 +12,7 @@ import { o } from '../../../../shared/utilities/odata/odata.util';
 import { SortColumn } from '../../../../shared/utilities/sort/sort.util';
 import { NavbarAction } from '../../../app/components/navbar-action/navbar-action.component';
 import { CarrierExecution } from '../../models/carrier-execution';
+import { ExecutionStatusType, getExecutionStatusTypeMetadata } from '../../models/execution-status-type';
 import { CarrierExecutionService } from '../../services/carrier-execution/carrier-execution.service';
 
 @Component({
@@ -32,7 +34,7 @@ export class CarrierExecutionListComponent extends ListComponent<CarrierExecutio
   private readonly $activatedRoute = inject(ActivatedRoute);
   private readonly $router = inject(Router);
 
-  private id!: number;
+  protected id!: number;
 
   override readonly perPage: number = 10;
 
@@ -81,6 +83,31 @@ export class CarrierExecutionListComponent extends ListComponent<CarrierExecutio
             o.null()
           )
         )
+      )
+      .expand("carrier", e => e
+        .select("id", "name")
       );
+  }
+  
+  getExecutionStatusMetadata(statusType: ExecutionStatusType) {
+    return getExecutionStatusTypeMetadata(statusType);
+  }
+
+  getDiffTime(dateTime1: DateTime | null | undefined, dateTime2: DateTime | null | undefined) {
+    if (!dateTime1 || !dateTime2)
+      return "—";
+
+    let duration = Duration.fromMillis(dateTime2.toMillis() - dateTime1.toMillis())
+      .shiftTo("hours", "minutes", "seconds");
+
+    if (duration.hours === 0) {
+      duration = duration.shiftTo("minutes", "seconds");
+
+      if (duration.minutes === 0) {
+        duration = duration.shiftTo("seconds");
+      }
+    }
+
+    return duration.toHuman({ unitDisplay: "short" }).split(",")[0];
   }
 }

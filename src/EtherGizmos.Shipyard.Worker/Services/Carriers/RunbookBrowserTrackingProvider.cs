@@ -86,8 +86,8 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
             var html = await _browserClient.GetHtmlAsync(cancellationToken);
             var webp = await _browserClient.GetScreenshotAsync(cancellationToken);
 
-            var htmlDesc = await artifactWriter.WriteForRunAsync(runId, ArtifactType.Text, $"page-{index}", new MemoryStream(Encoding.UTF8.GetBytes(html)), cancellationToken: cancellationToken);
-            var webpDesc = await artifactWriter.WriteForRunAsync(runId, ArtifactType.WebP, $"screenshot-{index}", webp, cancellationToken: cancellationToken);
+            var htmlDesc = await artifactWriter.WriteForRunAsync(runId, ArtifactFormat.Text, $"page-{index}", new MemoryStream(Encoding.UTF8.GetBytes(html)), cancellationToken: cancellationToken);
+            var webpDesc = await artifactWriter.WriteForRunAsync(runId, ArtifactFormat.WebP, $"screenshot-{index}", webp, cancellationToken: cancellationToken);
 
             _logger.LogInformation("Created HTML artifact {ArtifactUri}", htmlDesc);
             _logger.LogInformation("Created WebP artifact {ArtifactUri}", webpDesc);
