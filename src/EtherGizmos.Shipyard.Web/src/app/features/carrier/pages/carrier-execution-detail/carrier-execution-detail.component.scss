@@ -1,0 +1,49 @@
+.log-console {
+  min-height: 360px;
+  max-height: 520px;
+  overflow: auto;
+  font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace;
+  font-size: 12.5px;
+}
+
+.log-line {
+  padding: 2px 0;
+}
+
+.log-marker {
+  color: var(--bs-secondary-color);
+}
+/* gray for STEP_* */
+.log-warn {
+  color: var(--bs-warning-text-emphasis);
+}
+
+.log-error {
+  color: var(--bs-danger-text-emphasis);
+}
+
+.log-src {
+  font-weight: 600;
+  margin: 0 8px;
+  padding: 0 6px;
+  border-radius: 4px;
+}
+
+.log-src-js {
+  background: var(--bs-warning-bg-subtle);
+  color: var(--bs-warning-text-emphasis);
+}
+
+.log-src-dotnet {
+  background: var(--bs-info-bg-subtle);
+  color: var(--bs-info-text-emphasis);
+}
+
+.log-ts {
+  color: var(--bs-secondary-color);
+  margin-right: 6px;
+}
+
+.log-msg {
+  white-space: pre-wrap;
+}

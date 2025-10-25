@@ -71,10 +71,240 @@
   </div>
 </div>
 
+<!-- Actions (under Summary) -->
+<div class="row">
+  <div class="col-12 mt-2">
+    <div class="d-flex gap-2 flex-wrap">
+      <button class="btn btn-primary btn-sm" disabled>
+        <i class="bi bi-arrow-repeat me-1"></i> Re-run
+      </button>
+      <button class="btn btn-outline-secondary btn-sm" disabled>
+        <i class="bi bi-file-zip me-1"></i> Download all (.zip)
+      </button>
+      <button class="btn btn-outline-secondary btn-sm" disabled>
+        <i class="bi bi-journal-code me-1"></i> Open runbook.json
+      </button>
+      <button class="btn btn-outline-secondary btn-sm" disabled>
+        <i class="bi bi-terminal me-1"></i> Open log (.ndjson)
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="row">
   <div class="col-12 mt-3">
     <detail-box icon="bi-window" text="Execution Log">
+      <div class="row">
+        <!-- Left: Steps rail (desktop only) -->
+        <div class="col-lg-3 d-none d-lg-block border-end mt-3">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="fw-semibold small text-uppercase text-muted">Steps</div>
+            <span class="small text-muted">Jump</span>
+          </div>
+
+          <div class="list-group list-group-flush small">
+            <!-- Each item shows a duration chip; chevron is “jump to” affordance -->
+            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+               href="javascript:void(0)" style="cursor: default;">
+              <span><i class="bi bi-chevron-right me-1 text-muted"></i> 1 · Navigate</span>
+              <span class="badge bg-secondary-subtle text-secondary border">0.80s</span>
+            </a>
+            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+               href="javascript:void(0)" style="cursor: default;">
+              <span><i class="bi bi-chevron-right me-1 text-muted"></i> 2 · WaitFor #st_App_View_Details</span>
+              <span class="badge bg-secondary-subtle text-secondary border">1.38s</span>
+            </a>
+            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+               href="javascript:void(0)" style="cursor: default;">
+              <span><i class="bi bi-chevron-right me-1 text-muted"></i> 3 · Click “View Details”</span>
+              <span class="badge bg-secondary-subtle text-secondary border">0.42s</span>
+            </a>
+            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+               href="javascript:void(0)" style="cursor: default;">
+              <span><i class="bi bi-chevron-right me-1 text-muted"></i> 4 · WaitFor #st_Events (visible)</span>
+              <span class="badge bg-secondary-subtle text-secondary border">0.52s</span>
+            </a>
+            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+               href="javascript:void(0)" style="cursor: default;">
+              <span><i class="bi bi-chevron-right me-1 text-muted"></i> 5 · Parse events</span>
+              <span class="badge bg-secondary-subtle text-secondary border">0.61s</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Center: Log viewer -->
+        <div class="col-lg-6 col-12 mt-3">
+          <!-- Mobile jump-to (no steps rail on mobile) -->
+          <div class="d-lg-none mb-2">
+            <label class="form-label small text-muted">Jump to step</label>
+            <select class="form-select form-select-sm" disabled>
+              <option>1 · Navigate (0.80s)</option>
+              <option>2 · WaitFor #st_App_View_Details (1.38s)</option>
+              <option>3 · Click “View Details” (0.42s)</option>
+              <option>4 · WaitFor #st_Events (0.52s)</option>
+              <option>5 · Parse events (0.61s)</option>
+            </select>
+          </div>
+
+          <!-- Log toolbar -->
+          <div class="d-flex gap-2 align-items-center mb-2">
+            <div class="dropdown">
+              <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" disabled>
+                Filter: All
+              </button>
+              <ul class="dropdown-menu">
+                <li><span class="dropdown-item disabled">All</span></li>
+                <li><span class="dropdown-item disabled">Markers only</span></li>
+                <li><span class="dropdown-item disabled">Warnings/Errors</span></li>
+                <li><span class="dropdown-item disabled">JS only</span></li>
+              </ul>
+            </div>
+            <div class="flex-grow-1">
+              <input class="form-control form-control-sm" placeholder="Search logs…" disabled />
+            </div>
+            <button class="btn btn-outline-secondary btn-sm" disabled>
+              <i class="bi bi-funnel"></i>
+            </button>
+          </div>
+
+          <!-- Log lines (single-line, colored) -->
+          <div class="border rounded p-2 bg-body-tertiary log-console">
+            <!-- STEP_START (muted gray) -->
+            <div class="log-line log-marker">
+              <span class="log-ts">16:12:03.111</span>
+              <span class="log-src log-src-dotnet">dotnet</span>
+              <span class="log-badge badge bg-secondary-subtle text-secondary border me-1">STEP_START</span>
+              <span class="log-msg">[step=1] Navigate → https://tools.usps.com/go/TrackAction?tLabels={{'9400…'}}</span>
+            </div>
+
+            <!-- JS info (white text) -->
+            <div class="log-line">
+              <span class="log-ts">16:12:03.566</span>
+              <span class="log-src log-src-js">js</span>
+              <span class="log-lvl badge bg-light text-dark border me-1">INFO</span>
+              <span class="log-msg">console.log: initializing tracker UI</span>
+            </div>
+
+            <!-- Artifact (blue emphasis) -->
+            <div class="log-line">
+              <span class="log-ts">16:12:04.007</span>
+              <span class="log-src log-src-dotnet">dotnet</span>
+              <span class="log-badge badge bg-primary-subtle text-primary border me-1">ARTIFACT</span>
+              <span class="log-msg">
+                [step=1] <span class="text-primary fw-semibold">screenshot-1</span>
+                <span class="text-muted">image/webp · 90 KB</span>
+                <button class="btn btn-link btn-sm p-0 ms-2" disabled>View</button>
+                <button class="btn btn-link btn-sm p-0" disabled>Download</button>
+              </span>
+            </div>
+
+            <!-- Warning (yellow) -->
+            <div class="log-line log-warn">
+              <span class="log-ts">16:12:05.118</span>
+              <span class="log-src log-src-js">js</span>
+              <span class="log-lvl badge bg-warning-subtle text-warning border me-1">WARN</span>
+              <span class="log-msg">console.warn: deprecation warning…</span>
+            </div>
+
+            <!-- STEP_END (muted gray, with duration) -->
+            <div class="log-line log-marker">
+              <span class="log-ts">16:12:04.330</span>
+              <span class="log-src log-src-dotnet">dotnet</span>
+              <span class="log-badge badge bg-secondary-subtle text-secondary border me-1">STEP_END</span>
+              <span class="log-msg">[step=1] completed in 0.80s</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Artifacts quick access (desktop); collapses below on mobile -->
+        <div class="col-lg-3 col-12 mt-3">
+          <div class="fw-semibold small text-uppercase text-muted mb-2">Artifacts</div>
+
+          <div class="mb-3">
+            <div class="text-muted small mb-1">Execution</div>
+            <div class="card card-body py-2 px-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="small">
+                  execution.ndjson<br />
+                  <span class="text-muted">application/x-ndjson</span>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm" disabled>Download</button>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <div class="small">
+                  runbook.json<br />
+                  <span class="text-muted">application/json</span>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm" disabled>Download</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="text-muted small mb-1">Step 1</div>
+            <div class="card card-body py-2 px-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="small">screenshot-1.webp<br /><span class="text-muted">image/webp</span></div>
+                <button class="btn btn-outline-secondary btn-sm" disabled>View</button>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <div class="small">page-1.html<br /><span class="text-muted">text/html</span></div>
+                <button class="btn btn-outline-secondary btn-sm" disabled>Download</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="text-muted small mb-1">Step 3</div>
+            <div class="card card-body py-2 px-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="small">screenshot-3.webp<br /><span class="text-muted">image/webp</span></div>
+                <button class="btn btn-outline-secondary btn-sm" disabled>View</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </detail-box>
+  </div>
+</div>
+
+<!-- (Optional) Simple modals to preview artifacts -->
+<div class="modal fade" id="artifactImageModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title">Screenshot — step N</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" disabled></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center">
+          <div class="border rounded bg-body-tertiary" style="height: 420px; display:flex; align-items:center; justify-content:center;">
+            <span class="text-muted">[ image preview placeholder ]</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" disabled>Download</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="artifactGenericModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title">Artifact</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" disabled></button>
+      </div>
+      <div class="modal-body">
+        <pre class="bg-body-tertiary p-3 rounded small m-0">[ preview / filename / mime-type ]</pre>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" disabled>Download</button>
+      </div>
+    </div>
   </div>
 </div>
 }
