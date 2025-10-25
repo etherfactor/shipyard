@@ -2,7 +2,7 @@
 
 public interface IArtifactReader
 {
-    Task<(string ContentType, Stream Stream)> ReadAsync(
+    Task<ArtifactRead> ReadAsync(
         ArtifactUri identifier,
         CancellationToken cancellationToken = default);
 }

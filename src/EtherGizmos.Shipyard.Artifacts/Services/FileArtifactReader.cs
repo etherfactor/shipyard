@@ -15,7 +15,7 @@ internal class FileArtifactReader : IArtifactReader
         _uowFactory = uowFactory;
     }
 
-    public async Task<(string ContentType, Stream Stream)> ReadAsync(
+    public async Task<ArtifactRead> ReadAsync(
         ArtifactUri identifier,
         CancellationToken cancellationToken = default)
     {
@@ -28,12 +28,12 @@ internal class FileArtifactReader : IArtifactReader
         var fs = new FileStream(artifact.PhysicalPath, FileMode.Open, FileAccess.Read);
         var readFrom = fs as Stream;
 
-        if (artifact.FileName.EndsWith(".gz"))
+        if (artifact.PhysicalPath.EndsWith(".gz"))
         {
             var gz = new GZipStream(fs, CompressionMode.Decompress);
             readFrom = gz;
         }
 
-        return (artifact.ContentType, readFrom);
+        return new(identifier, artifact.FileName, artifact.ContentType, artifact.Bytes, readFrom);
     }
 }

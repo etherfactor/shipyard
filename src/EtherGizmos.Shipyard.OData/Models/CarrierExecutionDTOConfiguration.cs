@@ -16,6 +16,10 @@ public class CarrierExecutionDTOConfiguration : IModelConfiguration
         entity.Namespace = "EtherGizmos.Shipyard";
         entity.Name = entity.Name.Replace("DTO", "");
 
+        var readArtifact = entity.Function("readArtifact");
+        readArtifact.Parameter<string>("uri");
+        readArtifact.Returns<Stream>();
+
         entity.IgnoreAll();
 
         if (apiVersion >= ApiVersions.V0_1)

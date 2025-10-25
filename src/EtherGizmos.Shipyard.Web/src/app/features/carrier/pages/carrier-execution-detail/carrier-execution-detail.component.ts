@@ -93,6 +93,10 @@ export class CarrierExecutionDetailComponent {
       const data = await exec.data;
 
       this.carrierExecution$$.set(data);
+
+      const uri = data.artifacts.find(e => e.contentType === "application/x-ndjson")!.artifactUri;
+      const resp = await this.$carrierExecution.readArtifact(id, uri).execute().data;
+      console.log(resp);
     } finally {
       this.isLoadingStack$$.set(this.isLoadingStack$$() - 1);
     }

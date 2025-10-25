@@ -24,7 +24,17 @@ export class CarrierExecutionService {
       })
       .build();
 
-    this.$set = set;
+    const readArtifact = this.$odata
+      .function(set, "readArtifact")
+      .withDefaultMethod()
+      .withParameters({ uri: o.paramString })
+      .withSingleResponse<string>()
+      .build();
+
+    const set2 = this.$odata.bind
+      .function(set, { readArtifact });
+
+    this.$set = set2;
   }
 
   search() {
@@ -33,5 +43,9 @@ export class CarrierExecutionService {
 
   get(id: number) {
     return this.$set.read(id);
+  }
+
+  readArtifact(id: number, uri: string) {
+    return this.$set.functions.readArtifact.invoke(id, { uri });
   }
 }
