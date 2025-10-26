@@ -85,31 +85,16 @@
 
           <div class="list-group list-group-flush small">
             <!-- Each item shows a duration chip; chevron is “jump to” affordance -->
+            @let sections = sections$$();
+            @for (section of sections; track section) {
             <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-               href="javascript:void(0)" style="cursor: default;">
-              <span><i class="bi bi-chevron-right me-1 text-muted"></i> 1 · Navigate</span>
-              <span class="badge bg-secondary-subtle text-secondary border">0.80s</span>
+               href="javascript:void(0)" (click)="jumpToStep(section.step)">
+              <div style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                <span><i class="bi bi-chevron-right me-1 text-muted"></i> {{section.step}} · {{section.name}}</span>
+              </div>
+              <span class="badge bg-secondary-subtle text-secondary border">{{section.duration}}s</span>
             </a>
-            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-               href="javascript:void(0)" style="cursor: default;">
-              <span><i class="bi bi-chevron-right me-1 text-muted"></i> 2 · WaitFor #st_App_View_Details</span>
-              <span class="badge bg-secondary-subtle text-secondary border">1.38s</span>
-            </a>
-            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-               href="javascript:void(0)" style="cursor: default;">
-              <span><i class="bi bi-chevron-right me-1 text-muted"></i> 3 · Click “View Details”</span>
-              <span class="badge bg-secondary-subtle text-secondary border">0.42s</span>
-            </a>
-            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-               href="javascript:void(0)" style="cursor: default;">
-              <span><i class="bi bi-chevron-right me-1 text-muted"></i> 4 · WaitFor #st_Events (visible)</span>
-              <span class="badge bg-secondary-subtle text-secondary border">0.52s</span>
-            </a>
-            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-               href="javascript:void(0)" style="cursor: default;">
-              <span><i class="bi bi-chevron-right me-1 text-muted"></i> 5 · Parse events</span>
-              <span class="badge bg-secondary-subtle text-secondary border">0.61s</span>
-            </a>
+            }
           </div>
         </div>
 
@@ -149,17 +134,16 @@
           </div>
 
           <!-- Log lines (single-line, colored) -->
-          <div class="border rounded p-2 bg-body-tertiary log-console">
+          <div class="border rounded p-2 bg-body-tertiary log-console" id="logView">
 
             @let logs = logs$$();
             @for (log of logs; track log) {
 
             @if (log.properties["FLAG"] === "STEP_START") {
             <!-- STEP_START (muted gray) -->
-            <div class="log-line log-marker">
+            <div class="log-line log-marker" [attr.data-sy-stepid]="log.properties['Step']">
               <span class="log-ts">{{log.timestamp.toISOTime({ includeOffset: false })}}</span>
-              <span class="log-src log-src-dotnet">c#</span>
-              <span class="log-badge log-badge-start">STEP_START</span>
+              <span class="log-badge log-badge-marker">BGN</span>
               <span class="log-msg">{{log.message}}</span>
             </div>
 
@@ -167,17 +151,15 @@
             <!-- STEP_END (muted gray, with duration) -->
             <div class="log-line log-marker">
               <span class="log-ts">{{log.timestamp.toISOTime({ includeOffset: false })}}</span>
-              <span class="log-src log-src-dotnet">c#</span>
-              <span class="log-badge log-badge-end">STEP_END</span>
+              <span class="log-badge log-badge-marker">END</span>
               <span class="log-msg">{{log.message}}</span>
             </div>
 
             } @else if (log.properties["FLAG"] === "ARTIFACT") {
             <!-- Artifact (blue emphasis) -->
-            <div class="log-line">
+            <div class="log-line log-marker">
               <span class="log-ts">{{log.timestamp.toISOTime({ includeOffset: false })}}</span>
-              <span class="log-src log-src-dotnet">c#</span>
-              <span class="log-badge log-badge-artifact">ARTIFACT</span>
+              <span class="log-badge log-badge-artifact">AFT</span>
               <span class="log-msg">[step={{log.properties["Step"]}}]
                 <span class="text-primary fw-semibold">{{log.properties["ArtifactName"]}} </span>
                 <span class="text-muted">{{log.properties["ArtifactContentType"]}} · {{log.properties["ArtifactSize"]}} </span>

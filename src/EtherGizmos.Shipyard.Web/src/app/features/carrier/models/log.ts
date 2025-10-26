@@ -57,3 +57,9 @@ const safeJson = (v: any) => {
 };
 
 export interface Log extends z.infer<typeof LogZ> { }
+
+export interface LogSection {
+  step: number;
+  name: string;
+  duration: number;
+}

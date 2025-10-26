@@ -1,5 +1,5 @@
 .log-console {
-  min-height: 360px;
+  min-height: 520px;
   max-height: 520px;
   overflow: auto;
   font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace;
@@ -22,103 +22,108 @@
   color: var(--bs-danger-text-emphasis);
 }
 
-.log-src {
+/* ---------- Base pill styles ---------- */
+.log-lvl,
+.log-src,
+.log-badge {
   font-weight: 600;
   margin: 0 4px;
   padding: 0 6px;
   border-radius: 4px;
+  border: 1px solid transparent;
+  line-height: 1.25;
+  display: inline-flex;
+  align-items: center;
 }
 
+/* Optional: timestamp tint follows line color */
+.log-ts {
+  opacity: .8;
+  margin-right: 6px;
+}
+
+/* ---------- Level badges ---------- */
+.log-lvl-verbose {
+  background: var(--log-verbose-bg);
+  color: var(--log-verbose-fg);
+  border-color: var(--log-verbose-bd);
+}
+
+.log-lvl-debug {
+  background: var(--log-debug-bg);
+  color: var(--log-debug-fg);
+  border-color: var(--log-debug-bd);
+}
+
+.log-lvl-information {
+  background: var(--log-info-bg);
+  color: var(--log-info-fg);
+  border-color: var(--log-info-bd);
+}
+
+.log-lvl-warning {
+  background: var(--log-warn-bg);
+  color: var(--log-warn-fg);
+  border-color: var(--log-warn-bd);
+}
+
+.log-lvl-error {
+  background: var(--log-error-bg);
+  color: var(--log-error-fg);
+  border-color: var(--log-error-bd);
+}
+
+.log-lvl-critical {
+  background: var(--log-critical-bg);
+  color: var(--log-critical-fg);
+  border-color: var(--log-critical-bd);
+}
+
+.log-lvl-fatal {
+  background: var(--log-fatal-bg);
+  color: var(--log-fatal-fg);
+  border-color: var(--log-fatal-bd);
+}
+
+/* ---------- Source chips ---------- */
 .log-src-js {
-  background: var(--bs-warning-bg-subtle);
-  color: var(--bs-warning-text-emphasis);
+  background: var(--log-src-js-bg);
+  color: var(--log-src-js-fg);
+  border-color: var(--log-src-js-bd);
 }
 
 .log-src-dotnet {
-  background: var(--bs-info-bg-subtle);
-  color: var(--bs-info-text-emphasis);
+  background: var(--log-src-dotnet-bg);
+  color: var(--log-src-dotnet-fg);
+  border-color: var(--log-src-dotnet-bd);
 }
 
-.log-lvl {
-  font-weight: 600;
-  margin: 0 4px 0 0;
-  padding: 0 6px;
-  border-radius: 4px;
-}
-
-/* Lightest, low-signal */
-.log-lvl-verbose {
-  background: #e7e9ec;
-  color: #495057;
-  border-color: #d3d6da;
-}
-
-/* Developer-level */
-.log-lvl-debug {
-  background: #d7e3f8;
-  color: #1b4f8a;
-  border-color: #c0d3f2;
-}
-
-/* Normal "happy path" */
-.log-lvl-information {
-  background: #d9f2e4;
-  color: #1c6844;
-  border-color: #c2e8d3;
-}
-
-/* Heads-up */
-.log-lvl-warning {
-  background: #fff3cd;
-  color: #8a6d1b;
-  border-color: #ffe69c;
-}
-
-/* Something failed */
-.log-lvl-error {
-  background: #f8d7da;
-  color: #842029;
-  border-color: #f1aeb5;
-}
-
-/* Very bad */
-.log-lvl-critical {
-  background: #f1b0b7;
-  color: #64121a;
-  border-color: #e28a94;
-}
-
-/* Worst case */
-.log-lvl-fatal {
-  background: #d63333;
-  color: white;
-  border-color: #b02a2a;
-}
-
-.log-badge {
-  font-weight: 600;
-  margin: 0 4px 0 0;
-  padding: 0 6px;
-  border-radius: 4px;
-}
-
-.log-badge-start,
-.log-badge-end {
-  background: var(--bs-secondary-bg-subtle);
-  color: rgba(var(--bs-secondary-rgb));
-  border-color: var(--bs-border-color);
+/* ---------- Marker badges (STEP_START/END, ARTIFACT) ---------- */
+.log-badge-marker {
+  background: var(--log-marker-bg);
+  color: var(--log-marker-fg);
+  border-color: var(--log-marker-bd);
 }
 
 .log-badge-artifact {
-  background: var(--bs-primary-bg-subtle);
-  color: rgba(var(--bs-primary-rgb));
-  border-color: var(--bs-border-color);
+  background: var(--log-artifact-bg);
+  color: var(--log-artifact-fg);
+  border-color: var(--log-artifact-bd);
 }
 
-.log-ts {
-  color: var(--bs-secondary-color);
+/* Optional: make entire line inherit a severity tint */
+.log-line.warn {
+  color: var(--log-warn-fg);
 }
 
-.log-msg {
-  white-space: pre-wrap;
+.log-line.error {
+  color: var(--log-error-fg);
+}
+
+.log-line.crit {
+  color: var(--log-critical-fg);
+}
+
+.log-line.fatal {
+  color: var(--log-fatal-fg);
 }

@@ -12,7 +12,7 @@ import { NavbarAction } from '../../../app/components/navbar-action/navbar-actio
 import { StatusType, getStatusTypeMetadata } from '../../../package/models/status-type';
 import { CarrierExecution } from '../../models/carrier-execution';
 import { ExecutionStatusType, getExecutionStatusTypeMetadata } from '../../models/execution-status-type';
-import { Log, LogZ } from '../../models/log';
+import { Log, LogSection, LogZ } from '../../models/log';
 import { CarrierExecutionService } from '../../services/carrier-execution/carrier-execution.service';
 
 @Component({
@@ -40,6 +40,7 @@ export class CarrierExecutionDetailComponent {
   readonly carrierExecution$$ = signal<CarrierExecution | undefined>(undefined);
 
   readonly logs$$ = signal<Log[]>([]);
+  readonly sections$$ = signal<LogSection[]>([]);
 
   readonly isLoading$$ = computed(() => this.isLoadingStack$$() > 0);
   private readonly isLoadingStack$$ = signal(0);
@@ -102,7 +103,25 @@ export class CarrierExecutionDetailComponent {
 
       const logs = logText.split("\n").map(log => log.trim()).filter(log => log).map(log => LogZ.parse(JSON.parse(log)));
       this.logs$$.set(logs);
-      console.log(logs);
+
+      const sections: LogSection[] = [];
+      let section: LogSection = {} as LogSection;
+      for (const log of logs) {
+        if (log.properties["FLAG"] === "STEP_START") {
+          section = {
+            step: parseInt(log.properties["Step"]),
+            name: log.properties["StepName"],
+            duration: 0,
+          };
+        }
+
+        if (log.properties["FLAG"] === "STEP_END") {
+          section.duration = parseInt(log.properties["StepDuration"]) / 1000.0;
+          sections.push(section);
+        }
+      }
+
+      this.sections$$.set(sections);
     } finally {
       this.isLoadingStack$$.set(this.isLoadingStack$$() - 1);
     }
@@ -128,5 +147,10 @@ export class CarrierExecutionDetailComponent {
     }
 
     return duration.toHuman({ unitDisplay: "short" }).split(",")[0];
+  }
+
+  jumpToStep(step: number) {
+    const log = document.querySelector(`[data-sy-stepid="${step}"]`);
+    log?.scrollIntoView();
   }
 }

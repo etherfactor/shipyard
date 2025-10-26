@@ -85,7 +85,7 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
             step.Index = ++index;
             using var stepmark = _logger.BeginKeyedScope("Step", step.Index);
             using (_logger.BeginKeyedScope("FLAG", "STEP_START"))
-                _logger.LogInformation("[step={StepIndex}] {StepName}", step.Index, step.StepName);
+                _logger.LogInformation("[step={Step}] {StepName}", step.Index, step.StepName);
 
             var stopwatch = Stopwatch.StartNew();
 
@@ -98,7 +98,7 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
             var webpDesc = await artifactWriter.WriteForRunAsync(runId, ArtifactFormat.WebP, $"screenshot-{step.Index}", webp, cancellationToken: cancellationToken);
 
             using (_logger.BeginKeyedScope("FLAG", "STEP_END"))
-                _logger.LogInformation("[step={StepIndex}] completed in {StepDuration}ms", step.Index, stopwatch.ElapsedMilliseconds);
+                _logger.LogInformation("[step={Step}] completed in {StepDuration}ms", step.Index, stopwatch.ElapsedMilliseconds);
 
             artifacts.Add(new()
             {
