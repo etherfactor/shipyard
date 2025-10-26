@@ -12,6 +12,8 @@ public class CarrierExecutionArtifactDTO
 
     public string ContentType { get; set; } = null!;
 
+    public string FileName { get; set; } = null!;
+
     public long Bytes { get; set; }
 
     public short? StepIndex { get; set; }
@@ -27,6 +29,7 @@ public class CarrierExecutionArtifactDTOProfile : Profile
         /*  End Audit  */
         toDto.MapMember(dest => dest.ArtifactUri, src => src.ArtifactUri);
         toDto.MapMember(dest => dest.ContentType, src => src.ContentType);
+        toDto.MapMember(dest => dest.FileName, src => src.FileName);
         toDto.MapMember(dest => dest.Bytes, src => src.Bytes);
         toDto.MapMember(dest => dest.StepIndex, src => src.StepIndex);
     })
@@ -40,6 +43,7 @@ public static class CarrierExecutionArtifactDTOExamples
     {
         ArtifactUri = "artifact://runs/1/00000000-0000-0000-0000-000000000000",
         ContentType = "text/plain; charset=utf8",
+        FileName = "test.txt",
         Bytes = 255,
         StepIndex = 1,
     };

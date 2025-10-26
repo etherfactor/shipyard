@@ -48,6 +48,7 @@ public class TrackingResponseConsumer : IMessageConsumer<TrackingResponse>
             {
                 ArtifactUri = e.Uri,
                 ContentType = e.ContentType,
+                FileName = e.FileName,
                 Bytes = e.Bytes,
                 StepIndex = e.StepIndex,
             })];

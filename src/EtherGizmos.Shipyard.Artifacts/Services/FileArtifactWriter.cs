@@ -36,13 +36,17 @@ internal class FileArtifactWriter : IArtifactWriter
 
         var id = Guid.NewGuid();
 
-        var useFileName = $"{id}-{fileName}";
+        var useFileName = fileName;
 
         if (!useFileName.EndsWith(type.Extension))
             useFileName += $".{type.Extension}";
 
+        var recordFileName = useFileName;
+
         if (type.ShouldGzip)
             useFileName += ".gz";
+
+        useFileName = $"{id}-{useFileName}";
 
         var basePath = _options.CurrentValue.BasePath;
         var fullPath = Path.GetFullPath(Path.Combine(basePath, container, useFileName));
@@ -58,7 +62,7 @@ internal class FileArtifactWriter : IArtifactWriter
             Uri = $"artifact://{container}/{id}",
             ContentType = type.ContentType,
             Bytes = 0,
-            FileName = fileName,
+            FileName = recordFileName,
             PhysicalPath = fullPath,
         };
 
@@ -91,10 +95,6 @@ internal class FileArtifactWriter : IArtifactWriter
 
         scope.Complete();
 
-        var logFileName = fileName;
-        if (!logFileName.EndsWith(type.Extension))
-            logFileName += $".{type.Extension}";
-
         var logSize = artifact.Bytes * 1.0m;
         var logSizeUnit = "B";
 
@@ -120,11 +120,11 @@ internal class FileArtifactWriter : IArtifactWriter
 
         using (_logger.BeginKeyedScope("FLAG", "ARTIFACT"))
             _logger.LogInformation("Created artifact {ArtifactName} ({ArtifactContentType}) with URI {ArtifactUri}, occupying {ArtifactSize}",
-                logFileName,
+                recordFileName,
                 artifact.ContentType,
                 artifact.Uri.ToString(),
                 $"{logSize} {logSizeUnit}");
 
-        return new(new(artifact.Uri), artifact.ContentType, artifact.Bytes);
+        return new(new(artifact.Uri), artifact.ContentType, recordFileName, artifact.Bytes);
     }
 }

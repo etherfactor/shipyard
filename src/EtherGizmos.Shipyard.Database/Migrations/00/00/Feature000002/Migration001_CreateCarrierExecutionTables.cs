@@ -57,6 +57,7 @@ public class Migration001_CreateCarrierExecutionTables : MigrationExtension
             .WithColumn("carrier_execution_id").AsInt32().NotNullable()
             .WithColumn("artifact_uri").AsString(300).NotNullable()
             .WithColumn("content_type").AsString(50).NotNullable()
+            .WithColumn("file_name").AsString(100).NotNullable()
             .WithColumn("bytes").AsInt64().NotNullable()
             .WithColumn("step_index").AsInt16().Nullable();
 

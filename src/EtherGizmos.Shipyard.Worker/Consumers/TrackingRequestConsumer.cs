@@ -71,12 +71,14 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
                 {
                     Uri = e.Uri,
                     ContentType = e.ContentType,
+                    FileName = e.FileName,
                     Bytes = e.Bytes,
                     StepIndex = e.StepIndex,
                 }), new()
                 {
                     Uri = ndjsonDesc.Uri,
                     ContentType = ndjsonDesc.ContentType,
+                    FileName = ndjsonDesc.FileName,
                     Bytes = ndjsonDesc.Bytes,
                     StepIndex = null,
                 }],
@@ -104,6 +106,7 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
                 {
                     Uri = ndjsonDesc.Uri,
                     ContentType = ndjsonDesc.ContentType,
+                    FileName = ndjsonDesc.FileName,
                     Bytes = ndjsonDesc.Bytes,
                     StepIndex = null,
                 }],

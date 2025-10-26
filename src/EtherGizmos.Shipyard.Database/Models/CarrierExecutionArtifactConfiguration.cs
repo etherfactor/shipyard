@@ -32,6 +32,9 @@ public class CarrierExecutionArtifactConfiguration : IEntityTypeConfiguration<Ca
         entity.Property(e => e.ContentType)
             .HasColumnName("content_type");
 
+        entity.Property(e => e.FileName)
+            .HasColumnName("file_name");
+
         entity.Property(e => e.Bytes)
             .HasColumnName("bytes");
 

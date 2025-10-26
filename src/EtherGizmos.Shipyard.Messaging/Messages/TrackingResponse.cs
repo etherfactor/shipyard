@@ -38,6 +38,8 @@ public record TrackingResponseArtifact
 
     public string ContentType { get; init; } = null!;
 
+    public string FileName { get; set; } = null!;
+
     public long Bytes { get; init; }
 
     public short? StepIndex { get; init; }

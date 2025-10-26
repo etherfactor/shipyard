@@ -23,6 +23,7 @@ public class CarrierExecutionArtifactDTOConfiguration : IModelConfiguration
             /*  End Audit  */
             complex.Property(e => e.ArtifactUri);
             complex.Property(e => e.ContentType);
+            complex.Property(e => e.FileName);
             complex.Property(e => e.Bytes);
             complex.Property(e => e.StepIndex);
         }

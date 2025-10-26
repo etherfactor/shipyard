@@ -15,6 +15,8 @@ public class CarrierExecutionArtifact : Auditable, IEntity
 
     public virtual string ContentType { get; set; } = null!;
 
+    public virtual string FileName { get; set; } = null!;
+
     public virtual long Bytes { get; set; }
 
     public virtual short? StepIndex { get; set; }

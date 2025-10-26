@@ -4,6 +4,7 @@ import { formFactoryForModel } from "../../../shared/utilities/form/form.util";
 export const CarrierExecutionArtifactZ = z.object({
   artifactUri: z.string(),
   contentType: z.string(),
+  fileName: z.string(),
   bytes: z.number().int(),
   stepIndex: z.number().int().nullish(),
 });
@@ -15,6 +16,7 @@ export type CarrierExecutionArtifactF = Omit<CarrierExecutionArtifact, "">;
 export const carrierExecutionArtifactForm = formFactoryForModel<CarrierExecutionArtifactF>(($form, model) => ({
   artifactUri: [model.artifactUri],
   contentType: [model.contentType],
+  fileName: [model.fileName],
   bytes: [model.bytes],
   stepIndex: [model.stepIndex],
 }));

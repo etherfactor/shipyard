@@ -104,6 +104,7 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
             {
                 Uri = htmlDesc.Uri,
                 ContentType = htmlDesc.ContentType,
+                FileName = htmlDesc.FileName,
                 Bytes = htmlDesc.Bytes,
                 StepIndex = (short)step.Index,
             });
@@ -112,6 +113,7 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
             {
                 Uri = webpDesc.Uri,
                 ContentType = webpDesc.ContentType,
+                FileName = webpDesc.FileName,
                 Bytes = webpDesc.Bytes,
                 StepIndex = (short)step.Index,
             });
