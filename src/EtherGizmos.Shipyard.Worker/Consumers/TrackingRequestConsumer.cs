@@ -1,4 +1,5 @@
 using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Common.Extensions;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Messages;
 using EtherGizmos.Shipyard.Worker.Services.Carriers;
@@ -34,6 +35,8 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
         var message = context.Message;
         _logger.LogInformation("Received request message {@Message}", message);
 
+        using var dotnet = _logger.BeginKeyedScope("Language", "Dotnet");
+
         var ndjson = new MemoryStream();
         using var tee = _teeScopeFactory.Begin(ndjson);
 
@@ -47,8 +50,6 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
             tee.Dispose();
             ndjson.Position = 0;
             var ndjsonDesc = await _artifactWriter.WriteForRunAsync(message.ExecutionId, ArtifactFormat.NdJson, $"log", ndjson, cancellationToken: context.CancellationToken);
-
-            _logger.LogInformation("Created NdJson artifact {ArtifactUri}", ndjsonDesc);
 
             var ended = DateTimeOffset.UtcNow;
             await _sender.SendAsync("tracking-poll-response", new TrackingResponse()
@@ -88,8 +89,6 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
             tee.Dispose();
             ndjson.Position = 0;
             var ndjsonDesc = await _artifactWriter.WriteForRunAsync(message.ExecutionId, ArtifactFormat.NdJson, $"log", ndjson, cancellationToken: context.CancellationToken);
-
-            _logger.LogInformation("Created NdJson artifact {ArtifactUri}", ndjsonDesc);
 
             var ended = DateTimeOffset.UtcNow;
             await _sender.SendAsync("tracking-poll-response", new TrackingResponse()

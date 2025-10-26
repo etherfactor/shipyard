@@ -71,26 +71,7 @@
   </div>
 </div>
 
-<!-- Actions (under Summary) -->
-<div class="row">
-  <div class="col-12 mt-2">
-    <div class="d-flex gap-2 flex-wrap">
-      <button class="btn btn-primary btn-sm" disabled>
-        <i class="bi bi-arrow-repeat me-1"></i> Re-run
-      </button>
-      <button class="btn btn-outline-secondary btn-sm" disabled>
-        <i class="bi bi-file-zip me-1"></i> Download all (.zip)
-      </button>
-      <button class="btn btn-outline-secondary btn-sm" disabled>
-        <i class="bi bi-journal-code me-1"></i> Open runbook.json
-      </button>
-      <button class="btn btn-outline-secondary btn-sm" disabled>
-        <i class="bi bi-terminal me-1"></i> Open log (.ndjson)
-      </button>
-    </div>
-  </div>
-</div>
-
+<!-- Execution Log -->
 <div class="row">
   <div class="col-12 mt-3">
     <detail-box icon="bi-window" text="Execution Log">
@@ -169,50 +150,79 @@
 
           <!-- Log lines (single-line, colored) -->
           <div class="border rounded p-2 bg-body-tertiary log-console">
+
+            @let logs = logs$$();
+            @for (log of logs; track log) {
+
+            @if (log.properties["FLAG"] === "STEP_START") {
             <!-- STEP_START (muted gray) -->
             <div class="log-line log-marker">
-              <span class="log-ts">16:12:03.111</span>
-              <span class="log-src log-src-dotnet">dotnet</span>
-              <span class="log-badge badge bg-secondary-subtle text-secondary border me-1">STEP_START</span>
-              <span class="log-msg">[step=1] Navigate → https://tools.usps.com/go/TrackAction?tLabels={{'9400…'}}</span>
+              <span class="log-ts">{{log.timestamp.toISOTime({ includeOffset: false })}}</span>
+              <span class="log-src log-src-dotnet">c#</span>
+              <span class="log-badge log-badge-start">STEP_START</span>
+              <span class="log-msg">{{log.message}}</span>
             </div>
 
-            <!-- JS info (white text) -->
-            <div class="log-line">
-              <span class="log-ts">16:12:03.566</span>
-              <span class="log-src log-src-js">js</span>
-              <span class="log-lvl badge bg-light text-dark border me-1">INFO</span>
-              <span class="log-msg">console.log: initializing tracker UI</span>
+            } @else if (log.properties["FLAG"] === "STEP_END") {
+            <!-- STEP_END (muted gray, with duration) -->
+            <div class="log-line log-marker">
+              <span class="log-ts">{{log.timestamp.toISOTime({ includeOffset: false })}}</span>
+              <span class="log-src log-src-dotnet">c#</span>
+              <span class="log-badge log-badge-end">STEP_END</span>
+              <span class="log-msg">{{log.message}}</span>
             </div>
 
+            } @else if (log.properties["FLAG"] === "ARTIFACT") {
             <!-- Artifact (blue emphasis) -->
             <div class="log-line">
-              <span class="log-ts">16:12:04.007</span>
-              <span class="log-src log-src-dotnet">dotnet</span>
-              <span class="log-badge badge bg-primary-subtle text-primary border me-1">ARTIFACT</span>
-              <span class="log-msg">
-                [step=1] <span class="text-primary fw-semibold">screenshot-1</span>
-                <span class="text-muted">image/webp · 90 KB</span>
-                <button class="btn btn-link btn-sm p-0 ms-2" disabled>View</button>
-                <button class="btn btn-link btn-sm p-0" disabled>Download</button>
+              <span class="log-ts">{{log.timestamp.toISOTime({ includeOffset: false })}}</span>
+              <span class="log-src log-src-dotnet">c#</span>
+              <span class="log-badge log-badge-artifact">ARTIFACT</span>
+              <span class="log-msg">[step={{log.properties["Step"]}}]
+                <span class="text-primary fw-semibold">{{log.properties["ArtifactName"]}} </span>
+                <span class="text-muted">{{log.properties["ArtifactContentType"]}} · {{log.properties["ArtifactSize"]}} </span>
+                <button class="btn btn-link btn-sm p-0 me-2" style="font-size: 12.5px; line-height: 1;">View</button>
+                <button class="btn btn-link btn-sm p-0 me-2" style="font-size: 12.5px; line-height: 1;">Download</button>
               </span>
             </div>
 
-            <!-- Warning (yellow) -->
-            <div class="log-line log-warn">
-              <span class="log-ts">16:12:05.118</span>
+            } @else {
+            <!-- LOG (white) -->
+            <div class="log-line" [class]="log.level === 'Fatal' || log.level === 'Error' ? 'log-error' : log.level === 'Warning' ? 'log-warn' : ''">
+              <span class="log-ts">{{log.timestamp.toISOTime({ includeOffset: false })}}</span>
+              @if (log.properties["Language"] === "JavaScript") {
               <span class="log-src log-src-js">js</span>
-              <span class="log-lvl badge bg-warning-subtle text-warning border me-1">WARN</span>
-              <span class="log-msg">console.warn: deprecation warning…</span>
+              } @else {
+              <span class="log-src log-src-dotnet">c#</span>
+              }
+              @switch (log.level) {
+              @case ("Verbose") {
+              <span class="log-lvl log-lvl-verbose">VRB</span>
+              }
+              @case ("Debug") {
+              <span class="log-lvl log-lvl-debug">DBG</span>
+              }
+              @case ("Information") {
+              <span class="log-lvl log-lvl-information">INF</span>
+              }
+              @case ("Warning") {
+              <span class="log-lvl log-lvl-warning">WRN</span>
+              }
+              @case ("Error") {
+              <span class="log-lvl log-lvl-error">ERR</span>
+              }
+              @case ("Fatal") {
+              <span class="log-lvl log-lvl-fatal">FTL</span>
+              }
+              @default {
+              <span class="log-lvl">UNK</span>
+              }
+              }
+              <span class="log-msg">{{log.message}}</span>
             </div>
+            }
+            }
 
-            <!-- STEP_END (muted gray, with duration) -->
-            <div class="log-line log-marker">
-              <span class="log-ts">16:12:04.330</span>
-              <span class="log-src log-src-dotnet">dotnet</span>
-              <span class="log-badge badge bg-secondary-subtle text-secondary border me-1">STEP_END</span>
-              <span class="log-msg">[step=1] completed in 0.80s</span>
-            </div>
           </div>
         </div>
 

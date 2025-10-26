@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EtherGizmos.Common.Utilities\EtherGizmos.Common.Utilities.csproj" />
     <ProjectReference Include="..\EtherGizmos.Shipyard.Database\EtherGizmos.Shipyard.Database.csproj" />
   </ItemGroup>
 

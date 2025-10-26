@@ -7,6 +7,8 @@ namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
 
 internal class ReturnStep : ScrapingStep
 {
+    public override string StepName => "[DEPRECATED] Return";
+
     [Required]
     public string Name { get; set; } = null!;
 

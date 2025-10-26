@@ -83,8 +83,9 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
         foreach (var step in runbook)
         {
             step.Index = ++index;
+            using var stepmark = _logger.BeginKeyedScope("Step", step.Index);
             using (_logger.BeginKeyedScope("FLAG", "STEP_START"))
-                _logger.LogInformation("▶ STEP_START [step={StepIndex}]", step.Index);
+                _logger.LogInformation("[step={StepIndex}] {StepName}", step.Index, step.StepName);
 
             var stopwatch = Stopwatch.StartNew();
 
@@ -93,14 +94,11 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
             var html = await _browserClient.GetHtmlAsync(cancellationToken);
             var webp = await _browserClient.GetScreenshotAsync(cancellationToken);
 
-            var htmlDesc = await artifactWriter.WriteForRunAsync(runId, ArtifactFormat.Text, $"page-{step.Index}", new MemoryStream(Encoding.UTF8.GetBytes(html)), cancellationToken: cancellationToken);
+            var htmlDesc = await artifactWriter.WriteForRunAsync(runId, ArtifactFormat.Html, $"page-{step.Index}", new MemoryStream(Encoding.UTF8.GetBytes(html)), cancellationToken: cancellationToken);
             var webpDesc = await artifactWriter.WriteForRunAsync(runId, ArtifactFormat.WebP, $"screenshot-{step.Index}", webp, cancellationToken: cancellationToken);
 
-            _logger.LogInformation("Created HTML artifact {ArtifactUri}", htmlDesc);
-            _logger.LogInformation("Created WebP artifact {ArtifactUri}", webpDesc);
-
             using (_logger.BeginKeyedScope("FLAG", "STEP_END"))
-                _logger.LogInformation("◀ STEP_END ({StepDuration}ms) [step={StepIndex}]", stopwatch.ElapsedMilliseconds, step.Index);
+                _logger.LogInformation("[step={StepIndex}] completed in {StepDuration}ms", step.Index, stopwatch.ElapsedMilliseconds);
 
             artifacts.Add(new()
             {

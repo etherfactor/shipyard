@@ -11,6 +11,8 @@ public abstract class ScrapingStep
     private readonly IList<TrackingResultArtifact> _artifacts = [];
     private DateTimeOffset? _eta;
 
+    public abstract string StepName { get; }
+
     internal int Index { get; set; }
 
     internal ILogger Logger { get; set; } = NullLogger.Instance;

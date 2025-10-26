@@ -12,6 +12,7 @@ import { NavbarAction } from '../../../app/components/navbar-action/navbar-actio
 import { StatusType, getStatusTypeMetadata } from '../../../package/models/status-type';
 import { CarrierExecution } from '../../models/carrier-execution';
 import { ExecutionStatusType, getExecutionStatusTypeMetadata } from '../../models/execution-status-type';
+import { Log, LogZ } from '../../models/log';
 import { CarrierExecutionService } from '../../services/carrier-execution/carrier-execution.service';
 
 @Component({
@@ -37,6 +38,8 @@ export class CarrierExecutionDetailComponent {
 
   readonly id$$ = signal<number | undefined>(undefined);
   readonly carrierExecution$$ = signal<CarrierExecution | undefined>(undefined);
+
+  readonly logs$$ = signal<Log[]>([]);
 
   readonly isLoading$$ = computed(() => this.isLoadingStack$$() > 0);
   private readonly isLoadingStack$$ = signal(0);
@@ -95,8 +98,11 @@ export class CarrierExecutionDetailComponent {
       this.carrierExecution$$.set(data);
 
       const uri = data.artifacts.find(e => e.contentType === "application/x-ndjson")!.artifactUri;
-      const resp = await this.$carrierExecution.readArtifact(id, uri).execute().data;
-      console.log(resp);
+      const logText = await this.$carrierExecution.readArtifact(id, uri).execute().data;
+
+      const logs = logText.split("\n").map(log => log.trim()).filter(log => log).map(log => LogZ.parse(JSON.parse(log)));
+      this.logs$$.set(logs);
+      console.log(logs);
     } finally {
       this.isLoadingStack$$.set(this.isLoadingStack$$() - 1);
     }

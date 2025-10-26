@@ -13,7 +13,7 @@
 .log-marker {
   color: var(--bs-secondary-color);
 }
-/* gray for STEP_* */
+
 .log-warn {
   color: var(--bs-warning-text-emphasis);
 }
@@ -24,7 +24,7 @@
 
 .log-src {
   font-weight: 600;
-  margin: 0 8px;
+  margin: 0 4px;
   padding: 0 6px;
   border-radius: 4px;
 }
@@ -39,9 +39,84 @@
   color: var(--bs-info-text-emphasis);
 }
 
+.log-lvl {
+  font-weight: 600;
+  margin: 0 4px 0 0;
+  padding: 0 6px;
+  border-radius: 4px;
+}
+
+/* Lightest, low-signal */
+.log-lvl-verbose {
+  background: #e7e9ec;
+  color: #495057;
+  border-color: #d3d6da;
+}
+
+/* Developer-level */
+.log-lvl-debug {
+  background: #d7e3f8;
+  color: #1b4f8a;
+  border-color: #c0d3f2;
+}
+
+/* Normal "happy path" */
+.log-lvl-information {
+  background: #d9f2e4;
+  color: #1c6844;
+  border-color: #c2e8d3;
+}
+
+/* Heads-up */
+.log-lvl-warning {
+  background: #fff3cd;
+  color: #8a6d1b;
+  border-color: #ffe69c;
+}
+
+/* Something failed */
+.log-lvl-error {
+  background: #f8d7da;
+  color: #842029;
+  border-color: #f1aeb5;
+}
+
+/* Very bad */
+.log-lvl-critical {
+  background: #f1b0b7;
+  color: #64121a;
+  border-color: #e28a94;
+}
+
+/* Worst case */
+.log-lvl-fatal {
+  background: #d63333;
+  color: white;
+  border-color: #b02a2a;
+}
+
+.log-badge {
+  font-weight: 600;
+  margin: 0 4px 0 0;
+  padding: 0 6px;
+  border-radius: 4px;
+}
+
+.log-badge-start,
+.log-badge-end {
+  background: var(--bs-secondary-bg-subtle);
+  color: rgba(var(--bs-secondary-rgb));
+  border-color: var(--bs-border-color);
+}
+
+.log-badge-artifact {
+  background: var(--bs-primary-bg-subtle);
+  color: rgba(var(--bs-primary-rgb));
+  border-color: var(--bs-border-color);
+}
+
 .log-ts {
   color: var(--bs-secondary-color);
-  margin-right: 6px;
 }
 
 .log-msg {

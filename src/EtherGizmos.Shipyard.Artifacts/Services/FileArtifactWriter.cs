@@ -1,6 +1,8 @@
-﻿using EtherGizmos.Shipyard.Abstractions;
+﻿using EtherGizmos.Common.Extensions;
+using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Models;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.IO.Compression;
 using System.Transactions;
@@ -9,13 +11,16 @@ namespace EtherGizmos.Shipyard.Services;
 
 internal class FileArtifactWriter : IArtifactWriter
 {
+    private readonly ILogger _logger;
     private readonly IOptionsMonitor<ArtifactOptions> _options;
     private readonly IUnitOfWorkFactory _uowFactory;
 
     public FileArtifactWriter(
+        ILogger<FileArtifactWriter> logger,
         IOptionsMonitor<ArtifactOptions> options,
         IUnitOfWorkFactory uowFactory)
     {
+        _logger = logger;
         _options = options;
         _uowFactory = uowFactory;
     }
@@ -85,6 +90,40 @@ internal class FileArtifactWriter : IArtifactWriter
         await uow.SaveChangesAsync(cancellationToken);
 
         scope.Complete();
+
+        var logFileName = fileName;
+        if (!logFileName.EndsWith(type.Extension))
+            logFileName += $".{type.Extension}";
+
+        var logSize = artifact.Bytes * 1.0m;
+        var logSizeUnit = "B";
+
+        if (logSize >= 1024)
+        {
+            logSize /= 1024;
+            logSizeUnit = "KB";
+        }
+
+        if (logSize >= 1024)
+        {
+            logSize /= 1024;
+            logSizeUnit = "MB";
+        }
+
+        if (logSize >= 1024)
+        {
+            logSize /= 1024;
+            logSizeUnit = "GB";
+        }
+
+        logSize = Math.Round(logSize, 1);
+
+        using (_logger.BeginKeyedScope("FLAG", "ARTIFACT"))
+            _logger.LogInformation("Created artifact {ArtifactName} ({ArtifactContentType}) with URI {ArtifactUri}, occupying {ArtifactSize}",
+                logFileName,
+                artifact.ContentType,
+                artifact.Uri.ToString(),
+                $"{logSize} {logSizeUnit}");
 
         return new(new(artifact.Uri), artifact.ContentType, artifact.Bytes);
     }

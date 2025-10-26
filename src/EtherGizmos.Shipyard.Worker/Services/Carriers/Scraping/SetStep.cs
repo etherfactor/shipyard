@@ -8,6 +8,8 @@ namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
 
 internal class SetStep : ScrapingStep, ISettableStep
 {
+    public override string StepName => $"Set {Var} to {Value}";
+
     [Required]
     public string Var { get; set; } = null!;
 

@@ -28,6 +28,9 @@ internal class TeeStreamLoggerProvider : ILoggerProvider
             var ctx = TeeStreamAmbient.Current;
             if (ctx is null) return; // tee is inactive → do nothing
 
+            //Don't log EF Core, it's noisy
+            if (_category == "Microsoft.EntityFrameworkCore.Database.Command") return;
+
             // Minimal work when inactive; when active, format as Serilog LogEvent
             var serilogLevel = level switch
             {

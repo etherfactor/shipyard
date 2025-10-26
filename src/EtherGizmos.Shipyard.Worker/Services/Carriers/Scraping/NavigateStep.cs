@@ -8,6 +8,8 @@ namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
 
 internal class NavigateStep : ScrapingStep
 {
+    public override string StepName => $"Navigate → {Url}";
+
     [Required]
     public string Url { get; set; } = null!;
 
