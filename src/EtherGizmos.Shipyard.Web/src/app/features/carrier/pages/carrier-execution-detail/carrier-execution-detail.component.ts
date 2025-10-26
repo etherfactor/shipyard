@@ -171,6 +171,12 @@ export class CarrierExecutionDetailComponent {
     log?.scrollIntoView();
   }
 
+  jumpToStepEvent($event: any) {
+    try {
+      this.jumpToStep(parseInt($event.target.value));
+    } catch { }
+  }
+
   async openArtifactPreview(uri: string) {
     await openModal({ modal: this.$modal, options: { size: "xl" } }, ArtifactPreviewModalComponent, this.id$$()!, uri);
   }

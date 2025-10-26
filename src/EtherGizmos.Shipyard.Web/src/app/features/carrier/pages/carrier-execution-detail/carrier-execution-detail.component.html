@@ -76,16 +76,14 @@
   <div class="col-12 mt-3">
     <detail-box icon="bi-window" text="Execution Log">
       <div class="row">
+        @let sections = sections$$();
+
         <!-- Left: Steps rail (desktop only) -->
         <div class="col-lg-3 d-none d-lg-block border-end mt-3">
-          <div class="d-flex align-items-center justify-content-between mb-2">
-            <div class="fw-semibold small text-uppercase text-muted">Steps</div>
-            <span class="small text-muted">Jump</span>
-          </div>
+          <div class="fw-semibold small text-uppercase text-muted mb-2">Steps</div>
 
           <div class="list-group list-group-flush small">
             <!-- Each item shows a duration chip; chevron is “jump to” affordance -->
-            @let sections = sections$$();
             @for (section of sections; track section) {
             <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
                href="javascript:void(0)" (click)="jumpToStep(section.step)">
@@ -102,18 +100,17 @@
         <div class="col-lg-6 col-12 mt-3">
           <!-- Mobile jump-to (no steps rail on mobile) -->
           <div class="d-lg-none mb-2">
-            <label class="form-label small text-muted">Jump to step</label>
-            <select class="form-select form-select-sm" disabled>
-              <option>1 · Navigate (0.80s)</option>
-              <option>2 · WaitFor #st_App_View_Details (1.38s)</option>
-              <option>3 · Click “View Details” (0.42s)</option>
-              <option>4 · WaitFor #st_Events (0.52s)</option>
-              <option>5 · Parse events (0.61s)</option>
+            <div class="fw-semibold small text-uppercase text-muted mb-2">Steps</div>
+            <select class="form-select form-select-sm" (change)="jumpToStepEvent($event)">
+              <option disabled>-- Select a step --</option>
+              @for (section of sections; track section) {
+              <option [value]="section.step">{{section.step}} · {{section.name}} ({{section.duration}}s)</option>
+              }
             </select>
           </div>
 
-          <!-- Log toolbar -->
-          <div class="d-flex gap-2 align-items-center mb-2">
+          <!-- Log toolbar - consider adding later -->
+          <!--<div class="d-flex gap-2 align-items-center mb-2">
             <div class="dropdown">
               <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" disabled>
                 Filter: All
@@ -131,7 +128,9 @@
             <button class="btn btn-outline-secondary btn-sm" disabled>
               <i class="bi bi-funnel"></i>
             </button>
-          </div>
+          </div>-->
+
+          <div class="fw-semibold small text-uppercase text-muted mb-2">Logs</div>
 
           <!-- Log lines (single-line, colored) -->
           <div class="border rounded p-2 bg-body-tertiary log-console" id="logView">
@@ -212,7 +211,7 @@
         <div class="col-lg-3 col-12 mt-3">
           <div class="fw-semibold small text-uppercase text-muted">Artifacts</div>
 
-          <div style="max-height: 538px; overflow-y: scroll;">
+          <div style="max-height: 528px; overflow-y: scroll;">
             @for (container of sortedArtifacts$$(); track container.step) {
             @if (container.step) {
             <div class="text-muted small mt-2">Step {{container.step}}</div>
