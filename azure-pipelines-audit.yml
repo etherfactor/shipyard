@@ -42,7 +42,7 @@ stages:
     parameters:
       name: 'audit_api'
       vmImage: 'ubuntu-22.04'
-      pathToProject: '**/EtherGizmos.Shipyard.Api.csproj'
+      pathToProject: './src/EtherGizmos.Shipyard.Api/EtherGizmos.Shipyard.Api.csproj'
       apiUrl: '$(DependencyTrack.ApiUrl)'
       apiKey: '$(DependencyTrack.ApiKey)'
       projectName: 'shipyard-api'
@@ -53,7 +53,7 @@ stages:
     parameters:
       name: 'audit_worker'
       vmImage: 'ubuntu-22.04'
-      pathToProject: '**/EtherGizmos.Shipyard.Worker.csproj'
+      pathToProject: './src/EtherGizmos.Shipyard.Worker/EtherGizmos.Shipyard.Worker.csproj'
       apiUrl: '$(DependencyTrack.ApiUrl)'
       apiKey: '$(DependencyTrack.ApiKey)'
       projectName: 'shipyard-worker'
