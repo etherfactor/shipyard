@@ -1,7 +1,8 @@
-using EtherGizmos.Common.Messaging.Abstractions;
-using EtherGizmos.Shipyard.Database.Services;
-using EtherGizmos.Shipyard.Models.Database;
-using EtherGizmos.Shipyard.Models.Database.Enums;
+using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Database.Enums;
+using EtherGizmos.Shipyard.Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -129,24 +130,4 @@ public class TrackingResponseConsumer : IMessageConsumer<TrackingResponse>
             }
         }
     }
-}
-
-public record TrackingResponse
-{
-    public int PackageId { get; init; }
-
-    public DateTimeOffset? EstimatedDeliveryAt { get; init; }
-
-    public IReadOnlyList<TrackingResponseDetail> Details { get; init; } = [];
-}
-
-public record TrackingResponseDetail
-{
-    public DateTimeOffset OccurredAt { get; init; }
-
-    public int StatusTypeId { get; init; }
-
-    public string? Location { get; init; }
-
-    public string? Description { get; init; }
 }

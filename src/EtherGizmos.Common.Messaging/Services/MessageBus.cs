@@ -1,10 +1,10 @@
-using EtherGizmos.Common.Messaging.Abstractions;
+using EtherGizmos.Common.Abstractions;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks.Dataflow;
 
-namespace EtherGizmos.Common.Messaging.Services;
+namespace EtherGizmos.Common.Services;
 
 internal class MessageBus : IMessageBus
 {
@@ -16,8 +16,8 @@ internal class MessageBus : IMessageBus
     private readonly ConcurrentDictionary<string, Lazy<Task<(IMessageListener Listener, CancellationTokenSource Cts)>>> _listeners = [];
     private readonly ConcurrentDictionary<string, Lazy<Task<IMessagePublisher>>> _publishers = [];
 
-    private bool _isRunning = false;
     private ActionBlock<ReceivedMessage>? _pump;
+    private CancellationTokenSource? _pumpCts;
 
     public MessageBus(
         ILogger<MessageBus> logger,
@@ -38,8 +38,17 @@ internal class MessageBus : IMessageBus
 
         if (_listeners.TryGetValue(logicalName, out var lazy))
         {
-            listener = lazy.Value.Result.Listener;
-            return true;
+            try
+            {
+                var tuple = lazy.Value.GetAwaiter().GetResult();
+                listener = tuple.Listener;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "TryGetListener faulted for {LogicalName}. Removing lazy to allow retry.", logicalName);
+                _listeners.TryRemove(logicalName, out _);
+            }
         }
 
         return false;
@@ -52,8 +61,16 @@ internal class MessageBus : IMessageBus
 
         if (_publishers.TryGetValue(logicalName, out var lazy))
         {
-            publisher = lazy.Value.Result;
-            return true;
+            try
+            {
+                publisher = lazy.Value.GetAwaiter().GetResult();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "TryGetPublisher faulted for {LogicalName}. Removing lazy to allow retry.", logicalName);
+                _publishers.TryRemove(logicalName, out _);
+            }
         }
 
         return false;
@@ -65,20 +82,18 @@ internal class MessageBus : IMessageBus
         var lazy = new Lazy<Task<(IMessageListener Listener, CancellationTokenSource Cts)>>(async () =>
         {
             var listener = _listenerFactory.CreateListenerForQueue(logicalName, queue);
-            await listener.StartAsync(cancellationToken);
+            await listener.StartAsync(cancellationToken).ConfigureAwait(false);
 
             var cts = new CancellationTokenSource();
             _ = ExecuteListenerPumpAsync(logicalName, listener, cts.Token);
 
             return (listener, cts);
-        });
+        }, LazyThreadSafetyMode.ExecutionAndPublication);
 
         if (!_listeners.TryAdd(logicalName, lazy))
-        {
             throw new InvalidOperationException("Listener already registered");
-        }
 
-        var result = await lazy.Value;
+        var result = await lazy.Value.ConfigureAwait(false);
         return result.Listener;
     }
 
@@ -88,20 +103,18 @@ internal class MessageBus : IMessageBus
         var lazy = new Lazy<Task<(IMessageListener Listener, CancellationTokenSource Cts)>>(async () =>
         {
             var listener = _listenerFactory.CreateListenerForTopic(logicalName, topic, subscription);
-            await listener.StartAsync(cancellationToken);
+            await listener.StartAsync(cancellationToken).ConfigureAwait(false);
 
             var cts = new CancellationTokenSource();
             _ = ExecuteListenerPumpAsync(logicalName, listener, cts.Token);
 
             return (listener, cts);
-        });
+        }, LazyThreadSafetyMode.ExecutionAndPublication);
 
         if (!_listeners.TryAdd(logicalName, lazy))
-        {
             throw new InvalidOperationException("Listener already registered");
-        }
 
-        var result = await lazy.Value;
+        var result = await lazy.Value.ConfigureAwait(false);
         return result.Listener;
     }
 
@@ -111,18 +124,14 @@ internal class MessageBus : IMessageBus
         var lazy = new Lazy<Task<IMessagePublisher>>(async () =>
         {
             var publisher = _publisherFactory.CreatePublisherForQueue(logicalName, queue);
-            await publisher.StartAsync(cancellationToken);
-
+            await publisher.StartAsync(cancellationToken).ConfigureAwait(false);
             return publisher;
-        });
+        }, LazyThreadSafetyMode.ExecutionAndPublication);
 
         if (!_publishers.TryAdd(logicalName, lazy))
-        {
             throw new InvalidOperationException("Publisher already registered");
-        }
 
-        var result = await lazy.Value;
-        return result;
+        return await lazy.Value.ConfigureAwait(false);
     }
 
     public async Task<IMessagePublisher> RegisterPublisherForTopicAsync(
@@ -131,41 +140,36 @@ internal class MessageBus : IMessageBus
         var lazy = new Lazy<Task<IMessagePublisher>>(async () =>
         {
             var publisher = _publisherFactory.CreatePublisherForTopic(logicalName, topic);
-            await publisher.StartAsync(cancellationToken);
-
+            await publisher.StartAsync(cancellationToken).ConfigureAwait(false);
             return publisher;
-        });
+        }, LazyThreadSafetyMode.ExecutionAndPublication);
 
         if (!_publishers.TryAdd(logicalName, lazy))
-        {
             throw new InvalidOperationException("Publisher already registered");
-        }
 
-        var result = await lazy.Value;
-        return result;
+        return await lazy.Value.ConfigureAwait(false);
     }
 
     public Task StartAsync(
         CancellationToken cancellationToken = default)
     {
         var parallelism = 8;
+        _pumpCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-        _pump = new(
+        _pump = new ActionBlock<ReceivedMessage>(
             async message =>
             {
                 try
                 {
-                    await _receiver.ReceiveAsync(message);
+                    await _receiver.ReceiveAsync(message, _pumpCts.Token).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "The message receiver encountered an error while processing the message. The message " +
-                        "will be abandoned, and the message will be returned to the broker.");
-
+                    _logger.LogError(ex, "Receiver error; abandoning message.");
                     try
                     {
                         if (!message.Actions.Invoked)
-                            await message.Actions.AbandonAsync();
+                            await message.Actions.AbandonAsync().ConfigureAwait(false);
                     }
                     catch (Exception ex2)
                     {
@@ -177,30 +181,54 @@ internal class MessageBus : IMessageBus
             {
                 MaxDegreeOfParallelism = parallelism,
                 BoundedCapacity = parallelism,
+                CancellationToken = _pumpCts.Token,
             });
 
-        _isRunning = true;
-
+        _logger.LogInformation("MessageBus pump started with parallelism {Parallelism}.", parallelism);
         return Task.CompletedTask;
     }
 
-    public async Task StopAsync(
-        CancellationToken cancellationToken = default)
+    public async Task StopAsync(CancellationToken cancellationToken = default)
     {
-        _isRunning = false;
+        _logger.LogInformation("Stopping MessageBus...");
 
+        // 1) Cancel listener pumps first so they stop pushing into the bus
+        foreach (var key in _listeners.Keys.ToList())
+        {
+            if (_listeners.TryGetValue(key, out var lazy))
+            {
+                try
+                {
+                    var tuple = await lazy.Value.ConfigureAwait(false);
+                    tuple.Cts.Cancel();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to cancel pump CTS for {LogicalName}.", key);
+                }
+            }
+        }
+
+        // 2) Stop the main pump
+        _pumpCts?.Cancel();
         _pump?.Complete();
+        if (_pump is not null)
+        {
+            try { await _pump.Completion.ConfigureAwait(false); }
+            catch (Exception ex) { _logger.LogWarning(ex, "Pump completion observed fault."); }
+        }
         _pump = null;
+        _pumpCts?.Dispose();
+        _pumpCts = null;
 
-        foreach (var logicalName in _publishers.Keys)
-        {
-            await UnregisterPublisherAsync(logicalName, cancellationToken);
-        }
+        // 3) Stop publishers, then listeners
+        foreach (var logicalName in _publishers.Keys.ToList())
+            await UnregisterPublisherAsync(logicalName, cancellationToken).ConfigureAwait(false);
 
-        foreach (var logicalName in _listeners.Keys)
-        {
-            await UnregisterListenerAsync(logicalName, cancellationToken);
-        }
+        foreach (var logicalName in _listeners.Keys.ToList())
+            await UnregisterListenerAsync(logicalName, cancellationToken).ConfigureAwait(false);
+
+        _logger.LogInformation("MessageBus stopped.");
     }
 
     public async Task UnregisterListenerAsync(string logicalName, CancellationToken cancellationToken = default)
@@ -209,10 +237,15 @@ internal class MessageBus : IMessageBus
         {
             try
             {
-                var result = await lazy.Value;
-                await result.Listener.StopAsync(cancellationToken);
+                var (listener, cts) = await lazy.Value.ConfigureAwait(false);
+                cts.Cancel();
+                cts.Dispose();
+                await listener.StopAsync(cancellationToken).ConfigureAwait(false);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to stop listener {LogicalName}.", logicalName);
+            }
         }
     }
 
@@ -222,10 +255,13 @@ internal class MessageBus : IMessageBus
         {
             try
             {
-                var result = await lazy.Value;
-                await result.StopAsync(cancellationToken);
+                var publisher = await lazy.Value.ConfigureAwait(false);
+                await publisher.StopAsync(cancellationToken).ConfigureAwait(false);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to stop publisher {LogicalName}.", logicalName);
+            }
         }
     }
 
@@ -234,21 +270,41 @@ internal class MessageBus : IMessageBus
         IMessageListener listener,
         CancellationToken cancellationToken)
     {
-        while (!cancellationToken.IsCancellationRequested)
+        _logger.LogInformation("Pump loop starting for {LogicalName}.", logicalName);
+
+        try
         {
-            try
+            await foreach (var message in listener.Channel.ReadAllAsync(cancellationToken).ConfigureAwait(false))
             {
-                await foreach (var message in listener.Channel.ReadAllAsync(cancellationToken))
+                var pump = _pump;
+                if (pump is null)
                 {
-                    await _pump!.SendAsync(message, cancellationToken);
+                    _logger.LogWarning("Pump is null; dropping message for {LogicalName}.", logicalName);
+                    continue;
+                }
+
+                if (pump.Completion.IsCompleted)
+                {
+                    _logger.LogWarning("Pump completed; dropping message for {LogicalName}.", logicalName);
+                    continue;
+                }
+
+                var accepted = await pump.SendAsync(message, cancellationToken).ConfigureAwait(false);
+                if (!accepted)
+                {
+                    _logger.LogWarning("Pump rejected message for {LogicalName}.", logicalName);
                 }
             }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Encountered an error during channel pump loop for {LogicalName}.", logicalName);
-                await Task.Delay(2000, cancellationToken);
-            }
+
+            _logger.LogWarning("Channel completed; terminating pump for {LogicalName}.", logicalName);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogInformation("Pump loop canceled for {LogicalName}.", logicalName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in pump loop for {LogicalName}.", logicalName);
         }
     }
 }

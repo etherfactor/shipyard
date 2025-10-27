@@ -1,6 +1,6 @@
-using EtherGizmos.Common.Utilities.Abstractions;
+using EtherGizmos.Common.Abstractions;
 
-namespace EtherGizmos.Shipyard.Models.Database;
+namespace EtherGizmos.Shipyard.Database;
 
 public class Carrier : Auditable, IEntity
 {

@@ -1,7 +1,8 @@
-﻿using EtherGizmos.Common.Messaging.Abstractions;
-using EtherGizmos.Shipyard.Notifications.Configuration;
-using EtherGizmos.Shipyard.Notifications.Models;
-using EtherGizmos.Shipyard.Notifications.Services;
+using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Configuration;
+using EtherGizmos.Shipyard.Messages;
+using EtherGizmos.Shipyard.Models;
+using EtherGizmos.Shipyard.Services;
 using Microsoft.Extensions.Options;
 
 namespace EtherGizmos.Shipyard.Worker.Consumers;
@@ -9,11 +10,11 @@ namespace EtherGizmos.Shipyard.Worker.Consumers;
 public class PackageDeliveredConsumer : IMessageConsumer<PackageDelivered>
 {
     private readonly IOptionsMonitor<NotificationOptions> _notificationOptions;
-    private readonly IEmailNotificationSender<PackageDelivered> _emailSender;
+    private readonly IEmailNotificationSender<PackageDeliveredEvent> _emailSender;
 
     public PackageDeliveredConsumer(
         IOptionsMonitor<NotificationOptions> notificationOptions,
-        IEmailNotificationSender<PackageDelivered> emailSender)
+        IEmailNotificationSender<PackageDeliveredEvent> emailSender)
     {
         _notificationOptions = notificationOptions;
         _emailSender = emailSender;
@@ -45,25 +46,4 @@ public class PackageDeliveredConsumer : IMessageConsumer<PackageDelivered>
             EstimatedDeliveryAt = message.EstimatedDeliveryAt,
         }, cancellationToken: context.CancellationToken);
     }
-}
-
-public record PackageDelivered
-{
-    public int PackageId { get; init; }
-
-    public int CarrierId { get; init; }
-
-    public string CarrierName { get; init; } = null!;
-
-    public string TrackingNumber { get; init; } = null!;
-
-    public string? Contents { get; init; }
-
-    public DateTimeOffset OccurredAt { get; init; }
-
-    public string? Location { get; init; }
-
-    public string? Description { get; init; }
-
-    public DateTimeOffset? EstimatedDeliveryAt { get; init; }
 }

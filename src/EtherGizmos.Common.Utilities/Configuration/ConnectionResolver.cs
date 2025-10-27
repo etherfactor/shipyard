@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+using EtherGizmos.Common.Utilities.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
-namespace EtherGizmos.Common.Utilities.Configuration;
+namespace EtherGizmos.Common.Configuration;
 
 internal class ConnectionResolver : IConnectionResolver
 {

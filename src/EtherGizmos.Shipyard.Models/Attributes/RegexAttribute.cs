@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-namespace EtherGizmos.Shipyard.Models.Attributes;
+namespace EtherGizmos.Shipyard.Attributes;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 public class RegexAttribute : ValidationAttribute

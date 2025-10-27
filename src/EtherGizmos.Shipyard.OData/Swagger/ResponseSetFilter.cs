@@ -1,10 +1,10 @@
-﻿using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
 using System.Text.Json.Nodes;
 
-namespace EtherGizmos.Shipyard.OData.Swagger;
+namespace EtherGizmos.Shipyard.Swagger;
 
 public class ResponseSetFilter : IOperationFilter
 {

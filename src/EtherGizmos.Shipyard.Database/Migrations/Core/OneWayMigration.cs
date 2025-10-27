@@ -1,6 +1,6 @@
-﻿using FluentMigrator;
+using FluentMigrator;
 
-namespace EtherGizmos.Shipyard.Database.Migrations.Core;
+namespace EtherGizmos.Shipyard.Migrations.Core;
 
 /// <summary>
 /// Allows migration forward, but not backward.

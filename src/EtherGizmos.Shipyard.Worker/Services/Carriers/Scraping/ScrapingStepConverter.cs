@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
@@ -22,6 +22,7 @@ public class ScrapingStepConverter : JsonConverter<ScrapingStep>
             "navigate" => JsonSerializer.Deserialize<NavigateStep>(root.GetRawText(), options),
             "replace" => JsonSerializer.Deserialize<ReplaceStep>(root.GetRawText(), options),
             "return" => JsonSerializer.Deserialize<ReturnStep>(root.GetRawText(), options),
+            "script" => JsonSerializer.Deserialize<ScriptStep>(root.GetRawText(), options),
             "send" => JsonSerializer.Deserialize<SendStep>(root.GetRawText(), options),
             "set" => JsonSerializer.Deserialize<SetStep>(root.GetRawText(), options),
             "waitfor" => JsonSerializer.Deserialize<WaitForStep>(root.GetRawText(), options),

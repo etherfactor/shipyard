@@ -1,9 +1,11 @@
-﻿using FluentMigrator.Runner;
+using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
+using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EtherGizmos.Shipyard.Database.Services;
+namespace EtherGizmos.Shipyard.Services;
 
-internal class MigrationManager : IMigrationManager
+internal class MigrationManager : IMigrationManager, IOAuth2MigrationManager
 {
     private readonly IServiceProvider _serviceProvider;
 
@@ -16,15 +18,16 @@ internal class MigrationManager : IMigrationManager
         _serviceProvider = serviceProvider;
     }
 
-    public void EnsureMigrated()
+    public Task EnsureMigratedAsync(
+        CancellationToken cancellationToken = default)
     {
         if (_isMigrated)
-            return;
+            return Task.CompletedTask;
 
         lock (_lock)
         {
             if (_isMigrated)
-                return;
+                return Task.CompletedTask;
 
             using var scope = _serviceProvider.CreateScope();
             var provider = scope.ServiceProvider;
@@ -34,5 +37,7 @@ internal class MigrationManager : IMigrationManager
             runner.MigrateUp();
             _isMigrated = true;
         }
+
+        return Task.CompletedTask;
     }
 }

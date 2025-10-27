@@ -1,9 +1,9 @@
-﻿using EtherGizmos.Shipyard.Database.Extensions;
-using EtherGizmos.Shipyard.Models.Database;
+using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace EtherGizmos.Shipyard.Database.Models;
+namespace EtherGizmos.Shipyard.Models;
 
 public class PackageConfiguration : IEntityTypeConfiguration<Package>
 {
@@ -14,7 +14,7 @@ public class PackageConfiguration : IEntityTypeConfiguration<Package>
 
         entity.HasKey(e => e.Id);
 
-        entity.HasAlternateKey(e => new { e.CarrierId, e.TrackingNumber });
+        //entity.HasAlternateKey(e => new { e.CarrierId, e.TrackingNumber });
 
         entity.Property(e => e.Id)
             .HasColumnName("package_id");

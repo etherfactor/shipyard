@@ -1,8 +1,8 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-namespace EtherGizmos.Shipyard.OData.Configuration;
+namespace EtherGizmos.Shipyard.Configuration;
 
 public class ODataOptions
 {

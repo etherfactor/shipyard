@@ -1,22 +1,41 @@
-﻿using Asp.Versioning;
-using EtherGizmos.Shipyard.Models.Api;
-using EtherGizmos.Shipyard.Models.Database;
-using EtherGizmos.Shipyard.OData.Swagger;
+using Asp.Versioning;
+using AutoMapper;
+using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Extensions;
+using EtherGizmos.Shipyard.Messages;
+using EtherGizmos.Shipyard.Models.Api.Errors;
+using EtherGizmos.Shipyard.Swagger;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace EtherGizmos.Shipyard.Api.Controllers;
 
+[Authorize]
 public class PackagesController : AutoODataController
 {
     private const string BaseRoute = "api/v{version:apiVersion}/packages";
 
+    private readonly IUnitOfWorkFactory _uowFactory;
+    private readonly IMapper _mapper;
+    private readonly IMessageSender _sender;
+
     public PackagesController(
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        IUnitOfWorkFactory uowFactory,
+        IMapper mapper,
+        IMessageSender sender)
         : base(serviceProvider)
     {
+        _uowFactory = uowFactory;
+        _mapper = mapper;
+        _sender = sender;
     }
 
     [ApiVersion(1.0)]
@@ -70,6 +89,67 @@ public class PackagesController : AutoODataController
         CancellationToken cancellationToken = default)
         => ForItem(id)
             .DeleteAsync(cancellationToken);
+
+    [ApiVersion(1.0)]
+    [HttpGet("api/v{version:apiVersion}/findUpdatedPackages")]
+    [ProducesResponseSet]
+    [ProducesResponseType(200, Type = typeof(PackageDTO)), SwaggerResponseExample(200, typeof(PackageDTOExampleGet))]
+    public async Task<IActionResult> FindUpdatedPackages(
+        ODataQueryOptions<PackageDTO> queryOptions,
+        CancellationToken cancellationToken = default)
+    {
+        using var uow = _uowFactory.Create(useRequestScope: true);
+        var packageRepo = uow.Repository<Package>();
+
+        var dbData = await packageRepo.Data
+            .Include(e => e.TrackingUpdates)
+            .OrderByDescending(package => package.TrackingUpdates.OrderByDescending(update => update.OccurredAt).Last().OccurredAt)
+            .Take(queryOptions.Top.Value)
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        var data = await _mapper.MapExplicitly(dbData.AsQueryable())
+            .To<PackageDTO>()
+            .ApplyQueryOptions(queryOptions)
+            .ExecuteAsync(cancellationToken);
+
+        return Ok(data);
+    }
+
+    [ApiVersion(1.0)]
+    [HttpPost(BaseRoute + "({id})" + "/schedulePoll")]
+    [ProducesResponseType(202)]
+    public async Task<IActionResult> SchedulePoll(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        using var uow = _uowFactory.Create(useRequestScope: true);
+        var packageRepo = uow.Repository<Package>();
+
+        var package = await packageRepo.Data
+            .SingleOrDefaultAsync(e => e.Id == id, cancellationToken: cancellationToken);
+
+        if (package is null)
+        {
+            new Error.Reference.EntityNotFoundReferenceError<PackageDTO>()
+                .AddDetail((e => e.Id, id))
+                .Return();
+        }
+
+        await _sender.SendAsync("tracking-poll-request", new TrackingRequest()
+        {
+            PackageId = package.Id,
+            CarrierSlug = package.Carrier.Slug,
+            TrackingNumber = package.TrackingNumber,
+        }, cancellationToken: cancellationToken);
+
+        package.LastPollAt = DateTimeOffset.UtcNow;
+        package.NextPollAt = package.LastPollAt
+            + TimeSpan.FromHours(6) * (double)package.LastStatusType.PollingFactor;
+
+        await uow.SaveChangesAsync(cancellationToken);
+
+        return Accepted();
+    }
 
     private IKeylessRequestBuilder<Package, PackageDTO> ForSet()
         => ForSet<Package, PackageDTO>();

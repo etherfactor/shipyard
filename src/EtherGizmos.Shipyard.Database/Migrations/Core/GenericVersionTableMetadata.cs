@@ -1,7 +1,7 @@
-﻿using FluentMigrator.Runner.VersionTableInfo;
+using FluentMigrator.Runner.VersionTableInfo;
 using System.Diagnostics.CodeAnalysis;
 
-namespace EtherGizmos.Shipyard.Database.Migrations.Core;
+namespace EtherGizmos.Shipyard.Migrations.Core;
 
 /// <summary>
 /// Overrides default FluentMigrator version table naming.

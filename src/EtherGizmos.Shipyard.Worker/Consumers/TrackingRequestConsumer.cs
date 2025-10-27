@@ -1,4 +1,5 @@
-using EtherGizmos.Common.Messaging.Abstractions;
+using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Messages;
 using EtherGizmos.Shipyard.Worker.Services.Carriers;
 using Microsoft.Extensions.Logging;
 
@@ -43,13 +44,4 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
             })],
         }, cancellationToken: context.CancellationToken);
     }
-}
-
-public record TrackingRequest
-{
-    public int PackageId { get; init; }
-
-    public string CarrierSlug { get; init; } = null!;
-
-    public string TrackingNumber { get; init; } = null!;
 }

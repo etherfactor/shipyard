@@ -1,5 +1,5 @@
-﻿using EtherGizmos.Shipyard.Models.Api.Errors;
-using EtherGizmos.Shipyard.Models.Extensions;
+using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Models.Api.Errors;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -8,7 +8,7 @@ using Microsoft.OData.UriParser;
 using System.Reflection;
 using System.Text;
 
-namespace EtherGizmos.Shipyard.OData.Extensions;
+namespace EtherGizmos.Shipyard.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="ODataQueryOptions{TEntity}"/>.

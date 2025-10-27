@@ -1,7 +1,7 @@
-﻿using EtherGizmos.Shipyard.Notifications.Models;
+using EtherGizmos.Shipyard.Models;
 using MimeKit;
 
-namespace EtherGizmos.Shipyard.Notifications.Services;
+namespace EtherGizmos.Shipyard.Services;
 
 public interface ISmtpNotificationRenderer<in TEvent>
     where TEvent : NotificationEvent

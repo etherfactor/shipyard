@@ -16,6 +16,7 @@ selenium.WithHttpEndpoint(targetPort: 4444, name: "endpoint");
 
 var api = builder.AddProject<Projects.EtherGizmos_Shipyard_Api>("api");
 api.WaitFor(database).WithReference(database, connectionName: "Connections:AspireDb:PostgreSql:ConnectionString");
+api.WaitFor(rabbitmq).WithReference(rabbitmq, connectionName: "RabbitMq:ConnectionString");
 api.WithEnvironment("Connections:AspireDb:Type", "Database");
 api.WithEnvironment("Database:ConnectionId", "AspireDb");
 

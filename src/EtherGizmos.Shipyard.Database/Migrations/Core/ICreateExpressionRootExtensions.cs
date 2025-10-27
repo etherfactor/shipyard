@@ -1,11 +1,11 @@
-﻿using FluentMigrator;
+using FluentMigrator;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.IfDatabase;
 using FluentMigrator.Infrastructure;
 using System.Data;
 using System.Reflection;
 
-namespace EtherGizmos.Shipyard.Database.Migrations.Core;
+namespace EtherGizmos.Shipyard.Migrations.Core;
 
 public static class ICreateExpressionRootExtensions
 {
@@ -36,7 +36,7 @@ begin
     set new.`modified_at_utc` = utc_timestamp;
 end;");
 
-        var postgres = new IfDatabaseExpressionRoot(context, ProcessorIdConstants.Postgres);
+        var postgres = new IfDatabaseExpressionRoot(context, ProcessorIdConstants.PostgreSQL);
 
         postgres.Execute
             .Sql($@"create or replace function {PostgreSqlHelper.Escape($"TR_{table}_audit")}()

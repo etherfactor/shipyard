@@ -1,13 +1,14 @@
-﻿using EtherGizmos.Shipyard.Notifications.Configuration;
-using EtherGizmos.Shipyard.Notifications.Models;
+using EtherGizmos.Shipyard.Configuration;
+using EtherGizmos.Shipyard.Models;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MimeKit;
 
-namespace EtherGizmos.Shipyard.Notifications.Services;
+namespace EtherGizmos.Shipyard.Services;
 
 internal class SmtpNotificationSender<TEvent> : IEmailNotificationSender<TEvent>
+    where TEvent : NotificationEvent
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IOptionsMonitor<NotificationOptions> _notificationOptions;
@@ -24,7 +25,7 @@ internal class SmtpNotificationSender<TEvent> : IEmailNotificationSender<TEvent>
     }
 
     public async Task NotifyAsync(
-        NotificationEvent notification,
+        TEvent notification,
         CancellationToken cancellationToken = default)
     {
         var options = _notificationOptions.CurrentValue;

@@ -1,9 +1,9 @@
-﻿using EtherGizmos.Shipyard.Database.Extensions;
-using EtherGizmos.Shipyard.Models.Database;
+using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace EtherGizmos.Shipyard.Database.Models;
+namespace EtherGizmos.Shipyard.Models;
 
 public class CarrierConfiguration : IEntityTypeConfiguration<Carrier>
 {

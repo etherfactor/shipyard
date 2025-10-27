@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Database.Migrations.Core;
+using EtherGizmos.Shipyard.Migrations.Core;
 
 namespace EtherGizmos.Shipyard.Database.Migrations._00._00.Feature000000;
 
@@ -11,7 +11,7 @@ public class Migration002_LoadTrackingTables : MigrationExtension
          * Load [dbo].[status_types]
          */
         Merge.IntoTable("status_types")
-            .Row(new { status_type_id = 0, name = "Unknown", polling_factor = 4m, is_final = false })
+            .Row(new { status_type_id = 0, name = "Unknown", polling_factor = 1m, is_final = false })
             .Row(new { status_type_id = 1, name = "Waiting", polling_factor = 2m, is_final = false })
             .Row(new { status_type_id = 10, name = "In transit", polling_factor = 1m, is_final = false })
             .Row(new { status_type_id = 20, name = "Out for delivery", polling_factor = 0.167m, is_final = false })
@@ -34,6 +34,7 @@ public class Migration002_LoadTrackingTables : MigrationExtension
             .Row(new { step_type_id = 40, name = "Set" })
             .Row(new { step_type_id = 41, name = "Replace" })
             .Row(new { step_type_id = 100, name = "Return" })
+            .Row(new { step_type_id = 1000, name = "Script" })
             .Match(e => new { e.step_type_id });
     }
 

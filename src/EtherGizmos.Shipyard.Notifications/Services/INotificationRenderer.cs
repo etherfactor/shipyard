@@ -1,6 +1,6 @@
-﻿using EtherGizmos.Shipyard.Notifications.Models;
+using EtherGizmos.Shipyard.Models;
 
-namespace EtherGizmos.Shipyard.Notifications.Services;
+namespace EtherGizmos.Shipyard.Services;
 
 public interface INotificationRenderer<in TEvent> :
     INotificationRenderer,

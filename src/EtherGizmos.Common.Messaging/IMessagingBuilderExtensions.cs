@@ -1,8 +1,8 @@
-using EtherGizmos.Common.Messaging.Abstractions;
+using EtherGizmos.Common.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
-namespace EtherGizmos.Common.Messaging;
+namespace EtherGizmos.Common;
 
 public static class IMessagingBuilderExtensions
 {

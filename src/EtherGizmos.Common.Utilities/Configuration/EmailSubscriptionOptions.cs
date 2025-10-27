@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
-namespace EtherGizmos.Common.Utilities.Configuration;
+namespace EtherGizmos.Common.Configuration;
 
 public class EmailSubscriptionOptions
 {

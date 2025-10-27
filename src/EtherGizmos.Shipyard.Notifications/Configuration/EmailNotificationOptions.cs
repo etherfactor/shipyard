@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
-namespace EtherGizmos.Shipyard.Notifications.Configuration;
+namespace EtherGizmos.Shipyard.Configuration;
 
 public class EmailNotificationOptions
 {

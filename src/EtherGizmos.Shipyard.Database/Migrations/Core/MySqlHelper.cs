@@ -1,6 +1,6 @@
-﻿using System.Data;
+using System.Data;
 
-namespace EtherGizmos.Shipyard.Database.Migrations.Core;
+namespace EtherGizmos.Shipyard.Migrations.Core;
 
 internal static class MySqlHelper
 {

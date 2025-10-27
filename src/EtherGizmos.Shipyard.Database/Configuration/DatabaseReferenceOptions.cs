@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
-namespace EtherGizmos.Shipyard.Database.Configuration;
+namespace EtherGizmos.Shipyard.Configuration;
 
 public class DatabaseReferenceOptions
 {

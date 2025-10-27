@@ -1,9 +1,9 @@
-﻿using EtherGizmos.Shipyard.Database.Extensions;
-using EtherGizmos.Shipyard.Models.Database;
+using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace EtherGizmos.Shipyard.Database.Models;
+namespace EtherGizmos.Shipyard.Models;
 
 public class TrackingUpdateConfiguration : IEntityTypeConfiguration<TrackingUpdate>
 {
@@ -37,9 +37,11 @@ public class TrackingUpdateConfiguration : IEntityTypeConfiguration<TrackingUpda
             .HasForeignKey(e => e.StatusTypeId);
 
         entity.Property(e => e.Location)
-            .HasColumnName("location");
+            .HasColumnName("location")
+            .HasMaxLength(200);
 
         entity.Property(e => e.Description)
-            .HasColumnName("description");
+            .HasColumnName("description")
+            .HasMaxLength(200);
     }
 }

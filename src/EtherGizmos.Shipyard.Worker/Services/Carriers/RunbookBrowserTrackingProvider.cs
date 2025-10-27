@@ -1,6 +1,6 @@
-﻿using EtherGizmos.Shipyard.Database.Services;
-using EtherGizmos.Shipyard.Models.Database;
-using EtherGizmos.Shipyard.Models.Database.Enums;
+using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
 using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using Microsoft.EntityFrameworkCore;
@@ -68,9 +68,12 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
             { "entryUrl", $"https://tools.usps.com/go/TrackAction?tLabels={HttpUtility.UrlEncode(trackingNumber)}" },
         };
         var results = new Dictionary<string, object>();
+
+        var index = 0;
+        ApplyLogger(runbook);
         foreach (var step in runbook)
         {
-            step.Logger = _logger;
+            step.Index = ++index;
             await step.Apply(_browserClient, variables, results, cancellationToken);
         }
 
@@ -79,6 +82,11 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
             ? DateTimeOffset.TryParse(estimatedAtStr, out var estimatedAtDt)
             ? estimatedAtDt as DateTimeOffset?
             : null : null : null;
+
+        estimatedAt = runbook
+            .Select(e => e.Eta)
+            .Where(e => e is not null).Min()
+            ?? estimatedAt;
 
         var details = results.TryGetValue("details", out object? detailsObj)
             ? detailsObj is List<object> detailsList
@@ -110,6 +118,8 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
             })
             : [] : [];
 
+        details = details.Concat(runbook.SelectMany(e => e.Updates));
+
         details = details
             .Where(e => e.OccurredAt != DateTimeOffset.MinValue);
 
@@ -121,6 +131,20 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
         };
 
         return result;
+    }
+
+    private void ApplyLogger(
+        IEnumerable<ScrapingStep> steps)
+    {
+        foreach (var step in steps)
+        {
+            step.Logger = _logger;
+
+            if (step is ExtractListStep extractStep)
+            {
+                ApplyLogger(extractStep.Steps);
+            }
+        }
     }
 
     private string? NullIfEmpty(string? input)

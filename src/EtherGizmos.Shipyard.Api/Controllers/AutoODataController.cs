@@ -1,8 +1,9 @@
 using AutoMapper;
-using EtherGizmos.Common.Utilities.Abstractions;
-using EtherGizmos.Shipyard.Database.Services;
+using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Models.Api.Errors;
-using EtherGizmos.Shipyard.OData.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -25,7 +26,7 @@ public abstract class AutoODataController : ODataController
         _serviceProvider = serviceProvider;
     }
 
-    private async Task<TEntity> LoadRecordAsync<TEntity, TDto, TKey>(
+    protected async Task<TEntity> LoadRecordAsync<TEntity, TDto, TKey>(
         IUnitOfWork uow,
         IEnumerable<KeyMapping<TEntity, TDto, TKey>> keys,
         string target = ErrorConstants.RequestTarget.Uri,
@@ -225,6 +226,8 @@ public abstract class AutoODataController : ODataController
             repository.Create(record);
 
             await uow.SaveChangesAsync(cancellationToken: cancellationToken);
+
+            record = await repository.ReloadAsync(record, cancellationToken);
 
             var finished = _mapper
                 .MapExplicitly(record)

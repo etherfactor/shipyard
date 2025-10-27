@@ -1,19 +1,19 @@
-﻿using AutoMapper;
-using EtherGizmos.Shipyard.Models.Api.Enums;
-using EtherGizmos.Shipyard.Models.Attributes;
-using EtherGizmos.Shipyard.Models.Database;
-using EtherGizmos.Shipyard.Models.Extensions;
+using AutoMapper;
+using EtherGizmos.Shipyard.Api.Enums;
+using EtherGizmos.Shipyard.Attributes;
+using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Extensions;
 using Swashbuckle.AspNetCore.Filters;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
-namespace EtherGizmos.Shipyard.Models.Api;
+namespace EtherGizmos.Shipyard.Api;
 
 public class CarrierStatusRuleDTO
 {
-    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset? CreatedAt { get; set; }
 
-    public DateTimeOffset ModifiedAt { get; set; }
+    public DateTimeOffset? ModifiedAt { get; set; }
 
     [Required, Regex]
     public string Pattern { get; set; } = null!;

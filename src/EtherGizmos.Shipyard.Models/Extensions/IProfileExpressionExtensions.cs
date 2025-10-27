@@ -1,8 +1,8 @@
-﻿using AutoMapper;
+using AutoMapper;
 using AutoMapper.Configuration;
 using System.Linq.Expressions;
 
-namespace EtherGizmos.Shipyard.Models.Extensions;
+namespace EtherGizmos.Shipyard.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="IProfileExpression"/>.

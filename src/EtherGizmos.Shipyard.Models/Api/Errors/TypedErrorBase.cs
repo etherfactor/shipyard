@@ -1,7 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using EtherGizmos.Shipyard.Models.Api.Errors;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
-namespace EtherGizmos.Shipyard.Models.Api.Errors;
+namespace EtherGizmos.Shipyard.Api.Errors;
 
 public abstract class TypedErrorBase
 {

@@ -1,11 +1,10 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Asp.Versioning.OData;
-using EtherGizmos.Shipyard.Models;
-using EtherGizmos.Shipyard.Models.Api;
-using EtherGizmos.Shipyard.OData.Extensions;
+using EtherGizmos.Shipyard.Api;
+using EtherGizmos.Shipyard.Extensions;
 using Microsoft.OData.ModelBuilder;
 
-namespace EtherGizmos.Shipyard.OData.Models;
+namespace EtherGizmos.Shipyard.Models;
 
 public class PackageDTOConfiguration : IModelConfiguration
 {
@@ -38,6 +37,11 @@ public class PackageDTOConfiguration : IModelConfiguration
             entity.EnumProperty(e => e.LastStatusType);
             entity.Property(e => e.IsDelivered);
             entity.HasMany(e => e.TrackingUpdates);
+
+            builder.Function("findUpdatedPackages")
+                .ReturnsFromEntitySet<PackageDTO>("packages");
+
+            builder.Action("schedulePoll");
         }
     }
 }

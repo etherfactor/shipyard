@@ -1,7 +1,7 @@
-using EtherGizmos.Common.Messaging.Abstractions;
-using EtherGizmos.Shipyard.Database.Services;
-using EtherGizmos.Shipyard.Models.Database;
-using EtherGizmos.Shipyard.Worker.Consumers;
+using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -34,6 +34,7 @@ public class QueueTrackingRequestBackgroundService : PeriodicBackgroundService
 
         var ready = packageRepo.Data
             .Where(e => e.NextPollAt < DateTimeOffset.UtcNow)
+            .Include(e => e.Carrier)
             .Include(e => e.LastStatusType)
             .AsAsyncEnumerable();
 

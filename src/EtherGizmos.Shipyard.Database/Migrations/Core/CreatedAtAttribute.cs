@@ -1,6 +1,6 @@
-﻿using FluentMigrator;
+using FluentMigrator;
 
-namespace EtherGizmos.Shipyard.Database.Migrations.Core;
+namespace EtherGizmos.Shipyard.Migrations.Core;
 
 /// <summary>
 /// Generates a version number for the migration based on the date/time at which the migration was authored. Migrations will

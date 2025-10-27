@@ -1,0 +1,62 @@
+<nav class="navbar navbar-expand-md navbar-main bg-body-tertiary">
+  <div class="container-fluid">
+    <div class="navbar-grow d-flex flex-row align-items-center">
+      <button class="navbar-toggler d-block" type="button" aria-label="Toggle navigation"
+              (click)="openSidebar()">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand ms-3 pt-0 pb-0" style="font-size: 1.25rem;" [routerLink]="['/']">
+        <div class="d-inline-block me-2">
+          <div class="rounded-circle d-flex align-items-center justify-content-center"
+               style="width: 36px; height: 36px; background: rgba(13, 110, 253, .12);">
+            <i class="bi bi-box-seam-fill fs-5 text-primary" aria-hidden="true"></i>
+          </div>
+        </div>
+        <span class="d-none d-md-inline">Shipyard</span>
+      </a>
+    </div>
+    <input type="text" style="width: 400px;" class="form-control d-none d-md-block" id="exampleInputEmail1">
+    <button type="button" class="btn btn-link d-sm-block d-md-none"><span class="bi bi-search"></span></button>
+    <div class="navbar-grow d-flex flex-row-reverse align-items-center">
+      <ul class="navbar-nav mb-lg-0">
+        @if (isSignedIn$$()) {
+        <li ngbDropdown class="nav-item dropdown">
+          <a ngbDropdownToggle class="nav-link dropdown-toggle" href="javascript:void(0);">
+            {{name$$()}}
+          </a>
+          <ul ngbDropdownMenu class="dropdown-menu dropdown-menu-end">
+            <li><a ngbDropdownItem class="dropdown-item" href="javascript:void(0);" (click)="logout()">Sign out</a></li>
+          </ul>
+        </li>
+        } @else {
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0);" (click)="login()">
+            <span class="bi bi-box-arrow-in-right"></span> Sign In
+          </a>
+        </li>
+        }
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<nav class="navbar navbar-sub bg-body-tertiary sticky-top" aria-expanded="true" data-testid="navbar-sub">
+
+  <div class="container-fluid" style="min-height: 32px;">
+
+    <app-navbar-breadcrumb></app-navbar-breadcrumb>
+
+    <div class="d-none d-md-block" data-testid="actions">
+      <app-navbar-action></app-navbar-action>
+    </div>
+
+  </div>
+
+  <div class="container-fluid flex-row-reverse">
+
+    <div class="d-md-none" data-testid="actions">
+      <app-navbar-action></app-navbar-action>
+    </div>
+
+  </div>
+</nav>

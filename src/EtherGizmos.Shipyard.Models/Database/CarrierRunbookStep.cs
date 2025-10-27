@@ -1,9 +1,9 @@
-using EtherGizmos.Common.Utilities.Converters;
-using EtherGizmos.Shipyard.Models.Database.Enums;
+using EtherGizmos.Common.Converters;
+using EtherGizmos.Shipyard.Database.Enums;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace EtherGizmos.Shipyard.Models.Database;
+namespace EtherGizmos.Shipyard.Database;
 
 public class CarrierRunbookStep
 {

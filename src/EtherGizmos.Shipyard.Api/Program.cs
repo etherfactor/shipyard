@@ -1,16 +1,21 @@
+using EtherGizmos.Common;
 using EtherGizmos.Common.Configuration;
-using EtherGizmos.Common.Utilities;
+using EtherGizmos.Common.Services;
+using EtherGizmos.Shipyard;
+using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Api.Services.HostedServices;
 using EtherGizmos.Shipyard.Api.Services.Middleware;
+using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Database;
-using EtherGizmos.Shipyard.Database.Configuration;
-using EtherGizmos.Shipyard.Database.Services;
-using EtherGizmos.Shipyard.Models;
-using EtherGizmos.Shipyard.Models.Api.Errors;
-using EtherGizmos.Shipyard.Models.Database;
-using EtherGizmos.Shipyard.OData;
+using EtherGizmos.Shipyard.Services;
+using JavaScriptEngineSwitcher.Extensions.MsDependencyInjection;
+using JavaScriptEngineSwitcher.V8;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,19 +51,72 @@ builder.AddServiceDefaults();
 
 builder.Services.AddServiceConnections();
 
+// Security
+builder.UseOAuth2()
+    .AsAuthorizationServer<AuthorizationContext>(opt =>
+    {
+        builder.Configuration
+            .GetSection("Security")
+            .Bind(opt);
+
+        opt.Cookie.LoginUrl = "/account/login";
+        opt.Cookie.LogoutUrl = "/account/logout";
+    });
+
 // Database
 builder.Services
     .AddDatabase()
+    .AddDbContext<AuthorizationContext>((services, opt) =>
+    {
+        opt.UseLazyLoadingProxies();
+        opt.EnableSensitiveDataLogging();
+
+        var dbOptions = services.GetRequiredService<IOptions<DatabaseReferenceOptions>>()
+            .Value;
+
+        var connectionId = dbOptions.ConnectionId;
+
+        var resolver = services.GetRequiredService<IConnectionResolver>();
+        var connection = resolver.GetDatabaseConnection(connectionId);
+
+        connection.Match(
+            _ => throw new InvalidOperationException($"The connection {connectionId} is not a valid database connection."),
+            postgreSql =>
+            {
+                return opt.UseNpgsql(
+                    postgreSql.ConnectionString,
+                    o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
+            }
+        );
+    })
     .AddUnitOfWork(opt =>
     {
         opt.BindDbContext<ApplicationContext>();
     });
 
+// Messaging
+builder.Services
+    .AddMessaging((opt, conf) =>
+    {
+        opt.Publishers.AddQueue("tracking-poll-request", "tracking.poll.request");
+    })
+    .UseRabbitMQ((opt, conf) =>
+    {
+        conf.GetSection("RabbitMq")
+            .Bind(opt);
+    })
+    .AddConsumersFromAssemblies(typeof(Program).Assembly);
+
 // Models
 builder.Services.AddModelValidators();
 
 // Controllers
-builder.Services.AddControllers();
+builder.Services
+    .AddRouting(opt =>
+    {
+        opt.LowercaseUrls = true;
+    })
+    .AddControllersWithViews();
 
 builder.Services
     .AddOData((opt, conf) =>
@@ -70,6 +128,23 @@ builder.Services
     });
 
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
+
+builder.Services.AddHostedService<InitialConfigSeeder>();
+builder.Services.AddHostedService<OAuth2Seeder>();
+
+// Rendering
+builder.Services
+    .AddJsEngineSwitcher(opt => opt.DefaultEngineName = V8JsEngine.EngineName)
+    .AddV8();
+
+builder.Services
+    .AddWebOptimizer(opt =>
+    {
+        opt.CompileScssFiles();
+        opt.MinifyCssFiles();
+        opt.MinifyJsFiles();
+    });
 
 //**********************************************************
 // Pipeline
@@ -77,6 +152,10 @@ builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 var app = builder.Build();
 
 app.UseHttpsRedirection();
+
+app.UseWebOptimizer();
+app.UseStaticFiles();
+
 app.UseRouting();
 
 app.

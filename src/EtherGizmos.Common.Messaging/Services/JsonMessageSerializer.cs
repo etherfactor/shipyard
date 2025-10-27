@@ -1,8 +1,8 @@
-using EtherGizmos.Common.Messaging.Abstractions;
+using EtherGizmos.Common.Abstractions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace EtherGizmos.Common.Messaging.Services;
+namespace EtherGizmos.Common.Services;
 
 public class JsonMessageSerializer : IMessageSerializer
 {

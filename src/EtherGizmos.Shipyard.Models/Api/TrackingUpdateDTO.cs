@@ -1,11 +1,11 @@
-﻿using AutoMapper;
-using EtherGizmos.Shipyard.Models.Api.Enums;
-using EtherGizmos.Shipyard.Models.Database;
-using EtherGizmos.Shipyard.Models.Extensions;
+using AutoMapper;
+using EtherGizmos.Shipyard.Api.Enums;
+using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Extensions;
 using Swashbuckle.AspNetCore.Filters;
 using System.Diagnostics.CodeAnalysis;
 
-namespace EtherGizmos.Shipyard.Models.Api;
+namespace EtherGizmos.Shipyard.Api;
 
 public class TrackingUpdateDTO
 {

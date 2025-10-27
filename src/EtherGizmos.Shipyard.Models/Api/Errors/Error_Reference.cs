@@ -1,4 +1,5 @@
-using EtherGizmos.Common.Utilities.Extensions;
+using EtherGizmos.Common.Extensions;
+using EtherGizmos.Shipyard.Api.Errors;
 using System.Linq.Expressions;
 using System.Net;
 

@@ -1,5 +1,5 @@
-﻿using EtherGizmos.Shipyard.Database.Extensions;
-using EtherGizmos.Shipyard.Database.Migrations.Core;
+using EtherGizmos.Shipyard.Extensions;
+using EtherGizmos.Shipyard.Migrations.Core;
 using System.Data;
 
 namespace EtherGizmos.Shipyard.Database.Migrations._00._00.Feature000000;

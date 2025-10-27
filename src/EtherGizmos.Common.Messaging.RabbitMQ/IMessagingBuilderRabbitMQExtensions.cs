@@ -1,5 +1,5 @@
+using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Configuration;
-using EtherGizmos.Common.Messaging.Abstractions;
 using EtherGizmos.Common.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,6 +42,9 @@ public static class IMessagingBuilderRabbitMQExtensions
                     factory.Password = options.Password!;
                     factory.Port = options.Port;
                 }
+
+                factory.AutomaticRecoveryEnabled = true;
+                factory.TopologyRecoveryEnabled = true;
 
                 return factory;
             });

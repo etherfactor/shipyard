@@ -1,8 +1,10 @@
-using EtherGizmos.Common.Utilities.Configuration;
+using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Common.Configuration;
 using EtherGizmos.Extensions.DependencyInjection;
-using EtherGizmos.Shipyard.Database.Configuration;
-using EtherGizmos.Shipyard.Database.Migrations.Core;
-using EtherGizmos.Shipyard.Database.Services;
+using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Configuration;
+using EtherGizmos.Shipyard.Migrations.Core;
+using EtherGizmos.Shipyard.Services;
 using FluentMigrator.Runner;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +12,7 @@ using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Reflection;
 
-namespace EtherGizmos.Shipyard.Database;
+namespace EtherGizmos.Shipyard;
 
 public static class IServiceCollectionExtensions
 {
@@ -22,9 +24,11 @@ public static class IServiceCollectionExtensions
             .ValidateDataAnnotations();
 
         @this.AddSingleton<IMigrationManager, MigrationManager>()
+            .AddSingleton<IOAuth2MigrationManager, MigrationManager>()
             .AddDbContext<ApplicationContext>((services, opt) =>
             {
                 opt.UseLazyLoadingProxies();
+                opt.EnableSensitiveDataLogging();
 
                 var dbOptions = services.GetRequiredService<IOptions<DatabaseReferenceOptions>>()
                     .Value;
@@ -69,6 +73,7 @@ public static class IServiceCollectionExtensions
                         );
                     });
             })
+            .ImportLogging()
             .ForwardScoped<IMigrationRunner>();
 
         return @this;
@@ -79,7 +84,7 @@ public static class IServiceCollectionExtensions
         Action<UnitOfWorkOptions> configureOptions)
     {
         @this.AddSingleton<IUnitOfWorkFactory, UnitOfWorkFactory>()
-            .AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
+            .AddScoped(typeof(IRepository<>), typeof(EfCoreRepository<>));
 
         @this.AddOptions<UnitOfWorkOptions>()
             .Configure(configureOptions);
@@ -93,7 +98,7 @@ public static class IServiceCollectionExtensions
             var contextType = pair.Value;
             var serviceType = typeof(DbSet<>).MakeGenericType(entityType);
 
-            @this
+            @this.AddKeyedScoped(typeof(DbContext), entityType, contextType)
                 .AddScoped(serviceType, provider =>
                 {
                     var context = (DbContext)provider.GetRequiredService(contextType);

@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
+using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using HtmlAgilityPack;
 using System.ComponentModel.DataAnnotations;
 
@@ -11,7 +11,7 @@ internal class WaitForStep : ScrapingStep
 
     public override async Task Apply(IBrowserClient client, IDictionary<string, object> variables, IDictionary<string, object> results, CancellationToken cancellationToken = default)
     {
-        await client.WaitForElementAsync(Selector, cancellationToken: cancellationToken);
+        await client.WaitForElementAsync(Selector, timeout: TimeSpan.FromSeconds(15), cancellationToken: cancellationToken);
     }
 
     protected internal override async Task Apply(HtmlNode subNode, IBrowserClient client, IDictionary<string, object> variables, IDictionary<string, object> results, CancellationToken cancellationToken = default)

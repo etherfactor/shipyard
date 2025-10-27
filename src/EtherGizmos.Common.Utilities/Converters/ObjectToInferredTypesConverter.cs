@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace EtherGizmos.Common.Utilities.Converters;
+namespace EtherGizmos.Common.Converters;
 
 public class ObjectToInferredTypesConverter : JsonConverter<object>
 {

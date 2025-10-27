@@ -1,4 +1,5 @@
-using EtherGizmos.Common.Utilities.Abstractions;
+using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Models.Api.Errors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -8,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
-namespace EtherGizmos.Shipyard.OData.Services;
+namespace EtherGizmos.Shipyard.Services;
 
 internal class ValidationModelValidator<TModel> : IModelValidator<TModel>
 {

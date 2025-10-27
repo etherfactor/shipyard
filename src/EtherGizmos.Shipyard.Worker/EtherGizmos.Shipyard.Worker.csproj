@@ -22,6 +22,7 @@
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.12.1" />
     <PackageReference Include="HtmlAgilityPack.CssSelectors.NetCore" Version="1.2.1" />
+    <PackageReference Include="Jint" Version="4.4.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
     <PackageReference Include="NCrontab.Signed" Version="3.3.3" />
     <PackageReference Include="Selenium.Support" Version="4.33.0" />
@@ -38,6 +39,7 @@
     <ProjectReference Include="..\EtherGizmos.Common.Messaging.RabbitMQ\EtherGizmos.Common.RabbitMQ.csproj" />
     <ProjectReference Include="..\EtherGizmos.Common.ServiceDefaults\EtherGizmos.Common.ServiceDefaults.csproj" />
     <ProjectReference Include="..\EtherGizmos.Shipyard.Database\EtherGizmos.Shipyard.Database.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Shipyard.Messaging\EtherGizmos.Shipyard.Messaging.csproj" />
     <ProjectReference Include="..\EtherGizmos.Shipyard.Notifications\EtherGizmos.Shipyard.Notifications.csproj" />
   </ItemGroup>
 

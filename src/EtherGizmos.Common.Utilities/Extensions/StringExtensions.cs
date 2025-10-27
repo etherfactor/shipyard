@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text;
 
-namespace EtherGizmos.Common.Utilities.Extensions;
+namespace EtherGizmos.Common.Extensions;
 
 public static class StringExtensions
 {

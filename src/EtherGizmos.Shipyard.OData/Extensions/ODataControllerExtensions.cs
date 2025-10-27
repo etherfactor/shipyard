@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using System.Diagnostics.CodeAnalysis;
 
-namespace EtherGizmos.Shipyard.OData.Extensions;
+namespace EtherGizmos.Shipyard.Extensions;
 
 public static class ODataControllerExtensions
 {

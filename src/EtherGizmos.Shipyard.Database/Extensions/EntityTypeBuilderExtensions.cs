@@ -1,8 +1,8 @@
-using EtherGizmos.Common.Utilities.Abstractions;
+using EtherGizmos.Common.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace EtherGizmos.Shipyard.Database.Extensions;
+namespace EtherGizmos.Shipyard.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="EntityTypeBuilder{TEntity}"/>.
@@ -20,16 +20,20 @@ public static class EntityTypeBuilderExtensions
     {
         @this.Property(e => e.CreatedAt)
             .HasColumnName("created_at_utc")
-            .HasDefaultValueSql();
+            .HasDefaultValueSql()
+            .ValueGeneratedOnAddOrUpdate();
 
         @this.Property(e => e.CreatedByUserId)
-            .HasColumnName("created_by_user_id");
+            .HasColumnName("created_by_user_id")
+            .ValueGeneratedOnAddOrUpdate();
 
         @this.Property(e => e.ModifiedAt)
-            .HasColumnName("modified_at_utc");
+            .HasColumnName("modified_at_utc")
+            .ValueGeneratedOnAddOrUpdate();
 
         @this.Property(e => e.ModifiedByUserId)
-            .HasColumnName("modified_by_user_id");
+            .HasColumnName("modified_by_user_id")
+            .ValueGeneratedOnAddOrUpdate();
 
         return @this;
     }

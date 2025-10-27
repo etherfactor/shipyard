@@ -1,9 +1,9 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Asp.Versioning.OData;
-using EtherGizmos.Shipyard.Models.Api.Enums;
+using EtherGizmos.Shipyard.Api.Enums;
 using Microsoft.OData.ModelBuilder;
 
-namespace EtherGizmos.Shipyard.OData.Models.Enum;
+namespace EtherGizmos.Shipyard.Models.Enum;
 
 public class StatusTypeDTOConfiguration : IModelConfiguration
 {

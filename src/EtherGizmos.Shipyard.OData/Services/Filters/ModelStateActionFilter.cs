@@ -1,10 +1,11 @@
-﻿using EtherGizmos.Shipyard.Models.Api.Errors;
+using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Models.Api.Errors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Reflection;
 
-namespace EtherGizmos.Shipyard.OData.Services.Filters;
+namespace EtherGizmos.Shipyard.Services.Filters;
 
 public class ModelStateActionFilter : IActionFilter
 {

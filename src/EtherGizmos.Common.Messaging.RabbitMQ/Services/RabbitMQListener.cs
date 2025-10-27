@@ -1,4 +1,4 @@
-using EtherGizmos.Common.Messaging.Abstractions;
+using EtherGizmos.Common.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
@@ -9,7 +9,7 @@ using System.Threading.Channels;
 
 namespace EtherGizmos.Common.Services;
 
-internal class RabbitMQListener : IMessageListener
+internal class RabbitMQListener : IMessageListener, IDisposable
 {
     private readonly ILogger _logger;
     private readonly ConnectionFactory _rmqConnectionFactory;
@@ -18,6 +18,7 @@ internal class RabbitMQListener : IMessageListener
     private readonly string? _subscription;
 
     private readonly Channel<ReceivedMessage> _channel = System.Threading.Channels.Channel.CreateUnbounded<ReceivedMessage>();
+    private volatile bool _stopping;
 
     private IConnection? _rmqConnection;
     private IChannel? _rmqChannel;
@@ -49,83 +50,184 @@ internal class RabbitMQListener : IMessageListener
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
     {
-        _rmqConnection = await _rmqConnectionFactory.CreateConnectionAsync(cancellationToken: cancellationToken);
-        _rmqChannel = await _rmqConnection.CreateChannelAsync(cancellationToken: cancellationToken);
+        _stopping = false;
+
+        _rmqConnection = await _rmqConnectionFactory.CreateConnectionAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+        _rmqConnection.CallbackExceptionAsync += (_, e) =>
+        {
+            _logger.LogError(e.Exception, "RabbitMQ connection callback exception.");
+            return Task.CompletedTask;
+        };
+        _rmqConnection.ConnectionShutdownAsync += (_, e) =>
+        {
+            _logger.LogWarning("RabbitMQ connection shutdown: {ReplyText} ({ReplyCode})", e.ReplyText, (int)e.ReplyCode);
+            return Task.CompletedTask;
+        };
+
+        _rmqChannel = await _rmqConnection.CreateChannelAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+        _rmqChannel.ChannelShutdownAsync += (_, e) =>
+        {
+            if (e.Exception is not null)
+            {
+                _logger.LogError(e.Exception, "RabbitMQ channel shutdown: {ReplyText} ({ReplyCode})", e.ReplyText, (int)e.ReplyCode);
+            }
+            else
+            {
+                _logger.LogWarning("RabbitMQ channel shutdown: {ReplyText} ({ReplyCode})", e.ReplyText, (int)e.ReplyCode);
+            }
+            return Task.CompletedTask;
+        };
 
         if (_queue is not null)
         {
-            await _rmqChannel.QueueDeclareAsync(_queue, durable: true, exclusive: false, autoDelete: false, cancellationToken: cancellationToken);
+            await _rmqChannel.QueueDeclareAsync(_queue, durable: true, exclusive: false, autoDelete: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
         else
         {
-            await _rmqChannel.ExchangeDeclareAsync(_topic!, ExchangeType.Fanout, durable: true, autoDelete: false, cancellationToken: cancellationToken);
-            await _rmqChannel.QueueDeclareAsync($"{_topic}:{_subscription}", durable: true, exclusive: false, autoDelete: false, cancellationToken: cancellationToken);
-            await _rmqChannel.QueueBindAsync($"{_topic}:{_subscription}", exchange: _topic!, routingKey: _subscription!, cancellationToken: cancellationToken);
+            // Keep fanout semantics; routing key is ignored on bind
+            await _rmqChannel.ExchangeDeclareAsync(_topic!, ExchangeType.Fanout, durable: true, autoDelete: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+            var queueName = $"{_topic}:{_subscription}";
+            await _rmqChannel.QueueDeclareAsync(queueName, durable: true, exclusive: false, autoDelete: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+            await _rmqChannel.QueueBindAsync(queueName, exchange: _topic!, routingKey: string.Empty, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
+
+        // QoS for consumer (avoid unlimited unacked flood)
+        await _rmqChannel.BasicQosAsync(0, prefetchCount: 50, global: false, cancellationToken).ConfigureAwait(false);
 
         _rmqConsumer = new AsyncEventingBasicConsumer(_rmqChannel);
         _rmqConsumer.ReceivedAsync += RmqConsumer_ReceivedAsync;
+        _rmqConsumer.ShutdownAsync += (_, ea) =>
+        {
+            _logger.LogWarning("RabbitMQ consumer shutdown: {ReplyText} ({ReplyCode})", ea.ReplyText, (int)ea.ReplyCode);
+            return Task.CompletedTask;
+        };
+        _rmqConsumer.UnregisteredAsync += (_, ea) =>
+        {
+            _logger.LogInformation("RabbitMQ consumer unregistered: {@ConsumerTags}", ea.ConsumerTags);
+            return Task.CompletedTask;
+        };
+        _rmqConsumer.RegisteredAsync += (_, ea) =>
+        {
+            _logger.LogInformation("RabbitMQ consumer registered: {ConsumerTag}", ea.ConsumerTags);
+            return Task.CompletedTask;
+        };
 
-        await _rmqChannel.BasicConsumeAsync(_queue ?? $"{_topic}:{_subscription}", autoAck: false, consumer: _rmqConsumer, cancellationToken: cancellationToken);
+        await _rmqChannel.BasicConsumeAsync(
+            _queue ?? $"{_topic}:{_subscription}",
+            autoAck: false,
+            consumer: _rmqConsumer,
+            cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        _logger.LogInformation("RabbitMQListener started for {QueueOrTopic}.",
+            _queue ?? $"{_topic}:{_subscription}");
     }
 
-    private async Task RmqConsumer_ReceivedAsync(
-        object sender, BasicDeliverEventArgs @event)
-    {
-        while (_rmqChannel is null)
+    private static string AsString(object? v) =>
+        v switch
         {
-            await Task.Delay(200, @event.CancellationToken);
-        }
+            null => "",
+            byte[] b => Encoding.UTF8.GetString(b),
+            ReadOnlyMemory<byte> rom => Encoding.UTF8.GetString(rom.Span),
+            string s => s,
+            _ => v.ToString() ?? ""
+        };
+
+    private async Task RmqConsumer_ReceivedAsync(object sender, BasicDeliverEventArgs @event)
+    {
+        if (_stopping || @event.CancellationToken.IsCancellationRequested)
+            return;
+
+        // If the channel is gone because we’re stopping, bail early
+        if (_rmqChannel is null)
+            return;
 
         try
         {
             var body = Encoding.UTF8.GetString(@event.Body.Span);
 
-            var allHeaders = @event.BasicProperties.Headers?
-                .Select(e => new KeyValuePair<string, string>(e.Key, Encoding.UTF8.GetString((byte[])e.Value!) ?? ""))
-                .ToDictionary() ?? new Dictionary<string, string>();
+            var headerDict = @event.BasicProperties.Headers ?? new Dictionary<string, object?>();
+            var allHeaders = headerDict.ToDictionary(kvp => kvp.Key, kvp => AsString(kvp.Value));
+
+            if (!allHeaders.TryGetValue("$type", out var typeHeader) || string.IsNullOrWhiteSpace(typeHeader))
+            {
+                _logger.LogWarning("Received message without $type header. DeliveryTag={DeliveryTag}", @event.DeliveryTag);
+                typeHeader = "";
+            }
+
+            if (!allHeaders.TryGetValue("$logical", out var logicalHeader) || string.IsNullOrWhiteSpace(logicalHeader))
+            {
+                _logger.LogWarning("Received message without $logical header. DeliveryTag={DeliveryTag}", @event.DeliveryTag);
+                logicalHeader = "";
+            }
 
             var headers = allHeaders
-                .Where(e => e.Key != "$type")
-                .Where(e => e.Key != "$logical")
+                .Where(e => e.Key != "$type" && e.Key != "$logical")
                 .ToImmutableDictionary();
 
-            var actions = new RabbitMQMessageActions(_rmqChannel, @event.DeliveryTag);
+            var actions = new RabbitMQMessageActions(_logger, _rmqChannel, @event.DeliveryTag);
 
             var message = new ReceivedMessage()
             {
                 Id = @event.DeliveryTag.ToString(),
-                Type = allHeaders["$type"],
+                Type = typeHeader,
                 Body = body,
                 Headers = headers,
-                LogicalSourceName = allHeaders["$logical"],
+                LogicalSourceName = logicalHeader,
                 Actions = actions,
             };
 
-            await _channel.Writer.WriteAsync(message, @event.CancellationToken);
+            // If backpressure is desired, consider TryWrite with fallback
+            await _channel.Writer.WriteAsync(message, @event.CancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Encountered an error while receiving a RabbitMQ message");
-            await _rmqChannel.BasicNackAsync(@event.DeliveryTag, false, true, @event.CancellationToken);
+            _logger.LogError(ex, "Error while receiving a RabbitMQ message (DeliveryTag={DeliveryTag})", @event.DeliveryTag);
+
+            if (_rmqChannel is not null && !_stopping && !@event.CancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    await _rmqChannel.BasicNackAsync(@event.DeliveryTag, multiple: false, requeue: true, @event.CancellationToken).ConfigureAwait(false);
+                }
+                catch (Exception ex2)
+                {
+                    _logger.LogError(ex2, "Failed to nack message DeliveryTag={DeliveryTag}", @event.DeliveryTag);
+                }
+            }
         }
     }
 
     public async Task StopAsync(CancellationToken cancellationToken = default)
     {
-        if (_rmqChannel is not null)
-            await _rmqChannel.DisposeAsync();
-
-        if (_rmqConnection is not null)
-            await _rmqConnection.DisposeAsync();
+        _stopping = true;
 
         if (_rmqConsumer is not null)
         {
             _rmqConsumer.ReceivedAsync -= RmqConsumer_ReceivedAsync;
         }
 
-        _channel.Writer.Complete();
-        await _channel.Reader.Completion;
+        // Complete our outgoing channel so downstream pumps exit
+        _channel.Writer.TryComplete();
+
+        if (_rmqChannel is not null)
+        {
+            try { await _rmqChannel.DisposeAsync().ConfigureAwait(false); }
+            catch (Exception ex) { _logger.LogWarning(ex, "Error disposing RabbitMQ channel."); }
+            _rmqChannel = null;
+        }
+
+        if (_rmqConnection is not null)
+        {
+            try { await _rmqConnection.DisposeAsync().ConfigureAwait(false); }
+            catch (Exception ex) { _logger.LogWarning(ex, "Error disposing RabbitMQ connection."); }
+            _rmqConnection = null;
+        }
+
+        // Drain completion (safe even if already completed)
+        try { await _channel.Reader.Completion.ConfigureAwait(false); }
+        catch { /* ignore */ }
+
+        _logger.LogInformation("RabbitMQListener stopped for {QueueOrTopic}.", _queue ?? $"{_topic}:{_subscription}");
     }
 
     protected virtual void Dispose(bool disposing)
@@ -134,18 +236,14 @@ internal class RabbitMQListener : IMessageListener
         {
             if (disposing)
             {
-                // TODO: dispose managed state (managed objects)
+                try { StopAsync().GetAwaiter().GetResult(); } catch { /* ignore */ }
             }
-
-            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-            // TODO: set large fields to null
             _disposed = true;
         }
     }
 
     public void Dispose()
     {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }

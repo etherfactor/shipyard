@@ -1,12 +1,12 @@
-using EtherGizmos.Common.Utilities.Abstractions;
-using EtherGizmos.Common.Utilities.Configuration;
-using EtherGizmos.Common.Utilities.Services;
+using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Common.Configuration;
+using EtherGizmos.Common.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Reflection;
 
-namespace EtherGizmos.Common.Utilities;
+namespace EtherGizmos.Common;
 
 public static class IServiceCollectionExtensions
 {
@@ -29,6 +29,21 @@ public static class IServiceCollectionExtensions
             var serviceType = typeof(IModelValidator<>).MakeGenericType(modelValidator.ModelType);
             @this.TryAddScoped(serviceType, modelValidator.ValidatorType);
         }
+
+        return @this;
+    }
+
+    public static IServiceCollection AddCertificates(
+        this IServiceCollection @this)
+    {
+        @this.TryAddSingleton<ICertificateResolver, CertificateResolver>();
+
+        @this.AddOptions<Dictionary<string, CertificateOptions>>()
+            .Configure<IConfiguration>((opt, conf) =>
+            {
+                conf.GetSection("Security:Certificates")
+                    .Bind(opt);
+            });
 
         return @this;
     }

@@ -1,10 +1,10 @@
-﻿using FluentMigrator;
+using FluentMigrator;
 using FluentMigrator.Builders.Delete;
 using FluentMigrator.Builders.IfDatabase;
 using FluentMigrator.Infrastructure;
 using System.Reflection;
 
-namespace EtherGizmos.Shipyard.Database.Migrations.Core;
+namespace EtherGizmos.Shipyard.Migrations.Core;
 
 public static class IDeleteExpressionRootExtensions
 {
@@ -24,7 +24,7 @@ public static class IDeleteExpressionRootExtensions
         mySql.Execute
             .Sql($"drop trigger {MySqlHelper.Escape($"TR_{table}_audit_update")};");
 
-        var postgres = new IfDatabaseExpressionRoot(context, ProcessorIdConstants.Postgres);
+        var postgres = new IfDatabaseExpressionRoot(context, ProcessorIdConstants.PostgreSQL);
 
         postgres.Execute
             .Sql($"drop function {PostgreSqlHelper.Escape($"TR_{table}_audit")}() cascade;");

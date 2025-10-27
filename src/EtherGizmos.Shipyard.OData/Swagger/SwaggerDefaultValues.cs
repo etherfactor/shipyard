@@ -1,8 +1,8 @@
-﻿using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text.Json;
 
-namespace EtherGizmos.Shipyard.OData.Swagger;
+namespace EtherGizmos.Shipyard.Swagger;
 
 /// <summary>
 /// Represents the OpenAPI/Swashbuckle operation filter used to document the implicit API version parameter.

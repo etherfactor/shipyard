@@ -1,8 +1,8 @@
-using EtherGizmos.Common.Configuration.Providers;
+using EtherGizmos.Common.Providers;
 using Microsoft.Extensions.Configuration;
 using System.Text.RegularExpressions;
 
-namespace EtherGizmos.Common.Configuration;
+namespace EtherGizmos.Common;
 
 public static class IConfigurationBuilderExtensions
 {

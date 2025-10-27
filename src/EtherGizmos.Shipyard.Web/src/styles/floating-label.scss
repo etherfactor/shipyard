@@ -1,0 +1,52 @@
+@import './_base.scss';
+
+@import '../../node_modules/@tkrotoff/bootstrap-floating-label/src/bootstrap-floating-label.scss';
+
+.floating-label {
+  > input:focus + label,
+  > input[placeholder]:not(:placeholder-shown) + label {
+    color: $input-color;
+  }
+
+  > .ng-select {
+    > .ng-select-container {
+      overflow: visible !important;
+
+      .ng-value-container {
+        overflow: visible;
+      }
+    }
+
+    &.ng-select-filtered .ng-placeholder,
+    .ng-has-value .ng-placeholder {
+      display: inherit;
+    }
+
+    .ng-placeholder {
+      position: absolute;
+      z-index: 5;
+      max-width: calc(100% - 2px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      left: $input-padding-x-sm;
+      padding: 0 0.3rem;
+      line-height: $line-height-sm;
+      top: 50%;
+      transform: translateY(-50%);
+      transition: $transition-fast;
+    }
+
+    &.ng-select-focused .ng-placeholder,
+    &.ng-select-opened .ng-placeholder,
+    &.ng-select-filtered .ng-placeholder,
+    .ng-has-value .ng-placeholder {
+      top: -$label-top-position-sm;
+      transform: translateY(0%);
+      font-size: $font-size-sm;
+      color: $input-color !important;
+      background-color: $input-bg;
+      border-radius: $border-radius;
+    }
+  }
+}

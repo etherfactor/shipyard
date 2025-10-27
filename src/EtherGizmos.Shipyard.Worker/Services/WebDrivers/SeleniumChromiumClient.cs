@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Worker.Configuration;
+using EtherGizmos.Shipyard.Worker.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenQA.Selenium;
@@ -80,7 +80,7 @@ internal class SeleniumChromiumClient : IBrowserClient, IDisposable
 
         _logger.LogInformation("Navigated to url {RequestUri}", requestUrl);
 
-        var wait = new WebDriverWait(_driver, timeout ?? TimeSpan.FromSeconds(5));
+        var wait = new WebDriverWait(_driver, timeout ?? TimeSpan.FromSeconds(30));
         wait.Until(d =>
             ((IJavaScriptExecutor)d)
               .ExecuteScript("return document.readyState") as string == "complete");
@@ -98,7 +98,7 @@ internal class SeleniumChromiumClient : IBrowserClient, IDisposable
 
         _logger.LogInformation("Waiting until element {CssSelector} is loaded", selector);
 
-        var wait = new WebDriverWait(_driver, timeout ?? TimeSpan.FromSeconds(5));
+        var wait = new WebDriverWait(_driver, timeout ?? TimeSpan.FromSeconds(30));
         wait.Until(d => d.FindElement(By.CssSelector(selector)).Displayed);
 
         _logger.LogInformation("Element {CssSelector} is loaded", selector);
@@ -116,7 +116,15 @@ internal class SeleniumChromiumClient : IBrowserClient, IDisposable
 
         _logger.LogInformation("Clicking element {CssSelector}", selector);
 
-        _driver.FindElement(By.CssSelector(selector)).Click();
+        var element = _driver.FindElement(By.CssSelector(selector));
+        try
+        {
+            element.Click();
+        }
+        catch (ElementClickInterceptedException)
+        {
+            ((IJavaScriptExecutor)_driver).ExecuteScript("arguments[0].click();", element);
+        }
 
         _logger.LogInformation("Clicked element {CssSelector}", selector);
     }

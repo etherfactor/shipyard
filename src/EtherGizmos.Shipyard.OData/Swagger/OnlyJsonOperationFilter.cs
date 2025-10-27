@@ -1,7 +1,7 @@
-﻿using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace EtherGizmos.Shipyard.OData.Swagger;
+namespace EtherGizmos.Shipyard.Swagger;
 
 public class OnlyJsonOperationFilter : IOperationFilter
 {
