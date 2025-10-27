@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Models.Database;
+using EtherGizmos.Shipyard.Models.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -25,9 +25,7 @@ public class CarrierRunbookStepConfiguration : IEntityTypeConfiguration<CarrierR
         entity.Property(e => e.StepType)
             .HasColumnName("step_type_id");
 
-        entity.Property(e => e.PayloadJson)
+        entity.Property(e => e.Payload)
             .HasColumnName("payload");
-
-        entity.Ignore(e => e.Payload);
     }
 }

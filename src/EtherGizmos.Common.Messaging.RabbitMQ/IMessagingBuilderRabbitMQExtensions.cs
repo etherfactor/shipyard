@@ -1,12 +1,12 @@
-﻿using EtherGizmos.Messaging.Abstractions;
-using EtherGizmos.Messaging.Configuration;
-using EtherGizmos.Messaging.Services;
+using EtherGizmos.Common.Configuration;
+using EtherGizmos.Common.Messaging.Abstractions;
+using EtherGizmos.Common.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 
-namespace EtherGizmos.Messaging;
+namespace EtherGizmos.Common;
 
 public static class IMessagingBuilderRabbitMQExtensions
 {

@@ -1,9 +1,9 @@
-﻿using EtherGizmos.Messaging.Abstractions;
-using EtherGizmos.Messaging.Configuration;
+using EtherGizmos.Common.Messaging.Abstractions;
+using EtherGizmos.Common.Messaging.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-namespace EtherGizmos.Messaging.Services;
+namespace EtherGizmos.Common.Messaging.Services;
 
 public class MessagePumpHostedService : IHostedService
 {

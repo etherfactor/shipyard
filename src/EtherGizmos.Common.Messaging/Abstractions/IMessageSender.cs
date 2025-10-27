@@ -1,8 +1,8 @@
-﻿using EtherGizmos.Messaging.Configuration;
+using EtherGizmos.Common.Messaging.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace EtherGizmos.Messaging.Abstractions;
+namespace EtherGizmos.Common.Messaging.Abstractions;
 
 public interface IMessageSender
 {

@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Utilities.Extensions;
+namespace EtherGizmos.Common.Utilities.Extensions;
 
 public static class DateTimeOffsetExtensions
 {
@@ -24,7 +24,7 @@ public static class DateTimeOffsetExtensions
         this DateTimeOffset @this,
         TimeSpan interval)
     {
-        long ticks = (@this.Ticks + (interval.Ticks / 2) + 1) / interval.Ticks;
+        long ticks = (@this.Ticks + interval.Ticks / 2 + 1) / interval.Ticks;
 
         return new DateTimeOffset(ticks * interval.Ticks, @this.Offset);
     }

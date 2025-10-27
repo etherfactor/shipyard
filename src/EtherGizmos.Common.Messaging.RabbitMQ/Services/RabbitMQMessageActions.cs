@@ -1,7 +1,7 @@
-﻿using EtherGizmos.Messaging.Abstractions;
+using EtherGizmos.Common.Messaging.Abstractions;
 using RabbitMQ.Client;
 
-namespace EtherGizmos.Messaging.Services;
+namespace EtherGizmos.Common.Services;
 
 internal class RabbitMQMessageActions : IMessageActions
 {

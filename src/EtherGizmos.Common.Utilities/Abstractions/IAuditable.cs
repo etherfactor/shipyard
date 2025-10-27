@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EtherGizmos.Shipyard.Utilities.Abstractions;
+namespace EtherGizmos.Common.Utilities.Abstractions;
 
 public interface IAuditable
 {

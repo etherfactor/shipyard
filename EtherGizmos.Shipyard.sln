@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35806.99
@@ -33,6 +33,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Common.Utilities", "src\EtherGizmos.Common.Utilities\EtherGizmos.Common.Utilities.csproj", "{8710B7E8-6A52-47AF-9BD1-5DD8883ACA9D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.OData", "src\EtherGizmos.Shipyard.OData\EtherGizmos.Shipyard.OData.csproj", "{8ACBD7CB-F94E-481E-A769-655AE12A939C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.Notifications", "src\EtherGizmos.Shipyard.Notifications\EtherGizmos.Shipyard.Notifications.csproj", "{58303B68-0A73-4950-A9DA-9BBD9D05DC43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -84,6 +86,10 @@ Global
 		{8ACBD7CB-F94E-481E-A769-655AE12A939C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8ACBD7CB-F94E-481E-A769-655AE12A939C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8ACBD7CB-F94E-481E-A769-655AE12A939C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58303B68-0A73-4950-A9DA-9BBD9D05DC43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58303B68-0A73-4950-A9DA-9BBD9D05DC43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58303B68-0A73-4950-A9DA-9BBD9D05DC43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58303B68-0A73-4950-A9DA-9BBD9D05DC43}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,6 +106,7 @@ Global
 		{7044DA17-A7D2-4C0A-90A4-A18DC9CFC80F} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 		{8710B7E8-6A52-47AF-9BD1-5DD8883ACA9D} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 		{8ACBD7CB-F94E-481E-A769-655AE12A939C} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
+		{58303B68-0A73-4950-A9DA-9BBD9D05DC43} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FDAA95A9-84A5-47E0-85A2-730CDD821DD7}

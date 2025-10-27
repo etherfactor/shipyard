@@ -1,6 +1,6 @@
-﻿using System.Threading.Channels;
+using System.Threading.Channels;
 
-namespace EtherGizmos.Messaging.Abstractions;
+namespace EtherGizmos.Common.Messaging.Abstractions;
 
 public interface IMessageListener : IDisposable
 {

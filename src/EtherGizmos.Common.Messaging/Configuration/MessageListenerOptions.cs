@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
-namespace EtherGizmos.Messaging.Configuration;
+namespace EtherGizmos.Common.Messaging.Configuration;
 
 public class MessageListenerOptions
 {

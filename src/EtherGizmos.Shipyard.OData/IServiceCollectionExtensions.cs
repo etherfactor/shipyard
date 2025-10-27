@@ -1,11 +1,11 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Asp.Versioning.OData;
 using AutoMapper;
+using EtherGizmos.Common.Utilities.Abstractions;
 using EtherGizmos.Extensions.DependencyInjection;
 using EtherGizmos.Shipyard.OData.Services;
 using EtherGizmos.Shipyard.OData.Services.Filters;
 using EtherGizmos.Shipyard.OData.Swagger;
-using EtherGizmos.Shipyard.Utilities.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData;
 using Microsoft.Extensions.Configuration;

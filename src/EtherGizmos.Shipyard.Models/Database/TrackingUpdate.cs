@@ -1,5 +1,5 @@
-﻿using EtherGizmos.Shipyard.Utilities.Abstractions;
-using EtherGizmos.Shipyard.Utilities.Extensions;
+using EtherGizmos.Common.Utilities.Abstractions;
+using EtherGizmos.Common.Utilities.Extensions;
 using System.Diagnostics.CodeAnalysis;
 
 namespace EtherGizmos.Shipyard.Models.Database;

@@ -1,4 +1,5 @@
-﻿using EtherGizmos.Extensions.DependencyInjection;
+using EtherGizmos.Common.Utilities.Configuration;
+using EtherGizmos.Extensions.DependencyInjection;
 using EtherGizmos.Shipyard.Database.Configuration;
 using EtherGizmos.Shipyard.Database.Migrations.Core;
 using EtherGizmos.Shipyard.Database.Services;
@@ -16,25 +17,44 @@ public static class IServiceCollectionExtensions
     public static IServiceCollection AddDatabase(
         this IServiceCollection @this)
     {
-        @this.AddOptions<PostgreSqlOptions>();
+        @this.AddOptions<DatabaseReferenceOptions>()
+            .ValidateOnStart()
+            .ValidateDataAnnotations();
 
         @this.AddSingleton<IMigrationManager, MigrationManager>()
             .AddDbContext<ApplicationContext>((services, opt) =>
             {
-                var sqlOptions = services.GetRequiredService<IOptions<PostgreSqlOptions>>()
+                opt.UseLazyLoadingProxies();
+
+                var dbOptions = services.GetRequiredService<IOptions<DatabaseReferenceOptions>>()
                     .Value;
 
-                opt.UseLazyLoadingProxies()
-                    .UseNpgsql(
-                        sqlOptions.ConnectionString,
-                        o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
+                var connectionId = dbOptions.ConnectionId;
+
+                var resolver = services.GetRequiredService<IConnectionResolver>();
+                var connection = resolver.GetDatabaseConnection(connectionId);
+
+                connection.Match(
+                    _ => throw new InvalidOperationException($"The connection {connectionId} is not a valid database connection."),
+                    postgreSql =>
+                    {
+                        return opt.UseNpgsql(
+                            postgreSql.ConnectionString,
+                            o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
+                    }
+                );
             });
 
         @this
             .AddChildContainer((child, parent) =>
             {
-                var sqlOptions = parent.GetRequiredService<IOptions<PostgreSqlOptions>>()
+                var dbOptions = parent.GetRequiredService<IOptions<DatabaseReferenceOptions>>()
                     .Value;
+
+                var connectionId = dbOptions.ConnectionId;
+
+                var resolver = parent.GetRequiredService<IConnectionResolver>();
+                var connection = resolver.GetDatabaseConnection(connectionId);
 
                 child.AddFluentMigratorCore()
                     .ConfigureRunner(opt =>
@@ -42,8 +62,11 @@ public static class IServiceCollectionExtensions
                         opt.ScanIn(typeof(ApplicationContext).Assembly).For.Migrations()
                             .WithVersionTable(new PostgresVersionTableMetadata());
 
-                        opt.AddPostgres()
-                            .WithGlobalConnectionString(sqlOptions.ConnectionString);
+                        connection.Match(
+                            _ => throw new InvalidOperationException($"The connection {connectionId} is not a valid database connection."),
+                            postgreSql => opt.AddPostgres()
+                                .WithGlobalConnectionString(postgreSql.ConnectionString)
+                        );
                     });
             })
             .ForwardScoped<IMigrationRunner>();

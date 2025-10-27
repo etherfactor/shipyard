@@ -1,11 +1,11 @@
-﻿using EtherGizmos.Messaging.Abstractions;
-using EtherGizmos.Messaging.Configuration;
-using EtherGizmos.Messaging.Services;
+using EtherGizmos.Common.Messaging.Abstractions;
+using EtherGizmos.Common.Messaging.Configuration;
+using EtherGizmos.Common.Messaging.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace EtherGizmos.Messaging;
+namespace EtherGizmos.Common.Messaging;
 
 public static class IServiceCollectionExtensions
 {

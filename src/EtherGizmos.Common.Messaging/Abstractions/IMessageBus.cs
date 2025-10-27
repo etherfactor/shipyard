@@ -1,6 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 
-namespace EtherGizmos.Messaging.Abstractions;
+namespace EtherGizmos.Common.Messaging.Abstractions;
 
 public interface IMessageBus
 {

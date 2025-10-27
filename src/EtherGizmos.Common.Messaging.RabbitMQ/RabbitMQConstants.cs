@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Messaging;
+namespace EtherGizmos.Common;
 
 internal static class RabbitMQConstants
 {

@@ -1,11 +1,11 @@
-﻿using EtherGizmos.Messaging.Abstractions;
+using EtherGizmos.Common.Messaging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using System.Text;
 using System.Threading.Channels;
 
-namespace EtherGizmos.Messaging.Services;
+namespace EtherGizmos.Common.Services;
 
 internal class RabbitMQPublisher : IMessagePublisher
 {
@@ -56,7 +56,7 @@ internal class RabbitMQPublisher : IMessagePublisher
         }
         else
         {
-            await _rmqChannel.ExchangeDeclareAsync(_topic!, ExchangeType.Topic, durable: true, autoDelete: false, arguments: null, cancellationToken: cancellationToken);
+            await _rmqChannel.ExchangeDeclareAsync(_topic!, ExchangeType.Fanout, durable: true, autoDelete: false, arguments: null, cancellationToken: cancellationToken);
         }
 
         _publishCts = new();

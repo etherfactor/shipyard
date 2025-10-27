@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Messaging.Abstractions;
+using EtherGizmos.Common.Messaging.Abstractions;
 using EtherGizmos.Shipyard.Database.Services;
 using EtherGizmos.Shipyard.Models.Database;
 using EtherGizmos.Shipyard.Models.Database.Enums;
@@ -13,13 +13,16 @@ public class TrackingResponseConsumer : IMessageConsumer<TrackingResponse>
 
     private readonly ILogger _logger;
     private readonly IUnitOfWorkFactory _uowFactory;
+    private readonly IMessageSender _sender;
 
     public TrackingResponseConsumer(
         ILogger<TrackingResponseConsumer> logger,
-        IUnitOfWorkFactory uowFactory)
+        IUnitOfWorkFactory uowFactory,
+        IMessageSender sender)
     {
         _logger = logger;
         _uowFactory = uowFactory;
+        _sender = sender;
     }
 
     public async Task ConsumeAsync(
@@ -32,6 +35,8 @@ public class TrackingResponseConsumer : IMessageConsumer<TrackingResponse>
         _logger.LogInformation("Received response message {@Message}", message);
 
         var package = await packageRepo.Data.SingleAsync(e => e.Id == message.PackageId, cancellationToken: context.CancellationToken);
+
+        var initialStatus = package.LastStatusTypeId;
 
         var newDetails = message.Details
             .Select(e => new TrackingUpdate
@@ -87,6 +92,42 @@ public class TrackingResponseConsumer : IMessageConsumer<TrackingResponse>
         }
 
         await uow.SaveChangesAsync(context.CancellationToken);
+
+        if (initialStatus != package.LastStatusTypeId)
+        {
+            if (package.LastStatusTypeId == StatusTypeId.OutForDelivery)
+            {
+                var update = package.TrackingUpdates.OrderBy(e => e.OccurredAt).Last();
+                await _sender.SendAsync("notification-package-outfordelivery", new PackageOutForDelivery()
+                {
+                    PackageId = message.PackageId,
+                    CarrierId = package.Carrier.Id,
+                    CarrierName = package.Carrier.Name,
+                    TrackingNumber = package.TrackingNumber,
+                    Contents = package.Contents,
+                    OccurredAt = update.OccurredAt,
+                    Location = update.Location,
+                    Description = update.Description,
+                    EstimatedDeliveryAt = package.EstimatedDeliveryAt,
+                }, cancellationToken: context.CancellationToken);
+            }
+            else if (package.LastStatusTypeId == StatusTypeId.Delivered)
+            {
+                var update = package.TrackingUpdates.OrderBy(e => e.OccurredAt).Last();
+                await _sender.SendAsync("notification-package-delivered", new PackageDelivered()
+                {
+                    PackageId = message.PackageId,
+                    CarrierId = package.Carrier.Id,
+                    CarrierName = package.Carrier.Name,
+                    TrackingNumber = package.TrackingNumber,
+                    Contents = package.Contents,
+                    OccurredAt = update.OccurredAt,
+                    Location = update.Location,
+                    Description = update.Description,
+                    EstimatedDeliveryAt = package.EstimatedDeliveryAt,
+                }, cancellationToken: context.CancellationToken);
+            }
+        }
     }
 }
 

@@ -1,4 +1,5 @@
-using EtherGizmos.Configuration;
+using EtherGizmos.Common.Configuration;
+using EtherGizmos.Common.Utilities;
 using EtherGizmos.Shipyard.Api.Services.Middleware;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Configuration;
@@ -7,12 +8,15 @@ using EtherGizmos.Shipyard.Models;
 using EtherGizmos.Shipyard.Models.Api.Errors;
 using EtherGizmos.Shipyard.Models.Database;
 using EtherGizmos.Shipyard.OData;
-using EtherGizmos.Shipyard.Utilities;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSerilog((services, logger) =>
+    logger.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>()));
 
 //**********************************************************
 // Configuration
@@ -25,20 +29,22 @@ builder.Configuration
         (new(@"^ConnectionStrings:(?=[^_:])"), ""));
 
 builder.Services
-    .AddOptions<PostgreSqlOptions>()
+    .AddOptions<DatabaseReferenceOptions>()
     .Configure<IConfiguration>((opt, conf) =>
     {
-        conf.GetSection("PostgreSql")
+        conf.GetSection("Database")
             .Bind(opt);
     })
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+    .ValidateOnStart()
+    .ValidateDataAnnotations();
 
 //**********************************************************
-// Add Services
+// Services
 
 // General
 builder.AddServiceDefaults();
+
+builder.Services.AddServiceConnections();
 
 // Database
 builder.Services
@@ -66,7 +72,7 @@ builder.Services
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
 //**********************************************************
-// Add Middleware
+// Pipeline
 
 var app = builder.Build();
 

@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Utilities.Abstractions;
+namespace EtherGizmos.Common.Utilities.Abstractions;
 
 public interface IModelValidator<TModel>
 {

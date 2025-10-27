@@ -8,17 +8,22 @@ var postgres = builder.AddPostgres("postgres", port: 57691, userName: postgresUs
 
 var database = postgres.AddDatabase("postgres-db", databaseName: "shipyard");
 
-var rmq = builder.AddRabbitMQ("rmq");
+var rabbitmq = builder.AddRabbitMQ("rabbitmq");
+rabbitmq.WithManagementPlugin();
 
 var selenium = builder.AddContainer("selenium", "selenium/standalone-chromium:137.0");
 selenium.WithHttpEndpoint(targetPort: 4444, name: "endpoint");
 
 var api = builder.AddProject<Projects.EtherGizmos_Shipyard_Api>("api");
-api.WaitFor(database).WithReference(database, connectionName: "PostgreSql:ConnectionString");
+api.WaitFor(database).WithReference(database, connectionName: "Connections:AspireDb:PostgreSql:ConnectionString");
+api.WithEnvironment("Connections:AspireDb:Type", "Database");
+api.WithEnvironment("Database:ConnectionId", "AspireDb");
 
 var worker = builder.AddProject<Projects.EtherGizmos_Shipyard_Worker>("worker");
-worker.WaitFor(database).WithReference(database, connectionName: "PostgreSql:ConnectionString");
-worker.WaitFor(rmq).WithReference(rmq, connectionName: "RabbitMq:ConnectionString");
+worker.WaitFor(database).WithReference(database, connectionName: "Connections:AspireDb:PostgreSql:ConnectionString");
+worker.WaitFor(rabbitmq).WithReference(rabbitmq, connectionName: "RabbitMq:ConnectionString");
 worker.WaitFor(selenium).WithEnvironment("Selenium:ConnectionString", () => selenium.GetEndpoint("endpoint").Url + "/wd/hub");
+worker.WithEnvironment("Connections:AspireDb:Type", "Database");
+worker.WithEnvironment("Database:ConnectionId", "AspireDb");
 
 builder.Build().Run();
