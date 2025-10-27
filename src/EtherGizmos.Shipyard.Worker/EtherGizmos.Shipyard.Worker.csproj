@@ -35,6 +35,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="$(MSBuildProjectName).UnitTests" />
+    <InternalsVisibleTo Include="$(MSBuildProjectName).IntegrationTests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\EtherGizmos.Common.Configuration\EtherGizmos.Common.Configuration.csproj" />
     <ProjectReference Include="..\EtherGizmos.Common.Messaging.RabbitMQ\EtherGizmos.Common.RabbitMQ.csproj" />
     <ProjectReference Include="..\EtherGizmos.Common.ServiceDefaults\EtherGizmos.Common.ServiceDefaults.csproj" />

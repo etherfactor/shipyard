@@ -1,0 +1,7 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0
+
+COPY bin/Release/net9.0/. ./
+
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "EtherGizmos.Shipyard.Worker.dll"]

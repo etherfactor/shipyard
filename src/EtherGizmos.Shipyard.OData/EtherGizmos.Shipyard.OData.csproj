@@ -18,6 +18,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="$(MSBuildProjectName).UnitTests" />
+    <InternalsVisibleTo Include="$(MSBuildProjectName).IntegrationTests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\EtherGizmos.Shipyard.Models\EtherGizmos.Shipyard.Models.csproj" />
   </ItemGroup>
 

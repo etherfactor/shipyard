@@ -13,7 +13,7 @@ public partial class Error
         {
             private const string _message = "An entity with the provided id was not found.";
 
-            public override HttpStatusCode StatusCode => HttpStatusCode.BadRequest;
+            public override HttpStatusCode StatusCode => HttpStatusCode.NotFound;
 
             public EntityNotFoundReferenceError(
                 string target = ErrorConstants.RequestTarget.Uri)

@@ -11,6 +11,7 @@ using EtherGizmos.Shipyard.Services;
 using JavaScriptEngineSwitcher.Extensions.MsDependencyInjection;
 using JavaScriptEngineSwitcher.V8;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData;
@@ -127,6 +128,32 @@ builder.Services
         opt.ModelAssemblies = [typeof(Package).Assembly];
     });
 
+builder.Services
+    .AddHttpLogging(opt =>
+    {
+        opt.LoggingFields = HttpLoggingFields.All | HttpLoggingFields.RequestQuery;
+
+        opt.RequestHeaders.Add("Origin");
+        opt.RequestHeaders.Add("Priority");
+        opt.RequestHeaders.Add("Referer");
+        opt.RequestHeaders.Add("Sec-CH-UA");
+        opt.RequestHeaders.Add("Sec-CH-UA-Mobile");
+        opt.RequestHeaders.Add("Sec-CU-UA-Platform");
+        opt.RequestHeaders.Add("Sec-Fetch-Site");
+        opt.RequestHeaders.Add("Sec-Fetch-Mode");
+        opt.RequestHeaders.Add("Sec-Fetch-Dest");
+
+        opt.ResponseHeaders.Add("Access-Control-Allow-Headers");
+        opt.ResponseHeaders.Add("Access-Control-Allow-Methods");
+        opt.ResponseHeaders.Add("Access-Control-Allow-Origin");
+        opt.ResponseHeaders.Add("OData-Version");
+
+        opt.MediaTypeOptions.AddText("application/json");
+
+        opt.RequestBodyLogLimit = 8192;
+        opt.ResponseBodyLogLimit = 1024;
+    });
+
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
 
@@ -157,6 +184,8 @@ app.UseWebOptimizer();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseHttpLogging();
 
 app.
     UseExceptionHandler(errorApp =>

@@ -3,6 +3,7 @@ using EtherGizmos.Common.Configuration;
 using EtherGizmos.Common.Extensions;
 using EtherGizmos.Common.Models;
 using EtherGizmos.Common.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -94,7 +95,7 @@ public static class IOAuth2BuilderExtensions
 
         if (@this.Builder.Environment.IsEnvironment("Integration"))
         {
-            @this.Builder.Services.AddAuthentication()
+            @this.Builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
                     opt.MapInboundClaims = false;

@@ -16,6 +16,17 @@ public static class StringExtensions
         };
     }
 
+    public static string ToFirstLower(
+        this string @this)
+    {
+        return @this switch
+        {
+            null => throw new ArgumentNullException(nameof(@this)),
+            "" => "",
+            _ => string.Concat(@this[0].ToString().ToLowerInvariant(), @this.AsSpan(1))
+        };
+    }
+
     public static string SanitizeForTts(
         this string @this)
     {
