@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;

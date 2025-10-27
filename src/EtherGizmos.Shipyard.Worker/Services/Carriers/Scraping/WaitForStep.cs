@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
+using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using HtmlAgilityPack;
 using System.ComponentModel.DataAnnotations;
 

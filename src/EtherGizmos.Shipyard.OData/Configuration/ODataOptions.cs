@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 

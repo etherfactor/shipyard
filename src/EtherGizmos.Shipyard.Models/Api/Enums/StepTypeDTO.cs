@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Api.Enums;
+namespace EtherGizmos.Shipyard.Api.Enums;
 
 public enum StepTypeDTO
 {

@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Models.Api.Errors;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData.Edm;

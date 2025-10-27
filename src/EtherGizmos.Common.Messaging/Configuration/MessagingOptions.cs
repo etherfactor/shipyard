@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Common.Configuration;
+namespace EtherGizmos.Common.Configuration;
 
 public class MessagingOptions
 {

@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Api.Errors;
 using System.Net;
 
 namespace EtherGizmos.Shipyard.Models.Api.Errors;

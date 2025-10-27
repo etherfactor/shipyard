@@ -1,3 +1,3 @@
-﻿namespace EtherGizmos.Shipyard.Models;
+namespace EtherGizmos.Shipyard.Models;
 
 public abstract record NotificationEvent;

@@ -1,4 +1,4 @@
-﻿using FluentMigrator;
+using FluentMigrator;
 
 namespace EtherGizmos.Shipyard.Migrations.Core;
 

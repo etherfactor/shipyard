@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;

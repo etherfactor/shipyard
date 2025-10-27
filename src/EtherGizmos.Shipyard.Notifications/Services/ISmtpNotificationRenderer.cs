@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Models;
+using EtherGizmos.Shipyard.Models;
 using MimeKit;
 
 namespace EtherGizmos.Shipyard.Services;

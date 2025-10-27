@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Models.Api.Errors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;

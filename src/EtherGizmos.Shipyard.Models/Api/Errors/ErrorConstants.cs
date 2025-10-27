@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Api.Errors;
+namespace EtherGizmos.Shipyard.Api.Errors;
 
 public static class ErrorConstants
 {

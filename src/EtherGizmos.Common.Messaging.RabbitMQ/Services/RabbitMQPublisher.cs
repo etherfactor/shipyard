@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Common.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;

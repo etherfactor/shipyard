@@ -1,4 +1,4 @@
-﻿using FluentMigrator;
+using FluentMigrator;
 using FluentMigrator.Builders.Create.Table;
 
 namespace EtherGizmos.Shipyard.Extensions;

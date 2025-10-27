@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Extensions;
+namespace EtherGizmos.Shipyard.Extensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="object"/>.

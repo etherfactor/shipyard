@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Configuration;
+using EtherGizmos.Common.Configuration;
 using EtherGizmos.Common.Utilities.Configuration;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Models;

@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Worker.Configuration;
+using EtherGizmos.Shipyard.Worker.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenQA.Selenium;

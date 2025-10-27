@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Extensions;
 using System.Diagnostics.CodeAnalysis;
 

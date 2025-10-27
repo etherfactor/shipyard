@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Extensions;
+using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Migrations.Core;
 using System.Data;
 

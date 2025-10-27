@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Migrations.Core;
+using EtherGizmos.Shipyard.Migrations.Core;
 
 namespace EtherGizmos.Shipyard.Database.Migrations._00._00.Feature000000;
 

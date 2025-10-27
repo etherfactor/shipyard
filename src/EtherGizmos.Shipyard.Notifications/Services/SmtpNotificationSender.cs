@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Configuration;
+using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Models;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.DependencyInjection;

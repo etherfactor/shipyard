@@ -1,4 +1,4 @@
-﻿using FluentMigrator;
+using FluentMigrator;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;

@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
+using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;

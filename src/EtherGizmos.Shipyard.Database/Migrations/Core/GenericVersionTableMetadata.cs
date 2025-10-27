@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Runner.VersionTableInfo;
+using FluentMigrator.Runner.VersionTableInfo;
 using System.Diagnostics.CodeAnalysis;
 
 namespace EtherGizmos.Shipyard.Migrations.Core;

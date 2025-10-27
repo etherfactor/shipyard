@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Utilities.Configuration;
+using EtherGizmos.Common.Utilities.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 

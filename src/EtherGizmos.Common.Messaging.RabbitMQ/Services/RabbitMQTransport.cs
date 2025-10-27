@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Common.Abstractions;
 
 namespace EtherGizmos.Common.Services;
 

@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Authorization;

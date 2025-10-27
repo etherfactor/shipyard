@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

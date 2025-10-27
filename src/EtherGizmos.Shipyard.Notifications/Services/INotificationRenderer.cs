@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Models;
+using EtherGizmos.Shipyard.Models;
 
 namespace EtherGizmos.Shipyard.Services;
 

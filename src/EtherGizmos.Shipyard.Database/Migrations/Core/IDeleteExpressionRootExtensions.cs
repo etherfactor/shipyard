@@ -1,4 +1,4 @@
-﻿using FluentMigrator;
+using FluentMigrator;
 using FluentMigrator.Builders.Delete;
 using FluentMigrator.Builders.IfDatabase;
 using FluentMigrator.Infrastructure;

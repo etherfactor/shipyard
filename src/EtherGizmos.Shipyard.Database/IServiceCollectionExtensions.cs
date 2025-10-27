@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Configuration;
 using EtherGizmos.Extensions.DependencyInjection;
 using EtherGizmos.Shipyard.Abstractions;

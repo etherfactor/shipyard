@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Api.Errors;
 
 namespace EtherGizmos.Shipyard.Api.Services.Middleware;
 

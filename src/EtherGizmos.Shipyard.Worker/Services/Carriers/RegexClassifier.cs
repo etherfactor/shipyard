@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
 using Microsoft.EntityFrameworkCore;

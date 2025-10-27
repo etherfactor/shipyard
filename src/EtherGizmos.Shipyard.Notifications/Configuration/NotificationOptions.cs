@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Configuration;
+namespace EtherGizmos.Shipyard.Configuration;
 
 public class NotificationOptions
 {

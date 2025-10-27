@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Extensions;
+using EtherGizmos.Common.Extensions;
 using EtherGizmos.Shipyard.Api.Errors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;

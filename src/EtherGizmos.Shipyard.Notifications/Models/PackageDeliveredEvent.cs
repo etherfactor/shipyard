@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Services;
+using EtherGizmos.Shipyard.Services;
 using MimeKit;
 using System.Text;
 
