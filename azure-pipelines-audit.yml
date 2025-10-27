@@ -40,7 +40,7 @@ stages:
   # Audit api vulnerabilities
   - template: dotnet/security/dtrack.yml@sharedTemplates
     parameters:
-      name: 'audit_dotnet'
+      name: 'audit_api'
       vmImage: 'ubuntu-22.04'
       pathToProject: './src/EtherGizmos.Shipyard.Api'
       apiUrl: '$(DependencyTrack.ApiUrl)'
@@ -51,7 +51,7 @@ stages:
   # Audit worker vulnerabilities
   - template: dotnet/security/dtrack.yml@sharedTemplates
     parameters:
-      name: 'audit_dotnet'
+      name: 'audit_worker'
       vmImage: 'ubuntu-22.04'
       pathToProject: './src/EtherGizmos.Shipyard.Worker'
       apiUrl: '$(DependencyTrack.ApiUrl)'
@@ -62,7 +62,7 @@ stages:
   # Audit web vulnerabilities
   - template: node/security/dtrack.yml@sharedTemplates
     parameters:
-      name: 'audit_node'
+      name: 'audit_web'
       vmImage: 'ubuntu-22.04'
       nodeVersion: '22.x.x'
       pathToProject: './src/EtherGizmos.Shipyard.Web'
