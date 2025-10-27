@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Messaging.Configuration;
+using EtherGizmos.Common.Messaging.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 

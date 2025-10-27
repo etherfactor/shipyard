@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using System.Text.RegularExpressions;
 
 namespace EtherGizmos.Common.Configuration.Providers;

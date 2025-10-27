@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using EtherGizmos.Common.Utilities.Abstractions;
 using EtherGizmos.Shipyard.Database.Services;
 using EtherGizmos.Shipyard.Models.Api.Errors;

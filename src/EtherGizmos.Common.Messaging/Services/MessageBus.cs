@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Messaging.Abstractions;
+using EtherGizmos.Common.Messaging.Abstractions;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;

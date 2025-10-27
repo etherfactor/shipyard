@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Utilities.Configuration;
+using EtherGizmos.Common.Utilities.Configuration;
 using EtherGizmos.Extensions.DependencyInjection;
 using EtherGizmos.Shipyard.Database.Configuration;
 using EtherGizmos.Shipyard.Database.Migrations.Core;

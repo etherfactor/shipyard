@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Messaging.Abstractions;
+using EtherGizmos.Common.Messaging.Abstractions;
 using EtherGizmos.Common.Messaging.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;

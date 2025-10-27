@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Utilities.Abstractions;
+using EtherGizmos.Common.Utilities.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EtherGizmos.Common.Utilities.Services;

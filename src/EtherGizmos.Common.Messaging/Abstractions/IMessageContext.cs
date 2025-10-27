@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Common.Messaging.Abstractions;
+namespace EtherGizmos.Common.Messaging.Abstractions;
 
 public interface IMessageContext<TMessage>
     where TMessage : class, new()

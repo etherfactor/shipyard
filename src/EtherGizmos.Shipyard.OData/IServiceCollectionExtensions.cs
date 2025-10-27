@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Asp.Versioning.OData;
 using AutoMapper;
 using EtherGizmos.Common.Utilities.Abstractions;

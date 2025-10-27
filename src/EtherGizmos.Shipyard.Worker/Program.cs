@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common;
+using EtherGizmos.Common;
 using EtherGizmos.Common.Configuration;
 using EtherGizmos.Common.Messaging;
 using EtherGizmos.Common.Messaging.Configuration;

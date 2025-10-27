@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Utilities.Converters;
+using EtherGizmos.Common.Utilities.Converters;
 using EtherGizmos.Shipyard.Database.Extensions;
 using EtherGizmos.Shipyard.Models.Database;
 using Microsoft.EntityFrameworkCore;

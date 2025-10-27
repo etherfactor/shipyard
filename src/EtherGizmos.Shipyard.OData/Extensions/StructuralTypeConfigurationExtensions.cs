@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Utilities.Helpers;
+using EtherGizmos.Common.Utilities.Helpers;
 using Microsoft.OData.ModelBuilder;
 using System.Reflection;
 

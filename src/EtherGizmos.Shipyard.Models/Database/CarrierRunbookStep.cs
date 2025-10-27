@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Utilities.Converters;
+using EtherGizmos.Common.Utilities.Converters;
 using EtherGizmos.Shipyard.Models.Database.Enums;
 using System.Text.Json;
 using System.Text.Json.Serialization;

@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Common.Utilities.Abstractions;
+namespace EtherGizmos.Common.Utilities.Abstractions;
 
 public abstract class Auditable : IAuditable
 {
