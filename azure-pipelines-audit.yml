@@ -11,7 +11,7 @@ schedules:
   always: false
 
 variables:
-  - group: dependency-track
+- group: dependency-track
 
 resources:
   repositories:
@@ -37,14 +37,38 @@ stages:
 
   jobs:
 
-  # Audit vulnerabilities and publish them
-  - template: node/security/dtrack.yml@sharedTemplates
+  # Audit api vulnerabilities
+  - template: dotnet/security/dtrack.yml@sharedTemplates
     parameters:
-      name: 'audit'
+      name: 'audit_dotnet'
       vmImage: 'ubuntu-22.04'
       nodeVersion: '22.x.x'
-      pathToProject: '$(Build.SourcesDirectory)'
+      pathToProject: './src/EtherGizmos.Shipyard.Api'
       apiUrl: '$(DependencyTrack.ApiUrl)'
       apiKey: '$(DependencyTrack.ApiKey)'
-      projectName: 'shipyard'
+      projectName: 'shipyard-api'
+      projectType: 'APPLICATION'
+
+  # Audit worker vulnerabilities
+  - template: dotnet/security/dtrack.yml@sharedTemplates
+    parameters:
+      name: 'audit_dotnet'
+      vmImage: 'ubuntu-22.04'
+      nodeVersion: '22.x.x'
+      pathToProject: './src/EtherGizmos.Shipyard.Worker'
+      apiUrl: '$(DependencyTrack.ApiUrl)'
+      apiKey: '$(DependencyTrack.ApiKey)'
+      projectName: 'shipyard-worker'
+      projectType: 'APPLICATION'
+
+  # Audit web vulnerabilities
+  - template: node/security/dtrack.yml@sharedTemplates
+    parameters:
+      name: 'audit_node'
+      vmImage: 'ubuntu-22.04'
+      nodeVersion: '22.x.x'
+      pathToProject: './src/EtherGizmos.Shipyard.Web'
+      apiUrl: '$(DependencyTrack.ApiUrl)'
+      apiKey: '$(DependencyTrack.ApiKey)'
+      projectName: 'shipyard-web'
       projectType: 'APPLICATION'
