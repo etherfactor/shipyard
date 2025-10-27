@@ -42,7 +42,6 @@ stages:
     parameters:
       name: 'audit_dotnet'
       vmImage: 'ubuntu-22.04'
-      nodeVersion: '22.x.x'
       pathToProject: './src/EtherGizmos.Shipyard.Api'
       apiUrl: '$(DependencyTrack.ApiUrl)'
       apiKey: '$(DependencyTrack.ApiKey)'
@@ -54,7 +53,6 @@ stages:
     parameters:
       name: 'audit_dotnet'
       vmImage: 'ubuntu-22.04'
-      nodeVersion: '22.x.x'
       pathToProject: './src/EtherGizmos.Shipyard.Worker'
       apiUrl: '$(DependencyTrack.ApiUrl)'
       apiKey: '$(DependencyTrack.ApiKey)'
