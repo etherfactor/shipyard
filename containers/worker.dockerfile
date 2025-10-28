@@ -1,6 +1,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0
 
-COPY bin/Release/net9.0/. ./
+WORKDIR /app
+
+COPY containers/deploy/worker/. ./
 
 EXPOSE 8080
 

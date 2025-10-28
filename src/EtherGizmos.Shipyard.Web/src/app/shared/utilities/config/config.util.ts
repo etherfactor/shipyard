@@ -17,7 +17,7 @@ export interface AppConfig extends z.infer<typeof AppConfigZ> { }
 export const APP_CONFIG = new InjectionToken<AppConfig>("config.json");
 
 export async function fetchConfig() {
-  const result = await fetch("/config.json");
+  const result = await fetch("/assets/config.json");
   const json = await result.json();
   const config = AppConfigZ.parse(json);
 

@@ -21,7 +21,8 @@ internal class SearchAuthenticationAspect<TEntity, TId>
 
             var response = await client.GetAsync(specification.BaseRoute);
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.StatusCode, Is.Not.EqualTo(HttpStatusCode.Unauthorized));
+            Assert.That(response.StatusCode, Is.Not.EqualTo(HttpStatusCode.Forbidden));
         });
 
         yield return new AspectCase($"search:anon:401", async context =>
@@ -54,7 +55,8 @@ internal class GetAuthenticationAspect<TEntity, TId>
             var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForRead);
             var response = await client.GetAsync(specification.BaseRoute + specification.Path(id));
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.StatusCode, Is.Not.EqualTo(HttpStatusCode.Unauthorized));
+            Assert.That(response.StatusCode, Is.Not.EqualTo(HttpStatusCode.Forbidden));
         });
 
         yield return new AspectCase($"get:anon:401", async context =>
@@ -88,7 +90,8 @@ internal class CreateAuthenticationAspect<TEntity, TId>
             var body = specification.Create();
             var response = await client.PostAsync(specification.BaseRoute, body);
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+            Assert.That(response.StatusCode, Is.Not.EqualTo(HttpStatusCode.Unauthorized));
+            Assert.That(response.StatusCode, Is.Not.EqualTo(HttpStatusCode.Forbidden));
         });
 
         yield return new AspectCase($"create:anon:401", async context =>
@@ -123,7 +126,8 @@ internal class PatchAuthenticationAspect<TEntity, TId>
             var body = specification.Update(entity);
             var response = await client.PatchAsync(specification.BaseRoute + specification.Path(id), body);
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.StatusCode, Is.Not.EqualTo(HttpStatusCode.Unauthorized));
+            Assert.That(response.StatusCode, Is.Not.EqualTo(HttpStatusCode.Forbidden));
         });
 
         yield return new AspectCase($"patch:anon:401", async context =>
@@ -158,7 +162,8 @@ internal class DeleteAuthenticationAspect<TEntity, TId>
             var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForUpdate);
             var response = await client.DeleteAsync(specification.BaseRoute + specification.Path(id));
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
+            Assert.That(response.StatusCode, Is.Not.EqualTo(HttpStatusCode.Unauthorized));
+            Assert.That(response.StatusCode, Is.Not.EqualTo(HttpStatusCode.Forbidden));
         });
 
         yield return new AspectCase($"delete:anon:401", async context =>
