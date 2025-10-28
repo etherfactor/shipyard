@@ -1,8 +1,10 @@
 import { Component, computed, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { buildUrl } from '@ethergizmos/odata-fluent-client/dist/src/utils/http';
 import { NgbDropdownModule, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { Options } from '@popperjs/core';
 import { OAuth2Service } from '../../../../shared/services/oauth2/oauth2.service';
+import { APP_CONFIG } from '../../../../shared/utilities/config/config.util';
 import { openOffcanvas } from '../../../../shared/utilities/offcanvas/offcanvas.util';
 import { UserSessionService } from '../../../login/services/user-session/user-session.service';
 import { NavbarActionComponent } from '../navbar-action/navbar-action.component';
@@ -25,6 +27,7 @@ export class NavbarComponent {
   private readonly $oauth2 = inject(OAuth2Service);
   private readonly $offcanvas = inject(NgbOffcanvas);
   private readonly $userSession = inject(UserSessionService);
+  private readonly config = inject(APP_CONFIG);
 
   readonly isSignedIn$$ = computed(() => this.$userSession.isSignedIn$$());
   readonly name$$ = computed(() => this.$userSession.navbarName$$());
@@ -39,6 +42,10 @@ export class NavbarComponent {
 
   logout(): void {
     this.$oauth2.logout();
+  }
+
+  protected get changePasswordUrl() {
+    return buildUrl(this.config.oauth.authority, "account", `change-password?returnUrl=${window.location.href}`);
   }
 
   protected popperOptions(opts: Partial<Options>): Partial<Options> {
