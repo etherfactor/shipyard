@@ -3,7 +3,7 @@
   Basic layout for Login/Consent pages (and anything else).
 *@
 @{
-  var appName = (string?)ViewData["AppName"] ?? "Auth Server";
+  var appName = (string?)ViewData["AppName"] ?? "Shipyard";
   var title = (string?)ViewData["Title"] ?? appName;
 }
 
@@ -12,7 +12,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>@title - @appName</title>
+  <title>@appName | @title</title>
 
   <link rel="stylesheet" href="~/css/styles.scss" asp-append-version="true" />
 

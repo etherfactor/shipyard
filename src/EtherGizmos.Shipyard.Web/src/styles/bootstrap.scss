@@ -1,5 +1,15 @@
 @import './_base.scss';
 
+$theme-colors: map-merge(
+  $theme-colors,
+  (
+    "primary": #731dd8,
+    // "primary2": #a31621,
+    // "primary3": #af1b3f,
+    // "primary6": #00e5e5,
+  )
+);
+
 @import "../../node_modules/bootstrap/scss/bootstrap.scss";
 
 .form-control-plaintext {
@@ -9,5 +19,29 @@
   &.form-control-sm {
     padding-left: calc(0.5rem + var(--bs-border-width));
     padding-right: calc(0.5rem + var(--bs-border-width));
+  }
+}
+
+@media (max-width: 991.99px) {
+  .navbar {
+    .dropdown,
+    .dropdown-menu {
+      position: absolute;
+
+      &.dropdown-menu {
+        top: 100%;
+        margin-top: 0.125rem;
+      }
+
+      &.dropdown-menu-start {
+        left: 0;
+        right: auto;
+      }
+
+      &.dropdown-menu-end {
+        left: auto;
+        right: 0;
+      }
+    }
   }
 }
