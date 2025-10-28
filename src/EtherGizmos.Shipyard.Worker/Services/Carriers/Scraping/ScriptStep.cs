@@ -305,21 +305,21 @@ internal class ScriptStep : ScrapingStep
 
             console.Set("log", new ClrFunction(engine, "log", (thisObj, args) =>
             {
-                using var js = logger.BeginKeyedScope("Language", "JavaScript");
+                using var js = logger.BeginScope("Language", "JavaScript");
                 logger.LogInformation("[js] {Msg}", JoinArgs(args));
                 return JsValue.Undefined;
             }), true);
 
             console.Set("warn", new ClrFunction(engine, "warn", (thisObj, args) =>
             {
-                using var js = logger.BeginKeyedScope("Language", "JavaScript");
+                using var js = logger.BeginScope("Language", "JavaScript");
                 logger.LogWarning("[js] {Msg}", JoinArgs(args));
                 return JsValue.Undefined;
             }), true);
 
             console.Set("error", new ClrFunction(engine, "error", (thisObj, args) =>
             {
-                using var js = logger.BeginKeyedScope("Language", "JavaScript");
+                using var js = logger.BeginScope("Language", "JavaScript");
                 logger.LogError("[js] {Msg}", JoinArgs(args));
                 return JsValue.Undefined;
             }), true);

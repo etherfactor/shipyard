@@ -4,7 +4,7 @@ namespace EtherGizmos.Common.Extensions;
 
 public static class ILoggerExtensions
 {
-    public static IDisposable? BeginKeyedScope(
+    public static IDisposable? BeginScope(
         this ILogger @this,
         string key,
         object? value)

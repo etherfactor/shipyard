@@ -8,30 +8,41 @@ namespace EtherGizmos.Common.Services;
 
 internal class TeeStreamLoggerProvider : ILoggerProvider
 {
-    public ILogger CreateLogger(string categoryName) => new TeeLogger(categoryName);
-    public void Dispose() { /* nothing */ }
+    public ILogger CreateLogger(string categoryName)
+        => new TeeLogger(categoryName);
+
+    public void Dispose() { /* no-op */ }
 
     private sealed class TeeLogger : ILogger
     {
         private readonly string _category;
-        public TeeLogger(string category) => _category = category;
+
+        public TeeLogger(string category)
+        {
+            _category = category;
+        }
 
         public IDisposable BeginScope<TState>(TState state)
             where TState : notnull
             => NullScope.Instance;
 
-        public bool IsEnabled(LogLevel logLevel) => true; // cheap check in Log()
+        public bool IsEnabled(LogLevel logLevel)
+            => true;
 
-        public void Log<TState>(LogLevel level, EventId id, TState state, Exception? ex,
+        public void Log<TState>(
+            LogLevel level,
+            EventId id,
+            TState state,
+            Exception? ex,
             Func<TState, Exception?, string> formatter)
         {
             var ctx = TeeStreamAmbient.Current;
-            if (ctx is null) return; // tee is inactive → do nothing
+            if (ctx is null) return; //Tee is inactive → do nothing
 
             //Don't log EF Core, it's noisy
             if (_category == "Microsoft.EntityFrameworkCore.Database.Command") return;
 
-            // Minimal work when inactive; when active, format as Serilog LogEvent
+            //Minimal work when inactive; when active, format as Serilog LogEvent
             var serilogLevel = level switch
             {
                 LogLevel.Trace => LogEventLevel.Verbose,
@@ -53,7 +64,7 @@ internal class TeeStreamLoggerProvider : ILoggerProvider
             {
                 foreach (var kv in kvs)
                 {
-                    // avoid overwriting built-ins like "{OriginalFormat}" if you don’t want them
+                    //Avoid overwriting built-ins like "{OriginalFormat}"
                     if (kv.Key is not null)
                         properties.Add(new LogEventProperty(kv.Key, ToSerilogValue(kv.Value)));
                 }
@@ -74,7 +85,7 @@ internal class TeeStreamLoggerProvider : ILoggerProvider
         {
             if (value is null) return new ScalarValue(null);
 
-            // Common primitives first
+            //Common primitives first
             switch (value)
             {
                 case string s: return new ScalarValue(s);
@@ -89,27 +100,37 @@ internal class TeeStreamLoggerProvider : ILoggerProvider
                 case Uri u: return new ScalarValue(u.ToString());
             }
 
-            // KeyValue pairs → Structure
+            //KeyValue pairs → Structure
             if (value is IEnumerable<KeyValuePair<string, object?>> objKvp)
             {
                 var props = new List<LogEventProperty>();
                 foreach (var kv in objKvp)
+                {
                     props.Add(new LogEventProperty(kv.Key, ToSerilogValue(kv.Value)));
+                }
                 return new StructureValue(props);
             }
 
-            // Any non-string IEnumerable → Sequence
+            //Any non-string IEnumerable → Sequence
             if (value is IEnumerable seq && value is not string)
             {
                 var items = new List<LogEventPropertyValue>();
-                foreach (var item in seq) items.Add(ToSerilogValue(item));
+                foreach (var item in seq)
+                {
+                    items.Add(ToSerilogValue(item));
+                }
                 return new SequenceValue(items);
             }
 
-            // Fallback: treat as scalar (serialized by formatter)
+            //Fallback: treat as scalar (serialized by formatter)
             return new ScalarValue(value);
         }
 
-        private sealed class NullScope : IDisposable { public static readonly NullScope Instance = new(); public void Dispose() { } }
+        private sealed class NullScope : IDisposable
+        {
+            public static readonly NullScope Instance = new();
+
+            public void Dispose() { }
+        }
     }
 }

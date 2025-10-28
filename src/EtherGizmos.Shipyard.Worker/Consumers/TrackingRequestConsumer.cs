@@ -35,7 +35,7 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
         var message = context.Message;
         _logger.LogInformation("Received request message {@Message}", message);
 
-        using var dotnet = _logger.BeginKeyedScope("Language", "Dotnet");
+        using var dotnet = _logger.BeginScope("Language", "Dotnet");
 
         var ndjson = new MemoryStream();
         using var tee = _teeScopeFactory.Begin(ndjson);

@@ -47,6 +47,8 @@ internal static class Setup
 
         var preSettings = new Dictionary<string, string?>()
         {
+            ["Artifacts:BasePath"] = "artifacts",
+            ["Artifacts:Database:ConnectionId"] = "TestDb",
             ["Connections:TestDb:Type"] = "Database",
             ["Connections:TestDb:PostgreSql:ConnectionString"] = _pgsqlCstr,
             ["Database:ConnectionId"] = "TestDb",

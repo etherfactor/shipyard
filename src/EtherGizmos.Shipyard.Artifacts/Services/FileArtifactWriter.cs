@@ -118,7 +118,7 @@ internal class FileArtifactWriter : IArtifactWriter
 
         logSize = Math.Round(logSize, 1);
 
-        using (_logger.BeginKeyedScope("FLAG", "ARTIFACT"))
+        using (_logger.BeginScope("FLAG", "ARTIFACT"))
             _logger.LogInformation("Created artifact {ArtifactName} ({ArtifactContentType}) with URI {ArtifactUri}, occupying {ArtifactSize}",
                 recordFileName,
                 artifact.ContentType,
