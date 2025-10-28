@@ -18,8 +18,20 @@ internal class UnitOfWorkFactory : IUnitOfWorkFactory
         _serviceProvider = serviceProvider;
     }
 
+    public IUnitOfWork Create()
+    {
+        var scope = _serviceProvider.CreateScope();
+        return new UnitOfWork(_options, scope);
+    }
+
     public IUnitOfWork Create(
-        bool useRequestScope = false)
+        IServiceProvider provider)
+    {
+        return new UnitOfWork(_options, provider);
+    }
+
+    public IUnitOfWork Create(
+        bool useRequestScope)
     {
         if (useRequestScope)
         {
@@ -31,10 +43,7 @@ internal class UnitOfWorkFactory : IUnitOfWorkFactory
 
             return new UnitOfWork(_options, context.RequestServices);
         }
-        else
-        {
-            var scope = _serviceProvider.CreateScope();
-            return new UnitOfWork(_options, scope);
-        }
+
+        return Create();
     }
 }

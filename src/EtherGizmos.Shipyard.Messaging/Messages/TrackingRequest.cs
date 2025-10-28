@@ -2,9 +2,11 @@
 
 public record TrackingRequest
 {
+    public int ExecutionId { get; init; }
+
     public int PackageId { get; init; }
 
-    public string CarrierSlug { get; init; } = null!;
+    public int CarrierId { get; init; }
 
     public string TrackingNumber { get; init; } = null!;
 }

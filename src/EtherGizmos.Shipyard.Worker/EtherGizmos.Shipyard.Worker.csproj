@@ -20,6 +20,7 @@
     <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,6 +32,7 @@
     <ProjectReference Include="..\EtherGizmos.Common.Configuration\EtherGizmos.Common.Configuration.csproj" />
     <ProjectReference Include="..\EtherGizmos.Common.Messaging.RabbitMQ\EtherGizmos.Common.RabbitMQ.csproj" />
     <ProjectReference Include="..\EtherGizmos.Common.ServiceDefaults\EtherGizmos.Common.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Shipyard.Artifacts\EtherGizmos.Shipyard.Artifacts.csproj" />
     <ProjectReference Include="..\EtherGizmos.Shipyard.Database\EtherGizmos.Shipyard.Database.csproj" />
     <ProjectReference Include="..\EtherGizmos.Shipyard.Messaging\EtherGizmos.Shipyard.Messaging.csproj" />
     <ProjectReference Include="..\EtherGizmos.Shipyard.Notifications\EtherGizmos.Shipyard.Notifications.csproj" />

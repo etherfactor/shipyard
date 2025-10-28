@@ -5,6 +5,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
 using OpenQA.Selenium.Support.UI;
+using SixLabors.ImageSharp;
 using System.Collections.Concurrent;
 
 namespace EtherGizmos.Shipyard.Worker.Services.WebDrivers;
@@ -127,6 +128,27 @@ internal class SeleniumChromiumClient : IBrowserClient, IDisposable
         }
 
         _logger.LogInformation("Clicked element {CssSelector}", selector);
+    }
+
+    public async Task<Stream> GetScreenshotAsync(
+        CancellationToken cancellationToken = default)
+    {
+        while (_driver is null)
+        {
+            await Task.Delay(100, cancellationToken);
+        }
+
+        var screenshot = _driver.GetScreenshot();
+
+        using var stream = new MemoryStream(screenshot.AsByteArray);
+        using var image = await Image.LoadAsync(stream, cancellationToken);
+
+        var output = new MemoryStream();
+        await image.SaveAsWebpAsync(output, cancellationToken: cancellationToken);
+
+        output.Position = 0;
+
+        return output;
     }
 
     public async Task<string> GetHtmlAsync(

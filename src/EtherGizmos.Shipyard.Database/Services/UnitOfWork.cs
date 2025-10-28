@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
+using System.Transactions;
 
 namespace EtherGizmos.Shipyard.Services;
 
@@ -49,11 +50,6 @@ internal class UnitOfWork : IUnitOfWork
         var context = _contexts.GetOrAdd(contextType, type =>
         {
             var context = (DbContext)_serviceProvider.GetRequiredService(type);
-            lock (context.Database)
-            {
-                if (context.Database.CurrentTransaction is null)
-                    context.Database.BeginTransaction();
-            }
 
             return context;
         });
@@ -63,8 +59,10 @@ internal class UnitOfWork : IUnitOfWork
 
     public int SaveChanges()
     {
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
         var total = 0;
-        var exceptions = new List<Exception>();
+        var exceptions = new ConcurrentBag<Exception>();
 
         var parallelOptions = new ParallelOptions()
         {
@@ -75,7 +73,8 @@ internal class UnitOfWork : IUnitOfWork
         {
             try
             {
-                total += context.SaveChanges();
+                var count = context.SaveChanges();
+                Interlocked.Add(ref total, count);
             }
             catch (Exception ex)
             {
@@ -94,7 +93,7 @@ internal class UnitOfWork : IUnitOfWork
         {
             try
             {
-                context.Database.CommitTransaction();
+                scope.Complete();
             }
             catch (Exception ex)
             {
@@ -114,8 +113,10 @@ internal class UnitOfWork : IUnitOfWork
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
         var total = 0;
-        var exceptions = new List<Exception>();
+        var exceptions = new ConcurrentBag<Exception>();
 
         var parallelOptions = new ParallelOptions()
         {
@@ -127,7 +128,8 @@ internal class UnitOfWork : IUnitOfWork
         {
             try
             {
-                total += await context.SaveChangesAsync(cancellationToken: cancellationToken);
+                var count = await context.SaveChangesAsync(cancellationToken: cancellationToken);
+                Interlocked.Add(ref total, count);
             }
             catch (Exception ex)
             {
@@ -142,16 +144,18 @@ internal class UnitOfWork : IUnitOfWork
                 exceptions);
         }
 
-        await Parallel.ForEachAsync(_contexts.Values, parallelOptions, async (context, cancellationToken) =>
+        await Parallel.ForEachAsync(_contexts.Values, parallelOptions, (context, cancellationToken) =>
         {
             try
             {
-                await context.Database.CommitTransactionAsync(cancellationToken: cancellationToken);
+                scope.Complete();
             }
             catch (Exception ex)
             {
                 exceptions.Add(ex);
             }
+
+            return ValueTask.CompletedTask;
         });
 
         if (exceptions.Any())

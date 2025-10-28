@@ -13,6 +13,10 @@ public class ApplicationContext : DbContext
 {
     public virtual DbSet<Carrier> Carriers { get; set; }
 
+    public virtual DbSet<CarrierExecution> CarrierExecutions { get; set; }
+
+    public virtual DbSet<CarrierExecutionArtifact> CarrierExecutionArtifacts { get; set; }
+
     public virtual DbSet<Package> Packages { get; set; }
 
     public virtual DbSet<StatusType> StatusTypes { get; set; }
@@ -51,6 +55,10 @@ public class ApplicationContext : DbContext
         modelBuilder.AddGlobalValueConverter(new ValueConverter<DateTimeOffset?, DateTime?>(
             app => app != null ? app.Value.UtcDateTime : null,
             db => db != null ? new DateTimeOffset((DateTime)db, TimeSpan.Zero) : null));
+
+        modelBuilder.AddGlobalValueConverter(new ValueConverter<ArtifactUri, string>(
+            app => app.Value,
+            db => db != null ? new ArtifactUri(db) : default));
 
         modelBuilder.AddGlobalValueConverter(new ValueConverter<IDictionary<string, object?>, string>(
             app => JsonSerializer.Serialize(app, jsonOptions),

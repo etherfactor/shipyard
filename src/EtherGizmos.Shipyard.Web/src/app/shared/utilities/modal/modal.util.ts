@@ -1,4 +1,4 @@
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { NgbModal, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
 import { InitializeModal } from "../../components/initialize-modal/initialize-modal.component";
 
 export async function openModal<
@@ -6,11 +6,12 @@ export async function openModal<
   TClose = ExtractClose<TComponent>,
   TDismiss = ExtractDismiss<TComponent>
 >(
-  modal: NgbModal,
+  options: ModalInput,
   component: new (...args: any[]) => TComponent,
   ...args: ExtractArgs<TComponent>
 ): Promise<ModalReturn<TClose, TDismiss>> {
-  const ref = modal.open(component, { size: "md", centered: true, backdrop: "static", keyboard: false });
+  const useOptions: NgbModalOptions = { size: "md", centered: true, backdrop: "static", keyboard: false, ...options.options };
+  const ref = options.modal.open(component, useOptions);
   const compInstance = <TComponent>ref.componentInstance;
 
   compInstance.initialize(...args as any[]);
@@ -40,3 +41,8 @@ type ExtractDismiss<TComponent> =
 export type ModalReturn<TClose, TDismiss> =
   | { type: "closed"; value: TClose }
   | { type: "dismissed"; reason: TDismiss };
+
+interface ModalInput {
+  modal: NgbModal,
+  options?: Partial<NgbModalOptions>,
+}

@@ -1,4 +1,5 @@
-﻿using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
+﻿using EtherGizmos.Common.Extensions;
+using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using HtmlAgilityPack;
 using HtmlAgilityPack.CssSelectors.NetCore;
 using Jint;
@@ -14,6 +15,8 @@ namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
 
 internal class ScriptStep : ScrapingStep
 {
+    public override string StepName => $"Execute user script ({Script.Split('\n').Length} lines)";
+
     [Required]
     public string Script { get; set; } = null!;
 
@@ -302,18 +305,21 @@ internal class ScriptStep : ScrapingStep
 
             console.Set("log", new ClrFunction(engine, "log", (thisObj, args) =>
             {
+                using var js = logger.BeginScope("Language", "JavaScript");
                 logger.LogInformation("[js] {Msg}", JoinArgs(args));
                 return JsValue.Undefined;
             }), true);
 
             console.Set("warn", new ClrFunction(engine, "warn", (thisObj, args) =>
             {
+                using var js = logger.BeginScope("Language", "JavaScript");
                 logger.LogWarning("[js] {Msg}", JoinArgs(args));
                 return JsValue.Undefined;
             }), true);
 
             console.Set("error", new ClrFunction(engine, "error", (thisObj, args) =>
             {
+                using var js = logger.BeginScope("Language", "JavaScript");
                 logger.LogError("[js] {Msg}", JoinArgs(args));
                 return JsValue.Undefined;
             }), true);
@@ -327,6 +333,7 @@ internal class ScriptStep : ScrapingStep
                 TrackingNumber = "",
                 EstimatedDeliveryAt = eta,
                 Details = events,
+                Artifacts = [],
             };
         }
     }

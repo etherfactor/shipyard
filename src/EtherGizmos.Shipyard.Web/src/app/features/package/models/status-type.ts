@@ -9,7 +9,7 @@ export enum StatusType {
   Expired = "Expired",
 }
 
-interface StatusTypeMetadata {
+export interface StatusTypeMetadata {
   label: string;
   icon: string;
   color: string;

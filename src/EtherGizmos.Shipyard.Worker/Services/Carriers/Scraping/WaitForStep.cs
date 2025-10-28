@@ -6,6 +6,8 @@ namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
 
 internal class WaitForStep : ScrapingStep
 {
+    public override string StepName => $"Wait for {Selector}";
+
     [Required]
     public string Selector { get; set; } = null!;
 

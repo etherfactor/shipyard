@@ -21,6 +21,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Serilog;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -96,6 +97,7 @@ builder.Services
     .AddUnitOfWork(opt =>
     {
         opt.BindDbContext<ApplicationContext>();
+        opt.BindDbContext<ArtifactContext>();
     });
 
 // Messaging
@@ -110,6 +112,21 @@ builder.Services
             .Bind(opt);
     })
     .AddConsumersFromAssemblies(typeof(Program).Assembly);
+
+builder.Services
+    .AddOptions<JsonSerializerOptions>("Messaging")
+    .Configure(opt =>
+    {
+        opt.Converters.Add(new ArtifactUriConverter());
+    });
+
+// Storage
+builder.Services
+    .AddArtifactReader((opt, conf) =>
+    {
+        conf.GetSection("Artifacts")
+            .Bind(opt);
+    });
 
 // Models
 builder.Services.AddModelValidators();

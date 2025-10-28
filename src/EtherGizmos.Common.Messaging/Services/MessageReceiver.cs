@@ -58,7 +58,10 @@ internal class MessageReceiver : IMessageReceiver
         var middleware = Services.GetRequiredService<IEnumerable<IMessageMiddleware>>()
             .Concat(Services.GetRequiredKeyedService<IEnumerable<IMessageMiddleware>>(logicalName));
 
-        var consumers = Services.GetRequiredService<IEnumerable<IMessageConsumer<TMessage>>>();
+        using var scope = Services.CreateScope();
+        var provider = scope.ServiceProvider;
+
+        var consumers = provider.GetRequiredService<IEnumerable<IMessageConsumer<TMessage>>>();
         if (!consumers.Any())
             throw new InvalidOperationException($"No consumers available for type {typeof(TMessage)}");
 

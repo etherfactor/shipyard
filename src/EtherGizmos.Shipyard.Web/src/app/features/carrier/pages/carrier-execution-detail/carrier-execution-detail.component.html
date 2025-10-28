@@ -1,0 +1,250 @@
+@let record = carrierExecution$$();
+
+<!-- Header -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-header [text]="'Execution Details'"
+                   [subtext]="record?.carrier?.name + ' | Execution #' + record?.id" />
+  </div>
+</div>
+
+@if (record) {
+<!-- Summary -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-code" text="Execution Summary">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="carrier" class="col-sm-4 col-form-label">Carrier name</label>
+            <div class="col-sm-8">
+              <input id="carrier" type="text" [value]="record?.carrier?.name ?? '—'" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+
+        @let statusMeta = getExecutionStatusMetadata(record.executionStatusType!);
+        <div class="col-md-3">
+          <div class="row mt-3">
+            <label for="status" class="col-sm-4 col-form-label">Status</label>
+            <div class="col-sm-8">
+              <ng-select id="execStatus" [ngModel]="1" [ngModelOptions]="{ standalone: true }" [readonly]="true" [readonlyForm]="true">
+                <ng-option [value]="1">
+                  <span class="bi me-1" [class]="[statusMeta.icon, statusMeta.color]"></span>
+                  {{statusMeta.label}}
+                </ng-option>
+              </ng-select>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="row mt-3">
+            <label for="duration" class="col-sm-4 col-form-label">Duration</label>
+            <div class="col-sm-8">
+              <input id="duration" type="text" [value]="getDiffTime(record?.startedAt, record?.completedAt)" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="startedAt" class="col-sm-4 col-form-label">Started at</label>
+            <div class="col-sm-8">
+              <input id="startedAt" type="text" [value]="record.startedAt?.toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) ?? '—'" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="completedAt" class="col-sm-4 col-form-label">Completed at</label>
+            <div class="col-sm-8">
+              <input id="CompletedAt" type="text" [value]="record.completedAt?.toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) ?? '—'" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </detail-box>
+  </div>
+</div>
+
+<!-- Execution Log -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-window" text="Execution Log">
+      <div class="row">
+        @let sections = sections$$();
+
+        <!-- Left: Steps rail (desktop only) -->
+        <div class="col-lg-3 d-none d-lg-block border-end mt-3">
+          <div class="fw-semibold small text-uppercase text-muted mb-2">Steps</div>
+
+          <div class="list-group list-group-flush small">
+            <!-- Each item shows a duration chip; chevron is “jump to” affordance -->
+            @for (section of sections; track section) {
+            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+               href="javascript:void(0)" (click)="jumpToStep(section.step)">
+              <div style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                <span><i class="bi bi-chevron-right me-1 text-muted"></i> {{section.step}} · {{section.name}}</span>
+              </div>
+              <span class="badge bg-secondary-subtle text-secondary border">{{section.duration}}s</span>
+            </a>
+            }
+          </div>
+        </div>
+
+        <!-- Center: Log viewer -->
+        <div class="col-lg-6 col-12 mt-3">
+          <!-- Mobile jump-to (no steps rail on mobile) -->
+          <div class="d-lg-none mb-2">
+            <div class="fw-semibold small text-uppercase text-muted mb-2">Steps</div>
+            <select class="form-select form-select-sm" (change)="jumpToStepEvent($event)">
+              <option disabled>-- Select a step --</option>
+              @for (section of sections; track section) {
+              <option [value]="section.step">{{section.step}} · {{section.name}} ({{section.duration}}s)</option>
+              }
+            </select>
+          </div>
+
+          <!-- Log toolbar - consider adding later -->
+          <!--<div class="d-flex gap-2 align-items-center mb-2">
+            <div class="dropdown">
+              <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" disabled>
+                Filter: All
+              </button>
+              <ul class="dropdown-menu">
+                <li><span class="dropdown-item disabled">All</span></li>
+                <li><span class="dropdown-item disabled">Markers only</span></li>
+                <li><span class="dropdown-item disabled">Warnings/Errors</span></li>
+                <li><span class="dropdown-item disabled">JS only</span></li>
+              </ul>
+            </div>
+            <div class="flex-grow-1">
+              <input class="form-control form-control-sm" placeholder="Search logs…" disabled />
+            </div>
+            <button class="btn btn-outline-secondary btn-sm" disabled>
+              <i class="bi bi-funnel"></i>
+            </button>
+          </div>-->
+
+          <div class="fw-semibold small text-uppercase text-muted mb-2">Logs</div>
+
+          <!-- Log lines (single-line, colored) -->
+          <div class="border rounded p-2 bg-body-tertiary log-console" id="logView">
+
+            @let logs = logs$$();
+            @for (log of logs; track log) {
+
+            @if (log.properties["FLAG"] === "STEP_START") {
+            <!-- STEP_START (muted gray) -->
+            <div class="log-line log-marker" [attr.data-sy-stepid]="log.properties['Step']">
+              <span class="log-ts">{{log.timestamp.toISOTime({ includeOffset: false })}}</span>
+              <span class="log-badge log-badge-marker">BGN</span>
+              <span class="log-msg">{{log.message}}</span>
+            </div>
+
+            } @else if (log.properties["FLAG"] === "STEP_END") {
+            <!-- STEP_END (muted gray, with duration) -->
+            <div class="log-line log-marker">
+              <span class="log-ts">{{log.timestamp.toISOTime({ includeOffset: false })}}</span>
+              <span class="log-badge log-badge-marker">END</span>
+              <span class="log-msg">{{log.message}}</span>
+            </div>
+
+            } @else if (log.properties["FLAG"] === "ARTIFACT") {
+            <!-- Artifact (blue emphasis) -->
+            <div class="log-line log-marker">
+              <span class="log-ts">{{log.timestamp.toISOTime({ includeOffset: false })}}</span>
+              <span class="log-badge log-badge-artifact">AFT</span>
+              <span class="log-msg">[step={{log.properties["Step"]}}]
+                <span class="text-primary fw-semibold">{{log.properties["ArtifactName"]}} </span>
+                <span class="text-muted">{{log.properties["ArtifactContentType"]}} · {{log.properties["ArtifactSize"]}} </span>
+                <button class="btn btn-link btn-sm p-0 me-2" style="font-size: 12.5px; line-height: 1;" (click)="openArtifactPreview(log.properties['ArtifactUri'])">View</button>
+                <button class="btn btn-link btn-sm p-0 me-2" style="font-size: 12.5px; line-height: 1;" (click)="downloadArtifact(log.properties['ArtifactUri'])">Download</button>
+              </span>
+            </div>
+
+            } @else {
+            <!-- LOG (white) -->
+            <div class="log-line" [class]="log.level === 'Fatal' || log.level === 'Error' ? 'log-error' : log.level === 'Warning' ? 'log-warn' : ''">
+              <span class="log-ts">{{log.timestamp.toISOTime({ includeOffset: false })}}</span>
+              @if (log.properties["Language"] === "JavaScript") {
+              <span class="log-src log-src-js">js</span>
+              } @else {
+              <span class="log-src log-src-dotnet">c#</span>
+              }
+              @switch (log.level) {
+              @case ("Verbose") {
+              <span class="log-lvl log-lvl-verbose">VRB</span>
+              }
+              @case ("Debug") {
+              <span class="log-lvl log-lvl-debug">DBG</span>
+              }
+              @case ("Information") {
+              <span class="log-lvl log-lvl-information">INF</span>
+              }
+              @case ("Warning") {
+              <span class="log-lvl log-lvl-warning">WRN</span>
+              }
+              @case ("Error") {
+              <span class="log-lvl log-lvl-error">ERR</span>
+              }
+              @case ("Fatal") {
+              <span class="log-lvl log-lvl-fatal">FTL</span>
+              }
+              @default {
+              <span class="log-lvl">UNK</span>
+              }
+              }
+              <span class="log-msg">{{log.message}}</span>
+            </div>
+            }
+            }
+
+          </div>
+        </div>
+
+        <!-- Right: Artifacts quick access (desktop); collapses below on mobile -->
+        <div class="col-lg-3 col-12 mt-3">
+          <div class="fw-semibold small text-uppercase text-muted">Artifacts</div>
+
+          <div style="max-height: 528px; overflow-y: scroll;">
+            @for (container of sortedArtifacts$$(); track container.step) {
+            @if (container.step) {
+            <div class="text-muted small mt-2">Step {{container.step}}</div>
+            } @else {
+            <div class="text-muted small mt-2">Execution</div>
+            }
+            <div class="card card-body pt-0 pb-2 px-3 mt-1">
+              @for (artifact of container.artifacts; track artifact.artifactUri) {
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <div class="small">
+                  {{artifact.fileName}}<br />
+                  <span class="text-muted">{{artifact.contentType.split(';')[0]}}</span>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm" (click)="downloadArtifact(artifact.artifactUri)">Download</button>
+              </div>
+              }
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+    </detail-box>
+  </div>
+</div>
+}
+
+<!-- Loading Overlay -->
+@if (isLoading$$()) {
+<div style="position: fixed; top: 0; left: 0; height: 100%; width: 100%; background-color: color-mix(in srgb, var(--bs-body-bg) 50%, transparent); z-index: 100;">
+</div>
+<div style="position: fixed; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%); z-index: 100;">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+}

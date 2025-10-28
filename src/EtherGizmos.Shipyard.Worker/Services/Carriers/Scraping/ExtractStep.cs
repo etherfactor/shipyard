@@ -8,6 +8,8 @@ namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
 
 internal class ExtractStep : ScrapingStep, ISettableStep
 {
+    public override string StepName => "[DEPRECATED] Extract";
+
     [Required]
     public string Selector { get; set; } = null!;
 

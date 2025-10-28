@@ -1,0 +1,129 @@
+.log-console {
+  min-height: 520px;
+  max-height: 520px;
+  overflow: auto;
+  font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace;
+  font-size: 12.5px;
+}
+
+.log-line {
+  padding: 2px 0;
+}
+
+.log-marker {
+  color: var(--bs-secondary-color);
+}
+
+.log-warn {
+  color: var(--bs-warning-text-emphasis);
+}
+
+.log-error {
+  color: var(--bs-danger-text-emphasis);
+}
+
+/* ---------- Base pill styles ---------- */
+.log-lvl,
+.log-src,
+.log-badge {
+  font-weight: 600;
+  margin: 0 4px;
+  padding: 0 6px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  line-height: 1.25;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Optional: timestamp tint follows line color */
+.log-ts {
+  opacity: .8;
+  margin-right: 6px;
+}
+
+/* ---------- Level badges ---------- */
+.log-lvl-verbose {
+  background: var(--log-verbose-bg);
+  color: var(--log-verbose-fg);
+  border-color: var(--log-verbose-bd);
+}
+
+.log-lvl-debug {
+  background: var(--log-debug-bg);
+  color: var(--log-debug-fg);
+  border-color: var(--log-debug-bd);
+}
+
+.log-lvl-information {
+  background: var(--log-info-bg);
+  color: var(--log-info-fg);
+  border-color: var(--log-info-bd);
+}
+
+.log-lvl-warning {
+  background: var(--log-warn-bg);
+  color: var(--log-warn-fg);
+  border-color: var(--log-warn-bd);
+}
+
+.log-lvl-error {
+  background: var(--log-error-bg);
+  color: var(--log-error-fg);
+  border-color: var(--log-error-bd);
+}
+
+.log-lvl-critical {
+  background: var(--log-critical-bg);
+  color: var(--log-critical-fg);
+  border-color: var(--log-critical-bd);
+}
+
+.log-lvl-fatal {
+  background: var(--log-fatal-bg);
+  color: var(--log-fatal-fg);
+  border-color: var(--log-fatal-bd);
+}
+
+/* ---------- Source chips ---------- */
+.log-src-js {
+  background: var(--log-src-js-bg);
+  color: var(--log-src-js-fg);
+  border-color: var(--log-src-js-bd);
+}
+
+.log-src-dotnet {
+  background: var(--log-src-dotnet-bg);
+  color: var(--log-src-dotnet-fg);
+  border-color: var(--log-src-dotnet-bd);
+}
+
+/* ---------- Marker badges (STEP_START/END, ARTIFACT) ---------- */
+.log-badge-marker {
+  background: var(--log-marker-bg);
+  color: var(--log-marker-fg);
+  border-color: var(--log-marker-bd);
+}
+
+.log-badge-artifact {
+  background: var(--log-artifact-bg);
+  color: var(--log-artifact-fg);
+  border-color: var(--log-artifact-bd);
+}
+
+/* Optional: make entire line inherit a severity tint */
+.log-line.warn {
+  color: var(--log-warn-fg);
+}
+
+.log-line.error {
+  color: var(--log-error-fg);
+}
+
+.log-line.crit {
+  color: var(--log-critical-fg);
+}
+
+.log-line.fatal {
+  color: var(--log-fatal-fg);
+}

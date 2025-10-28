@@ -1,6 +1,7 @@
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,10 +41,25 @@ public class QueueTrackingRequestBackgroundService : PeriodicBackgroundService
 
         await Parallel.ForEachAsync(ready, async (package, ct) =>
         {
+            using var subUow = uowFactory.Create();
+            var executionRepo = subUow.Repository<CarrierExecution>();
+
+            var execution = new CarrierExecution()
+            {
+                CarrierId = package.CarrierId,
+                ExecutionStatus = ExecutionStatusType.Queued,
+                StepCount = (short)package.Carrier.Steps.Count,
+            };
+
+            executionRepo.Create(execution);
+
+            await subUow.SaveChangesAsync(ct);
+
             await _sender.SendAsync("tracking-poll-request", new TrackingRequest()
             {
+                ExecutionId = execution.Id,
                 PackageId = package.Id,
-                CarrierSlug = package.Carrier.Slug,
+                CarrierId = package.CarrierId,
                 TrackingNumber = package.TrackingNumber,
             }, cancellationToken: stoppingToken);
 

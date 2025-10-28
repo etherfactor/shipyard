@@ -10,22 +10,24 @@ export abstract class InitializeModal<
 
   private readonly _$activeModal = inject(NgbActiveModal);
 
+  abstract get defaultClose(): TClose;
+
   abstract get defaultDismiss(): TDismiss;
 
   abstract initialize(...args: TArgs): void;
 
-  close(result: TClose): void {
+  close(result?: TClose): void {
     const use: ModalReturn<TClose, TDismiss> = {
       type: "closed",
-      value: result,
+      value: result ?? this.defaultClose,
     };
     this._$activeModal.close(use);
   }
 
-  dismiss(result: TDismiss): void {
+  dismiss(result?: TDismiss): void {
     const use: ModalReturn<TClose, TDismiss> = {
       type: "dismissed",
-      reason: result,
+      reason: result ?? this.defaultDismiss,
     };
     this._$activeModal.dismiss(use);
   }

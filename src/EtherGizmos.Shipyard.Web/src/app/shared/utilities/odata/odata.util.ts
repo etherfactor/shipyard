@@ -11,6 +11,7 @@ export const o = createOperatorFactory({
   date: (value: DateTime) => new LuxonDateValue(value),
   dateTime: (value: DateTime) => new LuxonDateTimeValue(value),
   time: (value: Interval) => new LuxonTimeValue(value),
+  paramString: (value: string) => new UnwrappedStringValue(value),
 });
 
 export function provideODataClient(): Provider {
@@ -19,7 +20,7 @@ export function provideODataClient(): Provider {
     useFactory: (config: AppConfig, $http: HttpClient) => {
       const angularAdapter: HttpClientAdapter = {
         async invoke(request) {
-          let response: Observable<HttpResponse<object>>;
+          let response: Observable<HttpResponse<string>>;
 
           switch (request.method) {
             case "GET":
@@ -29,6 +30,7 @@ export function provideODataClient(): Provider {
                   headers: request.headers,
                   params: request.query,
                   observe: "response",
+                  responseType: "text",
                 });
               break;
 
@@ -39,6 +41,7 @@ export function provideODataClient(): Provider {
                   headers: request.headers,
                   params: request.query,
                   observe: "response",
+                  responseType: "text",
                 });
               break;
 
@@ -50,6 +53,7 @@ export function provideODataClient(): Provider {
                   headers: request.headers,
                   params: request.query,
                   observe: "response",
+                  responseType: "text",
                 });
               break;
 
@@ -61,6 +65,7 @@ export function provideODataClient(): Provider {
                   headers: request.headers,
                   params: request.query,
                   observe: "response",
+                  responseType: "text",
                 });
               break;
 
@@ -72,6 +77,7 @@ export function provideODataClient(): Provider {
                   headers: request.headers,
                   params: request.query,
                   observe: "response",
+                  responseType: "text",
                 });
               break;
 
@@ -80,9 +86,15 @@ export function provideODataClient(): Provider {
           }
 
           const result = await firstValueFrom(response);
+          let body: unknown = result.body!;
+
+          try {
+            body = JSON.parse(body as string);
+          } catch { }
+
           return {
             status: result.status,
-            data: Promise.resolve(result.body!),
+            data: Promise.resolve(body),
           };
         }
       };
@@ -171,6 +183,25 @@ class EnumValue<TEnum extends string> implements Value<TEnum> {
   }
 
   eval(): TEnum {
+    return this.value;
+  }
+}
+
+class UnwrappedStringValue implements Value<string> {
+
+  private readonly value: string;
+
+  _?: string | undefined;
+
+  constructor(value: string) {
+    this.value = value;
+  }
+
+  toString(): string {
+    return this.value;
+  }
+
+  eval(): string {
     return this.value;
   }
 }

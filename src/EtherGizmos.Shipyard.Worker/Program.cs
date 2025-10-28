@@ -11,17 +11,25 @@ using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Serilog;
+using System.Text.Json;
 
 var builder = Host.CreateApplicationBuilder(args);
 
+builder.Logging.ClearProviders();
+
 builder.Services.AddSerilog((services, logger) =>
-    logger.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>()));
+    logger.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>()),
+    writeToProviders: true);
+
+builder.Services.AddTeeStreamLogger();
 
 //************************************************************
 // Configuration
 
 builder.Configuration
+    .AddJsonFile($"appsettings.{builder.Environment}.json", optional: true, reloadOnChange: true)
     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
     .AddRemappedEnvironmentVariables(
         (new(@"(?<=[^:_])_(?=[^_])"), "."),
@@ -72,6 +80,7 @@ builder.Services
     .AddUnitOfWork(opt =>
     {
         opt.BindDbContext<ApplicationContext>();
+        opt.BindDbContext<ArtifactContext>();
     });
 
 // Messaging
@@ -96,6 +105,21 @@ builder.Services
             .Bind(opt);
     })
     .AddConsumersFromAssemblies(typeof(Program).Assembly);
+
+builder.Services
+    .AddOptions<JsonSerializerOptions>("Messaging")
+    .Configure(opt =>
+    {
+        opt.Converters.Add(new ArtifactUriConverter());
+    });
+
+// Storage
+builder.Services
+    .AddArtifactWriter((opt, conf) =>
+    {
+        conf.GetSection("Artifacts")
+            .Bind(opt);
+    });
 
 // Tracking
 builder.Services

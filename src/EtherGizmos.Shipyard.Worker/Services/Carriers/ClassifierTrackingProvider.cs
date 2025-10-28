@@ -5,18 +5,18 @@ namespace EtherGizmos.Shipyard.Worker.Services.Carriers;
 internal class ClassifierTrackingProvider : ITrackingProvider, IDisposable
 {
     private readonly IRegexClassifier _classifier;
-    private readonly string _slug;
+    private readonly int _carrierId;
     private readonly ITrackingProvider _inner;
 
     private bool _disposed;
 
     public ClassifierTrackingProvider(
         IServiceProvider serviceProvider,
-        string slug,
+        int carrierId,
         ITrackingProvider inner)
     {
         _classifier = serviceProvider.GetRequiredService<IRegexClassifier>();
-        _slug = slug;
+        _carrierId = carrierId;
         _inner = inner;
     }
 
@@ -31,7 +31,7 @@ internal class ClassifierTrackingProvider : ITrackingProvider, IDisposable
         {
             if (status.Description is not null)
             {
-                var statusTypeId = await _classifier.ClassifyStatusAsync(_slug, status.Description, cancellationToken: cancellationToken);
+                var statusTypeId = await _classifier.ClassifyStatusAsync(_carrierId, status.Description, cancellationToken: cancellationToken);
                 newStatuses.Add(status with
                 {
                     StatusTypeId = statusTypeId,

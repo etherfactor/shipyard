@@ -6,6 +6,8 @@ public interface IBrowserClient : IDisposable
 
     Task<string> GetHtmlAsync(CancellationToken cancellationToken = default);
 
+    Task<Stream> GetScreenshotAsync(CancellationToken cancellationToken = default);
+
     Task NavigateAsync(string requestUrl, TimeSpan? timeout = null, CancellationToken cancellationToken = default);
 
     Task SendAsync(string selector, string content, CancellationToken cancellationToken = default);

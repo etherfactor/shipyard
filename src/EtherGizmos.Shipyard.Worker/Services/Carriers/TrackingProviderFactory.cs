@@ -11,14 +11,11 @@ internal class TrackingProviderFactory : ITrackingProviderFactory
     }
 
     public ITrackingProvider CreateProvider(
-        string slug)
+        int carrierId,
+        int executionId)
     {
-        var provider = slug switch
-        {
-            //"usps" => new UspsBrowserTrackingProvider(_serviceProvider),
-            _ => new RunbookBrowserTrackingProvider(_serviceProvider, slug)
-        };
+        var provider = new RunbookBrowserTrackingProvider(_serviceProvider, carrierId, executionId);
 
-        return new ClassifierTrackingProvider(_serviceProvider, slug, provider);
+        return new ClassifierTrackingProvider(_serviceProvider, carrierId, provider);
     }
 }

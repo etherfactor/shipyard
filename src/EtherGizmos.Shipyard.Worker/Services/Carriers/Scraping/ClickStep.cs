@@ -7,6 +7,8 @@ namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
 
 internal class ClickStep : ScrapingStep
 {
+    public override string StepName => $"Click {Selector}";
+
     [Required]
     public string Selector { get; set; } = null!;
 

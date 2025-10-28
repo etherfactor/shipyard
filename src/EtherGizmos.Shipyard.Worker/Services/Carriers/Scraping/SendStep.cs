@@ -8,6 +8,8 @@ namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
 
 internal class SendStep : ScrapingStep
 {
+    public override string StepName => $"Send {Value} to {Selector}";
+
     [Required]
     public string Selector { get; set; } = null!;
 

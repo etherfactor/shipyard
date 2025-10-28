@@ -52,10 +52,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.Api.In
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "containers", "containers", "{8FA3D36E-AD8B-45B7-88D9-D61D4A212B96}"
 	ProjectSection(SolutionItems) = preProject
-		containers\web.dockerfile = containers\web.dockerfile
 		containers\api.dockerfile = containers\api.dockerfile
+		containers\web.dockerfile = containers\web.dockerfile
 		containers\worker.dockerfile = containers\worker.dockerfile
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.Artifacts", "src\EtherGizmos.Shipyard.Artifacts\EtherGizmos.Shipyard.Artifacts.csproj", "{03CA9E1D-36F2-44D5-9991-30A46966E836}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +131,10 @@ Global
 		{4724B095-C1AF-48E1-B9F7-040A8C348BE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4724B095-C1AF-48E1-B9F7-040A8C348BE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4724B095-C1AF-48E1-B9F7-040A8C348BE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03CA9E1D-36F2-44D5-9991-30A46966E836}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03CA9E1D-36F2-44D5-9991-30A46966E836}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03CA9E1D-36F2-44D5-9991-30A46966E836}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03CA9E1D-36F2-44D5-9991-30A46966E836}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -151,6 +157,7 @@ Global
 		{C332E6D7-0F33-4C09-A62D-AEF694B81235} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 		{4724B095-C1AF-48E1-B9F7-040A8C348BE6} = {FEDE1648-76A0-4976-A5B6-AC8028876B1F}
 		{8FA3D36E-AD8B-45B7-88D9-D61D4A212B96} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{03CA9E1D-36F2-44D5-9991-30A46966E836} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FDAA95A9-84A5-47E0-85A2-730CDD821DD7}

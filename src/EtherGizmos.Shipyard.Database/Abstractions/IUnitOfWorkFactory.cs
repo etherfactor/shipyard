@@ -1,6 +1,11 @@
-﻿namespace EtherGizmos.Shipyard.Abstractions;
+﻿
+namespace EtherGizmos.Shipyard.Abstractions;
 
 public interface IUnitOfWorkFactory
 {
-    IUnitOfWork Create(bool useRequestScope = false);
+    IUnitOfWork Create();
+
+    IUnitOfWork Create(bool useRequestScope);
+
+    IUnitOfWork Create(IServiceProvider provider);
 }
