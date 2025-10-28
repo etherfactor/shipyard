@@ -1,9 +1,10 @@
 /// <reference types="@angular/localize" />
 
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
-import { InjectionToken, Provider } from '@angular/core';
+import { InjectionToken, isDevMode, Provider } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
+import { provideServiceWorker } from '@angular/service-worker';
 import { buildUrl } from '@ethergizmos/odata-fluent-client/dist/src/utils/http';
 import { AbstractSecurityStorage, authInterceptor, DefaultLocalStorageService, LogLevel, provideAuth } from 'angular-auth-oidc-client';
 import { provideMonacoEditor } from 'ngx-monaco-editor-v2';
@@ -127,6 +128,10 @@ export {};
 
             monaco.languages.typescript.javascriptDefaults.addExtraLib(libSource, libUri);
           },
+        }),
+        provideServiceWorker("ngsw-worker.js", {
+          enabled: !isDevMode(),
+          registrationStrategy: "registerWhenStable:30000",
         }),
       ]
     })

@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <Content Exclude="wwwroot/_src/node_modules/bootstrap-icons/font/fonts/**" Include="wwwroot/_src/node_modules/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Remove="wwwroot\favicon.ico" />
+    <Content Remove="wwwroot\favicon.svg" />
     <Content Include="wwwroot/_src/node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff" TargetPath="wwwroot/css/fonts/bootstrap-icons.woff" CopyToOutputDirectory="PreserveNewest" Condition="Exists('wwwroot/_src/node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff')" />
     <Content Include="wwwroot/_src/node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2" TargetPath="wwwroot/css/fonts/bootstrap-icons.woff2" CopyToOutputDirectory="PreserveNewest" Condition="Exists('wwwroot/_src/node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2')" />
   </ItemGroup>
@@ -35,6 +37,11 @@
   <ItemGroup>
     <InternalsVisibleTo Include="$(MSBuildProjectName).UnitTests" />
     <InternalsVisibleTo Include="$(MSBuildProjectName).IntegrationTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\favicon.ico" />
+    <None Include="wwwroot\favicon.svg" />
   </ItemGroup>
 
   <ItemGroup>
