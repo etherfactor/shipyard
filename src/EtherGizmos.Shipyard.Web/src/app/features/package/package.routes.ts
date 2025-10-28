@@ -5,6 +5,7 @@ export const PACKAGE_ROUTES: ExtendedRoute[] = [
     path: "",
     pathMatch: "full",
     loadComponent: () => import("./pages/package-list/package-list.component").then(m => m.PackageListComponent),
+    title: "Shipyard | Package List",
     data: {
       breadcrumb: {
         label: "Package List",
@@ -17,6 +18,7 @@ export const PACKAGE_ROUTES: ExtendedRoute[] = [
     path: "new",
     pathMatch: "full",
     loadComponent: () => import("./pages/package-detail/package-detail.component").then(m => m.PackageDetailComponent),
+    title: "Shipyard | New Package",
     data: {
       breadcrumb: {
         label: "New Package",
@@ -34,6 +36,7 @@ export const PACKAGE_ROUTES: ExtendedRoute[] = [
     path: ":packageId",
     pathMatch: "full",
     loadComponent: () => import("./pages/package-detail/package-detail.component").then(m => m.PackageDetailComponent),
+    title: "Shipyard | Package #:packageId",
     data: {
       breadcrumb: {
         label: "Package #{packageId}",
