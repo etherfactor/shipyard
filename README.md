@@ -26,7 +26,7 @@ The background worker (headless) is not accessible directly. It communicates wit
 
 1. Download the `compose.yml` file.
 2. Run `docker compose -f compose.yml up -d` to pull and run the application stack.
-3. Access the application in a browser at http://localhost:7447 (default admin: `admin` / `password`).
+3. Access the application in a browser at http://localhost:7447, or your configured `SHIPYARD_API_HOST` (default admin: `admin` / `password`).
 4. (Optional) Run `docker compose -f compose.yml down` to stop and remove the application stack.
 
 > [!NOTE]
@@ -38,17 +38,18 @@ Settings can be configured by adjusting values in the `compose.yml` file or by c
 
 Values in `.env` will override those in `compose.yml`.
 
-| Setting                     | Description                                 | Default             |
-| --------------------------- | ------------------------------------------- | ------------------- |
-| POSTGRES_DB                 | The name of the PostgreSQL database.        | shipyard            |
-| POSTGRES_USER               | The name of the PostgreSQL user.            | shipyard            |
-| POSTGRES_PASSWORD           | The password of the PostgreSQL user.        | mySecure(!)Password |
-| RABBITMQ_USER               | The name of the RabbitMQ user.              | shipyard            |
-| RABBITMQ_PASSWORD           | The password of the RabbitMQ user.          | mySecure(!)Password |
-| SHIPYARD_BOOTSTRAP_USER     | The username of the default user to create. | admin               |
-| SHIPYARD_BOOTSTRAP_PASSWORD | The password of the default user to create. | password            |
-| SHIPYARD_API_PORT           | The port on which to run the Shipyard API.  | 7448                |
-| SHIPYARD_WEB_PORT           | The port on which to run the Shipyard UI.   | 7447                |
+| Setting                     | Description                                 | Default               |
+| --------------------------- | ------------------------------------------- | --------------------- |
+| POSTGRES_DB                 | The name of the PostgreSQL database.        | shipyard              |
+| POSTGRES_USER               | The name of the PostgreSQL user.            | shipyard              |
+| POSTGRES_PASSWORD           | The password of the PostgreSQL user.        | mySecure(!)Password   |
+| RABBITMQ_USER               | The name of the RabbitMQ user.              | shipyard              |
+| RABBITMQ_PASSWORD           | The password of the RabbitMQ user.          | mySecure(!)Password   |
+| SHIPYARD_BOOTSTRAP_USER     | The username of the default user to create. | admin                 |
+| SHIPYARD_BOOTSTRAP_PASSWORD | The password of the default user to create. | password              |
+| SHIPYARD_API_HOST           | The base URL hosting Shipyard.              | http://localhost:7448 |
+| SHIPYARD_API_PORT           | The port on which to run the Shipyard API.  | 7448                  |
+| SHIPYARD_WEB_PORT           | The port on which to run the Shipyard UI.   | 7447                  |
 
 > [!WARNING]
 > It is **strongly recommended** to replace the default authentication certificates.
@@ -57,10 +58,15 @@ Values in `.env` will override those in `compose.yml`.
 > 
 > Without updating these values, a malicious user familiar with this repository could craft valid authentication tokens. A future release will automate this step on first run.
 
+## SSL / Reverse Proxy
+
+Shipyard does not currently manage HTTPS certificates internally. It is recommended to deploy Shipyard behind a reverse proxy such as **nginx**, **Caddy**, or **Traefik** to enable SSL.
+
+If you use nginx, you can proxy the Web UI (port `7447`) and API (port `7448`) to serve them under your own domain with HTTPS enabled. Ensure the `SHIPYARD_API_HOST` is set to match your domain.
+
 ## Status
 
-Shipyard is currently in **Alpha**.  
-While it is functional and stable for personal use, breaking changes may occur between releases.
+Shipyard is currently in **Alpha**. While it is functional and stable for personal use, breaking changes may occur between releases.
 
 It is important to grab the latest `compose.yml` file when updating to a new version.
 
