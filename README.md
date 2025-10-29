@@ -18,7 +18,7 @@ Shipyard is comprised of three components, each with a different role.
 
 The web UI (port `7447`) is your primary window into the application. Designed as a progressive web app, this component gives you controls for tracking your existing packages, adding new ones, and configuring carriers.
 
-The API (port `7448`), provides access to the application's data. Built in [OData](https://www.odata.org/) style, its endpoints support filtering, sorting, and the creation of entities. The web UI communicates directly with the API.
+The API (port `7448`), provides access to the application's data. Built in [OData](https://www.odata.org/) style, its endpoints support filtering and sorting, in addition to standard CRUD operations. The web UI communicates directly with the API.
 
 The background worker (headless) is not accessible directly. It communicates with the API via a message bus and uses the bus internally for retries on failure. The worker executes carrier steps, extracts tracking data, and publishes tracking results.
 
