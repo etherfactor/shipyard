@@ -134,4 +134,9 @@ stages:
       inputArtifactName: 'web'
       outputArtifactName: 'web-docker'
       dockerfilePath: 'containers/web.dockerfile'
+      extraFiles:
+      - from: 'containers/apply-config-env.js'
+        to: ''
+      - from: 'containers/docker-entrypoint.web.sh'
+        to: ''
       repository: 'shipyard-web'
