@@ -84,7 +84,7 @@ stages:
           workingDir: './src/EtherGizmos.Shipyard.Api/wwwroot/_src'
 
   # Publish dotnet api (docker)
-  - template: shared/container/dockerize-artifact@sharedTemplates
+  - template: shared/container/dockerize-artifact.yml@sharedTemplates
     parameters:
       name: 'publish_dotnet_api_docker'
       dependsOn:
@@ -103,7 +103,7 @@ stages:
       artifactName: 'worker'
 
   # Publish dotnet worker (docker)
-  - template: shared/container/dockerize-artifact@sharedTemplates
+  - template: shared/container/dockerize-artifact.yml@sharedTemplates
     parameters:
       name: 'publish_dotnet_worker_docker'
       dependsOn:
@@ -126,7 +126,7 @@ stages:
       artifactName: 'web'
 
   # Publish angular web ui (docker)
-  - template: shared/container/dockerize-artifact@sharedTemplates
+  - template: shared/container/dockerize-artifact.yml@sharedTemplates
     parameters:
       name: 'publish_node_webui_docker'
       dependsOn:
