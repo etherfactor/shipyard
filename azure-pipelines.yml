@@ -136,7 +136,7 @@ stages:
       dockerfilePath: 'containers/web.dockerfile'
       extraFiles:
       - from: 'containers/apply-config-env.js'
-        to: ''
+        to: 'files'
       - from: 'containers/docker-entrypoint.web.sh'
-        to: ''
+        to: 'files'
       repository: 'shipyard-web'
