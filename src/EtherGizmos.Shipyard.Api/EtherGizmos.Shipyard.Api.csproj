@@ -40,8 +40,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\favicon.ico" />
-    <None Include="wwwroot\favicon.svg" />
+    <None Include="wwwroot\favicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\favicon.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
