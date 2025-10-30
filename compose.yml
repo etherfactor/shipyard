@@ -45,7 +45,7 @@ services:
         condition: on-failure
 
   api:
-    image: ethergizmos/shipyard-api:latest
+    image: etherfactor/shipyard-api:latest
     environment:
       ASPNETCORE_URLS: http://+:8080
       SHIPYARD_BOOTSTRAP_USER: "${SHIPYARD_BOOTSTRAP_USER:-admin}"
@@ -81,7 +81,7 @@ services:
         condition: on-failure
 
   worker:
-    image: ethergizmos/shipyard-worker:latest
+    image: etherfactor/shipyard-worker:latest
     environment:
       Database__ConnectionId: ComposeDb
       Connections__ComposeDb__Type: Database
@@ -113,7 +113,7 @@ services:
         condition: on-failure
 
   web:
-    image: ethergizmos/shipyard-web:latest
+    image: etherfactor/shipyard-web:latest
     environment:
       CONFIG__resourceServer: "${SHIPYARD_API_HOST:-http://localhost:7448}/api/v1"
       CONFIG__oauth__authority: "${SHIPYARD_API_HOST:-http://localhost:7448}"
