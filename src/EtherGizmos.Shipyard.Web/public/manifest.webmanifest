@@ -1,9 +1,12 @@
 {
-  "name": "EtherGizmos.Shipyard.Web",
-  "short_name": "EtherGizmos.Shipyard.Web",
+  "name": "Shipyard",
+  "short_name": "Shipyard",
+  "description": "Self-hosted package tracker with scriptable carrier logic.",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",
+  "theme_color": "#731dd8",
+  "background_color": "#ffffff",
   "icons": [
     {
       "src": "icons/icon-72x72.png",
