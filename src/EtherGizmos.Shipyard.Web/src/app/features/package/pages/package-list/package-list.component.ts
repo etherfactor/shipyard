@@ -45,10 +45,10 @@ export class PackageListComponent extends ListComponent<Package> {
     ];
 
     if (!this.isLoading()) {
-      actions.push({
-        icon: 'bi-layout-three-columns',
-        label: 'Edit Columns',
-      });
+      //actions.push({
+      //  icon: 'bi-layout-three-columns',
+      //  label: 'Edit Columns',
+      //});
       actions.push({
         icon: 'bi-plus-square',
         label: 'Add',

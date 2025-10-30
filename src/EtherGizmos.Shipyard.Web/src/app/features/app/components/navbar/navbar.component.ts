@@ -41,6 +41,7 @@ export class NavbarComponent {
       try {
         this.sidebar = offcanvas.componentInstance;
         await offcanvas.result;
+      } catch {
       } finally {
         this.sidebar = undefined;
       }
