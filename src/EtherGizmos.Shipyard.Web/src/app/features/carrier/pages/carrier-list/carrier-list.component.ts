@@ -44,10 +44,10 @@ export class CarrierListComponent extends ListComponent<Carrier> {
     ];
 
     if (!this.isLoading()) {
-      actions.push({
-        icon: 'bi-layout-three-columns',
-        label: 'Edit Columns',
-      });
+      //actions.push({
+      //  icon: 'bi-layout-three-columns',
+      //  label: 'Edit Columns',
+      //});
       actions.push({
         icon: 'bi-plus-square',
         label: 'Add',

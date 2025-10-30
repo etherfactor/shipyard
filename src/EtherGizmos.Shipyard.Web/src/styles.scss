@@ -54,6 +54,19 @@ body {
       top: var(--navbar-height);
     }
   }
+
+  .navbar-collapse {
+    display: flex !important;
+    flex-basis: auto !important;
+  }
+
+  .navbar-nav {
+    flex-direction: row !important;
+  }
+
+  .nav-item {
+    position: static !important;
+  }
 }
 
 @include media-breakpoint-down(sm) {

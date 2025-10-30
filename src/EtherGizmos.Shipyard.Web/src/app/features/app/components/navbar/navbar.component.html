@@ -14,8 +14,9 @@
         </div>
       </a>
     </div>
-    <input type="text" style="width: 400px;" class="form-control d-none d-md-block" id="exampleInputEmail1">
-    <button type="button" class="btn btn-link d-sm-block d-md-none"><span class="bi bi-search"></span></button>
+    <!-- Eventually, would be nice to bring back the search bar to quickly look up packages, carriers, etc. -->
+    <!--<input type="text" style="width: 400px;" class="form-control d-none d-md-block" id="exampleInputEmail1">
+    <button type="button" class="btn btn-link d-sm-block d-md-none"><span class="bi bi-search"></span></button>-->
     <div class="navbar-grow d-flex flex-row-reverse align-items-center">
       <ul class="navbar-nav mb-lg-0">
         @if (isSignedIn$$()) {
@@ -24,7 +25,7 @@
             {{name$$()}}
           </a>
           <ul ngbDropdownMenu class="dropdown-menu dropdown-menu-end">
-            <li><a ngbDropdownItem class="dropdown-item" [href]="changePasswordUrl" (click)="logout()">Change password</a></li>
+            <li><a ngbDropdownItem class="dropdown-item" [href]="changePasswordUrl">Change password</a></li>
             <li><a ngbDropdownItem class="dropdown-item" href="javascript:void(0);" (click)="logout()">Sign out</a></li>
           </ul>
         </li>

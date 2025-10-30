@@ -5,7 +5,6 @@ import { NgbDropdownModule, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { Options } from '@popperjs/core';
 import { OAuth2Service } from '../../../../shared/services/oauth2/oauth2.service';
 import { APP_CONFIG } from '../../../../shared/utilities/config/config.util';
-import { openOffcanvas } from '../../../../shared/utilities/offcanvas/offcanvas.util';
 import { UserSessionService } from '../../../login/services/user-session/user-session.service';
 import { NavbarActionComponent } from '../navbar-action/navbar-action.component';
 import { NavbarBreadcrumbComponent } from '../navbar-breadcrumb/navbar-breadcrumb.component';
@@ -32,8 +31,21 @@ export class NavbarComponent {
   readonly isSignedIn$$ = computed(() => this.$userSession.isSignedIn$$());
   readonly name$$ = computed(() => this.$userSession.navbarName$$());
 
+  private sidebar?: SidebarComponent;
+
   async openSidebar() {
-    await openOffcanvas(this.$offcanvas, SidebarComponent);
+    if (this.sidebar) {
+      this.sidebar.close(0);
+    } else {
+      const offcanvas = this.$offcanvas.open(SidebarComponent, { panelClass: "sidebar" });
+      try {
+        this.sidebar = offcanvas.componentInstance;
+        await offcanvas.result;
+      } catch {
+      } finally {
+        this.sidebar = undefined;
+      }
+    }
   }
 
   login(): void {
