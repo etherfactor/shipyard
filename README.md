@@ -51,11 +51,15 @@ Values in `.env` will override those in `compose.yml`.
 | SHIPYARD_API_PORT           | The port on which to run the Shipyard API.  | 7448                  |
 | SHIPYARD_WEB_HOST           | The base URL hosting Shipyard UI.           | http://localhost:7447 |
 | SHIPYARD_WEB_PORT           | The port on which to run the Shipyard UI.   | 7447                  |
+| SHIPYARD_ENC_CRT            | TEMP; encryption public key (.crt)          | (a certificate)       |
+| SHIPYARD_ENC_KEY            | TEMP; encryption private key (.key)         | (a certificate)       |
+| SHIPYARD_SIGN_CRT           | TEMP; signing public key (.crt)             | (a certificate)       |
+| SHIPYARD_SIGN_KEY           | TEMP; signing private key (.key)            | (a certificate)       |
 
 > [!WARNING]
 > It is **strongly recommended** to replace the default authentication certificates.
 > 
-> Generate two self-signed certificates and use them to set the `Security__Certificates__AuthEncryption`  and `Security__Certificates__AuthSigning` environment variables in `compose.yml`.  
+> Generate two self-signed certificates and use them to set the `SHIPYARD_ENC_*`  and `SHIPYARD_SIGN_*` environment variables in `.env`.  
 > 
 > Without updating these values, a malicious user familiar with this repository could craft valid authentication tokens. A future release will automate this step on first run.
 
