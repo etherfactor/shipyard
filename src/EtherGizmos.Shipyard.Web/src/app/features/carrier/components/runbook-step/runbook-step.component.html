@@ -46,15 +46,15 @@
                      [selectOnTab]="true"
                      [readonlyForm]="form.disabled">
             <ng-option [value]="StepType.Click">Click</ng-option>
-            <ng-option [value]="StepType.ExtractList">Extract list</ng-option>
             <ng-option [value]="StepType.Extract">Extract</ng-option>
             <ng-option [value]="StepType.Navigate">Navigate</ng-option>
             <ng-option [value]="StepType.Replace">Replace</ng-option>
-            <ng-option [value]="StepType.Return">Return</ng-option>
             <ng-option [value]="StepType.Script">Script</ng-option>
             <ng-option [value]="StepType.Send">Send</ng-option>
             <ng-option [value]="StepType.Set">Set</ng-option>
             <ng-option [value]="StepType.WaitFor">Wait for</ng-option>
+            <ng-option [value]="StepType.ExtractList">Extract list [DEPRECATED]</ng-option>
+            <ng-option [value]="StepType.Return">Return [DEPRECATED]</ng-option>
           </ng-select>
         </div>
       </div>
