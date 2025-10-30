@@ -49,6 +49,7 @@ Values in `.env` will override those in `compose.yml`.
 | SHIPYARD_BOOTSTRAP_PASSWORD | The password of the default user to create. | password              |
 | SHIPYARD_API_HOST           | The base URL hosting Shipyard.              | http://localhost:7448 |
 | SHIPYARD_API_PORT           | The port on which to run the Shipyard API.  | 7448                  |
+| SHIPYARD_WEB_HOST           | The base URL hosting Shipyard UI.           | http://localhost:7447 |
 | SHIPYARD_WEB_PORT           | The port on which to run the Shipyard UI.   | 7447                  |
 
 > [!WARNING]
