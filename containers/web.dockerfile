@@ -4,11 +4,11 @@ WORKDIR /app
 
 RUN npm install -g pm2 serve
 
-COPY containers/deploy/web/ether-gizmos.shipyard.web/browser/. ./browser
+COPY app/ether-gizmos.shipyard.web/browser/ ./browser
 RUN cp ./browser/assets/config.json ./browser/assets/config.base.json
 
-COPY containers/apply-config-env.js /opt/apply-config-env.js
-COPY containers/docker-entrypoint.web.sh /docker-entrypoint.sh
+COPY files/apply-config-env.js /opt/apply-config-env.js
+COPY files/docker-entrypoint.web.sh /docker-entrypoint.sh
 RUN sed -i 's/\r$//' /docker-entrypoint.sh /opt/apply-config-env.js \
   && chmod +x /docker-entrypoint.sh
 

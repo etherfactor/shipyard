@@ -8,7 +8,7 @@ resources:
   - repository: sharedTemplates
     type: git
     name: 'Projects/PipelineTemplates'
-    ref: 'refs/tags/1.1.0'
+    ref: 'refs/tags/1.2.0'
 
 stages:
 
@@ -83,6 +83,17 @@ stages:
           command: 'ci'
           workingDir: './src/EtherGizmos.Shipyard.Api/wwwroot/_src'
 
+  # Publish dotnet api (docker)
+  - template: shared/container/dockerize-artifact.yml@sharedTemplates
+    parameters:
+      name: 'publish_dotnet_api_docker'
+      dependsOn:
+      - 'publish_dotnet_api'
+      inputArtifactName: 'api'
+      outputArtifactName: 'api-docker'
+      dockerfilePath: 'containers/api.dockerfile'
+      repository: 'shipyard-api'
+
   # Publish dotnet worker
   - template: dotnet/publish/application.yml@sharedTemplates
     parameters:
@@ -90,6 +101,17 @@ stages:
       vmImage: 'ubuntu-22.04'
       projectName: 'EtherGizmos.Shipyard.Worker'
       artifactName: 'worker'
+
+  # Publish dotnet worker (docker)
+  - template: shared/container/dockerize-artifact.yml@sharedTemplates
+    parameters:
+      name: 'publish_dotnet_worker_docker'
+      dependsOn:
+      - 'publish_dotnet_worker'
+      inputArtifactName: 'worker'
+      outputArtifactName: 'worker-docker'
+      dockerfilePath: 'containers/worker.dockerfile'
+      repository: 'shipyard-worker'
 
   # Publish angular web ui
   - template: node/publish/application.yml@sharedTemplates
@@ -102,3 +124,19 @@ stages:
       distFolder: 'dist'
       projectName: 'EtherGizmos.Shipyard.Web'
       artifactName: 'web'
+
+  # Publish angular web ui (docker)
+  - template: shared/container/dockerize-artifact.yml@sharedTemplates
+    parameters:
+      name: 'publish_node_webui_docker'
+      dependsOn:
+      - 'publish_node_webui'
+      inputArtifactName: 'web'
+      outputArtifactName: 'web-docker'
+      dockerfilePath: 'containers/web.dockerfile'
+      extraFiles:
+      - from: 'containers/apply-config-env.js'
+        to: 'files'
+      - from: 'containers/docker-entrypoint.web.sh'
+        to: 'files'
+      repository: 'shipyard-web'

@@ -18,7 +18,7 @@ resources:
   - repository: sharedTemplates
     type: git
     name: 'Projects/PipelineTemplates'
-    ref: 'refs/tags/1.1.0'
+    ref: 'refs/tags/1.2.0'
 
 stages:
 
