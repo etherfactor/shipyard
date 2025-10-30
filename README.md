@@ -47,6 +47,7 @@ Values in `.env` will override those in `compose.yml`.
 | RABBITMQ_PASSWORD           | The password of the RabbitMQ user.          | mySecure(!)Password   |
 | SHIPYARD_BOOTSTRAP_USER     | The username of the default user to create. | admin                 |
 | SHIPYARD_BOOTSTRAP_PASSWORD | The password of the default user to create. | password              |
+| SHIPYARD_USE_PROXY          | Whether Shipyard is behind a reverse proxy. | false                 |
 | SHIPYARD_API_HOST           | The base URL hosting Shipyard.              | http://localhost:7448 |
 | SHIPYARD_API_PORT           | The port on which to run the Shipyard API.  | 7448                  |
 | SHIPYARD_WEB_HOST           | The base URL hosting Shipyard UI.           | http://localhost:7447 |

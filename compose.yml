@@ -48,8 +48,9 @@ services:
     image: etherfactor/shipyard-api:latest
     environment:
       ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: ${SHIPYARD_USE_PROXY:-false}
       SHIPYARD_BOOTSTRAP_USER: "${SHIPYARD_BOOTSTRAP_USER:-admin}"
-      SHIPYARD_BOOTSTRAP_PASSWORD: "${SHIPYARD_BOOTSTRAP_PASSWORD:-passowrd}"
+      SHIPYARD_BOOTSTRAP_PASSWORD: "${SHIPYARD_BOOTSTRAP_PASSWORD:-password}"
       # SHIPYARD_BOOTSTRAP_FORCE: true
       Database__ConnectionId: ComposeDb
       Artifacts__BasePath: /opt/artifacts
@@ -57,7 +58,7 @@ services:
       Connections__ComposeDb__Type: Database
       Connections__ComposeDb__PostgreSql__ConnectionString: Host=db;Database=${POSTGRES_DB:-shipyard};Username=${POSTGRES_USER:-shipyard};Password=${POSTGRES_PASSWORD:-mySecure(!)Password}
       RabbitMq__ConnectionString: amqp://${RABBITMQ_USER:-shipyard}:${RABBITMQ_PASSWORD:-mySecure(!)Password}@rmq:5672
-      Security__OAuth2__WebUIRedirectUrls__0: ${SHIPYARD_WEB_HOST:-http://localhost:7447}/login/callback}
+      Security__OAuth2__WebUIRedirectUrls__0: ${SHIPYARD_WEB_HOST:-http://localhost:7447}/login/callback
       Security__OAuth2__DisableTransportSecurityRequirement: true
       Security__OAuth2__EncryptionCertificate__CertificateId: AuthEncryption
       Security__Certificates__AuthEncryption__Type: Certificate
