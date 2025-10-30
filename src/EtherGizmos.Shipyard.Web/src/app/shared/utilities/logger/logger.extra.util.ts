@@ -1,5 +1,9 @@
+import { Injectable } from "@angular/core";
 import { LogEnricher, LogEvent, LogLevel, LogSink } from "./logger.util";
 
+@Injectable({
+  providedIn: "root"
+})
 export class ConsoleSink implements LogSink {
   log(event: LogEvent): void {
     const chunks: any[] = [];
@@ -47,6 +51,9 @@ export class ConsoleSink implements LogSink {
   }
 }
 
+@Injectable({
+  providedIn: "root"
+})
 export class SourceContextEnricher implements LogEnricher {
   enrich(event: LogEvent): Record<string, any> {
     return { SourceContext: event.sourceContext };

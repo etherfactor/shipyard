@@ -24,7 +24,7 @@ export class ConcreteOAuth2Service extends OAuth2Service {
 
   constructor() {
     super();
-    this.$oidc.checkAuth().subscribe();
+    this.$oidc.checkAuthIncludingServer().subscribe();
 
     this.$events.registerForEvents().subscribe(e => {
       if (e.type === EventTypes.CheckingAuthFinished) {
