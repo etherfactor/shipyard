@@ -14,6 +14,7 @@ using JavaScriptEngineSwitcher.V8;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData;
@@ -205,6 +206,15 @@ builder.Services
 // Pipeline
 
 var app = builder.Build();
+
+app.UseForwardedHeaders(
+    new()
+    {
+        ForwardedHeaders =
+            ForwardedHeaders.XForwardedFor |
+            ForwardedHeaders.XForwardedProto |
+            ForwardedHeaders.XForwardedHost
+    });
 
 app.UseHttpsRedirection();
 
