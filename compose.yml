@@ -52,6 +52,8 @@ services:
       SHIPYARD_BOOTSTRAP_PASSWORD: "${SHIPYARD_BOOTSTRAP_PASSWORD:-passowrd}"
       # SHIPYARD_BOOTSTRAP_FORCE: true
       Database__ConnectionId: ComposeDb
+      Artifacts__BasePath: /opt/artifacts
+      Artifacts__Database__ConnectionId: ComposeDb
       Connections__ComposeDb__Type: Database
       Connections__ComposeDb__PostgreSql__ConnectionString: Host=db;Database=${POSTGRES_DB:-shipyard};Username=${POSTGRES_USER:-shipyard};Password=${POSTGRES_PASSWORD:-mySecure(!)Password}
       RabbitMq__ConnectionString: amqp://${RABBITMQ_USER:-shipyard}:${RABBITMQ_PASSWORD:-mySecure(!)Password}@rmq:5672
@@ -79,11 +81,15 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
+    volumes:
+    - ./data/artifacts:/opt/artifacts
 
   worker:
     image: etherfactor/shipyard-worker:latest
     environment:
       Database__ConnectionId: ComposeDb
+      Artifacts__BasePath: /opt/artifacts
+      Artifacts__Database__ConnectionId: ComposeDb
       Connections__ComposeDb__Type: Database
       Connections__ComposeDb__PostgreSql__ConnectionString: Host=db;Database=${POSTGRES_DB:-shipyard};Username=${POSTGRES_USER:-shipyard};Password=${POSTGRES_PASSWORD:-mySecure(!)Password}
       RabbitMq__ConnectionString: amqp://${RABBITMQ_USER:-shipyard}:${RABBITMQ_PASSWORD:-mySecure(!)Password}@rmq:5672
@@ -111,6 +117,8 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
+    volumes:
+    - ./data/artifacts:/opt/artifacts
 
   web:
     image: etherfactor/shipyard-web:latest
