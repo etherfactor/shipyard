@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Exclude="wwwroot/_src/node_modules/bootstrap-icons/font/fonts/**" Include="wwwroot/_src/node_modules/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Remove="wwwroot\favicon.ico" />
+    <Content Remove="wwwroot\favicon.svg" />
+    <Content Include="wwwroot/_src/node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff" TargetPath="wwwroot/css/fonts/bootstrap-icons.woff" CopyToOutputDirectory="PreserveNewest" Condition="Exists('wwwroot/_src/node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff')" />
+    <Content Include="wwwroot/_src/node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2" TargetPath="wwwroot/css/fonts/bootstrap-icons.woff2" CopyToOutputDirectory="PreserveNewest" Condition="Exists('wwwroot/_src/node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2')" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="JavaScriptEngineSwitcher.Extensions.MsDependencyInjection" Version="3.24.1" />
+    <PackageReference Include="JavaScriptEngineSwitcher.V8" Version="3.29.1" />
+    <PackageReference Include="LigerShark.WebOptimizer.Sass" Version="3.0.123" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.linux-arm" Version="7.5.0" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.linux-arm64" Version="7.5.0" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.linux-x64" Version="7.5.0" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.osx-arm64" Version="7.5.0" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.osx-x64" Version="7.5.0" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.win-arm64" Version="7.5.0" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="7.5.0" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.win-x86" Version="7.5.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(MSBuildProjectName).UnitTests" />
+    <InternalsVisibleTo Include="$(MSBuildProjectName).IntegrationTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\favicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\favicon.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EtherGizmos.Common.Configuration\EtherGizmos.Common.Configuration.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Common.Messaging.RabbitMQ\EtherGizmos.Common.RabbitMQ.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Common.OAuth\EtherGizmos.Common.OAuth.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Common.ServiceDefaults\EtherGizmos.Common.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Shipyard.Artifacts\EtherGizmos.Shipyard.Artifacts.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Shipyard.Database\EtherGizmos.Shipyard.Database.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Shipyard.Messaging\EtherGizmos.Shipyard.Messaging.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Shipyard.OData\EtherGizmos.Shipyard.OData.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,47 @@
+<div class="modal-header">
+  <h5 class="modal-title">
+    Preview Artifact
+  </h5>
+  <button type="button" aria-label="close" class="btn-close" (click)="dismiss()"></button>
+</div>
+
+<div class="modal-body">
+  <div class="container-fluid position-relative">
+
+    @if (!isLoading$$()) {
+
+    @if (type) {
+
+    @if (type.startsWith("text/")) {
+    @let language = type === "text/html" ? "html" : "text";
+    <ngx-monaco-editor style="height: 520px;" [options]="{ theme: 'vs-dark', language: language, readOnly: true }" [ngModel]="textContent" readonly="true"></ngx-monaco-editor>
+    }
+
+    @if (type.startsWith("image/")) {
+    <img [src]="imageContent" style="width: 100%;" />
+    }
+
+    } @else {
+    Failed to load content
+    }
+
+    } @else {
+    <!-- Loading Overlay -->
+    <div style="position: fixed; top: 0; left: 0; height: 100%; width: 100%; background-color: color-mix(in srgb, var(--bs-body-bg) 50%, transparent); z-index: 100;">
+    </div>
+    <div style="position: fixed; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%); z-index: 100;">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    }
+
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" style="min-width: 100px;" (click)="dismiss()">
+    <span class="bi bi-x-square"></span>
+    Close
+  </button>
+</div>

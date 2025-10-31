@@ -1,0 +1,221 @@
+<div class="box container" [formGroup]="form">
+  <div class="row">
+    <div class="col-12">
+
+      <div class="row">
+        <div class="col-12 mt-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5>Step {{index + 1}}:</h5>
+            </div>
+
+            @if (!form.disabled) {
+            <div class="btn-group btn-group-sm" role="group">
+              <button type="button"
+                      class="btn btn-secondary"
+                      [disabled]="index === 0 || form.disabled"
+                      (click)="onMoveUp.emit()">
+                <i class="bi bi-arrow-up"></i>
+              </button>
+              <button type="button"
+                      class="btn btn-secondary"
+                      [disabled]="index === total - 1 || form.disabled"
+                      (click)="onMoveDown.emit()">
+                <i class="bi bi-arrow-down"></i>
+              </button>
+              <button type="button"
+                      class="btn btn-danger"
+                      [disabled]="form.disabled"
+                      (click)="onRemove.emit()">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Step Type -->
+      <div class="row mt-3">
+        <label for="stepType" class="col-sm-2 col-form-label">Step Type</label>
+        <div class="col-sm-10">
+          <ng-select id="stepType"
+                     formControlName="stepType"
+                     (change)="onStepTypeChange()"
+                     [clearable]="false"
+                     [selectOnTab]="true"
+                     [readonlyForm]="form.disabled">
+            <ng-option [value]="StepType.Click">Click</ng-option>
+            <ng-option [value]="StepType.Extract">Extract</ng-option>
+            <ng-option [value]="StepType.Navigate">Navigate</ng-option>
+            <ng-option [value]="StepType.Replace">Replace</ng-option>
+            <ng-option [value]="StepType.Script">Script</ng-option>
+            <ng-option [value]="StepType.Send">Send</ng-option>
+            <ng-option [value]="StepType.Set">Set</ng-option>
+            <ng-option [value]="StepType.WaitFor">Wait for</ng-option>
+            <ng-option [value]="StepType.ExtractList">Extract list [DEPRECATED]</ng-option>
+            <ng-option [value]="StepType.Return">Return [DEPRECATED]</ng-option>
+          </ng-select>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- URL -->
+        @if (isFieldVisible('url')) {
+        <div class="col-12 mt-3">
+          <div class="row">
+            <label for="url" class="col-sm-2 col-form-label">URL</label>
+            <div class="col-sm-10">
+              <input id="url" type="text" formControlName="url" [readonlyForm]="form.disabled" />
+            </div>
+          </div>
+        </div>
+        }
+
+        <!-- Name -->
+        @if (isFieldVisible('name')) {
+        <div class="col-md-6 mt-3">
+          <div class="row">
+            <label for="name" class="col-sm-4 col-form-label">Return Name</label>
+            <div class="col-sm-8">
+              <input id="name" type="text" formControlName="name" [readonlyForm]="form.disabled" />
+            </div>
+          </div>
+        </div>
+        }
+
+        <!-- Variable -->
+        @if (isFieldVisible('var')) {
+        <div class="col-md-6 mt-3">
+          <div class="row">
+            <label for="var" class="col-sm-4 col-form-label">Variable</label>
+            <div class="col-sm-8">
+              <input id="var" type="text" formControlName="var" [readonlyForm]="form.disabled" />
+            </div>
+          </div>
+        </div>
+        }
+
+        <!-- Selector -->
+        @if (isFieldVisible('selector')) {
+        <div class="col-md-6 mt-3">
+          <div class="row">
+            <label for="selector" class="col-sm-4 col-form-label">Selector</label>
+            <div class="col-sm-8">
+              <input id="selector" type="text" formControlName="selector" [readonlyForm]="form.disabled" />
+            </div>
+          </div>
+        </div>
+        }
+
+        <!-- From -->
+        @if (isFieldVisible('from')) {
+        <div class="col-md-6 mt-3">
+          <div class="row">
+            <label for="from" class="col-sm-4 col-form-label">From</label>
+            <div class="col-sm-8">
+              <input id="from" type="text" formControlName="from" [readonlyForm]="form.disabled" />
+            </div>
+          </div>
+        </div>
+        }
+
+        <!-- To -->
+        @if (isFieldVisible('to')) {
+        <div class="col-md-6 mt-3">
+          <div class="row">
+            <label for="to" class="col-sm-4 col-form-label">To</label>
+            <div class="col-sm-8">
+              <input id="to" type="text" formControlName="to" [readonlyForm]="form.disabled" />
+            </div>
+          </div>
+        </div>
+        }
+
+        <!-- Value -->
+        @if (isFieldVisible('value')) {
+        <div class="col-md-6 mt-3">
+          <div class="row">
+            <label for="value" class="col-sm-4 col-form-label">Value</label>
+            <div class="col-sm-8">
+              <input id="value" type="text" formControlName="value" [readonlyForm]="form.disabled" />
+            </div>
+          </div>
+        </div>
+        }
+
+        <!-- Trim -->
+        @if (isFieldVisible('isRegex')) {
+        <div class="col-md-6 mt-3">
+          <div class="row">
+            <label for="isRegex" class="col-sm-4 col-form-label">Is Regex?</label>
+            <div class="col-sm-8 d-flex align-items-center">
+              <div class="form-check">
+                <input id="isRegex" type="checkbox" class="form-check-input" formControlName="isRegex" />
+                <label for="isRegex" class="form-check-label">Yes</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+
+        <!-- Trim -->
+        @if (isFieldVisible('trim')) {
+        <div class="col-md-6 mt-3">
+          <div class="row">
+            <label for="trim" class="col-sm-4 col-form-label">Trim</label>
+            <div class="col-sm-8 d-flex align-items-center">
+              <div class="form-check">
+                <input id="trim" type="checkbox" class="form-check-input" formControlName="trim" />
+                <label for="trim" class="form-check-label">Yes</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+
+        <!-- Script -->
+        @if (isFieldVisible('script')) {
+        <div class="col-12 mt-3">
+          <div class="row">
+            <label for="script" class="col-sm-2 col-form-label">Script Text</label>
+            <div class="col-sm-10" style="height: 500px">
+              <ngx-monaco-editor style="height: 100%;" [options]="{ theme: 'vs-dark', language: 'javascript', readOnly: form.disabled }" formControlName="script" readonly="true"></ngx-monaco-editor>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+
+      <!-- Steps (nested) -->
+      @if (isFieldVisible('steps')) {
+      <div class="col-12 mt-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5>Nested Steps</h5>
+
+          @if (!form.disabled) {
+          <button type="button" class="btn btn-sm btn-primary" (click)="addStep()">Add step</button>
+          }
+        </div>
+
+        @for (step of form.controls.steps.controls; let i = $index; track i) {
+        <div class="row mt-3">
+          <div class="col-12">
+
+            <app-runbook-step [form]="step" [index]="i" [total]="form.controls.steps.controls.length"
+                              (onMoveUp)="onMoveUpFn(i)"
+                              (onMoveDown)="onMoveDownFn(i)"
+                              (onRemove)="onRemoveFn(i)"></app-runbook-step>
+
+          </div>
+        </div>
+        } @empty {
+        <div class="mt-3">No steps</div>
+        }
+
+      </div>
+      }
+
+    </div>
+  </div>
+</div>

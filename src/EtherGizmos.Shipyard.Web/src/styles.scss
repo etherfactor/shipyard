@@ -1,0 +1,203 @@
+@import './styles/_base.scss';
+
+@import './styles/bootstrap.scss';
+@import './styles/bootstrap-icons.scss';
+@import './styles/box.scss';
+@import './styles/floating-label.scss';
+@import './styles/material.scss';
+@import './styles/ng-select.scss';
+@import './styles/table.scss';
+@import './styles/validation.scss';
+
+$navbar-height: 48px;
+$navbar-sub-height: 40px;
+$navbar-sub-height-m: 62px;
+
+:root {
+  --navbar-height: #{$navbar-height};
+  --navbar-sub-height: #{$navbar-sub-height};
+}
+
+body {
+  position: relative;
+}
+
+.navbar {
+  height: var(--navbar-height);
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--bs-border-color-translucent);
+
+  &.navbar-main {
+    z-index: 1045;
+
+    .navbar-grow {
+      flex-grow: 1;
+      flex-basis: 0;
+    }
+  }
+
+  &.navbar-sub {
+    top: 0;
+    height: unset;
+
+    .navbar-nav {
+      gap: 10px;
+    }
+
+    .nav-link {
+      padding-top: 4px;
+      padding-bottom: 4px;
+    }
+
+    &[aria-expanded="true"] {
+      top: var(--navbar-height);
+    }
+  }
+
+  .navbar-collapse {
+    display: flex !important;
+    flex-basis: auto !important;
+  }
+
+  .navbar-nav {
+    flex-direction: row !important;
+  }
+
+  .nav-item {
+    position: static !important;
+  }
+}
+
+@include media-breakpoint-down(sm) {
+  :root {
+    --navbar-sub-height: #{$navbar-sub-height-m};
+  }
+
+  .navbar {
+    &.navbar-sub {
+
+      .navbar-nav {
+        gap: 15px;
+      }
+
+      .navbar-action-label {
+        clip: rect(0 0 0 0);
+        clip-path: inset(100%);
+        height: 1px;
+        overflow: hidden;
+        position: absolute;
+        white-space: nowrap;
+        width: 1px;
+      }
+    }
+  }
+}
+
+.offcanvas-start.sidebar {
+  height: calc(100vh - $navbar-height);
+  top: unset;
+  bottom: 0;
+}
+
+ul.pagination {
+  margin-bottom: 0px;
+}
+
+.top-spacer {
+  @extend .mt-3;
+  height: 0.1px;
+}
+
+[data-bs-theme="dark"] {
+  .tooltip-inner,
+  .tooltip-arrow {
+    --bs-tooltip-color: var(--bs-body-color);
+    --bs-tooltip-bg: #000000;
+  }
+}
+
+.card-header {
+  min-height: 48px;
+}
+
+/* ---------- LIGHT THEME ---------- */
+:root,
+[data-bs-theme="light"] {
+  /* levels */
+  --log-verbose-bg: #e7e9ec;
+  --log-verbose-fg: #495057;
+  --log-verbose-bd: #d3d6da;
+  --log-debug-bg: #d7e3f8;
+  --log-debug-fg: #1b4f8a;
+  --log-debug-bd: #c0d3f2;
+  --log-info-bg: #d9f2e4;
+  --log-info-fg: #1c6844;
+  --log-info-bd: #c2e8d3;
+  --log-warn-bg: #fff3cd;
+  --log-warn-fg: #8a6d1b;
+  --log-warn-bd: #ffe69c;
+  --log-error-bg: #f8d7da;
+  --log-error-fg: #842029;
+  --log-error-bd: #f1aeb5;
+  --log-critical-bg: #f1b0b7;
+  --log-critical-fg: #64121a;
+  --log-critical-bd: #e28a94;
+  --log-fatal-bg: #d63333;
+  --log-fatal-fg: #fff;
+  --log-fatal-bd: #b02a2a;
+  /* sources */
+  --log-src-js-bg: #fff1bf;
+  --log-src-js-fg: #7a5a00;
+  --log-src-js-bd: #ffe082;
+  --log-src-dotnet-bg: #cfe8ff;
+  --log-src-dotnet-fg: #0b4b85;
+  --log-src-dotnet-bd: #b7daff;
+  /* markers */
+  --log-marker-bg: #edf1f5;
+  --log-marker-fg: #5f6b77;
+  --log-marker-bd: #dfe6ee;
+  --log-artifact-bg: #e3edff;
+  --log-artifact-fg: #0b5ed7;
+  --log-artifact-bd: #cfe2ff;
+}
+
+/* ---------- DARK THEME ---------- */
+[data-bs-theme="dark"] {
+  /* levels */
+  --log-verbose-bg: #2e3338;
+  --log-verbose-fg: #cfd4da;
+  --log-verbose-bd: #3b4249;
+  --log-debug-bg: #243248;
+  --log-debug-fg: #9fc3ff;
+  --log-debug-bd: #2f4362;
+  --log-info-bg: #16352b;
+  --log-info-fg: #8edbb7;
+  --log-info-bd: #1f4b3d;
+  --log-warn-bg: #3e3317;
+  --log-warn-fg: #f6d173;
+  --log-warn-bd: #56441e;
+  --log-error-bg: #4a2024;
+  --log-error-fg: #f2a7af;
+  --log-error-bd: #5a272d;
+  --log-critical-bg: #4d1a1f;
+  --log-critical-fg: #ffa8b0;
+  --log-critical-bd: #5a1f25;
+  --log-fatal-bg: #7a1c1c;
+  --log-fatal-fg: #fff;
+  --log-fatal-bd: #5e1414;
+  /* sources */
+  --log-src-js-bg: #4a3a17;
+  --log-src-js-fg: #ffd666;
+  --log-src-js-bd: #5a451b;
+  --log-src-dotnet-bg: #1e3448;
+  --log-src-dotnet-fg: #8ec5ff;
+  --log-src-dotnet-bd: #29465f;
+  /* markers */
+  --log-marker-bg: var(--bs-secondary-bg-subtle); //#2b3036;
+  --log-marker-fg: var(--bs-secondary); //#aab4bf;
+  --log-marker-bd: var(--bs-border-color); //#3a4149;
+  --log-artifact-bg: var(--bs-primary-bg-subtle); //#1e2b40;
+  --log-artifact-fg: var(--bs-primary); //#8ab6ff;
+  --log-artifact-bd: var(--bs-border-color); //#2a3b57;
+}

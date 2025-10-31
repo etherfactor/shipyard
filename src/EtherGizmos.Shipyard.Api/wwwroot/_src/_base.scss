@@ -1,0 +1,21 @@
+@import './node_modules/bootstrap/scss/_functions.scss';
+
+$grid-gutter-width: 1rem;
+
+@import "./node_modules/bootstrap/scss/variables";
+
+$theme-colors: map-merge(
+  $theme-colors,
+  (
+    "primary": #731dd8,
+    // "primary2": #a31621,
+    // "primary3": #af1b3f,
+    // "primary6": #00e5e5,
+  )
+);
+
+@import "./node_modules/bootstrap/scss/bootstrap";
+
+@import "./node_modules/bootstrap-icons/font/bootstrap-icons";
+
+@import "./node_modules/@tkrotoff/bootstrap-floating-label/src/bootstrap-floating-label";

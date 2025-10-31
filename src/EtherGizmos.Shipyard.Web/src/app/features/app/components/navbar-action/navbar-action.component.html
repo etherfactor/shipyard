@@ -1,0 +1,42 @@
+<ul class="navbar-nav flex-row d-flex mb-lg-0">
+  @for (action of actions; track identifyNavbarAction(action); let ai = $index) {
+  @if (action.subActions) {
+  <li class="nav-item dropdown">
+    <button class="nav-link dropdown-toggle" data-bs-toggle="dropdown" (click)="performCallback(action)" data-testid="action-button">
+      <span class="bi" [class]="action.icon"></span>
+      <span class="navbar-action-label"> {{safe(action.label)()}}</span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end" style="position: absolute;">
+      @if (action.subActionSearch) {
+      <li>
+        <div class="p-1">
+          <div class="floating-label">
+            <input [searchAction]="action" id="_subActionSearch{{ai}}" type="text" class="form-control" placeholder=" " />
+            <label for="_subActionSearch{{ai}}">Search...</label>
+          </div>
+        </div>
+      </li>
+      }
+      @for (subAction of action.subActions; track identifyNavbarSubAction(subAction); let sai = $index) {
+      @if (!subAction.divider) {
+      <li>
+        <button class="dropdown-item" (click)="performCallback(subAction)">
+          <span class="bi" [class]="subAction.icon"></span> {{safe(subAction.label)()}}
+        </button>
+      </li>
+      } @else {
+      <li><hr class="dropdown-divider"></li>
+      }
+      }
+    </ul>
+  </li>
+  } @else {
+  <li class="nav-item">
+    <button class="nav-link" (click)="performCallback(action)" data-testid="action-button">
+      <span class="bi" [class]="action.icon"></span>
+      <span class="navbar-action-label"> {{safe(action.label)()}}</span>
+    </button>
+  </li>
+  }
+  }
+</ul>

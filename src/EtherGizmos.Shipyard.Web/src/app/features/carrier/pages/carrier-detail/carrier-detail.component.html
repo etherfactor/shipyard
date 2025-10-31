@@ -1,0 +1,218 @@
+@let record = carrier$$();
+@let form = form$$();
+
+<!-- Header -->
+<div class="row">
+  <div class="col-12 mt-3">
+    @if (id$$()) {
+    <detail-header [text]="'Carrier Details'"
+                   [subtext]="record?.name + ' (' + record?.slug + ')'" />
+    } @else {
+    <detail-header [text]="'Carrier Details'"
+                   [subtext]="'Creating new carrier'" />
+    }
+  </div>
+</div>
+
+@if (record && form) {
+<!-- Summary -->
+<div class="row" [formGroup]="form">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-truck" text="Carrier Summary">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="name" class="col-sm-4 col-form-label">Name</label>
+            <div class="col-sm-8">
+              <input id="name" type="text" formControlName="name" [readonlyForm]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="slug" class="col-sm-4 col-form-label">Slug</label>
+            <div class="col-sm-8">
+              <input id="slug" type="text" formControlName="slug" [readonlyForm]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </detail-box>
+  </div>
+</div>
+
+<!-- Last execution -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-code" text="Last Execution" [buttons]="execButtons$$()">
+      @let exec = exec$$();
+      @if (exec) {
+      <div class="row">
+        @let statusMeta = getExecutionStatusMetadata(exec.executionStatusType);
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="status" class="col-sm-4 col-form-label">
+              Status
+            </label>
+            <div class="col-sm-8">
+              <ng-select id="execStatus" [ngModel]="1" [ngModelOptions]="{ standalone: true }" [readonly]="true" [readonlyForm]="true">
+                <ng-option [value]="1">
+                  <span class="bi me-1" [class]="[statusMeta.icon, statusMeta.color]"></span>
+                  {{statusMeta.label}}
+                </ng-option>
+              </ng-select>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="execStartedAt" class="col-sm-4 col-form-label">
+              Started at
+            </label>
+            <div class="col-sm-8">
+              <input id="execStartedAt" type="text" [value]="exec.startedAt?.toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) ?? '—'" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row">
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="execDuration" class="col-sm-4 col-form-label">
+              Duration
+            </label>
+            <div class="col-sm-8">
+              <input id="execDuration" type="text" [value]="getDiffTime(exec.startedAt, exec.completedAt)" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="execArtifacts" class="col-sm-4 col-form-label">
+              Artifacts
+            </label>
+            <div class="col-sm-8">
+              <input id="execArtifacts" type="text" [value]="exec.artifacts.length" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+
+      </div>
+      } @else {
+      <div class="row">
+        <div class="col-12 mt-3">
+          No recent executions
+        </div>
+      </div>
+      }
+    </detail-box>
+  </div>
+</div>
+
+<!-- Rules -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-filter-circle" text="Tracking Rules" [buttons]="ruleButtons$$()">
+      <div class="table-responsive mt-3">
+        <table class="table table-sm table-transparent table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Pattern</th>
+              <th>Status Type</th>
+              <th>Priority</th>
+              <th>Active</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (rule of form.controls.rules.controls; let i = $index; track i) {
+            <tr [formGroup]="rule">
+              <!-- Pattern -->
+              <td>
+                <input type="text" class="font-monospace" style="min-width: 500px;" formControlName="pattern" [readonlyForm]="!isEditing$$()" formSize="small" />
+              </td>
+
+              <!-- Status Type -->
+              <td>
+                <ng-select formControlName="statusType" [clearable]="false" [selectOnTab]="true" [appendTo]="'body'"
+                           [readonlyForm]="!isEditing$$()" formSize="small">
+                  <ng-option [value]="StatusType.Waiting">Waiting</ng-option>
+                  <ng-option [value]="StatusType.InTransit">In transit</ng-option>
+                  <ng-option [value]="StatusType.OutForDelivery">Out for delivery</ng-option>
+                  <ng-option [value]="StatusType.Delivered">Delivered</ng-option>
+                  <ng-option [value]="StatusType.FailedAttempt">Failed attempt</ng-option>
+                  <ng-option [value]="StatusType.Returned">Returned</ng-option>
+                  <ng-option [value]="StatusType.Expired">Expired</ng-option>
+                </ng-select>
+              </td>
+
+              <!-- Priority -->
+              <td>
+                <input type="number" formControlName="priority" [readonlyForm]="!isEditing$$()" formSize="small" />
+              </td>
+
+              <!-- Active -->
+              <td>
+                <div class="form-check mt-1">
+                  <input id="rule{{i}}Active" class="form-check-input" type="checkbox" formControlName="isActive" />
+                  <label for="rule{{i}}Active" class="form-check-label">Yes</label>
+                </div>
+              </td>
+
+              <!-- Actions -->
+              <td>
+                <button class="btn btn-sm btn-danger" (click)="removeRule(i)" [disabled]="form.disabled">
+                  <span class="bi bi-x"></span>
+                </button>
+              </td>
+            </tr>
+            }
+          </tbody>
+
+        </table>
+      </div>
+    </detail-box>
+  </div>
+</div>
+
+<!-- Steps -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-list-task" text="Tracking Steps" [buttons]="stepButtons$$()">
+      @for (step of form.controls.steps.controls; let i = $index; track i) {
+      <div class="row">
+        <div class="col-12 mt-3">
+          <app-runbook-step [form]="step" [index]="i" [total]="form.controls.steps.controls.length"
+                            (onMoveUp)="onMoveUp(i)"
+                            (onMoveDown)="onMoveDown(i)"
+                            (onRemove)="onRemove(i)"></app-runbook-step>
+        </div>
+      </div>
+      } @empty {
+      <div class="row">
+        <div class="col-12 mt-3">
+          No steps defined
+        </div>
+      </div>
+      }
+    </detail-box>
+  </div>
+</div>
+}
+
+<!-- Loading Overlay -->
+@if (isLoading$$()) {
+<div style="position: fixed; top: 0; left: 0; height: 100%; width: 100%; background-color: color-mix(in srgb, var(--bs-body-bg) 50%, transparent); z-index: 100;">
+</div>
+<div style="position: fixed; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%); z-index: 100;">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+}

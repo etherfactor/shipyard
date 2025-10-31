@@ -1,0 +1,10 @@
+{
+  "production": false,
+  "resourceServer": "https://localhost:7265/api/v1",
+  "oauth": {
+    "authority": "https://localhost:7265",
+    "clientId": "1c9cc927-68fe-4376-8d3f-b71ef15289b6",
+    "scope": "openid offline_access app"
+  },
+  "version": "dev"
+}

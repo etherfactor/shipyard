@@ -1,0 +1,139 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-shipyard}"
+      POSTGRES_USER: "${POSTGRES_USER:-shipyard}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-mySecure(!)Password}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-shipyard} -d ${POSTGRES_DB:-shipyard}"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    deploy:
+      restart_policy:
+        condition: on-failure
+    volumes:
+    - ./data/db:/var/lib/postgresql/data
+
+  rmq:
+    image: rabbitmq:4-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: "${RABBITMQ_USER:-shipyard}"
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PASSWORD:-mySecure(!)Password}"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    ports:
+    - "15672:15672"
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  selenium:
+    image: selenium/standalone-chromium:latest
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:4444/wd/hub/status | grep -q 'ready'"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  api:
+    image: etherfactor/shipyard-api:latest
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: ${SHIPYARD_USE_PROXY:-false}
+      SHIPYARD_BOOTSTRAP_USER: "${SHIPYARD_BOOTSTRAP_USER:-admin}"
+      SHIPYARD_BOOTSTRAP_PASSWORD: "${SHIPYARD_BOOTSTRAP_PASSWORD:-password}"
+      # SHIPYARD_BOOTSTRAP_FORCE: true
+      Database__ConnectionId: ComposeDb
+      Artifacts__BasePath: /opt/artifacts
+      Artifacts__Database__ConnectionId: ComposeDb
+      Connections__ComposeDb__Type: Database
+      Connections__ComposeDb__PostgreSql__ConnectionString: Host=db;Database=${POSTGRES_DB:-shipyard};Username=${POSTGRES_USER:-shipyard};Password=${POSTGRES_PASSWORD:-mySecure(!)Password}
+      RabbitMq__ConnectionString: amqp://${RABBITMQ_USER:-shipyard}:${RABBITMQ_PASSWORD:-mySecure(!)Password}@rmq:5672
+      Security__OAuth2__WebUIRedirectUrls__0: ${SHIPYARD_WEB_HOST:-http://localhost:7447}/login/callback
+      Security__OAuth2__DisableTransportSecurityRequirement: true
+      Security__OAuth2__EncryptionCertificate__CertificateId: AuthEncryption
+      Security__Certificates__AuthEncryption__Type: Certificate
+      Security__Certificates__AuthEncryption__Text__PublicKey: ${SHIPYARD_ENC_CRT:------BEGIN CERTIFICATE-----MIIFbTCCA1WgAwIBAgIUMEqO+53HDYtk0T7682UeETqWu+QwDQYJKoZIhvcNAQELBQAwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoMGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDAgFw0yNTA4MTkyMjQ5MzlaGA8yMTI1MDcyNjIyNDkzOVowRTELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoMGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAM5CeFhR5J7MYnaDhTq8uBLM0lbW3yU2+zxL8TalD2OehIR4qZIUT78aDll7TYxEiuvJdWJp9EZWtmkRd33QL6CS2RHiYwqiJzpYch3B7loPDDWA4cLnuOO7TItyILce7iGqQxGGsRej4D3DmFIKsd4hVCxjar1SyDNmSMyRyTZlrK0VbfWrJYmWUEsWOrUpwA46kdV3qVXGLq5zBKTIGyX4TSbIZoauXEUTRu1R7RUonBkpg7T0OLJJaAccf05WwpI4CnihzHJO5sEu15qz8XBIi7xxW4u6hHmI22CI3yDJ95IrSV/Wz2Oejcs6LTa14zdtZFCyDM00T+TQoRL6Q97MO0tkD7zbiWqrSw5FH/qf67avV72Xnb+5mml1hO+WOnRRCfgW3eifarApZJe6rjKXSRZcOYFGwrkSQtoHh6yLdjlDNxFeWxy+pPeekjvsAsnsI48FU32dXpDyqWJpHVf5LWPEZTzJNaa8homzEHxi/aVac4LIfcBuKQvGoRrNe7uee3X/TmM79+ompijUTDL+r26B6z93IVgBkfKjePn9E20XpSubndAzqEpTcjK7gq79Hc51zwDi0W835ixyRDTdAGPCHBo7Yd5hyPJRd2ve3si7bPTB99CSFL0S9JWX7S/q/GFhJUnmbqgnv41ujWFHkBmsHsyajg+FxDwMpggzAgMBAAGjUzBRMB0GA1UdDgQWBBRxV9szSv4e8Y0hSr2zkdl56o34UzAfBgNVHSMEGDAWgBRxV9szSv4e8Y0hSr2zkdl56o34UzAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4ICAQBTkkMEtObBD9kWiWAWeN687LAGmU4q87/xjcDUhLLKxTKM6bxly6HCoi00H8NQzk/8A/OUw89EgHwLqxLdpCJdQBO/UshME6sTfaAK/irntKdfmDg5WpGXRZR+K81NwF0NguvdDwdsp3YdlSLWVOK0UA5N3Agb3kIockSqTjJUi+mC6/NM40BtGe0nwOMASqW+2k5hYTTcod5qvVJXvelO5SpumoWUFWqTk5ZC8Z20ESBNnM+ZRl09YXMB8hTXB1m0ENhkVajN2MGp1aCZi5j8N23sl7VW4tZ+d9wiYKNsS2kKMvNoRTqf9dn8a8FAMO2iXdNBQqJsR8iT/tGSQ1ykx+f1s3BJ5BE9ObUxn5S7Cn+GwCY4UzswoyOVBZbXjO11MeZVMYXubzuOcTerlO0u0njUDfoQahnqvderdi8P7Ko+bIrfwOURh93V/pH3JakK63kc/avB3h0srBtA3RyrzcI7vANc6nrefZu2UyvszzhSrzthrsTRXTPzvplrqbv9GRNyRsgQDZCzJ4hZouNrjUzRc3Fm07Cz89F0onZXllUWbiKSN7/ccUZpgKORPhH6meTaKJtRsd1VOuFwhFTYIwErK5tOVEAqJjOITAGkk9seNgktyn9jBVMJ6nmA5ujnpYDR+ifMUXl4aG+6qUBjvq2MDkQLITuOtzu1BizrzQ==-----END CERTIFICATE-----}
+      Security__Certificates__AuthEncryption__Text__PrivateKey: ${SHIPYARD_ENC_KEY:------BEGIN PRIVATE KEY-----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-----END PRIVATE KEY-----}
+      Security__OAuth2__SigningCertificate__CertificateId: AuthSigning
+      Security__Certificates__AuthSigning__Type: Certificate
+      Security__Certificates__AuthSigning__Text__PublicKey: ${SHIPYARD_SIGN_CRT:------BEGIN CERTIFICATE-----MIIFbTCCA1WgAwIBAgIUY9h5LzOhinBizRaLsQUpcxfh5b8wDQYJKoZIhvcNAQELBQAwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoMGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDAgFw0yNTA4MTkyMjQ5NTJaGA8yMTI1MDcyNjIyNDk1MlowRTELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoMGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBANR2+emXEHUvSNdS/EUZhDN1qL9FXZl4k2ATCyFqKnj/wRjH6oOdiejxLiKJaJyM7RE4x5dTSmp93JjflkGR208i6N5zOkoH5xpRT6mncRpg9Vr2vSlH3rEp5aj0ut1RcUNKce3DnZhQzp0edbrtnsPLKLd2SJdSkXrsnWwT1g0Ngeh+lXyXvtSBiGrTspPVwYLaCocdx/ksEVOX15RHwacqm1CtHF7KeJTN52xB/yvSwgoX45GKnJDTuN7yuCLbxNwYF0Ut52Z24katS/I6g6V4aOJ0IHsRPwvAUbQk+UYXRJ+zDbH41Rzop7GReX6FT5YGj9B4nK/AimrQ3XLQTE3JKbJWhQgoEDr+SP9N1cqe+sqfzCrBZv9BDMJmp62nUvVtRucPiAfpHlt9+++wZFvKfLsdqF6Uja9mjDjm66jyoJEncEVIN6Fk7U65g0gz3rEoGJX+3O6kAGIvgaedUcjA/CQxSDolFzgkdtRxeBy3dvl+AZNuTLG4lLvIStrQgUCAMG4HuKjJpgkUDI9hUIFzKurGNwIJ7x6xGBFRpYu4RT5Xha9Ufql1DvWWy6qYMe8idZuJgFlwewibjxs+LPpoShkwdl/qdWVTiOUQS0zVAC7lCVY+5udX/qXeTrtVdQWANPlw25v87oufxSI4IEjPnvRj9PZdk7T7vQ8e0cUPAgMBAAGjUzBRMB0GA1UdDgQWBBSpSnLb7uFTMQNLNY0VvBFiaQh38zAfBgNVHSMEGDAWgBSpSnLb7uFTMQNLNY0VvBFiaQh38zAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4ICAQAlif2iqf7PLK+M/M+QGkk0lRo+QpwFeoaruEkPN3v8ymbR+gA9Nc+dztNd8IcFTFoQq9TzklqbE645CkdGGyHXhkBM+d7Bt+sM+60svfevmCec1arYc1FiuY/22blLZcUUdpqruNvEytCFo9KZ6mvpNsR3CwKWAQ8zYnxDmtuPJfN6P6ys5vAeLFYFTUKY6Xnb/DMv30SQL6VZbIyJX+6Y6mEUOrVRlzsxfWkHQYkssfCzqQPWyLUP2tNkWKYzOIrJiI8P41YmTex19/P9MvdrndUuUSXe99CjXUXbNkHckoxxBH1LyrI1d4M6uXE1EEtdYoSr7NgoU+Vbfv5aR52ZrO0t+8RAumePIUW87WFRQAtMVTNK0J57weHJaQnKhXW4U8MxP4yT07kmOfb5MBtwLMgamvgB9mm3QK3YC688kfUavy8jP1oaM8MOPkrjLt6wEH/UU8AnTu9mivu5GIdvmc0+n3jq0qcTtNqD1H9wnzbgZlQecB6+o8etkseY5x6KH30UtYgWxMb4FI3G8nybuLav04rgnq4HyENiKtOQmUyPxyw5UgrCSjymFz+2gTw6BNqiruAaDb8mDiV3iuVg6E2oh2Eph4+/8+Ysc2STPO674UiVxbHb6p7Pv41rqQEiy1NyqBLJK3FtrH0a3nBf7Iu8VLTZYbkQChpQhV2CRg==-----END CERTIFICATE-----}
+      Security__Certificates__AuthSigning__Text__PrivateKey: ${SHIPYARD_SIGN_KEY:------BEGIN PRIVATE KEY-----MIIJQwIBADANBgkqhkiG9w0BAQEFAASCCS0wggkpAgEAAoICAQDUdvnplxB1L0jXUvxFGYQzdai/RV2ZeJNgEwshaip4/8EYx+qDnYno8S4iiWicjO0ROMeXU0pqfdyY35ZBkdtPIujeczpKB+caUU+pp3EaYPVa9r0pR96xKeWo9LrdUXFDSnHtw52YUM6dHnW67Z7Dyyi3dkiXUpF67J1sE9YNDYHofpV8l77UgYhq07KT1cGC2gqHHcf5LBFTl9eUR8GnKptQrRxeyniUzedsQf8r0sIKF+ORipyQ07je8rgi28TcGBdFLedmduJGrUvyOoOleGjidCB7ET8LwFG0JPlGF0Sfsw2x+NUc6KexkXl+hU+WBo/QeJyvwIpq0N1y0ExNySmyVoUIKBA6/kj/TdXKnvrKn8wqwWb/QQzCZqetp1L1bUbnD4gH6R5bffvvsGRbyny7HahelI2vZow45uuo8qCRJ3BFSDehZO1OuYNIM96xKBiV/tzupABiL4GnnVHIwPwkMUg6JRc4JHbUcXgct3b5fgGTbkyxuJS7yEra0IFAgDBuB7ioyaYJFAyPYVCBcyrqxjcCCe8esRgRUaWLuEU+V4WvVH6pdQ71lsuqmDHvInWbiYBZcHsIm48bPiz6aEoZMHZf6nVlU4jlEEtM1QAu5QlWPubnV/6l3k67VXUFgDT5cNub/O6Ln8UiOCBIz570Y/T2XZO0+70PHtHFDwIDAQABAoICAB9W6Wg2Wzwd3G2+lO2QZPq+OUT1c2gG7B440OR954PvnckM/B+r5kLRCJAZmq+07ecja/V7WLe6lwaJvH0xiZrzuEvPzWJMJh+wrMKGq11LvgVL7f0f185kMrcoWkP5Fm7plUKQHzfve3qbmpwXHtscpYXiUbTYfhMWweXGS0Wjn2zu9xfovkJUVQ4E6gt6dU/a38CseOndQTUGacs6hmslEsHktxGYZg71DFTgq0YIkYyxl2TJgGywfk2MmfKyXihk+VHAAqkPkjMArvos/Ww0BayZmozsr1MJbEPZTFe1aO7xl2yQGsdn3gyIO9aYzXOAxkfm8p3OFdzJsFCWPxrZLmkKek0RxQcyraUrmvgDNN1GrNd5wmyW2aO24ffg2zg+xJsUf6W5ISCsB5lMTfgzb1vZMKfcqjVhMZiicLUBtyJPnef/qzrkcFzjRrscORPvRpWan2JP3+ZbgfLXZ40GZKx+2wlu78q33mLu221CgeOHH28951r1fBWgCCTIIp2MMoW8+QkHX1VVkCt8MyHMRTr0/2fnmSDKfqOYRxZ161OK6xLty160/JpOvERquCAlHrugdlBpvWUeUJNo0NiG2um5I8/NFZ+EArKqJ6NvuMzAHOvXI1ZlA3SGAISkPgv7qZdqSREpPy3mCKAeiIYMg+vagauw2A+pud8GxEQBAoIBAQD9XpOUOn/NxQCWjhrLeamkToSjadKe7r4gPZNZM7zi+iuG8xTBh0n4PVecLHdxfSebC6jxCfQTX24WK1r2FBvOsJ79WYekqGvd5rzJSI453eK939DW9Yv7sibGHJqYP9/uEx/T2MOjNOE2OHjubshh9AL2IpM3IhSCTUDzQdl4w5vq0Lpvj+ugPOjBA6/ZsjZvAwxjS50VnzhDwmBjvforqrR8ESN4wqlhUtZEiIRgLm0VyY0zNwrXIVgR+BGEfzwuD+fE8MtNfHGcWrYjdP0rtJiZhVQCiP17IRHBcH3OZVNdhGQDQEbm9X+6kTQRJq5Tv4xrszJD6Hjwhv56bRoBAoIBAQDWq64pPlYkKZIRYHzTfx8YJob8CWoMBAr3LH2pz2N9sM/HbVPZ4yEfETemYMRUozzwqjYYerDOMCJYlqEwwpekeff4dMLyT3PSTooA3r6qQuacJxwkrGK0HGMY4b6fywGV+8TmhI+xOkt/3U6HgJm+o/wlA+7wvESU3whSU7BhXqJqvHgaYFnKhEBewLV3gEM/E7yJXI3KC9TaZu2uTbdJIjFZM4LOFpufO6awBPB8zJaXyNJuEZDoe7Iv4Kox5kXSigwGt70bTl3Wh30ae9wqGMGEApfbTmGNKL8N4NhR//xzhg1DAt1TnRI4BjEscJIq5Fk1QdcZwUEHK/tjBz8PAoIBAFl23Lt5UIly53tB4Do60mjfBLzC8AkImf++XlogB7FJzrbO/GQ9hiPuXRIbLW3YWHTJ0DSUZCe3CaMwWeUMQqlf+jPROjEs+zGWeNDGGtpZ++c5sX9FotEUHdbUYM4jt8lT3WgrYSEu2dsQY7slSQI1bBpHKR5NnVpJNwbuGIEo6NQoMbyU4AlrmHAXAi/nWosmU2h4WZY5618ZsnllqoFivGoWjyTj73UbD+eRINTpb8FCsuYDqINAFd36bw0O9Ev7d8Y1lEPfDiq8aRXqCD83fK6wwnJGtuKUUbWxJ+sKIj6iMcJoHuEMjLZu8SihNOsDduzMkJIj8xhTQmYuQgECggEBALE/T63+KmHxcQmoAWkfrSzjotC3dTg2nlc4BQoQkrVVKDohqvpc7xwXuztE6tZ3cfnEkKXlp9aXJ8S9mpoIEe1cR8J9pfksYRVkg830HLm4Q3DrWfFt5JGSXsBMpHiLxeNw3kL3cS2EVJJeyFhZdphSDf8CIGflCztgbB6NuzSqTrCSrRgaNglg6UVTGIJzBRMv2JwSL4CEBFvQYK9qu8tG0Dg2r+o6AISZXCg569cflbf9uMHo/xz2BUpC1kQdPcl48jUZwKqrKg/YDxOu8TpQ9ndpLLmHHkTPP/DVlcce9fLs3EZYNyayqjhX5IIs8IM5x+6RTmmVh3vEdOxvL0ECggEBANJYPZhBcX5RjkxPk3XjrI7Pqvy2LK0agvl3xtkPVlsnN/u/QkxQjKtqtC7lKi13Bf8r1dgZIVBsEPhdDQgeICKsXGXhn27Gdg6TIpq42As+CdYZWSf1qI6VdAjTw813j2f3jdV+MPafs82cFXGYhu8KJFM4aHHdinh1Vj95ncmFLSpvz4Qg7SY0iKsSCfmoFgAvZNWaIYueKPgOQNE5q63PSCo20kUAzWQxKNmO0CvqCmlVQaWgODu14SvFiE/g0GSxRvbygspzTLBnzj+JyJDCsl1636g0BFHhi9vWKQfLmbAZy/Xzl6IuToCNdGh1mf4s5EB0VPQY53d0sIXQpRY=-----END PRIVATE KEY-----}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      db: { condition: service_healthy }
+      rmq: { condition: service_healthy }
+    ports:
+    - "${SHIPYARD_API_PORT:-7448}:8080"
+    deploy:
+      restart_policy:
+        condition: on-failure
+    volumes:
+    - ./data/artifacts:/opt/artifacts
+
+  worker:
+    image: etherfactor/shipyard-worker:latest
+    environment:
+      Database__ConnectionId: ComposeDb
+      Artifacts__BasePath: /opt/artifacts
+      Artifacts__Database__ConnectionId: ComposeDb
+      Connections__ComposeDb__Type: Database
+      Connections__ComposeDb__PostgreSql__ConnectionString: Host=db;Database=${POSTGRES_DB:-shipyard};Username=${POSTGRES_USER:-shipyard};Password=${POSTGRES_PASSWORD:-mySecure(!)Password}
+      RabbitMq__ConnectionString: amqp://${RABBITMQ_USER:-shipyard}:${RABBITMQ_PASSWORD:-mySecure(!)Password}@rmq:5672
+      Selenium__ConnectionString: http://selenium:4444/wd/hub
+      # Connections__MySmtp__Type: Email
+      # Connections__MySmtp__Smtp__Host: "${SMTP_HOST}"
+      # Connections__MySmtp__Smtp__Port: "${SMTP_PORT}"
+      # Connections__MySmtp__Smtp__Username: "${SMTP_USER}"
+      # Connections__MySmtp__Smtp__Password: "${SMTP_PASSWORD}"
+      # Connections__MySmtp__Smtp__UseTls: true
+      # Notifications__IsEnabled: true
+      # Notifications__Email__IsEnabled: true
+      # Notifications__Email__ConnectionId: MySmtp
+      # Notifications__Email__To__0: "${SMTP_RECIPIENT}"
+    healthcheck:
+      test: ["CMD-SHELL", "grep -qa 'EtherGizmos.Shipyard.Worker' /proc/1/cmdline && bash -c '</dev/tcp/rmq/5672'"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      db: { condition: service_healthy }
+      rmq: { condition: service_healthy }
+      selenium: { condition: service_healthy }
+    deploy:
+      restart_policy:
+        condition: on-failure
+    volumes:
+    - ./data/artifacts:/opt/artifacts
+
+  web:
+    image: etherfactor/shipyard-web:latest
+    environment:
+      CONFIG__resourceServer: "${SHIPYARD_API_HOST:-http://localhost:7448}/api/v1"
+      CONFIG__oauth__authority: "${SHIPYARD_API_HOST:-http://localhost:7448}"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/assets/config.json || exit 1"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    ports:
+    - "${SHIPYARD_WEB_PORT:-7447}:8080"
+    deploy:
+      restart_policy:
+        condition: on-failure

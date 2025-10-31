@@ -1,0 +1,167 @@
+@let record = package$$();
+@let form = form$$();
+<!-- Header -->
+<div class="row">
+  <div class="col-12 mt-3">
+
+    @if (id$$()) {
+    <detail-header [text]="'Package Details'"
+                   [subtext]="'Tracking ' + (record?.carrier?.name ?? 'Unknown') + ' package #' + record?.trackingNumber" />
+    } @else {
+    <detail-header [text]="'Package Details'"
+                   [subtext]="'Creating new package'" />
+    }
+
+  </div>
+</div>
+
+@if (record && form) {
+<!-- Summary / Metadata -->
+<div class="row" [formGroup]="form">
+  <div class="col-12 mt-3">
+
+    <detail-box icon="bi-clipboard" text="Package Summary">
+      <div class="row">
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="contents" class="col-sm-4 col-form-label">
+              Contents
+            </label>
+            <div class="col-sm-8">
+              <textarea id="contents" rows="3" formControlName="contents" [readonlyForm]="!isEditing$$()"></textarea>
+            </div>
+          </div>
+        </div>
+
+        @let statusMeta = getStatusMetadata(record.lastStatusType);
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="status" class="col-sm-4 col-form-label">
+              Status
+            </label>
+            <div class="col-sm-8">
+              <ng-select id="status" [ngModel]="1" [ngModelOptions]="{ standalone: true }" [readonly]="true" [readonlyForm]="true">
+                <ng-option [value]="1">
+                  <span class="bi me-1" [class]="[statusMeta.icon, statusMeta.color]"></span>
+                  {{statusMeta.label}}
+                </ng-option>
+              </ng-select>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="trackingNumber" class="col-sm-4 col-form-label">
+              Tracking number
+            </label>
+            <div class="col-sm-8">
+              <input id="trackingNumber" type="text" formControlName="trackingNumber" [readonlyForm]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="carrierId" class="col-sm-4 col-form-label">
+              Carrier
+            </label>
+            <div class="col-sm-8">
+              <ng-select id="carrierId" formControlName="carrierId" [readonly]="!isEditing$$()" [readonlyForm]="!isEditing$$()">
+                @for (carrier of carriers$$(); track carrier.id) {
+                <ng-option [value]="carrier.id">
+                  {{carrier.name}}
+                </ng-option>
+                }
+              </ng-select>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="lastUpdate" class="col-sm-4 col-form-label">
+              Last update
+            </label>
+            <div class="col-sm-8">
+              <input id="lastUpdate" type="text" [value]="record.trackingUpdates?.[record.trackingUpdates!.length - 1]?.occurredAt?.toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) ?? '—'" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="estimatedDeliveryAt" class="col-sm-4 col-form-label">
+              ETA
+            </label>
+            <div class="col-sm-8">
+              <input id="estimatedDeliveryAt" type="text" [value]="record.estimatedDeliveryAt?.toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) ?? '—'" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </detail-box>
+
+  </div>
+</div>
+
+<!-- Tracking History -->
+<div class="row">
+  <div class="col-12 mt-3">
+
+    <detail-box icon="bi-clock-history" text="Tracking History">
+      <div class="table-responsive mt-3">
+        <table class="table table-sm table-transparent table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th scope="col">Time</th>
+              <th scope="col">Status</th>
+              <th scope="col">Description</th>
+              <th scope="col">Location</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (update of trackingUpdates; track update) {
+            @let statusMeta = getStatusMetadata(update.statusType);
+            <tr>
+              <td class="text-nowrap">
+                {{update.occurredAt.toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}}
+              </td>
+              <td class="text-nowrap">
+                <span class="bi" [class]="[statusMeta.icon, statusMeta.color]"></span>
+                {{statusMeta.label}}
+              </td>
+              <td class="text-nowrap">
+                {{update.description ?? '-'}}
+              </td>
+              <td class="text-nowrap">
+                {{update.location ?? '—'}}
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td class="text-nowrap text-center" colspan="999">
+                No updates available
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </detail-box>
+
+  </div>
+</div>
+}
+
+<!-- Loading Overlay -->
+@if (isLoading$$()) {
+<div style="position: fixed; top: 0; left: 0; height: 100%; width: 100%; background-color: color-mix(in srgb, var(--bs-body-bg) 50%, transparent); z-index: 100;">
+</div>
+<div style="position: fixed; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%); z-index: 100;">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+}

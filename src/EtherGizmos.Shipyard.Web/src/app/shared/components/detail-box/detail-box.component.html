@@ -1,0 +1,15 @@
+<div class="box h-100">
+  <div class="box-title mt-2 d-flex align-items-center">
+    <span class="fs-3" [class]="iconClass"></span>
+    <h5 class="ms-2">{{text}}</h5>
+
+    <div style="flex-grow: 1"></div>
+
+    @for (button of buttons; track button.text) {
+    <button class="btn btn-sm btn-{{button.color}}" (click)="button.callback()">
+      {{button.text}}
+    </button>
+    }
+  </div>
+  <ng-content></ng-content>
+</div>

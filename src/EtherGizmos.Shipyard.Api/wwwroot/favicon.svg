@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="33 50.5 135 135" width="2048" height="2048" role="img" aria-labelledby="t2b d2b">
+  <title id="SvgjsTitle1154">Shipyard Icon</title>
+  <desc id="SvgjsDesc1153">Three separated isometric faces with base purple on top, light on right, dark on left for natural balance.</desc>
+  <defs>
+    <style>
+      :root {
+      --p-base:  #731DD8; /* top */
+      --p-light: #8E5CF0; /* right */
+      --p-dark:  #5B15B8; /* left */
+      }
+      .face { stroke: none; }
+      .top   { fill: var(--p-base);  }
+      .right { fill: var(--p-light); }
+      .left  { fill: var(--p-dark);  }
+    </style>
+  </defs>
+
+  <!-- Left (dark) -->
+  <g transform="translate(-7.5, 4.33)">
+    <polygon class="face left" points="48.038,90 48.038,150 100,180 100,120"></polygon>
+  </g>
+
+  <!-- Right (light) -->
+  <g transform="translate(7.5, 4.33)">
+    <polygon class="face right" points="151.962,90 151.962,150 100,180 100,120"></polygon>
+  </g>
+
+  <!-- Top (base) -->
+  <g transform="translate(0, -8.66)">
+    <polygon class="face top" points="100,60 151.962,90 100,120 48.038,90"></polygon>
+  </g>
+</svg>

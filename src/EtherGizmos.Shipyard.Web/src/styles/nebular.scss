@@ -1,0 +1,38 @@
+@use '../../node_modules/@nebular/theme/styles/prebuilt/default.scss';
+
+@import "../../node_modules/bootstrap/scss/_mixins.scss";
+
+nb-chat {
+  &.no-header > div.header {
+    display: none;
+  }
+
+  &.no-footer nb-chat-form {
+    display: none;
+  }
+
+  div.scrollable {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+
+    &::-webkit-scrollbar { /* Chrome */
+      display: none;
+    }
+  }
+
+  box-shadow: none;
+
+  > div.form > nb-chat-form > div.message-row {
+    input[nbInput],
+    input[nbInput]:hover,
+    input[nbInput]:focus:hover {
+      @extend .form-control;
+    }
+  }
+}
+
+@include color-mode(dark) {
+  nb-chat {
+    background-color: transparent;
+  }
+}
