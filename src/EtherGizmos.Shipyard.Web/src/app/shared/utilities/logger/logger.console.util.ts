@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { LogEnricher, LogEvent, LogLevel, LogSink } from "./logger.util";
+import { LogEvent, LogLevel, LogSink } from "./logger.util";
 
 interface TemplateArgs {
   template: string;
@@ -12,7 +12,7 @@ const COLORS = {
 
   get FmtNumber() { return isDark ? "#ff00ff" : "#800080"; },
 
-  get FmtString() { return isDark ? "#00ffff" : "#00ced1"; },
+  get FmtString() { return isDark ? "#00ffff" : "#0000cd"; },
 
   get TxtLight() { return "#ffffff"; },
 
@@ -88,7 +88,12 @@ function formatMessage(template: string, properties: Record<string, any>): Templ
       continue;
 
     const { property } = match.groups;
-    result.template += template.substring(lastIndex, match.index);
+    const midText = template.substring(lastIndex, match.index).split(" ");
+    for (let i = 0; i < midText.length; i++) {
+      if (i > 0) result.template += " ";
+      result.template += "%c" + midText[i];
+      result.args.push("color:inherit;");
+    }
 
     const formatted = formatValue(properties[property]);
     result.template += formatted.template;
@@ -97,7 +102,12 @@ function formatMessage(template: string, properties: Record<string, any>): Templ
     lastIndex = match.index + match[0].length;
   }
 
-  result.template += template.substring(lastIndex);
+  const endText = template.substring(lastIndex).split(" ");
+  for (let i = 0; i < endText.length; i++) {
+    if (i > 0) result.template += " ";
+    result.template += "%c" + endText[i];
+    result.args.push("color:inherit;");
+  }
 
   //if (event.exception) {
   //  chunks.push(event.exception);
@@ -199,14 +209,5 @@ export class ConsoleSink implements LogSink {
         console.debug(formatted.template, ...formatted.args);
         break;
     }
-  }
-}
-
-@Injectable({
-  providedIn: "root"
-})
-export class SourceContextEnricher implements LogEnricher {
-  enrich(event: LogEvent): Record<string, any> {
-    return { SourceContext: event.sourceContext };
   }
 }

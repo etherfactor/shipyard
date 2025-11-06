@@ -10,11 +10,14 @@ import { AbstractLoggerService, AbstractSecurityStorage, authInterceptor, Defaul
 import { provideMonacoEditor } from 'ngx-monaco-editor-v2';
 import { AppComponent } from './app/app.component';
 import { APP_ROUTES } from './app/app.routes';
+import { loggingInterceptor } from './app/shared/interceptors/logging/logging.interceptor';
 import { provideOAuth2Service } from './app/shared/services/oauth2/oauth2.service.concrete';
 import { OidcLoggerService } from './app/shared/services/oidc-logger/oidc-logger.service';
 import { TitleStrategyService } from './app/shared/services/title-strategy/title-strategy.service';
 import { APP_CONFIG, fetchConfig } from './app/shared/utilities/config/config.util';
-import { ConsoleSink, SourceContextEnricher } from './app/shared/utilities/logger/logger.extra.util';
+import { ConsoleSink } from './app/shared/utilities/logger/logger.console.util';
+import { NumberDestructurer } from './app/shared/utilities/logger/logger.number.util';
+import { SourceContextEnricher } from './app/shared/utilities/logger/logger.source-context.util';
 import { LoggerConfiguration, provideLogger } from './app/shared/utilities/logger/logger.util';
 import { provideODataClient } from './app/shared/utilities/odata/odata.util';
 
@@ -31,16 +34,18 @@ import { provideODataClient } from './app/shared/utilities/odata/odata.util';
           withFetch(),
           withInterceptors([
             authInterceptor(),
+            loggingInterceptor,
           ])
         ),
         provideODataClient(),
         provideLogger(
-          [ConsoleSink, SourceContextEnricher] as const,
-          (consoleSink, sourceContextEnricher) =>
+          [ConsoleSink, SourceContextEnricher, NumberDestructurer] as const,
+          (consoleSink, sourceContextEnricher, numberDestructurer) =>
             new LoggerConfiguration()
               .minimumLevel.information()
               .writeTo.sink(consoleSink)
               .enrich.with(sourceContextEnricher)
+              .destructure.destructure(numberDestructurer)
               .createLogger()
         ),
         provideOAuth2Service(),
