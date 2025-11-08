@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NavbarComponent } from './features/app/components/navbar/navbar.component';
@@ -9,7 +8,6 @@ import { Logger } from './shared/utilities/logger/logger.util';
 @Component({
   selector: 'app-root',
   imports: [
-    CommonModule,
     NavbarComponent,
     RouterModule,
   ],

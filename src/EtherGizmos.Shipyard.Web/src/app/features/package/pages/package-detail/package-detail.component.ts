@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -20,7 +19,6 @@ import { PackageService } from '../../services/package/package.service';
 @Component({
   selector: 'app-package-detail',
   imports: [
-    CommonModule,
     DetailBoxComponent,
     DetailHeaderComponent,
     FormsModule,
