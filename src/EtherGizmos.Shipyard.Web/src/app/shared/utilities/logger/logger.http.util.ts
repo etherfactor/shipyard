@@ -20,9 +20,6 @@ export interface HttpBatchLogSinkOptions {
 
   /** Flush immediately when levels match these (default: ["Error","Fatal"]) */
   immediateFlushLevels?: Array<"Error" | "Fatal" | "Warning" | "Information" | "Debug" | "Verbose" | "None">;
-
-  /** Use navigator.sendBeacon on unload/visibility-hidden if available (default: true) */
-  useSendBeacon?: boolean;
 }
 
 export const HTTP_BATCH_LOG_SINK_OPTIONS =
@@ -61,16 +58,15 @@ export class HttpBatchLogSink implements LogSink {
       maxIntervalMs: options.maxIntervalMs ?? 2000,
       maxQueueSize: options.maxQueueSize ?? 2000,
       immediateFlushLevels: options.immediateFlushLevels ?? ["Error", "Fatal"],
-      useSendBeacon: options.useSendBeacon ?? true,
     };
 
     // Flush on tab close/backgrounding
-    if (this.options.useSendBeacon && typeof window !== "undefined") {
-      window.addEventListener("beforeunload", () => this.flush(true));
+    if (typeof window !== "undefined") {
+      window.addEventListener("beforeunload", () => this.flush());
       document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "hidden") this.flush(true);
+        if (document.visibilityState === "hidden") this.flush();
       });
-      addEventListener("pagehide", () => this.flush(true));
+      addEventListener("pagehide", () => this.flush());
     }
   }
 
@@ -98,8 +94,8 @@ export class HttpBatchLogSink implements LogSink {
     }
   }
 
-  /** Flush the buffer; if `useBeaconAttempt` true, try sendBeacon once. */
-  private flush(useBeaconAttempt = false): void {
+  /** Flush the buffer */
+  private flush(): void {
     if (this.buffer.length === 0) return;
 
     // Avoid parallel posts
@@ -111,23 +107,11 @@ export class HttpBatchLogSink implements LogSink {
       this.timerId = null;
     }
 
+    // Pull a batch of logs off the buffer to send
     const batch = this.buffer.splice(0, this.options.maxBatchSize);
 
-    // Try sendBeacon for unload scenarios
-    if (useBeaconAttempt && this.options.useSendBeacon && typeof navigator?.sendBeacon === "function") {
-      try {
-        const payload = new Blob([JSON.stringify(batch)], { type: "application/json" });
-        const ok = navigator.sendBeacon(this.options.endpoint, payload);
-
-        // We successfully scheduled, we do not want to send twice
-        if (ok) return;
-      } catch {
-        // We failed to send, so let's try with HttpClient
-      }
-    }
-
     this.inflight = true;
-    this.http.post(this.options.endpoint, batch, { headers: this.options.headers }).subscribe({
+    this.http.post(this.options.endpoint, batch, { headers: this.options.headers, keepalive: true }).subscribe({
       next: () => {
         this.inflight = false;
         this.retryDelayMs = 0; // reset backoff
