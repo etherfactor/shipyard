@@ -30,9 +30,11 @@ internal class SourceLoggerFactory : ISourceLoggerFactory
         {
             var logger = _loggers.GetOrAdd(source.Value.ApiKey, apiKey =>
             {
+                var sharedRoot = _configuration.GetSection($"LogIngestion");
                 var sourceRoot = _configuration.GetSection($"LogIngestion:Sources:{source.Key}");
 
                 var logger = new LoggerConfiguration()
+                    .ReadFrom.Configuration(sharedRoot)
                     .ReadFrom.Configuration(sourceRoot)
                     .CreateLogger();
 

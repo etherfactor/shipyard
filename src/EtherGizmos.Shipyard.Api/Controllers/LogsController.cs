@@ -82,8 +82,11 @@ public class LogsController : ControllerBase
             }
         }
 
+        var localTz = TimeZoneInfo.Local;
+        var timestamp = TimeZoneInfo.ConvertTime(log.Timestamp!.Value, localTz);
+
         var logEvent = new LogEvent(
-            log.Timestamp!.Value,
+            timestamp,
             logLevel,
             exception,
             messageTemplate,
