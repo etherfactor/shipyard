@@ -2,9 +2,12 @@ using EtherGizmos.Common;
 using EtherGizmos.Common.Configuration;
 using EtherGizmos.Common.Services;
 using EtherGizmos.Shipyard;
+using EtherGizmos.Shipyard.Api.Abstractions;
+using EtherGizmos.Shipyard.Api.Configuration;
 using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Api.Services.Health;
 using EtherGizmos.Shipyard.Api.Services.HostedServices;
+using EtherGizmos.Shipyard.Api.Services.Logging;
 using EtherGizmos.Shipyard.Api.Services.Middleware;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Database;
@@ -15,7 +18,6 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
@@ -48,6 +50,16 @@ builder.Services
     })
     .ValidateOnStart()
     .ValidateDataAnnotations();
+
+builder.Services
+    .AddOptions<LogIngestionOptions>()
+    .Configure<IConfiguration>((opt, config) =>
+    {
+        config.GetSection("LogIngestion")
+            .Bind(opt);
+    })
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 //**********************************************************
 // Services
@@ -176,7 +188,7 @@ builder.Services
     });
 
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddSingleton<ISourceLoggerFactory, SourceLoggerFactory>();
 
 builder.Services.AddHostedService<InitialConfigSeeder>();
 builder.Services.AddHostedService<OAuth2Seeder>();

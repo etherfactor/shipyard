@@ -16,6 +16,7 @@ import { OidcLoggerService } from './app/shared/services/oidc-logger/oidc-logger
 import { TitleStrategyService } from './app/shared/services/title-strategy/title-strategy.service';
 import { APP_CONFIG, fetchConfig } from './app/shared/utilities/config/config.util';
 import { ConsoleSink } from './app/shared/utilities/logger/logger.console.util';
+import { HTTP_BATCH_LOG_SINK_OPTIONS, HttpBatchLogSink } from './app/shared/utilities/logger/logger.http.util';
 import { NumberDestructurer } from './app/shared/utilities/logger/logger.number.util';
 import { SourceContextEnricher } from './app/shared/utilities/logger/logger.source-context.util';
 import { LoggerConfiguration, provideLogger } from './app/shared/utilities/logger/logger.util';
@@ -39,15 +40,20 @@ import { provideODataClient } from './app/shared/utilities/odata/odata.util';
         ),
         provideODataClient(),
         provideLogger(
-          [ConsoleSink, SourceContextEnricher, NumberDestructurer] as const,
-          (consoleSink, sourceContextEnricher, numberDestructurer) =>
+          [ConsoleSink, HttpBatchLogSink, SourceContextEnricher, NumberDestructurer] as const,
+          (consoleSink, httpBatchLogSink, sourceContextEnricher, numberDestructurer) =>
             new LoggerConfiguration()
               .minimumLevel.information()
               .writeTo.sink(consoleSink)
+              .writeTo.sink(httpBatchLogSink)
               .enrich.with(sourceContextEnricher)
               .destructure.destructure(numberDestructurer)
               .createLogger()
         ),
+        provideSimpleConfig(HTTP_BATCH_LOG_SINK_OPTIONS, {
+          endpoint: "https://localhost:7265/api/v1/logs?apiKey=d142d01e-9f50-4704-ac67-fe09c157922a",
+          headers: {},
+        }),
         provideOAuth2Service(),
         provideAuth({
           config: {
