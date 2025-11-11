@@ -8,4 +8,6 @@ public class FileCertificateOptions : CertificateReferenceOptions
     public string Path { get; set; } = null!;
 
     public string? Password { get; set; }
+
+    public bool AutoGenerate { get; set; } = false;
 }

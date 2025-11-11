@@ -1,6 +1,7 @@
 ﻿using EtherGizmos.Common.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
 namespace EtherGizmos.Common.Configuration;
@@ -70,6 +71,22 @@ internal class CertificateResolver : ICertificateResolver
     private X509Certificate2 LoadFromPfx(
         FileCertificateOptions file)
     {
+        if (!File.Exists(file.Path))
+        {
+            using var rsa = RSA.Create(2048);
+            var request = new CertificateRequest(
+                "CN=auto",
+                rsa,
+                HashAlgorithmName.SHA256,
+                RSASignaturePadding.Pkcs1);
+
+            var now = DateTimeOffset.UtcNow;
+            var signed = request.CreateSelfSigned(now, now.AddYears(100));
+
+            var bytes = signed.Export(X509ContentType.Pfx, file.Password);
+            File.WriteAllBytes(file.Path, bytes);
+        }
+
         var certificate = X509CertificateLoader.LoadPkcs12FromFile(file.Path, file.Password);
         return certificate;
     }
