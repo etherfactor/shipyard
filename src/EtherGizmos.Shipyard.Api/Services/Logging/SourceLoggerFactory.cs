@@ -25,20 +25,33 @@ internal class SourceLoggerFactory : ISourceLoggerFactory
     {
         var options = _logOptions.Value;
 
-        var source = options.Sources.SingleOrDefault(e => e.Value.ApiKey.Equals(apiKey, StringComparison.InvariantCultureIgnoreCase));
+        var source = options.Sources.SingleOrDefault(e => e.Value.ApiKey.Equals(apiKey, StringComparison.OrdinalIgnoreCase));
         if (source.Key is not null)
         {
             var logger = _loggers.GetOrAdd(source.Value.ApiKey, apiKey =>
             {
-                var sharedRoot = _configuration.GetSection($"LogIngestion");
-                var sourceRoot = _configuration.GetSection($"LogIngestion:Sources:{source.Key}");
+                var sharedRoot = _configuration.GetSection("LogIngestion");
+                var sharedSerilog = sharedRoot.GetSection("Serilog");
 
-                var logger = new LoggerConfiguration()
-                    .ReadFrom.Configuration(sharedRoot)
-                    .ReadFrom.Configuration(sourceRoot)
-                    .CreateLogger();
+                var sourceRoot = sharedRoot.GetSection("Sources").GetSection(source.Key);
+                var sourceSerilog = sourceRoot.GetSection("Serilog");
 
-                return logger;
+                var logger = new LoggerConfiguration();
+
+                if (sourceSerilog.Exists())
+                {
+                    logger.ReadFrom.Configuration(sourceRoot);
+                }
+                else if (sharedSerilog.Exists())
+                {
+                    logger.ReadFrom.Configuration(sharedRoot);
+                }
+                else
+                {
+                    logger.ReadFrom.Configuration(_configuration);
+                }
+
+                return logger.CreateLogger();
             });
 
             return logger;
