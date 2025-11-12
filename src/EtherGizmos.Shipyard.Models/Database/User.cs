@@ -13,7 +13,11 @@ public class User : InternalUser<Guid>, IEntity, IAuditable
 
     public Guid? ModifiedByUserId { get; set; }
 
-    public string Password { set => PasswordHash = _hasher.HashPassword(this, value); }
+    public string Password
+    {
+        get => throw new NotSupportedException();
+        set => PasswordHash = _hasher.HashPassword(this, value);
+    }
 
     private static readonly IPasswordHasher<User> _hasher = new PasswordHasher<User>();
 }
