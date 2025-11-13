@@ -37,5 +37,14 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasColumnName("full_name");
 
         entity.Ignore(e => e.Password);
+
+        entity.HasMany(e => e.Roles)
+            .WithMany(e => e.Users)
+            .UsingEntity<RoleUser>();
+
+        entity.Property(e => e.PrincipalId)
+            .HasColumnName("principal_id");
+
+        entity.HasOne(e => e.Principal);
     }
 }

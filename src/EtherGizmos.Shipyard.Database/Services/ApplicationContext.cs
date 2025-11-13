@@ -12,6 +12,8 @@ namespace EtherGizmos.Shipyard.Services;
 
 public class ApplicationContext : DbContext
 {
+    public virtual DbSet<AclEntry> AclEntries { get; set; }
+
     public virtual DbSet<Carrier> Carriers { get; set; }
 
     public virtual DbSet<CarrierExecution> CarrierExecutions { get; set; }
@@ -19,6 +21,10 @@ public class ApplicationContext : DbContext
     public virtual DbSet<CarrierExecutionArtifact> CarrierExecutionArtifacts { get; set; }
 
     public virtual DbSet<Package> Packages { get; set; }
+
+    public virtual DbSet<Role> Roles { get; set; }
+
+    public virtual DbSet<RoleUser> RoleUsers { get; set; }
 
     public virtual DbSet<StatusType> StatusTypes { get; set; }
 

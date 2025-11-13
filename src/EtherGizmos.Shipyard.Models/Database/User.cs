@@ -5,19 +5,25 @@ namespace EtherGizmos.Shipyard.Database;
 
 public class User : InternalUser<Guid>, IEntity, IAuditable
 {
-    public DateTimeOffset? CreatedAt { get; set; }
+    public virtual DateTimeOffset? CreatedAt { get; set; }
 
-    public Guid? CreatedByUserId { get; set; }
+    public virtual Guid? CreatedByUserId { get; set; }
 
-    public DateTimeOffset? ModifiedAt { get; set; }
+    public virtual DateTimeOffset? ModifiedAt { get; set; }
 
-    public Guid? ModifiedByUserId { get; set; }
+    public virtual Guid? ModifiedByUserId { get; set; }
 
-    public string Password
+    public virtual string Password
     {
         get => throw new NotSupportedException();
         set => PasswordHash = _hasher.HashPassword(this, value);
     }
 
     private static readonly IPasswordHasher<User> _hasher = new PasswordHasher<User>();
+
+    public virtual List<Role> Roles { get; set; } = [];
+
+    public virtual Guid PrincipalId { get; init; }
+
+    public virtual Principal Principal { get; init; } = new() { Type = Enums.PrincipalType.User };
 }
