@@ -35,5 +35,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         entity.Property(e => e.FullName)
             .HasColumnName("full_name");
+
+        entity.Ignore(e => e.Password);
     }
 }

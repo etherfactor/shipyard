@@ -27,6 +27,11 @@ export const APP_ROUTES: ExtendedRoute[] = [
     loadChildren: () => import("./features/carrier/carrier.routes").then(m => m.CARRIER_ROUTES),
     canActivate: [authenticationGuard],
   },
+  {
+    path: "users",
+    loadChildren: () => import("./features/user/user.routes").then(m => m.USER_ROUTES),
+    canActivate: [authenticationGuard],
+  },
 ];
 
 export type ExtendedRoute = ParentRoute | BreadedRoute;
