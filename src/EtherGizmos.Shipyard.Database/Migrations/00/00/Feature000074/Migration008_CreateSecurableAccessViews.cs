@@ -1,0 +1,249 @@
+﻿using EtherGizmos.Shipyard.Migrations.Core;
+
+namespace EtherGizmos.Shipyard.Migrations._00._00.Feature000074;
+
+[CreatedAt(year: 2025, month: 11, day: 13, hour: 18, minute: 20, description: "Create securable access views", trackingId: 74)]
+public class Migration008_CreateSecurableAccessViews : MigrationExtension
+{
+    public override void Up()
+    {
+        /*
+         * Create [acl].[carriers]
+         */
+        Execute.Sql("""
+            create view acl.carriers as
+            with global_permissions as (
+              select a.principal_user_id,
+                r.carrier_id,
+                a.permission_id,
+                a.permission_grant_type_id
+                from carriers r
+                  inner join acl.user_entries a
+                    on a.securable_type_id = 10
+            ),
+            record_permissions as (
+              select a.principal_user_id,
+                r.carrier_id,
+                a.permission_id,
+                a.permission_grant_type_id
+                from carriers r
+                  inner join acl.user_entries a
+                    on a.securable_id = r.securable_id
+            ),
+            combined_permissions as (
+              select gp.principal_user_id,
+                gp.carrier_id,
+                gp.permission_id,
+                gp.permission_grant_type_id
+                from global_permissions gp
+                  where not exists (
+                    select 1
+                      from record_permissions rp
+                        where rp.principal_user_id = gp.principal_user_id
+                          and rp.carrier_id = gp.carrier_id
+                          and rp.permission_id = gp.permission_id
+                  )
+              union all
+              select rp.principal_user_id,
+                rp.carrier_id,
+                rp.permission_id,
+                rp.permission_grant_type_id
+                from record_permissions rp
+            )
+            select p.principal_user_id,
+              p.carrier_id,
+              p.permission_id,
+              p.permission_grant_type_id,
+              case when p.permission_grant_type_id = 2 then 1
+                when p.permission_grant_type_id = 1 then 1
+               	else 0 end as is_grant
+              from combined_permissions p
+                inner join carriers r
+               	  on r.carrier_id = p.carrier_id;
+            """);
+
+        /*
+         * Create [acl].[packages]
+         */
+        Execute.Sql("""
+            create view acl.packages as
+            with global_permissions as (
+              select a.principal_user_id,
+                r.package_id,
+                a.permission_id,
+                a.permission_grant_type_id
+                from packages r
+                  inner join acl.user_entries a
+                    on a.securable_type_id = 20
+            ),
+            record_permissions as (
+              select a.principal_user_id,
+                r.package_id,
+                a.permission_id,
+                a.permission_grant_type_id
+                from packages r
+                  inner join acl.user_entries a
+                    on a.securable_id = r.securable_id
+            ),
+            combined_permissions as (
+              select gp.principal_user_id,
+                gp.package_id,
+                gp.permission_id,
+                gp.permission_grant_type_id
+                from global_permissions gp
+                  where not exists (
+                    select 1
+                      from record_permissions rp
+                        where rp.principal_user_id = gp.principal_user_id
+                          and rp.package_id = gp.package_id
+                          and rp.permission_id = gp.permission_id
+                  )
+              union all
+              select rp.principal_user_id,
+                rp.package_id,
+                rp.permission_id,
+                rp.permission_grant_type_id
+                from record_permissions rp
+            )
+            select p.principal_user_id,
+              p.package_id,
+              p.permission_id,
+              p.permission_grant_type_id,
+              case when p.permission_grant_type_id = 2 then 1
+                when p.permission_grant_type_id = 1 and r.created_by_user_id = p.principal_user_id then 1
+               	else 0 end as is_grant
+              from combined_permissions p
+                inner join packages r
+               	  on r.package_id = p.package_id;
+            """);
+
+        /*
+         * Create [acl].[users]
+         */
+        Execute.Sql("""
+            create view acl.users as
+            with global_permissions as (
+              select a.principal_user_id,
+                r.user_id,
+                a.permission_id,
+                a.permission_grant_type_id
+                from users r
+                  inner join acl.user_entries a
+                    on a.securable_type_id = 100
+            ),
+            record_permissions as (
+              select a.principal_user_id,
+                r.user_id,
+                a.permission_id,
+                a.permission_grant_type_id
+                from users r
+                  inner join acl.user_entries a
+                    on a.securable_id = r.securable_id
+            ),
+            combined_permissions as (
+              select gp.principal_user_id,
+                gp.user_id,
+                gp.permission_id,
+                gp.permission_grant_type_id
+                from global_permissions gp
+                  where not exists (
+                    select 1
+                      from record_permissions rp
+                        where rp.principal_user_id = gp.principal_user_id
+                          and rp.user_id = gp.user_id
+                          and rp.permission_id = gp.permission_id
+                  )
+              union all
+              select rp.principal_user_id,
+                rp.user_id,
+                rp.permission_id,
+                rp.permission_grant_type_id
+                from record_permissions rp
+            )
+            select p.principal_user_id,
+              p.user_id,
+              p.permission_id,
+              p.permission_grant_type_id,
+              case when p.permission_grant_type_id = 2 then 1
+                when p.permission_grant_type_id = 1 then 1
+               	else 0 end as is_grant
+              from combined_permissions p
+                inner join users r
+               	  on r.user_id = p.user_id;
+            """);
+
+        /*
+         * Create [acl].[roles]
+         */
+        Execute.Sql("""
+            create view acl.roles as
+            with global_permissions as (
+              select a.principal_user_id,
+                r.role_id,
+                a.permission_id,
+                a.permission_grant_type_id
+                from roles r
+                  inner join acl.user_entries a
+                    on a.securable_type_id = 110
+            ),
+            record_permissions as (
+              select a.principal_user_id,
+                r.role_id,
+                a.permission_id,
+                a.permission_grant_type_id
+                from roles r
+                  inner join acl.user_entries a
+                    on a.securable_id = r.securable_id
+            ),
+            combined_permissions as (
+              select gp.principal_user_id,
+                gp.role_id,
+                gp.permission_id,
+                gp.permission_grant_type_id
+                from global_permissions gp
+                  where not exists (
+                    select 1
+                      from record_permissions rp
+                        where rp.principal_user_id = gp.principal_user_id
+                          and rp.role_id = gp.role_id
+                          and rp.permission_id = gp.permission_id
+                  )
+              union all
+              select rp.principal_user_id,
+                rp.role_id,
+                rp.permission_id,
+                rp.permission_grant_type_id
+                from record_permissions rp
+            )
+            select p.principal_user_id,
+              p.role_id,
+              p.permission_id,
+              p.permission_grant_type_id,
+              case when p.permission_grant_type_id = 2 then 1
+                when p.permission_grant_type_id = 1 then 1
+               	else 0 end as is_grant
+              from combined_permissions p
+                inner join roles r
+               	  on r.role_id = p.role_id;
+            """);
+    }
+
+    public override void Down()
+    {
+        Execute.Sql("""
+            drop view acl.roles;
+            """);
+
+        Execute.Sql("""
+            drop view acl.users;
+            """);
+
+        Execute.Sql("""
+            drop view acl.packages;
+            """);
+
+        Execute.Sql("""
+            drop view acl.carriers;
+            """);
+    }
+}

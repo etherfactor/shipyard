@@ -28,10 +28,42 @@ public class Migration004_CreateUserPrincipals : MigrationExtension
         Create.ForeignKey("FK_users_principal_id")
             .FromTable("users").ForeignColumn("principal_id")
             .ToTable("principals").InSchema("acl").PrimaryColumn("principal_id");
+
+        Create.Column("securable_id")
+            .OnTable("users")
+            .AsGuid()
+            .Nullable()
+            .WithDefault(SystemMethods.NewGuid);
+
+        Execute.Sql("""
+            insert into acl.securables ( securable_id, securable_type_id )
+            select securable_id, 100
+              from users;
+            """);
+
+        Alter.Column("securable_id")
+            .OnTable("users")
+            .AsGuid()
+            .NotNullable();
+
+        Create.ForeignKey("FK_users_securable_id")
+            .FromTable("users").ForeignColumn("securable_id")
+            .ToTable("securables").InSchema("acl").PrimaryColumn("securable_id");
     }
 
     public override void Down()
     {
+        Execute.Sql("""
+            delete from acl.securables
+              where securable_id in (
+                select securable_id
+                  from users u
+              );
+            """);
+
+        Delete.Column("securable_id")
+            .FromTable("users");
+
         Execute.Sql("""
             delete from acl.principals
               where principal_id in (

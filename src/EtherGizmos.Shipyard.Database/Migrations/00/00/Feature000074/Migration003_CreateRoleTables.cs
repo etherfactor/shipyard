@@ -18,7 +18,8 @@ public class Migration003_CreateRoleTables : AutoReversingMigration
             .WithColumn("name").AsString(200).NotNullable()
             .WithColumn("description").AsString(int.MaxValue).Nullable()
             .WithColumn("system_id").AsGuid().Nullable()
-            .WithColumn("principal_id").AsGuid().NotNullable();
+            .WithColumn("principal_id").AsGuid().NotNullable()
+            .WithColumn("securable_id").AsGuid().NotNullable();
 
         Create.ForeignKey("FK_roles_principal_id")
             .FromTable("roles").ForeignColumn("principal_id")

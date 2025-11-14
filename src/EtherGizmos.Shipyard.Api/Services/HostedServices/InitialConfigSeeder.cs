@@ -41,22 +41,37 @@ public class InitialConfigSeeder : IHostedService
         }
 
         var roleRepo = uow.Repository<Role>();
-        var admin = await roleRepo.Data.SingleOrDefaultAsync(e => e.SystemId == new Guid("1706f63d-9bc5-4251-bf61-a50d5c705e08"), cancellationToken: cancellationToken);
+        var admin = await roleRepo.Data
+            .Include(e => e.Principal)
+            .ThenInclude(e => e.AclEntries)
+            .SingleOrDefaultAsync(e => e.SystemId == new Guid("1706f63d-9bc5-4251-bf61-a50d5c705e08"), cancellationToken: cancellationToken);
         if (admin is null)
         {
-            admin ??= new Role();
+            admin ??= new Role()
+            {
+                SystemId = new Guid("1706f63d-9bc5-4251-bf61-a50d5c705e08"),
+            };
             roleRepo.Create(admin);
         }
 
         admin.Name = "Administrator";
         admin.Description = "Capable of performing any action within the application.";
 
-        SetPermission(admin.Principal, securableType: SecurableType.Carrier, permissionId: 10, grantType: PermissionGrantType.Full);
-        SetPermission(admin.Principal, securableType: SecurableType.Carrier, permissionId: 20, grantType: PermissionGrantType.Full);
-        SetPermission(admin.Principal, securableType: SecurableType.Carrier, permissionId: 30, grantType: PermissionGrantType.Full);
-        SetPermission(admin.Principal, securableType: SecurableType.Package, permissionId: 10, grantType: PermissionGrantType.Full);
-        SetPermission(admin.Principal, securableType: SecurableType.Package, permissionId: 20, grantType: PermissionGrantType.Full);
-        SetPermission(admin.Principal, securableType: SecurableType.Package, permissionId: 30, grantType: PermissionGrantType.Full);
+        SetPermission(admin.Principal, securableType: SecurableType.Carrier, permissionId: PermissionId.Read, grantType: PermissionGrantType.Full);
+        SetPermission(admin.Principal, securableType: SecurableType.Carrier, permissionId: PermissionId.Write, grantType: PermissionGrantType.Full);
+        SetPermission(admin.Principal, securableType: SecurableType.Carrier, permissionId: PermissionId.Delete, grantType: PermissionGrantType.Full);
+
+        SetPermission(admin.Principal, securableType: SecurableType.Package, permissionId: PermissionId.Read, grantType: PermissionGrantType.Full);
+        SetPermission(admin.Principal, securableType: SecurableType.Package, permissionId: PermissionId.Write, grantType: PermissionGrantType.Full);
+        SetPermission(admin.Principal, securableType: SecurableType.Package, permissionId: PermissionId.Delete, grantType: PermissionGrantType.Full);
+
+        SetPermission(admin.Principal, securableType: SecurableType.User, permissionId: PermissionId.Read, grantType: PermissionGrantType.Full);
+        SetPermission(admin.Principal, securableType: SecurableType.User, permissionId: PermissionId.Write, grantType: PermissionGrantType.Full);
+        SetPermission(admin.Principal, securableType: SecurableType.User, permissionId: PermissionId.Delete, grantType: PermissionGrantType.Full);
+
+        SetPermission(admin.Principal, securableType: SecurableType.Role, permissionId: PermissionId.Read, grantType: PermissionGrantType.Full);
+        SetPermission(admin.Principal, securableType: SecurableType.Role, permissionId: PermissionId.Write, grantType: PermissionGrantType.Full);
+        SetPermission(admin.Principal, securableType: SecurableType.Role, permissionId: PermissionId.Delete, grantType: PermissionGrantType.Full);
 
         var roleUserRepo = uow.Repository<RoleUser>();
         if (!await roleUserRepo.Data.AnyAsync(cancellationToken: cancellationToken))
