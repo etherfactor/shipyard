@@ -6,6 +6,7 @@ using EtherGizmos.Common.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using static OpenIddict.Abstractions.OpenIddictConstants;
@@ -129,6 +130,9 @@ public static class IOAuth2BuilderExtensions
         }
 
         @this.Builder.Services.AddAuthorization();
+
+        @this.Builder.Services.AddHttpContextAccessor();
+        @this.Builder.Services.TryAddSingleton<IUserContext, UserContext>();
 
         return @this;
     }
