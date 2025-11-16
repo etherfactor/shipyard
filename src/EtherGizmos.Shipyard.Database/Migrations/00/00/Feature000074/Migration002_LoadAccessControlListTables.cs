@@ -21,8 +21,8 @@ public class Migration002_LoadAccessControlListTables : MigrationExtension
          */
         Merge.IntoTable("permission_grant_types").InSchema("acl")
             .Row(new { permission_grant_type_id = -1, name = "Deny", description = "Denies all access." })
-            .Row(new { permission_grant_type_id = 1, name = "Filter", description = "Provides contextual filtered access." })
-            .Row(new { permission_grant_type_id = 2, name = "Full", description = "Provides full access." })
+            .Row(new { permission_grant_type_id = 1, name = "Full", description = "Provides full access." })
+            .Row(new { permission_grant_type_id = 2, name = "Filter", description = "Provides contextual filtered access." })
             .Match(e => new { e.permission_grant_type_id });
 
         /*

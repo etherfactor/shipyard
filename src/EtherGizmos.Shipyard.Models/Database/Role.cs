@@ -15,7 +15,11 @@ public class Role : Auditable, IEntity
 
     public virtual List<User> Users { get; set; } = [];
 
-    public virtual Guid PrincipalId { get; init; }
+    public virtual Guid PrincipalId { get; set; }
 
-    public virtual Principal Principal { get; init; } = new() { Type = PrincipalType.Role };
+    public virtual Principal Principal { get; set; } = new() { Type = PrincipalType.Role };
+
+    public virtual Guid SecurableId { get; set; }
+
+    public virtual Securable Securable { get; set; } = new() { Type = SecurableType.Role };
 }

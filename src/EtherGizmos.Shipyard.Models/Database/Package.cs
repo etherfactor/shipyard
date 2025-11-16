@@ -27,4 +27,8 @@ public class Package : Auditable, IEntity
     public virtual bool IsDelivered { get; set; }
 
     public virtual List<TrackingUpdate> TrackingUpdates { get; set; } = [];
+
+    public virtual Guid SecurableId { get; set; }
+
+    public virtual Securable Securable { get; set; } = new() { Type = Enums.SecurableType.Package };
 }

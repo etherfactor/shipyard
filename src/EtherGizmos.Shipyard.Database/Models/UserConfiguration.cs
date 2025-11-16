@@ -46,5 +46,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasColumnName("principal_id");
 
         entity.HasOne(e => e.Principal);
+
+        entity.Property(e => e.SecurableId)
+            .HasColumnName("securable_id");
+
+        entity.HasOne(e => e.Securable);
     }
 }

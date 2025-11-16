@@ -33,9 +33,11 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
             .UsingEntity<RoleUser>();
 
         entity.Property(e => e.PrincipalId)
-            .HasColumnName("principal_id")
-            .HasDefaultValueSql();
+            .HasColumnName("principal_id");
 
         entity.HasOne(e => e.Principal);
+
+        entity.Property(e => e.SecurableId)
+            .HasColumnName("securable_id");
     }
 }

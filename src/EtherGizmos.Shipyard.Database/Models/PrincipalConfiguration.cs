@@ -14,7 +14,8 @@ public class PrincipalConfiguration : IEntityTypeConfiguration<Principal>
         entity.HasKey(e => e.Id);
 
         entity.Property(e => e.Id)
-            .HasColumnName("principal_id");
+            .HasColumnName("principal_id")
+            .HasDefaultValueSql();
 
         entity.Property(e => e.Type)
             .HasColumnName("principal_type_id");

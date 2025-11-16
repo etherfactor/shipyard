@@ -54,8 +54,8 @@ public class Migration008_CreateSecurableAccessViews : MigrationExtension
               p.carrier_id,
               p.permission_id,
               p.permission_grant_type_id,
-              case when p.permission_grant_type_id = 2 then 1
-                when p.permission_grant_type_id = 1 then 1
+              case when p.permission_grant_type_id = 1 then 1
+                when p.permission_grant_type_id = 2 then 1
                	else 0 end as is_grant
               from combined_permissions p
                 inner join carriers r
@@ -109,8 +109,8 @@ public class Migration008_CreateSecurableAccessViews : MigrationExtension
               p.package_id,
               p.permission_id,
               p.permission_grant_type_id,
-              case when p.permission_grant_type_id = 2 then 1
-                when p.permission_grant_type_id = 1 and r.created_by_user_id = p.principal_user_id then 1
+              case when p.permission_grant_type_id = 1 then 1
+                when p.permission_grant_type_id = 2 and r.created_by_user_id = p.principal_user_id then 1
                	else 0 end as is_grant
               from combined_permissions p
                 inner join packages r
@@ -164,8 +164,8 @@ public class Migration008_CreateSecurableAccessViews : MigrationExtension
               p.user_id,
               p.permission_id,
               p.permission_grant_type_id,
-              case when p.permission_grant_type_id = 2 then 1
-                when p.permission_grant_type_id = 1 then 1
+              case when p.permission_grant_type_id = 1 then 1
+                when p.permission_grant_type_id = 2 then 1
                	else 0 end as is_grant
               from combined_permissions p
                 inner join users r
@@ -219,8 +219,8 @@ public class Migration008_CreateSecurableAccessViews : MigrationExtension
               p.role_id,
               p.permission_id,
               p.permission_grant_type_id,
-              case when p.permission_grant_type_id = 2 then 1
-                when p.permission_grant_type_id = 1 then 1
+              case when p.permission_grant_type_id = 1 then 1
+                when p.permission_grant_type_id = 2 then 1
                	else 0 end as is_grant
               from combined_permissions p
                 inner join roles r

@@ -12,12 +12,19 @@ public class Migration007_CreateAccessControlListViews : MigrationExtension
          */
         Execute.Sql("""
             create view acl.user_entries as
-            with role_permissions as (
+            with role_permissions_base as (
               select u.user_id as principal_user_id,
                 a.securable_id,
                 a.securable_type_id,
                 a.permission_id,
-                a.permission_grant_type_id
+                a.permission_grant_type_id,
+            	row_number() over (
+            	  partition by u.user_id, a.securable_id, a.securable_type_id, a.permission_id
+            	  order by case when a.permission_grant_type_id = -1 then 1
+            	    when a.permission_grant_type_id = 1 then 2
+                    when a.permission_grant_type_id = 2 then 3
+            	    else 999999 end
+            	) as rownum
                 from users u
                   inner join role_users ru
                     on ru.user_id = u.user_id
@@ -25,6 +32,15 @@ public class Migration007_CreateAccessControlListViews : MigrationExtension
                     on r.role_id = ru.role_id
                   inner join acl.entries a
                     on a.principal_id = r.principal_id
+            ),
+            role_permissions as (
+              select rp.principal_user_id,
+            	rp.securable_id,
+            	rp.securable_type_id,
+            	rp.permission_id,
+            	rp.permission_grant_type_id
+            	from role_permissions_base rp
+            	where rp.rownum = 1
             ),
             user_permissions as (
               select u.user_id as principal_user_id,

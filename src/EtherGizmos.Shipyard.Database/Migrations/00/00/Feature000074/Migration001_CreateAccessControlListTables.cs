@@ -66,7 +66,7 @@ public class Migration001_CreateAccessControlListTables : AutoReversingMigration
          * Create [acl].[securables]
          */
         Create.Table("securables").InSchema("acl")
-            .WithColumn("securable_id").AsGuid().PrimaryKey()
+            .WithColumn("securable_id").AsGuid().PrimaryKey().WithDefault(SystemMethods.NewGuid)
             .WithColumn("securable_type_id").AsInt32().NotNullable();
 
         Create.ForeignKey("FK_securables_securable_type_id")

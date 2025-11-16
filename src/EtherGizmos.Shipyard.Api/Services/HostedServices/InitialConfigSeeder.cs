@@ -77,6 +77,11 @@ public class InitialConfigSeeder : IHostedService
         if (!await roleUserRepo.Data.AnyAsync(cancellationToken: cancellationToken))
         {
             var users = await userRepo.Data.ToListAsync(cancellationToken: cancellationToken);
+            if (user is not null && !users.Contains(user))
+            {
+                users.Add(user);
+            }
+
             foreach (var nowAdmin in users)
             {
                 nowAdmin.Roles.Add(admin);

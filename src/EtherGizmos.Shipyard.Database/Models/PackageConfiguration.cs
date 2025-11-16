@@ -56,5 +56,10 @@ public class PackageConfiguration : IEntityTypeConfiguration<Package>
         entity.HasMany(e => e.TrackingUpdates)
             .WithOne(e => e.Package)
             .HasForeignKey(e => e.PackageId);
+
+        entity.Property(e => e.SecurableId)
+            .HasColumnName("securable_id");
+
+        entity.HasOne(e => e.Securable);
     }
 }

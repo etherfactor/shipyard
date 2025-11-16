@@ -23,7 +23,11 @@ public class User : InternalUser<Guid>, IEntity, IAuditable
 
     public virtual List<Role> Roles { get; set; } = [];
 
-    public virtual Guid PrincipalId { get; init; }
+    public virtual Guid PrincipalId { get; set; }
 
-    public virtual Principal Principal { get; init; } = new() { Type = Enums.PrincipalType.User };
+    public virtual Principal Principal { get; set; } = new() { Type = Enums.PrincipalType.User };
+
+    public virtual Guid SecurableId { get; set; }
+
+    public virtual Securable Securable { get; set; } = new() { Type = Enums.SecurableType.User };
 }
