@@ -38,6 +38,13 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         entity.Ignore(e => e.Password);
 
+        entity.Property(e => e.GroupId)
+            .HasColumnName("group_id");
+
+        entity.HasOne(e => e.Group)
+            .WithMany(e => e.Users)
+            .HasForeignKey(e => e.GroupId);
+
         entity.HasMany(e => e.Roles)
             .WithMany(e => e.Users)
             .UsingEntity<RoleUser>();

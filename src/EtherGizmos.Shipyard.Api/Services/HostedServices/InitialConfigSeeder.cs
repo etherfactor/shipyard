@@ -32,12 +32,30 @@ public class InitialConfigSeeder : IHostedService
         {
             if (user is null)
             {
-                user ??= new User();
+                user = new User();
                 userRepo.Create(user);
             }
 
             user.Username = username;
             user.Password = password;
+        }
+
+        var groupRepo = uow.Repository<Group>();
+        var group = await groupRepo.Data
+            .SingleOrDefaultAsync(e => e.SystemId == new Guid("86c51dd9-c62d-49a5-9fa1-87dbd5a95cb5"), cancellationToken: cancellationToken);
+        if (group is null)
+        {
+            group = new Group()
+            {
+                Name = "Default",
+                SystemId = new Guid("86c51dd9-c62d-49a5-9fa1-87dbd5a95cb5"),
+            };
+            groupRepo.Create(group);
+        }
+
+        if (user is not null)
+        {
+            user.Group ??= group;
         }
 
         var roleRepo = uow.Repository<Role>();
@@ -47,7 +65,7 @@ public class InitialConfigSeeder : IHostedService
             .SingleOrDefaultAsync(e => e.SystemId == new Guid("1706f63d-9bc5-4251-bf61-a50d5c705e08"), cancellationToken: cancellationToken);
         if (admin is null)
         {
-            admin ??= new Role()
+            admin = new Role()
             {
                 SystemId = new Guid("1706f63d-9bc5-4251-bf61-a50d5c705e08"),
             };
@@ -86,6 +104,22 @@ public class InitialConfigSeeder : IHostedService
             {
                 nowAdmin.Roles.Add(admin);
             }
+        }
+
+        await uow.SaveChangesAsync(cancellationToken);
+
+        await userRepo.Data
+            .Where(e => e.GroupId == null)
+            .ExecuteUpdateAsync(e => e.SetProperty(e => e.GroupId, _ => group.Id), cancellationToken: cancellationToken);
+
+        var packageRepo = uow.Repository<Package>();
+        var missingGroups = await packageRepo.Data
+            .Where(e => e.GroupId == null)
+            .Include(e => e.CreatedByUser)
+            .ToListAsync(cancellationToken: cancellationToken);
+        foreach (var package in missingGroups)
+        {
+            package.GroupId = package.CreatedByUser?.GroupId;
         }
 
         await uow.SaveChangesAsync(cancellationToken);

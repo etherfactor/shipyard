@@ -6,4 +6,5 @@ public enum SecurableType
     Package = 20,
     User = 100,
     Role = 110,
+    Group = 120,
 }

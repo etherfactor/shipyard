@@ -34,6 +34,8 @@ public class ApplicationContext : DbContext
 
     public virtual DbSet<CarrierExecutionArtifact> CarrierExecutionArtifacts { get; set; }
 
+    public virtual DbSet<Group> Groups { get; set; }
+
     public virtual DbSet<Package> Packages { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }

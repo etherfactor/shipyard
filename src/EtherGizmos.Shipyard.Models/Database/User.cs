@@ -21,6 +21,10 @@ public class User : InternalUser<Guid>, IEntity, IAuditable
 
     private static readonly IPasswordHasher<User> _hasher = new PasswordHasher<User>();
 
+    public virtual int? GroupId { get; set; }
+
+    public virtual Group Group { get; set; } = null!;
+
     public virtual List<Role> Roles { get; set; } = [];
 
     public virtual Guid PrincipalId { get; set; }
