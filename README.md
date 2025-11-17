@@ -61,7 +61,7 @@ Values in `.env` will override those in `compose.yml`.
 | SHIPYARD_SIGN_CRT           | TEMP; if Text, signing public key (.crt)             | (a certificate)                       |
 | SHIPYARD_SIGN_KEY           | TEMP; if Text, signing private key (.key)            | (a certificate)                       |
 
-> [!NOTE]
+> [!WARNING]
 > The `SHIPYARD_ENC_CRT`, `SHIPYARD_ENC_KEY`, `SHIPYARD_SIGN_CRT`, and `SHIPYARD_SIGN_KEY` environment variables are deprecated and will be removed in a future release.
 >
 > If you created a custom certificate, merge it into a `.pfx` and move it to `./data/certificates` to be prepared for the removal of these environment variables.
