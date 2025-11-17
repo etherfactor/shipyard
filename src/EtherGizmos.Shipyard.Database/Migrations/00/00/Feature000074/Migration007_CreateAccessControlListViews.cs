@@ -1,4 +1,4 @@
-using EtherGizmos.Shipyard.Migrations.Core;
+﻿using EtherGizmos.Shipyard.Migrations.Core;
 
 namespace EtherGizmos.Shipyard.Migrations._00._00.Feature000074;
 
@@ -75,6 +75,42 @@ public class Migration007_CreateAccessControlListViews : MigrationExtension
               up.permission_id,
               up.permission_grant_type_id
               from user_permissions up;
+            """);
+
+        /*
+         * Create [acl].[user_capabilities]
+         */
+        Execute.Sql("""
+            create view user_capabilities as
+            with user_grants as (
+              select distinct ue.principal_user_id,
+                ue.securable_type_id,
+                ue.permission_id
+                from acl.user_entries ue
+                where ue.securable_type_id is not null
+                  and coalesce( ue.permission_grant_type_id, -1 ) <> -1
+              union
+              select distinct ue.principal_user_id,
+                s.securable_type_id,
+                ue.permission_id
+                from acl.user_entries ue
+                  inner join acl.securables s
+                    on s.securable_id = ue.securable_id
+                where ue.securable_id is not null
+                  and coalesce( ue.permission_grant_type_id, -1 ) <> -1
+            )
+            select u.user_id as principal_user_id,
+              st.securable_type_id,
+              p.permission_id,
+              case when ug.principal_user_id is not null then 1
+                else 0 end as is_allowed
+              from users u
+                cross join acl.securable_types st
+                cross join acl.permissions p
+                left outer join user_grants ug
+                  on ug.principal_user_id = u.user_id
+                    and ug.securable_type_id = st.securable_type_id
+                    and ug.permission_id = p.permission_id;
             """);
     }
 
