@@ -110,11 +110,16 @@ public class Migration008_CreateSecurableAccessViews : MigrationExtension
               p.permission_id,
               p.permission_grant_type_id,
               case when p.permission_grant_type_id = 1 then 1
-                when p.permission_grant_type_id = 2 and r.created_by_user_id = p.principal_user_id then 1
+                when p.permission_grant_type_id = 2 and (
+                  r.created_by_user_id = p.principal_user_id
+                  or r.group_id = u.group_id
+                ) then 1
                	else 0 end as is_grant
               from combined_permissions p
                 inner join packages r
-               	  on r.package_id = p.package_id;
+               	  on r.package_id = p.package_id
+                inner join users u
+                  on u.user_id = p.principal_user_id;
             """);
 
         /*
@@ -165,11 +170,15 @@ public class Migration008_CreateSecurableAccessViews : MigrationExtension
               p.permission_id,
               p.permission_grant_type_id,
               case when p.permission_grant_type_id = 1 then 1
-                when p.permission_grant_type_id = 2 then 1
+                when p.permission_grant_type_id = 2 and (
+                  r.group_id = u.group_id
+                ) then 1
                	else 0 end as is_grant
               from combined_permissions p
                 inner join users r
-               	  on r.user_id = p.user_id;
+               	  on r.user_id = p.user_id
+                inner join users u
+                  on u.user_id = p.principal_user_id;
             """);
 
         /*

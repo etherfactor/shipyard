@@ -264,14 +264,15 @@ public class InitialConfigSeeder : IHostedService
                 grantType: permission.GrantType);
         }
 
-        var missingList = role.Principal.AclEntries
-            .Where(current => !permissions.Any(next =>
-                next.PermissionId == current.PermissionId
-                && next.SecurableType == current.SecurableType
-                && next.SecurableId == current.SecurableId))
+        var desiredKeySet = role.Principal.AclEntries
+            .Select(e => (e.PermissionId, e.SecurableId, e.SecurableType))
+            .ToHashSet();
+
+        var toRemove = role.Principal.AclEntries
+            .Where(e => !desiredKeySet.Contains((e.PermissionId, e.SecurableId, e.SecurableType)))
             .ToList();
 
-        foreach (var missing in missingList)
+        foreach (var missing in toRemove)
         {
             role.Principal.AclEntries.Remove(missing);
         }
