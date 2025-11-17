@@ -27,6 +27,8 @@ public class User : InternalUser<Guid>, IEntity, IAuditable
 
     public virtual List<Role> Roles { get; set; } = [];
 
+    public virtual List<AclUserCapability> Capabilities { get; set; } = [];
+
     public virtual Guid PrincipalId { get; set; }
 
     public virtual Principal Principal { get; set; } = new() { Type = Enums.PrincipalType.User };

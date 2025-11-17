@@ -10,10 +10,10 @@ internal class UserContextModelCacheKeyFactory : IModelCacheKeyFactory
         bool designTime)
     {
         var userContext = ((ApplicationContext)context).UserContext;
-        return new UserContextModelCacheKey(userContext.UserId);
+        return new UserContextModelCacheKey(userContext.UserId is not null);
     }
 }
 
 internal record UserContextModelCacheKey(
-    Guid? UserId
+    bool UserExists
 );

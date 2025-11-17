@@ -28,6 +28,8 @@ public class ApplicationContext : DbContext
 
     public virtual DbSet<AclUser> AclUsers { get; set; }
 
+    public virtual DbSet<AclUserCapability> AclUserCapabilities { get; set; }
+
     public virtual DbSet<Carrier> Carriers { get; set; }
 
     public virtual DbSet<CarrierExecution> CarrierExecutions { get; set; }
@@ -107,14 +109,25 @@ public class ApplicationContext : DbContext
         if (userId is not null)
         {
             modelBuilder.Entity<Package>()
-                .HasQueryFilter(e => AclPackages.Any(e =>
-                    e.PrincipalUserId == userId
-                    && e.PermissionId == PermissionId.Read
-                    && e.IsGrant == 1));
+                .HasQueryFilter(record => AclPackages.Any(acl =>
+                    acl.PrincipalUserId == userId
+                    && acl.PermissionId == PermissionId.Read
+                    && acl.IsGrant == 1
+                    && acl.PackageId == record.Id));
+
+            modelBuilder.Entity<User>()
+                .HasQueryFilter(record => AclUsers.Any(acl =>
+                    acl.PrincipalUserId == userId
+                    && acl.PermissionId == PermissionId.Read
+                    && acl.IsGrant == 1
+                    && acl.UserId == record.Id));
         }
         else
         {
             modelBuilder.Entity<Package>()
+                .HasQueryFilter(e => false);
+
+            modelBuilder.Entity<User>()
                 .HasQueryFilter(e => false);
         }
     }

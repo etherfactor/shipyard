@@ -81,7 +81,7 @@ public class Migration007_CreateAccessControlListViews : MigrationExtension
          * Create [acl].[user_capabilities]
          */
         Execute.Sql("""
-            create view user_capabilities as
+            create view acl.user_capabilities as
             with user_grants as (
               select distinct ue.principal_user_id,
                 ue.securable_type_id,
@@ -117,7 +117,11 @@ public class Migration007_CreateAccessControlListViews : MigrationExtension
     public override void Down()
     {
         Execute.Sql("""
-            drop view acl.users;
+            drop view acl.user_capabilities;
+            """);
+
+        Execute.Sql("""
+            drop view acl.user_entries;
             """);
     }
 }

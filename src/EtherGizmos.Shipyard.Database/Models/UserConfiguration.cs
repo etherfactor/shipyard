@@ -49,6 +49,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .WithMany(e => e.Users)
             .UsingEntity<RoleUser>();
 
+        entity.HasMany(e => e.Capabilities)
+            .WithOne(e => e.PrincipalUser)
+            .HasForeignKey(e => e.PrincipalUserId);
+
         entity.Property(e => e.PrincipalId)
             .HasColumnName("principal_id");
 
