@@ -2,6 +2,7 @@ using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
+using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -22,7 +23,7 @@ public class TrackingResponseConsumer : IMessageConsumer<TrackingResponse>
         IMessageSender sender)
     {
         _logger = logger;
-        _uowFactory = uowFactory;
+        _uowFactory = uowFactory.AsUnfiltered();
         _sender = sender;
     }
 

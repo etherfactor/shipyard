@@ -2,6 +2,7 @@ using EtherGizmos.Common.Extensions;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
+using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
 using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using Microsoft.EntityFrameworkCore;
@@ -44,7 +45,7 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
     {
         _serviceProvider = serviceProvider;
         _logger = serviceProvider.GetRequiredService<ILogger<RunbookBrowserTrackingProvider>>();
-        _uowFactory = serviceProvider.GetRequiredService<IUnitOfWorkFactory>();
+        _uowFactory = serviceProvider.GetRequiredService<IUnitOfWorkFactory>().AsUnfiltered();
         _browserClient = serviceProvider.GetRequiredService<IBrowserClient>();
         _carrierId = carrierId;
         _executionId = executionId;
