@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { DateTime } from 'luxon';
@@ -7,7 +6,6 @@ import { DateTime } from 'luxon';
   selector: 'input-luxon-datetime',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
   ],
   templateUrl: './input-luxon-datetime.component.html',

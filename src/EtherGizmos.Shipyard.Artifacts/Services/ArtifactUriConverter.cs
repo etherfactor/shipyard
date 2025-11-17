@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Abstractions;
+﻿using EtherGizmos.Common.Abstractions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 

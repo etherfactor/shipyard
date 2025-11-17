@@ -1,4 +1,6 @@
-﻿namespace EtherGizmos.Shipyard.Abstractions;
+﻿using EtherGizmos.Common.Abstractions;
+
+namespace EtherGizmos.Shipyard.Abstractions;
 
 public record ArtifactDescriptor(
     ArtifactUri Uri,

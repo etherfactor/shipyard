@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -26,7 +25,6 @@ import { CarrierService } from '../../services/carrier/carrier.service';
 @Component({
   selector: 'app-carrier-detail',
   imports: [
-    CommonModule,
     DetailBoxComponent,
     DetailHeaderComponent,
     FormsModule,

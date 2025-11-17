@@ -1,20 +1,18 @@
-<ng-container *ngIf="placeholder; else noLabel">
-  <div class="floating-label">
-    <input [id]="id"
-           type="datetime-local"
-           [class]="readonly ? 'form-control-plaintext' : 'form-control'"
-           [disabled]="disabled && !readonly"
-           [readonly]="readonly"
-           [(ngModel)]="value" />
-    <label [for]="id">{{placeholder}}</label>
-  </div>
-</ng-container>
-
-<ng-template #noLabel>
+@if (placeholder) {
+<div class="floating-label">
   <input [id]="id"
          type="datetime-local"
          [class]="readonly ? 'form-control-plaintext' : 'form-control'"
          [disabled]="disabled && !readonly"
          [readonly]="readonly"
          [(ngModel)]="value" />
-</ng-template>
+  <label [for]="id">{{placeholder}}</label>
+</div>
+} @else {
+<input [id]="id"
+       type="datetime-local"
+       [class]="readonly ? 'form-control-plaintext' : 'form-control'"
+       [disabled]="disabled && !readonly"
+       [readonly]="readonly"
+       [(ngModel)]="value" />
+}

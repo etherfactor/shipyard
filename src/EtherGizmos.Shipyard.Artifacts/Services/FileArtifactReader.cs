@@ -1,4 +1,5 @@
-﻿using EtherGizmos.Shipyard.Abstractions;
+﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Models;
 using Microsoft.EntityFrameworkCore;
 using System.IO.Compression;
