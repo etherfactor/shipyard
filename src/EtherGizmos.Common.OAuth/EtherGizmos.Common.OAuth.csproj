@@ -24,4 +24,8 @@
     <ProjectReference Include="..\EtherGizmos.Common.Utilities\EtherGizmos.Common.Utilities.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\Pipeline\OAuth2\" />
+  </ItemGroup>
+
 </Project>

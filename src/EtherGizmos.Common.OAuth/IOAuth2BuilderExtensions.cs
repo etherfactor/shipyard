@@ -4,11 +4,13 @@ using EtherGizmos.Common.Extensions;
 using EtherGizmos.Common.Models;
 using EtherGizmos.Common.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace EtherGizmos.Common;
@@ -134,6 +136,27 @@ public static class IOAuth2BuilderExtensions
         @this.Builder.Services.AddHttpContextAccessor();
         @this.Builder.Services.TryAddSingleton<IUserContext, UserContext>();
 
+        @this.Builder.Services.TryAddSingleton<IOAuth2PrincipalFactory, OAuth2PrincipalFactory>();
+
+        var userTypes = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(assembly => { try { return assembly.GetTypes(); } catch { return []; } })
+            .Where(type => type.IsAssignableTo(typeof(IUser)));
+
+        foreach (var type in userTypes)
+        {
+            var method = typeof(IOAuth2BuilderExtensions).GetMethod(nameof(AddUser), BindingFlags.NonPublic | BindingFlags.Instance)!
+                .MakeGenericMethod(type);
+
+            method.Invoke(null, [@this.Builder.Services]);
+        }
+
         return @this;
+    }
+
+    private static void AddUser<TUser>(
+        IServiceCollection services)
+        where TUser : class, IUser
+    {
+        services.TryAddSingleton<IUserClaimsPrincipalFactory<TUser>, UserClaimsPrincipalFactory<TUser>>();
     }
 }

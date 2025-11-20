@@ -22,6 +22,6 @@ public class UserContext : IUserContext
         => !string.IsNullOrWhiteSpace(input)
             ? Guid.TryParse(input, out var output)
             ? output
-            : null 
+            : null
             : null;
 }
