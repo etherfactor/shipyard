@@ -29,20 +29,20 @@ export class ConcreteOAuth2Service extends OAuth2Service {
 
     this.initialize();
 
-    effect(() => {
+    effect(async () => {
       const auth = this.$oidc.authenticated();
       const oidcReady = this.oidcReady$$();
 
-      this.$oidc.getAccessToken().subscribe(token => this.accessToken$$.set(token));
-      this.$oidc.getIdToken().subscribe(token => this.idToken$$.set(token));
+      this.accessToken$$.set(await firstValueFrom(this.$oidc.getAccessToken()));
+      this.idToken$$.set(await firstValueFrom(this.$oidc.getIdToken()));
       if (auth.isAuthenticated) {
-        this.$oidc.getPayloadFromIdToken().subscribe(token => this.idTokenData$$.set(token));
-
-        if (oidcReady) {
-          this.onReadyResolve();
-        }
+        this.idTokenData$$.set(await firstValueFrom(this.$oidc.getPayloadFromIdToken()));
       } else {
         this.idTokenData$$.set({});
+      }
+
+      if (oidcReady) {
+        this.onReadyResolve();
       }
     });
   }
