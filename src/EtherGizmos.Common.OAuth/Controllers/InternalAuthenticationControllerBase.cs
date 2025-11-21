@@ -1,12 +1,9 @@
 ﻿using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Common.Extensions;
 using EtherGizmos.Common.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using OpenIddict.Abstractions;
-using System.Security.Claims;
-using static OpenIddict.Abstractions.OpenIddictConstants;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EtherGizmos.Common.Controllers;
 
@@ -15,12 +12,18 @@ namespace EtherGizmos.Common.Controllers;
 public abstract class InternalAuthenticationControllerBase<TUser> : Controller
     where TUser : class, IInternalUser
 {
+    private readonly IInternalUserStore<TUser> _userStore;
+    private readonly ICookiePrincipalFactory<TUser> _principalFactory;
+    private readonly IEnumerable<IUserLoginHandler<TUser>> _loginHandlers;
+
     protected virtual string LoginScheme => CookieAuthenticationDefaults.AuthenticationScheme;
 
     public InternalAuthenticationControllerBase(
         IServiceProvider serviceProvider)
     {
-
+        _userStore = serviceProvider.GetRequiredService<IInternalUserStore<TUser>>();
+        _principalFactory = serviceProvider.GetRequiredService<ICookiePrincipalFactory<TUser>>();
+        _loginHandlers = serviceProvider.GetRequiredService<IEnumerable<IUserLoginHandler<TUser>>>();
     }
 
     [IgnoreAntiforgeryToken]
@@ -47,16 +50,26 @@ public abstract class InternalAuthenticationControllerBase<TUser> : Controller
     {
         if (ModelState.IsValid)
         {
-            var user = await FindUserAsync(model.Username, cancellationToken);
+            var user = await _userStore.FindUserByUsernameAsync(model.Username, cancellationToken);
             if (user is not null)
             {
-                var validated = await ValidatePasswordAsync(user, model.Password, cancellationToken);
+                var validated = await _userStore.ValidatePasswordAsync(user, model.Password, cancellationToken);
                 if (validated)
                 {
-                    var principal = await CreateCookiePrincipalAsync(user, cancellationToken);
+                    var context = CookiePrincipalContext<TUser>
+                        .FromUser(HttpContext, user);
+
+                    var principal = await _principalFactory.CreateAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        context,
+                        cancellationToken);
 
                     await HttpContext.SignInAsync(LoginScheme, principal);
-                    await OnLoginAsync(user, cancellationToken);
+
+                    foreach (var handler in _loginHandlers)
+                    {
+                        await handler.OnLoginAsync(user, cancellationToken);
+                    }
 
                     return LocalRedirect(model.ReturnUrl ?? "/");
                 }
@@ -80,39 +93,39 @@ public abstract class InternalAuthenticationControllerBase<TUser> : Controller
         return LocalRedirect(returnUrl ?? "/");
     }
 
-    protected abstract Task<TUser?> FindUserAsync(
-        string username,
-        CancellationToken cancellationToken = default);
+    //protected abstract Task<TUser?> FindUserAsync(
+    //    string username,
+    //    CancellationToken cancellationToken = default);
 
-    protected abstract string FindSubject(
-        TUser user);
+    //protected abstract string FindSubject(
+    //    TUser user);
 
-    protected abstract Task<bool> ValidatePasswordAsync(
-        TUser user,
-        string password,
-        CancellationToken cancellationToken = default);
+    //protected abstract Task<bool> ValidatePasswordAsync(
+    //    TUser user,
+    //    string password,
+    //    CancellationToken cancellationToken = default);
 
-    protected virtual Task<ClaimsPrincipal> CreateCookiePrincipalAsync(
-        TUser user,
-        CancellationToken cancellationToken = default)
-    {
-        var identity = new ClaimsIdentity(
-            authenticationType: LoginScheme,
-            nameType: Claims.Name,
-            roleType: Claims.Role);
+    //protected virtual Task<ClaimsPrincipal> CreateCookiePrincipalAsync(
+    //    TUser user,
+    //    CancellationToken cancellationToken = default)
+    //{
+    //    var identity = new ClaimsIdentity(
+    //        authenticationType: LoginScheme,
+    //        nameType: Claims.Name,
+    //        roleType: Claims.Role);
 
-        identity.AddClaim(Claims.Subject, FindSubject(user));
-        identity.TryAddClaim(Claims.Name, user.FullName);
-        identity.TryAddClaim(Claims.GivenName, user.GivenName);
-        identity.TryAddClaim(Claims.FamilyName, user.FamilyName);
-        identity.TryAddClaim(Claims.Email, user.EmailAddress);
+    //    identity.AddClaim(Claims.Subject, FindSubject(user));
+    //    identity.TryAddClaim(Claims.Name, user.FullName);
+    //    identity.TryAddClaim(Claims.GivenName, user.GivenName);
+    //    identity.TryAddClaim(Claims.FamilyName, user.FamilyName);
+    //    identity.TryAddClaim(Claims.Email, user.EmailAddress);
 
-        var principal = new ClaimsPrincipal(identity);
-        return Task.FromResult(principal);
-    }
+    //    var principal = new ClaimsPrincipal(identity);
+    //    return Task.FromResult(principal);
+    //}
 
-    protected virtual Task OnLoginAsync(
-        TUser user,
-        CancellationToken cancellationToken = default)
-        => Task.CompletedTask;
+    //protected virtual Task OnLoginAsync(
+    //    TUser user,
+    //    CancellationToken cancellationToken = default)
+    //    => Task.CompletedTask;
 }

@@ -5,7 +5,7 @@ using FluentMigrator;
 namespace EtherGizmos.Shipyard.Migrations._00._00.Feature000074;
 
 [CreatedAt(year: 2025, month: 11, day: 15, hour: 18, minute: 00, description: "Create group tables", trackingId: 74)]
-public class Migration009_CreateGroupTables : AutoReversingMigration
+public class Migration008_CreateGroupTables : AutoReversingMigration
 {
     public override void Up()
     {

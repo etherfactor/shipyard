@@ -3,7 +3,7 @@
 namespace EtherGizmos.Shipyard.Migrations._00._00.Feature000074;
 
 [CreatedAt(year: 2025, month: 11, day: 15, hour: 18, minute: 30, description: "Load security tables for groups", trackingId: 74)]
-public class Migration010_LoadGroupTables : MigrationExtension
+public class Migration009_LoadGroupTables : MigrationExtension
 {
     public override void Up()
     {

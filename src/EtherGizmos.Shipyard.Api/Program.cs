@@ -77,6 +77,12 @@ builder.UseOAuth2()
             .GetSection("Security")
             .Bind(opt);
 
+        opt.ScanAssemblies =
+        [
+            typeof(ApplicationContext).Assembly,
+            typeof(User).Assembly,
+        ];
+
         opt.Cookie.LoginUrl = "/account/login";
         opt.Cookie.LogoutUrl = "/account/logout";
     });

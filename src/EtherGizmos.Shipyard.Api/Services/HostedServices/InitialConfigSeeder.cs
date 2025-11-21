@@ -1,6 +1,7 @@
 ﻿using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
+using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace EtherGizmos.Shipyard.Api.Services.HostedServices;
@@ -15,7 +16,7 @@ public class InitialConfigSeeder : IHostedService
         IUnitOfWorkFactory uowFactory)
     {
         _configuration = configuration;
-        _uowFactory = uowFactory;
+        _uowFactory = uowFactory.AsUnfiltered();
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)

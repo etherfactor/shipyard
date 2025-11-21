@@ -3,8 +3,9 @@ using EtherGizmos.Common.Configuration;
 using EtherGizmos.Common.Extensions;
 using EtherGizmos.Common.Models;
 using EtherGizmos.Common.Services;
+using EtherGizmos.Common.Services.Pipeline.Cookie;
+using EtherGizmos.Common.Services.Pipeline.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -136,27 +137,59 @@ public static class IOAuth2BuilderExtensions
         @this.Builder.Services.AddHttpContextAccessor();
         @this.Builder.Services.TryAddSingleton<IUserContext, UserContext>();
 
-        @this.Builder.Services.TryAddSingleton<IOAuth2PrincipalFactory, OAuth2PrincipalFactory>();
+        @this.Builder.Services.TryAddScoped<IOAuth2PrincipalFactory, OAuth2PrincipalFactory>();
 
-        var userTypes = AppDomain.CurrentDomain.GetAssemblies()
+        @this.Builder.Services.TryAddEnumerable(new ServiceDescriptor(typeof(IClaimsPipelineStep<OAuth2PrincipalContext>), typeof(OAuth2SetSubjectStep), ServiceLifetime.Scoped));
+        @this.Builder.Services.TryAddEnumerable(new ServiceDescriptor(typeof(IClaimsPipelineStep<OAuth2PrincipalContext>), typeof(OAuth2SetScopesStep), ServiceLifetime.Scoped));
+        @this.Builder.Services.TryAddEnumerable(new ServiceDescriptor(typeof(IClaimsPipelineStep<OAuth2PrincipalContext>), typeof(OAuth2SetResourcesStep), ServiceLifetime.Scoped));
+        @this.Builder.Services.TryAddEnumerable(new ServiceDescriptor(typeof(IClaimsPipelineStep<OAuth2PrincipalContext>), typeof(OAuth2SetClientMetadataStep), ServiceLifetime.Scoped));
+        @this.Builder.Services.TryAddEnumerable(new ServiceDescriptor(typeof(IClaimsPipelineStep<OAuth2PrincipalContext>), typeof(OAuth2SetProtocolMetadataStep), ServiceLifetime.Scoped));
+        @this.Builder.Services.TryAddEnumerable(new ServiceDescriptor(typeof(IClaimsPipelineStep<OAuth2PrincipalContext>), typeof(OAuth2ApplyDefaultDestinationsStep), ServiceLifetime.Scoped));
+
+        var assemblies = tempOptions.ScanAssemblies;
+
+        var allTypes = assemblies
             .SelectMany(assembly => { try { return assembly.GetTypes(); } catch { return []; } })
+            .ToList();
+
+        var userTypes = allTypes
+            .Where(type => type.IsClass && !type.IsAbstract && !type.IsGenericType)
             .Where(type => type.IsAssignableTo(typeof(IUser)));
 
         foreach (var type in userTypes)
         {
-            var method = typeof(IOAuth2BuilderExtensions).GetMethod(nameof(AddUser), BindingFlags.NonPublic | BindingFlags.Instance)!
+            var method = typeof(IOAuth2BuilderExtensions)
+                .GetMethod(nameof(AddUser), BindingFlags.NonPublic | BindingFlags.Static)!
                 .MakeGenericMethod(type);
 
-            method.Invoke(null, [@this.Builder.Services]);
+            method.Invoke(null, [@this.Builder.Services, allTypes]);
         }
 
         return @this;
     }
 
     private static void AddUser<TUser>(
-        IServiceCollection services)
+        IServiceCollection services,
+        IEnumerable<Type> allTypes)
         where TUser : class, IUser
     {
-        services.TryAddSingleton<IUserClaimsPrincipalFactory<TUser>, UserClaimsPrincipalFactory<TUser>>();
+        services.TryAddScoped<ICookiePrincipalFactory<TUser>, CookiePrincipalFactory<TUser>>();
+
+        services.TryAddEnumerable(new ServiceDescriptor(typeof(IClaimsPipelineStep<CookiePrincipalContext<TUser>>), typeof(CookieSetSubjectStep<TUser>), ServiceLifetime.Scoped));
+        services.TryAddEnumerable(new ServiceDescriptor(typeof(IClaimsPipelineStep<CookiePrincipalContext<TUser>>), typeof(CookieSetUserProfileStep<TUser>), ServiceLifetime.Scoped));
+
+        services.TryAddEnumerable(new ServiceDescriptor(typeof(IClaimsPipelineStep<OAuth2PrincipalContext>), typeof(OAuth2SetUserProfileStep<TUser>), ServiceLifetime.Scoped));
+
+        var storeTypes = allTypes
+            .Where(type => type.IsClass && !type.IsAbstract && !type.IsGenericType)
+            .Where(type => type.IsAssignableTo(typeof(IUserStore<TUser>)));
+
+        foreach (var type in storeTypes)
+        {
+            services.TryAddScoped(typeof(IUserStore<TUser>), type);
+
+            if (type.IsAssignableTo(typeof(IInternalUserStore<TUser>)))
+                services.TryAddScoped(typeof(IInternalUserStore<TUser>), type);
+        }
     }
 }

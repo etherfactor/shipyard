@@ -10,7 +10,7 @@ internal class OAuth2PrincipalFactory : IOAuth2PrincipalFactory
     public OAuth2PrincipalFactory(
         IEnumerable<IClaimsPipelineStep<OAuth2PrincipalContext>> steps)
     {
-        _steps = steps;
+        _steps = [.. steps.OrderBy(e => e.Order)];
     }
 
     public async Task<ClaimsPrincipal> CreateAsync(
@@ -23,7 +23,7 @@ internal class OAuth2PrincipalFactory : IOAuth2PrincipalFactory
             context = await step.ExecuteAsync(context, cancellationToken);
         }
 
-        var identity = new ClaimsIdentity(context.Claims, authenticationType);
+        var identity = new ClaimsIdentity(context.Identity.Claims, authenticationType);
         return new(identity);
     }
 }

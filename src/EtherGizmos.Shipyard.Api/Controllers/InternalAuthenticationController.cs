@@ -15,39 +15,15 @@ namespace EtherGizmos.Shipyard.Api.Controllers;
 public class InternalAuthenticationController : InternalAuthenticationControllerBase<User>
 {
     private readonly IUnitOfWorkFactory _uowFactory;
-    private readonly IPasswordHasher<User> _passwordHasher;
+    private readonly IPasswordHasher<User> _passwordHasher = new PasswordHasher<User>();
 
     public InternalAuthenticationController(
         IServiceProvider serviceProvider,
-        IUnitOfWorkFactory uowFactory,
-        IPasswordHasher<User> passwordHasher)
+        IUnitOfWorkFactory uowFactory)
         : base(serviceProvider)
     {
         _uowFactory = uowFactory;
-        _passwordHasher = passwordHasher;
     }
-
-    protected override Task<User?> FindUserAsync(
-        string username,
-        CancellationToken cancellationToken = default)
-    {
-        using var uow = _uowFactory.Create(useRequestScope: true);
-        var repo = uow.Repository<User>();
-
-        var user = repo.Data.SingleOrDefaultAsync(e => e.Username == username, cancellationToken: cancellationToken);
-        return user;
-    }
-
-    protected override string FindSubject(
-        User user)
-        => user.Id.ToString();
-
-    protected override Task<bool> ValidatePasswordAsync(
-        User user,
-        string password,
-        CancellationToken cancellationToken = default)
-        => Task.FromResult(
-            _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password) == PasswordVerificationResult.Success);
 
     [HttpGet("change-password")]
     [Authorize(AuthenticationSchemes = AuthorizationConstants.Cookie.AuthenticationScheme)]

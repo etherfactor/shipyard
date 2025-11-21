@@ -14,6 +14,7 @@ export class ConcreteOAuth2Service extends OAuth2Service {
   private readonly $oidc = inject(OidcSecurityService);
   private readonly $router = inject(Router);
 
+  private oidcReady$$ = signal(false);
   private onReadyResolve!: () => void;
   readonly onReady = new Promise<void>((resolve, reject) => {
     this.onReadyResolve = resolve;
@@ -30,11 +31,16 @@ export class ConcreteOAuth2Service extends OAuth2Service {
 
     effect(() => {
       const auth = this.$oidc.authenticated();
+      const oidcReady = this.oidcReady$$();
 
       this.$oidc.getAccessToken().subscribe(token => this.accessToken$$.set(token));
       this.$oidc.getIdToken().subscribe(token => this.idToken$$.set(token));
       if (auth.isAuthenticated) {
         this.$oidc.getPayloadFromIdToken().subscribe(token => this.idTokenData$$.set(token));
+
+        if (oidcReady) {
+          this.onReadyResolve();
+        }
       } else {
         this.idTokenData$$.set({});
       }
@@ -72,7 +78,7 @@ export class ConcreteOAuth2Service extends OAuth2Service {
         ).subscribe(() => {
           //We now have the access token and are ready to go
           this.$logger.information("Found a new access token");
-          this.onReadyResolve();
+          this.oidcReady$$.set(true);
         });
       }
     } else {
@@ -80,7 +86,7 @@ export class ConcreteOAuth2Service extends OAuth2Service {
       await firstValueFrom(this.$oidc.checkAuth());
 
       //There's no session, so we can start whenever
-      this.onReadyResolve();
+      this.oidcReady$$.set(true);
     }
   }
 

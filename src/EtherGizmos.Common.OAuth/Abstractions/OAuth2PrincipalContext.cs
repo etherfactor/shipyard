@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using OpenIddict.Abstractions;
-using System.Collections.Immutable;
 using System.Security.Claims;
 
 namespace EtherGizmos.Common.Abstractions;
@@ -12,7 +11,7 @@ public record OAuth2PrincipalContext(
     UpstreamPrincipal UpstreamPrincipal)
     : IClaimsContext
 {
-    public ImmutableArray<Claim> Claims { get; init; } = ImmutableArray<Claim>.Empty;
+    public ClaimsIdentity Identity { get; init; } = new();
 
     public static OAuth2PrincipalContext FromAuthorizeEndpoint(
         HttpContext httpContext,
@@ -82,12 +81,4 @@ public record OAuth2PrincipalContext(
             Request: cmpRequest,
             UpstreamPrincipal: cmpPrincipal);
     }
-
-    public OAuth2PrincipalContext WithClaim(
-        Claim claim)
-        => this with { Claims = Claims.Add(claim) };
-
-    public OAuth2PrincipalContext WithClaims(
-        IEnumerable<Claim> claims)
-        => this with { Claims = Claims.AddRange(claims) };
 }

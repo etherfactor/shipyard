@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 namespace EtherGizmos.Common.Configuration;
 
@@ -7,6 +8,8 @@ public class AuthorizationServerOptions
     public CookieOptions Cookie { get; set; } = new();
 
     public OAuth2Options OAuth2 { get; set; } = new();
+
+    public List<Assembly> ScanAssemblies { get; set; } = [];
 
     public class CookieOptions
     {

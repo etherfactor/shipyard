@@ -2,8 +2,8 @@
 
 namespace EtherGizmos.Shipyard.Migrations._00._00.Feature000074;
 
-[CreatedAt(year: 2025, month: 11, day: 13, hour: 18, minute: 20, description: "Create securable access views", trackingId: 74)]
-public class Migration008_CreateSecurableAccessViews : MigrationExtension
+[CreatedAt(year: 2025, month: 11, day: 20, hour: 18, minute: 00, description: "Create securable access views", trackingId: 74)]
+public class Migration010_CreateSecurableAccessViews : MigrationExtension
 {
     public override void Up()
     {
