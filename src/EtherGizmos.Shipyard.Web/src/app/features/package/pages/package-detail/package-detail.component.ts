@@ -12,6 +12,9 @@ import { getDirtyFormValues, TypedFormGroup } from '../../../../shared/utilities
 import { NavbarAction } from '../../../app/components/navbar-action/navbar-action.component';
 import { Carrier } from '../../../carrier/models/carrier';
 import { CarrierService } from '../../../carrier/services/carrier/carrier.service';
+import { UserSessionService } from '../../../login/services/user-session/user-session.service';
+import { PermissionId } from '../../../security/models/permission-id';
+import { SecurableType } from '../../../security/models/securable-type';
 import { Package, PackageF, packageForm } from '../../models/package';
 import { getStatusTypeMetadata, StatusType } from '../../models/status-type';
 import { PackageService } from '../../services/package/package.service';
@@ -37,6 +40,7 @@ export class PackageDetailComponent implements OnInit {
   private readonly $navbarAction = inject(NavbarActionService);
   private readonly $route = inject(ActivatedRoute);
   private readonly $router = inject(Router);
+  private readonly $session = inject(UserSessionService);
 
   readonly id$$ = signal<number | undefined>(undefined);
   readonly package$$ = signal<Package | undefined>(undefined);
@@ -55,25 +59,30 @@ export class PackageDetailComponent implements OnInit {
     const record = this.package$$();
 
     if (!this.isLoading$$()) {
-      if (this.id$$() && !record?.isDelivered) {
-        actions.push({
-          icon: "bi-arrow-repeat",
-          label: "Repoll",
-          callback: this.onRepoll,
-        });
-      }
-
+      const hasWrite = this.$session.hasCapability(SecurableType.Package, PermissionId.Write);
+      const hasDelete = this.$session.hasCapability(SecurableType.Package, PermissionId.Delete);
       if (!this.isEditing$$()) {
-        actions.push({
-          icon: "bi-pencil",
-          label: "Edit",
-          callback: this.onEdit,
-        });
-        actions.push({
-          icon: "bi-trash",
-          label: "Delete",
-          callback: this.onDelete,
-        });
+        if (this.id$$() && !record?.isDelivered && hasWrite) {
+          actions.push({
+            icon: "bi-arrow-repeat",
+            label: "Repoll",
+            callback: this.onRepoll,
+          });
+        }
+        if (hasWrite) {
+          actions.push({
+            icon: "bi-pencil",
+            label: "Edit",
+            callback: this.onEdit,
+          });
+        }
+        if (hasDelete) {
+          actions.push({
+            icon: "bi-trash",
+            label: "Delete",
+            callback: this.onDelete,
+          });
+        }
       } else {
         actions.push({
           icon: "bi-save",

@@ -17,7 +17,7 @@ public class AclUserCapabilityConfiguration : IEntityTypeConfiguration<AclUserCa
             .HasColumnName("principal_user_id");
 
         entity.Property(e => e.SecurableType)
-            .HasColumnName("securable_type");
+            .HasColumnName("securable_type_id");
 
         entity.Property(e => e.PermissionId)
             .HasColumnName("permission_id");

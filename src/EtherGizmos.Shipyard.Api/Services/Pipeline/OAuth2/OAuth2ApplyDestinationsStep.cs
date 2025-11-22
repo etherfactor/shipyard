@@ -3,11 +3,11 @@ using OpenIddict.Abstractions;
 using System.Security.Claims;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace EtherGizmos.Common.Services.Pipeline.OAuth2;
+namespace EtherGizmos.Shipyard.Api.Services.Pipeline.OAuth2;
 
-internal class OAuth2ApplyDefaultDestinationsStep : IClaimsPipelineStep<OAuth2PrincipalContext>
+public class OAuth2ApplyDestinationsStep : IClaimsPipelineStep<OAuth2PrincipalContext>
 {
-    public int Order => 900;
+    public int Order => 950;
 
     public Task<OAuth2PrincipalContext> ExecuteAsync(
         OAuth2PrincipalContext context,
@@ -28,6 +28,8 @@ internal class OAuth2ApplyDefaultDestinationsStep : IClaimsPipelineStep<OAuth2Pr
             case Claims.GivenName:
             case Claims.Name:
             case Claims.Subject:
+            case Claims.Username:
+            case "cap":
                 yield return Destinations.AccessToken;
                 yield return Destinations.IdentityToken;
                 yield break;

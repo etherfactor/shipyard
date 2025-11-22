@@ -1,4 +1,7 @@
 import { ExtendedRoute } from "../../app.routes";
+import { authorizationGuard } from "../../shared/guards/authorization/authorization.guard";
+import { PermissionId } from "../security/models/permission-id";
+import { SecurableType } from "../security/models/securable-type";
 
 export const USER_ROUTES: ExtendedRoute[] = [
   {
@@ -6,6 +9,9 @@ export const USER_ROUTES: ExtendedRoute[] = [
     pathMatch: "full",
     loadComponent: () => import("./pages/user-list/user-list.component").then(m => m.UserListComponent),
     title: "Shipyard | User List",
+    canActivate: [
+      authorizationGuard(SecurableType.User, PermissionId.Read),
+    ],
     data: {
       breadcrumb: {
         label: "User List",
@@ -19,6 +25,10 @@ export const USER_ROUTES: ExtendedRoute[] = [
     pathMatch: "full",
     loadComponent: () => import("./pages/user-detail/user-detail.component").then(m => m.UserDetailComponent),
     title: "Shipyard | New User",
+    canActivate: [
+      authorizationGuard(SecurableType.User, PermissionId.Read),
+      authorizationGuard(SecurableType.User, PermissionId.Write),
+    ],
     data: {
       breadcrumb: {
         label: "New User",
@@ -37,6 +47,9 @@ export const USER_ROUTES: ExtendedRoute[] = [
     pathMatch: "full",
     loadComponent: () => import("./pages/user-detail/user-detail.component").then(m => m.UserDetailComponent),
     title: "Shipyard | User #:userId",
+    canActivate: [
+      authorizationGuard(SecurableType.User, PermissionId.Read),
+    ],
     data: {
       breadcrumb: {
         label: "User #{userId}",

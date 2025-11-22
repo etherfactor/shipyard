@@ -104,31 +104,20 @@ public class ApplicationContext : DbContext
         //**********************************************************
         // Add Query Filters
 
-        var userId = _userContext.UserId;
+        modelBuilder.Entity<Package>()
+            .HasQueryFilter(record => AclPackages.Any(acl =>
+                _userContext.UserId != null
+                && acl.PrincipalUserId == _userContext.UserId
+                && acl.PermissionId == PermissionId.Read
+                && acl.IsGrant == 1
+                && acl.PackageId == record.Id));
 
-        if (userId is not null)
-        {
-            modelBuilder.Entity<Package>()
-                .HasQueryFilter(record => AclPackages.Any(acl =>
-                    acl.PrincipalUserId == userId
-                    && acl.PermissionId == PermissionId.Read
-                    && acl.IsGrant == 1
-                    && acl.PackageId == record.Id));
-
-            modelBuilder.Entity<User>()
-                .HasQueryFilter(record => AclUsers.Any(acl =>
-                    acl.PrincipalUserId == userId
-                    && acl.PermissionId == PermissionId.Read
-                    && acl.IsGrant == 1
-                    && acl.UserId == record.Id));
-        }
-        else
-        {
-            modelBuilder.Entity<Package>()
-                .HasQueryFilter(e => false);
-
-            modelBuilder.Entity<User>()
-                .HasQueryFilter(e => false);
-        }
+        modelBuilder.Entity<User>()
+            .HasQueryFilter(record => AclUsers.Any(acl =>
+                _userContext.UserId != null
+                && acl.PrincipalUserId == _userContext.UserId
+                && acl.PermissionId == PermissionId.Read
+                && acl.IsGrant == 1
+                && acl.UserId == record.Id));
     }
 }

@@ -10,6 +10,9 @@ import { TableComponent } from '../../../../shared/components/table/table.compon
 import { Bound } from '../../../../shared/utilities/bound/bound.util';
 import { SortColumn } from '../../../../shared/utilities/sort/sort.util';
 import { NavbarAction } from '../../../app/components/navbar-action/navbar-action.component';
+import { UserSessionService } from '../../../login/services/user-session/user-session.service';
+import { PermissionId } from '../../../security/models/permission-id';
+import { SecurableType } from '../../../security/models/securable-type';
 import { Package } from '../../models/package';
 import { getStatusTypeMetadata, StatusType } from '../../models/status-type';
 import { PackageService } from '../../services/package/package.service';
@@ -31,6 +34,7 @@ export class PackageListComponent extends ListComponent<Package> {
 
   private readonly $package = inject(PackageService);
   private readonly $router = inject(Router);
+  private readonly $session = inject(UserSessionService);
 
   override readonly perPage: number = 10;
 
@@ -45,15 +49,18 @@ export class PackageListComponent extends ListComponent<Package> {
     ];
 
     if (!this.isLoading()) {
+      const hasWrite = this.$session.hasCapability(SecurableType.Package, PermissionId.Write);
       //actions.push({
       //  icon: 'bi-layout-three-columns',
       //  label: 'Edit Columns',
       //});
-      actions.push({
-        icon: 'bi-plus-square',
-        label: 'Add',
-        callback: this.new,
-      });
+      if (hasWrite) {
+        actions.push({
+          icon: 'bi-plus-square',
+          label: 'Add',
+          callback: this.new,
+        });
+      }
     }
 
     return actions;

@@ -2,9 +2,9 @@
 
 public static class PermissionId
 {
-    public const int Read = 10;
+    public const int Read = 1;
 
-    public const int Write = 20;
+    public const int Write = 2;
 
-    public const int Delete = 30;
+    public const int Delete = 4;
 }

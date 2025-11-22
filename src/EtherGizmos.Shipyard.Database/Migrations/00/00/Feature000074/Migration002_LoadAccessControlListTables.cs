@@ -11,9 +11,9 @@ public class Migration002_LoadAccessControlListTables : MigrationExtension
          * Load [acl].[permissions]
          */
         Merge.IntoTable("permissions").InSchema("acl")
-            .Row(new { permission_id = 10, name = "Read", description = "Enables the reading of records." })
-            .Row(new { permission_id = 20, name = "Write", description = "Enables the creation and updating of records." })
-            .Row(new { permission_id = 30, name = "Delete", description = "Enables the deletion of records." })
+            .Row(new { permission_id = 1, name = "Read", description = "Enables the reading of records." })
+            .Row(new { permission_id = 2, name = "Write", description = "Enables the creation and updating of records." })
+            .Row(new { permission_id = 4, name = "Delete", description = "Enables the deletion of records." })
             .Match(e => new { e.permission_id });
 
         /*
