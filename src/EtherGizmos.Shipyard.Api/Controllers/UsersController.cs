@@ -1,13 +1,13 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
 using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Api.Services.Security;
 using EtherGizmos.Shipyard.Database;
-using EtherGizmos.Shipyard.Extensions;
+using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace EtherGizmos.Shipyard.Api.Controllers;
@@ -31,6 +31,7 @@ public class UsersController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute)]
+    [HasCapability(SecurableType.User, PermissionId.Read)]
     [ProducesResponseSet]
     [ProducesResponseType(200, Type = typeof(UserDTO)), SwaggerResponseExample(200, typeof(UserDTOExampleGet))]
     public Task<IActionResult> Search(
@@ -41,6 +42,7 @@ public class UsersController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute + "({id})")]
+    [HasCapability(SecurableType.User, PermissionId.Read)]
     [ProducesResponseType(200, Type = typeof(UserDTO)), SwaggerResponseExample(200, typeof(UserDTOExampleGet))]
     public Task<IActionResult> Get(
         Guid id,
@@ -51,6 +53,7 @@ public class UsersController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpPost(BaseRoute)]
+    [HasCapability(SecurableType.User, PermissionId.Write)]
     [Consumes(typeof(UserDTO), "application/json"), SwaggerRequestExample(typeof(UserDTO), typeof(UserDTOExamplePost))]
     [ProducesResponseType(200, Type = typeof(UserDTO)), SwaggerResponseExample(200, typeof(UserDTOExamplePost))]
     public Task<IActionResult> Create(
@@ -62,6 +65,7 @@ public class UsersController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpPatch(BaseRoute + "({id})")]
+    [HasCapability(SecurableType.User, PermissionId.Write)]
     [Consumes(typeof(UserDTO), "application/json"), SwaggerRequestExample(typeof(UserDTO), typeof(UserDTOExamplePatch))]
     [ProducesResponseType(200, Type = typeof(UserDTO)), SwaggerResponseExample(200, typeof(UserDTOExampleGet))]
     public Task<IActionResult> Patch(
@@ -74,35 +78,13 @@ public class UsersController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpDelete(BaseRoute + "({id})")]
+    [HasCapability(SecurableType.User, PermissionId.Delete)]
     [ProducesResponseType(204)]
     public Task<IActionResult> Delete(
         Guid id,
         CancellationToken cancellationToken = default)
         => ForItem(id)
             .DeleteAsync(cancellationToken);
-
-    [ApiVersion(1.0)]
-    [HttpGet("api/v{version:apiVersion}/findUpdatedUsers")]
-    [ProducesResponseSet]
-    [ProducesResponseType(200, Type = typeof(UserDTO)), SwaggerResponseExample(200, typeof(UserDTOExampleGet))]
-    public async Task<IActionResult> FindUpdatedUsers(
-        ODataQueryOptions<UserDTO> queryOptions,
-        CancellationToken cancellationToken = default)
-    {
-        using var uow = _uowFactory.Create(useRequestScope: true);
-        var userRepo = uow.Repository<User>();
-
-        var dbData = await userRepo.Data
-            .Take(queryOptions.Top.Value)
-            .ToListAsync(cancellationToken: cancellationToken);
-
-        var data = await _mapper.MapExplicitly(dbData.AsQueryable())
-            .To<UserDTO>()
-            .ApplyQueryOptions(queryOptions)
-            .ExecuteAsync(cancellationToken);
-
-        return Ok(data);
-    }
 
     private IKeylessRequestBuilder<User, UserDTO> ForSet()
         => ForSet<User, UserDTO>();

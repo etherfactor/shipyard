@@ -3,6 +3,7 @@ using AutoMapper;
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Api.Services.Security;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Extensions;
@@ -41,6 +42,7 @@ public class PackagesController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute)]
+    [HasCapability(SecurableType.Package, PermissionId.Read)]
     [ProducesResponseSet]
     [ProducesResponseType(200, Type = typeof(PackageDTO)), SwaggerResponseExample(200, typeof(PackageDTOExampleGet))]
     public Task<IActionResult> Search(
@@ -51,6 +53,7 @@ public class PackagesController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute + "({id})")]
+    [HasCapability(SecurableType.Package, PermissionId.Read)]
     [ProducesResponseType(200, Type = typeof(PackageDTO)), SwaggerResponseExample(200, typeof(PackageDTOExampleGet))]
     public Task<IActionResult> Get(
         int id,
@@ -61,6 +64,7 @@ public class PackagesController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpPost(BaseRoute)]
+    [HasCapability(SecurableType.Package, PermissionId.Write)]
     [Consumes(typeof(PackageDTO), "application/json"), SwaggerRequestExample(typeof(PackageDTO), typeof(PackageDTOExamplePost))]
     [ProducesResponseType(200, Type = typeof(PackageDTO)), SwaggerResponseExample(200, typeof(PackageDTOExamplePost))]
     public Task<IActionResult> Create(
@@ -72,6 +76,7 @@ public class PackagesController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpPatch(BaseRoute + "({id})")]
+    [HasCapability(SecurableType.Package, PermissionId.Write)]
     [Consumes(typeof(PackageDTO), "application/json"), SwaggerRequestExample(typeof(PackageDTO), typeof(PackageDTOExamplePatch))]
     [ProducesResponseType(200, Type = typeof(PackageDTO)), SwaggerResponseExample(200, typeof(PackageDTOExampleGet))]
     public Task<IActionResult> Patch(
@@ -84,6 +89,7 @@ public class PackagesController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpDelete(BaseRoute + "({id})")]
+    [HasCapability(SecurableType.Package, PermissionId.Delete)]
     [ProducesResponseType(204)]
     public Task<IActionResult> Delete(
         int id,
@@ -93,6 +99,7 @@ public class PackagesController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpGet("api/v{version:apiVersion}/findUpdatedPackages")]
+    [HasCapability(SecurableType.Package, PermissionId.Read)]
     [ProducesResponseSet]
     [ProducesResponseType(200, Type = typeof(PackageDTO)), SwaggerResponseExample(200, typeof(PackageDTOExampleGet))]
     public async Task<IActionResult> FindUpdatedPackages(
@@ -118,6 +125,7 @@ public class PackagesController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpPost(BaseRoute + "({id})" + "/schedulePoll")]
+    [HasCapability(SecurableType.Package, PermissionId.Write)]
     [ProducesResponseType(202)]
     public async Task<IActionResult> SchedulePoll(
         int id,
