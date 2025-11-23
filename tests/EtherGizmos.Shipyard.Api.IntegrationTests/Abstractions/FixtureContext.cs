@@ -21,7 +21,7 @@ public static class FixtureContextExtensions
     public static HttpClient GetClientWithCapabilities(
         this FixtureContext @this,
         string subject,
-        string capabilities = "Carrier=7;Package=7;User=7;Role=7;Group=7")
+        string capabilities = "Carrier:7;Package:7;User:7;Role:7;Group:7")
     {
         return @this.GetClient(new(subject)
         {

@@ -11,7 +11,7 @@ partial class Error
         {
             private const string _message = "You lack the necessary permissions to perform this action.";
 
-            public override HttpStatusCode StatusCode => HttpStatusCode.Unauthorized;
+            public override HttpStatusCode StatusCode => HttpStatusCode.Forbidden;
 
             public MissingPermissionError()
                 : base(ErrorConstants.Code.Authorization.MissingPermission,

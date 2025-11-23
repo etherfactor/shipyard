@@ -1,16 +1,12 @@
-﻿using EtherGizmos.Shipyard.Abstractions;
-using EtherGizmos.Shipyard.Api.Errors;
-using EtherGizmos.Shipyard.Database;
+﻿using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Database.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
-using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace EtherGizmos.Shipyard.Api.Services.Security;
 
-public class HasCapabilityFilter : IAsyncAuthorizationFilter
+public class HasCapabilityFilter : IAuthorizationFilter
 {
     private readonly SecurableType _securableType;
     private readonly int _permissionId;
@@ -23,29 +19,25 @@ public class HasCapabilityFilter : IAsyncAuthorizationFilter
         _permissionId = permissionId;
     }
 
-    public async Task OnAuthorizationAsync(
+    public void OnAuthorization(
         AuthorizationFilterContext context)
     {
         var httpUser = context.HttpContext.User;
         if (httpUser is not null)
         {
-            var services = context.HttpContext.RequestServices;
-            var uowFactory = services.GetRequiredService<IUnitOfWorkFactory>();
-
-            using var uow = uowFactory.Create(context.HttpContext.RequestServices);
-            var userRepo = uow.Repository<User>();
-
-            var subject = httpUser.GetClaim(Claims.Subject);
-            if (Guid.TryParse(subject, out var userId))
+            var capabilities = httpUser.GetClaim("cap");
+            if (capabilities is not null)
             {
-                var user = await userRepo.Data
-                    .SingleOrDefaultAsync(e => e.Id == userId);
+                var section = capabilities.Split(';')
+                    .SingleOrDefault(e => e.StartsWith($"{_securableType}:"));
 
-                if (user is not null)
+                if (section is not null)
                 {
-                    if (user.Capabilities.Any(e => e.SecurableType == _securableType && e.PermissionId == _permissionId))
+                    var value = int.Parse(section.Split(':')[1]);
+
+                    //The user has the permission. Bitwise AND checks that both numbers share at least one bit
+                    if ((_permissionId & value) != 0)
                     {
-                        //The user has the capability
                         return;
                     }
                 }
