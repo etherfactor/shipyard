@@ -1,4 +1,5 @@
 ﻿using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,6 +16,8 @@ public class GroupConfiguration : IEntityTypeConfiguration<Group>
 
         entity.Property(e => e.Id)
             .HasColumnName("group_id");
+
+        entity.AuditProperties();
 
         entity.Property(e => e.Name)
             .HasColumnName("name");

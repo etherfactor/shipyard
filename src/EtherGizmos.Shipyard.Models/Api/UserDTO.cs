@@ -28,6 +28,10 @@ public class UserDTO
     public string? FamilyName { get; set; }
 
     public string? FullName { get; set; }
+
+    public int GroupId { get; set; }
+
+    public GroupDTO Group { get; set; } = null!;
 }
 
 public class UserDTOProfile : Profile
@@ -47,6 +51,8 @@ public class UserDTOProfile : Profile
         toDto.MapMember(dest => dest.GivenName, src => src.GivenName);
         toDto.MapMember(dest => dest.FamilyName, src => src.FamilyName);
         toDto.MapMember(dest => dest.FullName, src => src.FullName);
+        toDto.MapMember(dest => dest.GroupId, src => src.GroupId);
+        toDto.MapMember(dest => dest.Group, src => src.Group, opt => opt.ExplicitExpansion());
 
         var fromDto = mapper.CreateMap<UserDTO, User>();
         fromDto.IgnoreAllMembers();
@@ -66,7 +72,12 @@ public static class UserDTOExamples
 {
     public static UserDTO Get { get; } = new()
     {
-
+        Id = Guid.NewGuid(),
+        CreatedAt = DateTimeOffset.UtcNow,
+        ModifiedAt = DateTimeOffset.UtcNow,
+        Username = "admin",
+        Password = "***",
+        GroupId = 1,
     };
 
     public static UserDTO Post { get; } = Get;

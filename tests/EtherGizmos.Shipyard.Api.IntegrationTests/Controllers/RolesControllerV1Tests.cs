@@ -3,22 +3,26 @@ using EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Aspects;
 
 namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers;
 
-internal class TrackingUpdatesControllerV1Tests : ODataControllerTestsBase<TrackingUpdateDTO, int>
+internal class RolesControllerV1Tests : ODataControllerTestsBase<RoleDTO, int>
 {
-    private static readonly IODataResourceSpec<TrackingUpdateDTO, int> _specification = new TrackingUpdatesControllerV1Spec();
+    private static readonly IODataResourceSpec<RoleDTO, int> _specification = new RolesControllerV1Spec();
     private static readonly FixtureContext _context = new(() => Setup.Client, new JwtTokenMinter());
 
-    protected override IODataResourceSpec<TrackingUpdateDTO, int> Specification => _specification;
+    protected override IODataResourceSpec<RoleDTO, int> Specification => _specification;
 
     public static IEnumerable<AspectCase> All
     {
         get
         {
-            var aspects = new IAspect<TrackingUpdateDTO, int>[] {
-                new SearchAuthenticationAspect<TrackingUpdateDTO, int>(),
+            var aspects = new IAspect<RoleDTO, int>[] {
+                new SearchAuthenticationAspect<RoleDTO, int>(),
+                new SearchConformanceAspect<RoleDTO, int>(),
+                new SearchSelectOptionAspect<RoleDTO, int>(),
 
-                new GetAuthenticationAspect<TrackingUpdateDTO, int>(),
-                new GetRecordNotFoundAspect<TrackingUpdateDTO, int>(),
+                new GetAuthenticationAspect<RoleDTO, int>(),
+                new GetConformanceAspect<RoleDTO, int>(),
+                new GetRecordNotFoundAspect<RoleDTO, int>(),
+                new GetSelectOptionAspect<RoleDTO, int>(),
             };
 
             foreach (var aspect in aspects)
@@ -34,27 +38,27 @@ internal class TrackingUpdatesControllerV1Tests : ODataControllerTestsBase<Track
     [TestCaseSource(nameof(All))]
     public async Task Aspect(AspectCase c) => await c.TestAsync(_context);
 
-    private class TrackingUpdatesControllerV1Source : IRecordSource<TrackingUpdateDTO, int>
+    private class RolesControllerV1Source : IRecordSource<RoleDTO, int>
     {
-        private readonly IODataResourceSpec<TrackingUpdateDTO, int> _specification;
+        private readonly IODataResourceSpec<RoleDTO, int> _specification;
 
-        public TrackingUpdatesControllerV1Source(
-            IODataResourceSpec<TrackingUpdateDTO, int> specification)
+        public RolesControllerV1Source(
+            IODataResourceSpec<RoleDTO, int> specification)
         {
             _specification = specification;
         }
 
-        public Task<(TrackingUpdateDTO Entity, int Id)> AcquireAsync(
+        public Task<(RoleDTO Entity, int Id)> AcquireAsync(
             FixtureContext context,
             AcquirePurpose purpose)
         {
-            return Task.FromResult((new TrackingUpdateDTO(), 1));
+            return Task.FromResult((new RoleDTO(), 1));
         }
     }
 
-    private class TrackingUpdatesControllerV1Spec : IODataResourceSpec<TrackingUpdateDTO, int>
+    private class RolesControllerV1Spec : IODataResourceSpec<RoleDTO, int>
     {
-        public string BaseRoute => "api/v1/trackingUpdates";
+        public string BaseRoute => "api/v1/roles";
 
         public IReadOnlySet<ODataCapability> Capabilities =>
             new HashSet<ODataCapability>()
@@ -70,14 +74,14 @@ internal class TrackingUpdatesControllerV1Tests : ODataControllerTestsBase<Track
                 ODataCapability.QueryTop,
             };
 
-        public Func<TrackingUpdateDTO, int> Identity => carrier => carrier.Id;
+        public Func<RoleDTO, int> Identity => carrier => carrier.Id;
 
         public Func<int, string> Path => id => $"({id})";
 
-        public IRecordSource<TrackingUpdateDTO, int> Records => new TrackingUpdatesControllerV1Source(_specification);
+        public IRecordSource<RoleDTO, int> Records => new RolesControllerV1Source(_specification);
 
         public HttpContent Create() => throw new NotImplementedException();
 
-        public HttpContent Update(TrackingUpdateDTO entity) => throw new NotImplementedException();
+        public HttpContent Update(RoleDTO entity) => throw new NotImplementedException();
     }
 }

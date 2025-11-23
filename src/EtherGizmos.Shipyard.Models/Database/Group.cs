@@ -3,7 +3,7 @@ using EtherGizmos.Shipyard.Database.Enums;
 
 namespace EtherGizmos.Shipyard.Database;
 
-public class Group : IEntity
+public class Group : Auditable, IEntity
 {
     public virtual int Id { get; set; }
 
