@@ -73,7 +73,7 @@ internal class PackagesControllerV1Tests : ODataControllerTestsBase<PackageDTO, 
             AcquirePurpose purpose)
         {
             var body = _specification.Create();
-            var client = context.GetClientAsRole("123", 1);
+            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString());
             var response = await client.PostAsync(_specification.BaseRoute, body);
 
             var entity = await response.Content.ReadFromJsonAsync<PackageDTO>(JsonOptions.Default);

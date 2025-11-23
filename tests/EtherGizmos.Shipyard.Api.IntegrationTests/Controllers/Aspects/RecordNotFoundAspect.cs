@@ -16,7 +16,7 @@ internal class GetRecordNotFoundAspect<TEntity, TId>
 
         yield return new AspectCase($"get:notexist:404", async context =>
         {
-            var client = context.GetClientAsRole("123", 1);
+            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString());
 
             var response = await client.GetAsync(specification.BaseRoute + specification.Path(default!));
 
@@ -38,7 +38,7 @@ internal class PatchRecordNotFoundAspect<TEntity, TId>
 
         yield return new AspectCase($"patch:notexist:404", async context =>
         {
-            var client = context.GetClientAsRole("123", 1);
+            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString());
 
             var body = specification.Create();
             var response = await client.PatchAsync(specification.BaseRoute + specification.Path(default!), body);
@@ -61,7 +61,7 @@ internal class DeleteRecordNotFoundAspect<TEntity, TId>
 
         yield return new AspectCase($"delete:notexist:404", async context =>
         {
-            var client = context.GetClientAsRole("123", 1);
+            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString());
 
             var response = await client.DeleteAsync(specification.BaseRoute + specification.Path(default!));
 

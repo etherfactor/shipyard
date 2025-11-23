@@ -1,11 +1,10 @@
 using EtherGizmos.Common.Extensions;
-using EtherGizmos.Shipyard.Api.Errors;
 using System.Linq.Expressions;
 using System.Net;
 
-namespace EtherGizmos.Shipyard.Models.Api.Errors;
+namespace EtherGizmos.Shipyard.Api.Errors;
 
-public partial class Error
+partial class Error
 {
     public static class Reference
     {

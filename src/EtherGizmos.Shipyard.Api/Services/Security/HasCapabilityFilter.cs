@@ -1,4 +1,5 @@
 ﻿using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -52,7 +53,9 @@ public class HasCapabilityFilter : IAsyncAuthorizationFilter
         }
 
         //The user does not exist or does not have the capability
-        context.Result = new ForbidResult();
+        new Error.Authorization.MissingPermissionError()
+            .AddDetail(_securableType, _permissionId)
+            .Return();
     }
 }
 

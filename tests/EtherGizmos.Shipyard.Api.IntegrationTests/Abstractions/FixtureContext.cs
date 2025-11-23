@@ -18,17 +18,17 @@ public record FixtureContext(Func<HttpClient> AnonymousClientFactory, ITokenMint
 
 public static class FixtureContextExtensions
 {
-    public static HttpClient GetClientAsRole(
+    public static HttpClient GetClientWithCapabilities(
         this FixtureContext @this,
         string subject,
-        int roleId)
+        string capabilities = "Carrier=7;Package=7;User=7;Role=7;Group=7")
     {
         return @this.GetClient(new(subject)
         {
             Issuer = "http://localhost",
             Claims = new Dictionary<string, string>()
             {
-                ["role"] = roleId.ToString(),
+                ["cap"] = capabilities,
             },
         });
     }

@@ -3,7 +3,6 @@ using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Extensions;
-using EtherGizmos.Shipyard.Models.Api.Errors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Extensions;

@@ -112,6 +112,14 @@ public class ApplicationContext : DbContext
                 && acl.IsGrant == 1
                 && acl.PackageId == record.Id));
 
+        modelBuilder.Entity<TrackingUpdate>()
+            .HasQueryFilter(record => AclPackages.Any(acl =>
+                _userContext.UserId != null
+                && acl.PrincipalUserId == _userContext.UserId
+                && acl.PermissionId == PermissionId.Read
+                && acl.IsGrant == 1
+                && acl.PackageId == record.PackageId));
+
         modelBuilder.Entity<User>()
             .HasQueryFilter(record => AclUsers.Any(acl =>
                 _userContext.UserId != null

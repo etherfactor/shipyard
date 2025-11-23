@@ -4,7 +4,6 @@ using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Api.Services.Security;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
-using EtherGizmos.Shipyard.Models.Api.Errors;
 using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

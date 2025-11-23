@@ -17,7 +17,7 @@ internal class SearchConformanceAspect<TEntity, TId>
 
         yield return new AspectCase($"search:conform", async context =>
         {
-            var client = context.GetClientAsRole("123", 1);
+            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString());
 
             var response = await client.GetAsync(specification.BaseRoute);
 
@@ -40,7 +40,7 @@ internal class GetConformanceAspect<TEntity, TId>
 
         yield return new AspectCase($"get:conform", async context =>
         {
-            var client = context.GetClientAsRole("123", 1);
+            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString());
 
             var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForRead);
             var response = await client.GetAsync(specification.BaseRoute + specification.Path(id));
@@ -64,7 +64,7 @@ internal class CreateConformanceAspect<TEntity, TId>
 
         yield return new AspectCase($"create:conform", async context =>
         {
-            var client = context.GetClientAsRole("123", 1);
+            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString());
 
             var body = specification.Create();
             var response = await client.PostAsync(specification.BaseRoute, body);
@@ -88,7 +88,7 @@ internal class PatchConformanceAspect<TEntity, TId>
 
         yield return new AspectCase($"patch:conform", async context =>
         {
-            var client = context.GetClientAsRole("123", 1);
+            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString());
 
             var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForUpdate);
             var body = specification.Update(entity);
@@ -113,7 +113,7 @@ internal class DeleteConformanceAspect<TEntity, TId>
 
         yield return new AspectCase($"delete:conform", async context =>
         {
-            var client = context.GetClientAsRole("123", 1);
+            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString());
 
             var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForUpdate);
             var response = await client.DeleteAsync(specification.BaseRoute + specification.Path(id));

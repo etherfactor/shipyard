@@ -18,7 +18,7 @@ internal class SearchSelectOptionAspect<TEntity, TId>
 
         yield return new AspectCase(Name, async context =>
         {
-            var client = context.GetClientAsRole("123", 1);
+            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString());
 
             //Grab any property, so we don't assume a property that may not exist
             var property = typeof(TEntity).GetProperties().First();
@@ -45,7 +45,7 @@ internal class GetSelectOptionAspect<TEntity, TId>
 
         yield return new AspectCase(Name, async context =>
         {
-            var client = context.GetClientAsRole("123", 1);
+            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString());
 
             //Grab any property, so we don't assume a property that may not exist
             var property = typeof(TEntity).GetProperties().First();
@@ -73,7 +73,7 @@ internal class CreateSelectOptionAspect<TEntity, TId>
 
         yield return new AspectCase(Name, async context =>
         {
-            var client = context.GetClientAsRole("123", 1);
+            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString());
 
             //Grab any property, so we don't assume a property that may not exist
             var property = typeof(TEntity).GetProperties().First();
@@ -101,7 +101,7 @@ internal class PatchSelectOptionAspect<TEntity, TId>
 
         yield return new AspectCase(Name, async context =>
         {
-            var client = context.GetClientAsRole("123", 1);
+            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString());
 
             //Grab any property, so we don't assume a property that may not exist
             var property = typeof(TEntity).GetProperties().First();

@@ -8,7 +8,6 @@ using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Messages;
-using EtherGizmos.Shipyard.Models.Api.Errors;
 using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
