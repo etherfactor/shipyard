@@ -1,7 +1,7 @@
 ﻿using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
 using System.Net;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Aspects;
+namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Aspects.Entity;
 
 internal class GetRecordNotFoundAspect<TEntity, TId>
     : IAspect<TEntity, TId>
@@ -11,7 +11,7 @@ internal class GetRecordNotFoundAspect<TEntity, TId>
 
     public IEnumerable<AspectCase> Build(IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Get))
+        if (!specification.Capabilities.Contains(ResourceFunctionality.Get))
             yield break;
 
         yield return new AspectCase($"get:notexist:404", async context =>
@@ -33,7 +33,7 @@ internal class PatchRecordNotFoundAspect<TEntity, TId>
 
     public IEnumerable<AspectCase> Build(IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Get))
+        if (!specification.Capabilities.Contains(ResourceFunctionality.Update))
             yield break;
 
         yield return new AspectCase($"patch:notexist:404", async context =>
@@ -56,7 +56,7 @@ internal class DeleteRecordNotFoundAspect<TEntity, TId>
 
     public IEnumerable<AspectCase> Build(IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Get))
+        if (!specification.Capabilities.Contains(ResourceFunctionality.Delete))
             yield break;
 
         yield return new AspectCase($"delete:notexist:404", async context =>

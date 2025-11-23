@@ -1,6 +1,6 @@
 ﻿namespace EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
 
-public enum ODataCapability
+public enum ResourceFunctionality
 {
     None = 0,
     Search = 1 << 0,
@@ -16,4 +16,5 @@ public enum ODataCapability
     QueryOrderBy = 1 << 10,
     QueryCount = 1 << 11,
     QueryApply = 1 << 12,
+    GroupFiltering = 1 << 16,
 }

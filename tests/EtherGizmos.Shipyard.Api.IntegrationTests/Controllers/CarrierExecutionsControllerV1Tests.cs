@@ -4,10 +4,10 @@ using EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Specifications;
 
 namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers;
 
-internal class TrackingUpdatesControllerV1Tests
+internal class CarrierExecutionsControllerV1Tests
 {
     public static IEnumerable<AspectCase> All
-        => EntityAspects.BuildAll(TrackingUpdatesControllerV1Spec.Instance);
+        => EntityAspects.BuildAll(CarrierExecutionsControllerV1Spec.Instance);
 
     [TestCaseSource(nameof(All))]
     public async Task Aspect(AspectCase c)

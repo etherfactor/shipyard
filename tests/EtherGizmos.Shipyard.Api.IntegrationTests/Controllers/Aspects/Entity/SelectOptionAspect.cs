@@ -1,8 +1,9 @@
 using EtherGizmos.Common.Extensions;
-using EtherGizmos.Shipyard.Api.IntegrationTests;
 using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
 using System.Net;
 using System.Text.Json;
+
+namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Aspects.Entity;
 
 internal class SearchSelectOptionAspect<TEntity, TId>
     : IAspect<TEntity, TId>
@@ -13,7 +14,7 @@ internal class SearchSelectOptionAspect<TEntity, TId>
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Search))
+        if (!specification.Capabilities.Contains(ResourceFunctionality.Search))
             yield break;
 
         yield return new AspectCase(Name, async context =>
@@ -24,6 +25,7 @@ internal class SearchSelectOptionAspect<TEntity, TId>
             var property = typeof(TEntity).GetProperties().First();
             var propertyName = property.Name.ToFirstLower();
 
+            await specification.Records.AcquireAsync(context, AcquirePurpose.ForRead);
             var response = await client.GetAsync(specification.BaseRoute + $"?$select={propertyName}&$top=1");
 
             await SearchSet.ValidateSetAsync<TEntity, TId>(response, propertyName);
@@ -40,7 +42,7 @@ internal class GetSelectOptionAspect<TEntity, TId>
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Get))
+        if (!specification.Capabilities.Contains(ResourceFunctionality.Get))
             yield break;
 
         yield return new AspectCase(Name, async context =>
@@ -68,7 +70,7 @@ internal class CreateSelectOptionAspect<TEntity, TId>
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Create))
+        if (!specification.Capabilities.Contains(ResourceFunctionality.Create))
             yield break;
 
         yield return new AspectCase(Name, async context =>
@@ -96,7 +98,7 @@ internal class PatchSelectOptionAspect<TEntity, TId>
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Update))
+        if (!specification.Capabilities.Contains(ResourceFunctionality.Update))
             yield break;
 
         yield return new AspectCase(Name, async context =>

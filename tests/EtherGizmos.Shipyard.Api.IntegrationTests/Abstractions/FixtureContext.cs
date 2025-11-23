@@ -1,7 +1,16 @@
-﻿namespace EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
+﻿using EtherGizmos.Shipyard.Api.IntegrationTests.Controllers;
+
+namespace EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
 
 public record FixtureContext(Func<HttpClient> AnonymousClientFactory, ITokenMinter Minter)
 {
+    public static FixtureContext Instance { get; }
+
+    static FixtureContext()
+    {
+        Instance = new(() => Setup.Client, new JwtTokenMinter());
+    }
+
     public HttpClient GetClient(
         TokenRequest request)
     {

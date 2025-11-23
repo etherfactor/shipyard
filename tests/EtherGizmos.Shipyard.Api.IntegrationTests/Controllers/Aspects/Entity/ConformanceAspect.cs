@@ -1,7 +1,7 @@
 ﻿using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
 using System.Net;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Aspects;
+namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Aspects.Entity;
 
 internal class SearchConformanceAspect<TEntity, TId>
     : IAspect<TEntity, TId>
@@ -12,7 +12,7 @@ internal class SearchConformanceAspect<TEntity, TId>
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Search))
+        if (!specification.Capabilities.Contains(ResourceFunctionality.Search))
             yield break;
 
         yield return new AspectCase($"search:conform", async context =>
@@ -35,7 +35,7 @@ internal class GetConformanceAspect<TEntity, TId>
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Get))
+        if (!specification.Capabilities.Contains(ResourceFunctionality.Get))
             yield break;
 
         yield return new AspectCase($"get:conform", async context =>
@@ -59,7 +59,7 @@ internal class CreateConformanceAspect<TEntity, TId>
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Create))
+        if (!specification.Capabilities.Contains(ResourceFunctionality.Create))
             yield break;
 
         yield return new AspectCase($"create:conform", async context =>
@@ -83,7 +83,7 @@ internal class PatchConformanceAspect<TEntity, TId>
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Update))
+        if (!specification.Capabilities.Contains(ResourceFunctionality.Update))
             yield break;
 
         yield return new AspectCase($"patch:conform", async context =>
@@ -108,7 +108,7 @@ internal class DeleteConformanceAspect<TEntity, TId>
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Delete))
+        if (!specification.Capabilities.Contains(ResourceFunctionality.Delete))
             yield break;
 
         yield return new AspectCase($"delete:conform", async context =>

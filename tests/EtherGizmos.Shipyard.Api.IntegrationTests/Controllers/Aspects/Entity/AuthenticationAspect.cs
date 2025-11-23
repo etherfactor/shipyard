@@ -1,9 +1,9 @@
 ﻿using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
 using System.Net;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Aspects;
+namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Aspects.Entity;
 
-internal class SearchAuthenticationAspect<TEntity, TId>
+internal class SearchAuthAspect<TEntity, TId>
     : IAspect<TEntity, TId>
     where TEntity : class, new()
 {
@@ -12,7 +12,7 @@ internal class SearchAuthenticationAspect<TEntity, TId>
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Search))
+        if (!specification.Capabilities.Contains(ResourceFunctionality.Search))
             yield break;
 
         yield return new AspectCase($"search:auth:200", async context =>
@@ -45,7 +45,7 @@ internal class SearchAuthenticationAspect<TEntity, TId>
     }
 }
 
-internal class GetAuthenticationAspect<TEntity, TId>
+internal class GetAuthAspect<TEntity, TId>
     : IAspect<TEntity, TId>
     where TEntity : class, new()
 {
@@ -54,7 +54,7 @@ internal class GetAuthenticationAspect<TEntity, TId>
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Get))
+        if (!specification.Capabilities.Contains(ResourceFunctionality.Get))
             yield break;
 
         yield return new AspectCase($"get:auth:200", async context =>
@@ -90,7 +90,7 @@ internal class GetAuthenticationAspect<TEntity, TId>
     }
 }
 
-internal class CreateAuthenticationAspect<TEntity, TId>
+internal class CreateAuthAspect<TEntity, TId>
     : IAspect<TEntity, TId>
     where TEntity : class, new()
 {
@@ -99,7 +99,7 @@ internal class CreateAuthenticationAspect<TEntity, TId>
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Create))
+        if (!specification.Capabilities.Contains(ResourceFunctionality.Create))
             yield break;
 
         yield return new AspectCase($"create:auth:201", async context =>
@@ -135,7 +135,7 @@ internal class CreateAuthenticationAspect<TEntity, TId>
     }
 }
 
-internal class PatchAuthenticationAspect<TEntity, TId>
+internal class PatchAuthAspect<TEntity, TId>
     : IAspect<TEntity, TId>
     where TEntity : class, new()
 {
@@ -144,7 +144,7 @@ internal class PatchAuthenticationAspect<TEntity, TId>
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Update))
+        if (!specification.Capabilities.Contains(ResourceFunctionality.Update))
             yield break;
 
         yield return new AspectCase($"patch:auth:200", async context =>
@@ -183,7 +183,7 @@ internal class PatchAuthenticationAspect<TEntity, TId>
     }
 }
 
-internal class DeleteAuthenticationAspect<TEntity, TId>
+internal class DeleteAuthAspect<TEntity, TId>
     : IAspect<TEntity, TId>
     where TEntity : class, new()
 {
@@ -192,7 +192,7 @@ internal class DeleteAuthenticationAspect<TEntity, TId>
     public IEnumerable<AspectCase> Build(
         IODataResourceSpec<TEntity, TId> specification)
     {
-        if (!specification.Capabilities.Contains(ODataCapability.Delete))
+        if (!specification.Capabilities.Contains(ResourceFunctionality.Delete))
             yield break;
 
         yield return new AspectCase($"delete:auth:204", async context =>

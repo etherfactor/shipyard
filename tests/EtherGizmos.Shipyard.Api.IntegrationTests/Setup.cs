@@ -100,6 +100,9 @@ internal static class Setup
 
     public static Guid OwnerUserId { get; private set; }
 
-    public static HttpClient Client =>
-        _waf.CreateClient(new() { HandleCookies = true });
+    public static HttpClient Client
+        => _waf.CreateClient(new() { HandleCookies = true });
+
+    public static IServiceProvider Services
+        => _waf.Services;
 }
