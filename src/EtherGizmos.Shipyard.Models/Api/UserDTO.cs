@@ -55,6 +55,7 @@ public class UserDTOProfile : Profile
         toDto.MapMember(dest => dest.FullName, src => src.FullName);
         toDto.MapMember(dest => dest.GroupId, src => src.GroupId);
         toDto.MapMember(dest => dest.Group, src => src.Group, opt => opt.ExplicitExpansion());
+        toDto.MapMember(dest => dest.Roles, src => src.Roles, opt => opt.ExplicitExpansion());
 
         var fromDto = mapper.CreateMap<UserDTO, User>();
         fromDto.IgnoreAllMembers();

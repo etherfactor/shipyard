@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { ODataClient } from '@ethergizmos/odata-fluent-client';
 import { Guid } from '../../../../shared/types/guid/guid';
 import { narrowValidator, o } from '../../../../shared/utilities/odata/odata.util';
+import { Role } from '../../../role/models/role';
 import { User, UserF, UserZ } from '../../models/user';
 
 @Injectable({
@@ -29,7 +30,24 @@ export class UserService {
       })
       .build();
 
-    this.$set = set;
+    const roles = this.$odata
+      .entitySet<Role>("roles")
+      .withKey("id")
+      .withKeyType(o.int)
+      .build();
+
+    const userRoles = this.$odata
+      .navigation(set, "roles")
+      .withCollection()
+      .withReference(roles)
+      .withAdd("POST")
+      .withRemove("DELETE")
+      .build();
+
+    const set2 = this.$odata.bind
+      .navigation(set, { roles: userRoles });
+
+    this.$set = set2;
   }
 
   search() {
@@ -50,5 +68,13 @@ export class UserService {
 
   delete(id: Guid) {
     return this.$set.delete(id);
+  }
+
+  createRefToRole(id: Guid, roleId: number) {
+    return this.$set.navigations.roles.add(id, roleId);
+  }
+
+  deleteRefToRole(id: Guid, roleId: number) {
+    return this.$set.navigations.roles.remove(id, roleId);
   }
 }

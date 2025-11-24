@@ -136,7 +136,7 @@ function joinNonEmpty(...input: Array<string | undefined>): string {
   return input.filter(e => !!e).join(" ").trim();
 }
 
-function formatName(
+export function formatName(
   parts: NameParts,
   variant: NameVariant,
   options?: NameFormatOptions,

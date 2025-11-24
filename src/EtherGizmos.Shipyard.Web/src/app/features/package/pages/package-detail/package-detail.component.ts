@@ -133,6 +133,8 @@ export class PackageDetailComponent implements OnInit {
   }
 
   private async load(single?: EntitySingle<Package>) {
+    this.loadCarriers();
+
     const id = this.id$$();
     if (!id)
       return;
@@ -162,6 +164,20 @@ export class PackageDetailComponent implements OnInit {
     }
   }
 
+  private async loadCarriers() {
+    if (!this.carriersLoaded) {
+      this.carriersLoaded = true;
+      const result = this.$carrier
+        .search()
+        .execute();
+
+      const data = await result.data;
+      data.sort((a, b) => a.name.localeCompare(b.name));
+
+      this.carriers$$.set(data);
+    }
+  }
+
   private init() {
     this.form$$.set(packageForm(this.$form, this.package$$()));
   }
@@ -182,18 +198,7 @@ export class PackageDetailComponent implements OnInit {
 
   @Bound async onEdit() {
     this.isEditing$$.set(true);
-
-    if (!this.carriersLoaded) {
-      this.carriersLoaded = true;
-      const result = this.$carrier
-        .search()
-        .execute();
-
-      const data = await result.data;
-      data.sort((a, b) => a.name.localeCompare(b.name));
-
-      this.carriers$$.set(data);
-    }
+    this.loadCarriers();
   }
 
   @Bound onDelete() {
