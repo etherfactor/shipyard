@@ -6,5 +6,8 @@
     "clientId": "1c9cc927-68fe-4376-8d3f-b71ef15289b6",
     "scope": "openid offline_access app"
   },
+  "logging": {
+    "minimumLevel": "Information"
+  },
   "version": "dev"
 }

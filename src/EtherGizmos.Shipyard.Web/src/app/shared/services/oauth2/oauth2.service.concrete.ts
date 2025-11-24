@@ -17,12 +17,7 @@ export class ConcreteOAuth2Service extends OAuth2Service {
   private oidcReady$$ = signal(false);
   private onReadyResolve!: () => void;
   readonly onReady = new Promise<void>((resolve, reject) => {
-    this.onReadyResolve = () => {
-      console.log("resolving...");
-      resolve();
-      console.log("resolved");
-      console.log(new Error().stack);
-    };
+    this.onReadyResolve = resolve;
   });
   readonly isReady$$ = signal(false);
   readonly accessToken$$ = signal("");
@@ -39,14 +34,15 @@ export class ConcreteOAuth2Service extends OAuth2Service {
       const oidcReady = this.oidcReady$$();
 
       this.accessToken$$.set(await firstValueFrom(this.$oidc.getAccessToken()));
+
       this.idToken$$.set(await firstValueFrom(this.$oidc.getIdToken()));
+
       let idTokenData: object;
       if (auth.isAuthenticated) {
         idTokenData = await firstValueFrom(this.$oidc.getPayloadFromIdToken());
       } else {
         idTokenData = {};
       }
-      console.log("id token data", idTokenData);
       this.idTokenData$$.set(idTokenData);
 
       if (oidcReady) {
@@ -61,7 +57,7 @@ export class ConcreteOAuth2Service extends OAuth2Service {
 
     if (refreshToken) {
       this.$logger.information("Found a refresh token");
-      let check = this.$oidc.checkAuthIncludingServer();
+      let check = this.$oidc.checkAuthIncludingServer();  
       check = check.pipe(
         catchError(() => timer(1000).pipe(
           switchMap(() => check),
