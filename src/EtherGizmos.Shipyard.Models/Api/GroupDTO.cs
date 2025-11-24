@@ -41,6 +41,7 @@ public class GroupDTOProfile : Profile
         var fromDto = mapper.CreateMap<GroupDTO, Group>();
         fromDto.IgnoreAllMembers();
         fromDto.MapMember(dest => dest.Name, src => src.Name);
+        fromDto.MapMember(dest => dest.Description, src => src.Description);
     })
     { }
 }

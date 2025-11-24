@@ -156,7 +156,8 @@ export function formatName(
       const constructed = order === "eastern"
         ? joinNonEmpty(family, given)
         : joinNonEmpty(given, family);
-      return full ?? constructed ?? parts.handle ?? "User";
+      const use = constructed ? constructed : undefined;
+      return full ?? use ?? parts.handle ?? "User";
 
     case "informal":
       return nickname ?? given ?? full ?? parts.handle ?? "User";
