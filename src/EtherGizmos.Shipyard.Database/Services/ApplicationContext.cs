@@ -22,6 +22,8 @@ public class ApplicationContext : DbContext
 
     public virtual DbSet<AclEntry> AclEntries { get; set; }
 
+    public virtual DbSet<AclGroup> AclGroups { get; set; }
+
     public virtual DbSet<AclPackage> AclPackages { get; set; }
 
     public virtual DbSet<AclRole> AclRoles { get; set; }
@@ -103,6 +105,14 @@ public class ApplicationContext : DbContext
 
         //**********************************************************
         // Add Query Filters
+
+        modelBuilder.Entity<Group>()
+            .HasQueryFilter(record => AclGroups.Any(acl =>
+                _userContext.UserId != null
+                && acl.PrincipalUserId == _userContext.UserId
+                && acl.PermissionId == PermissionId.Read
+                && acl.IsGrant == 1
+                && acl.GroupId == record.Id));
 
         modelBuilder.Entity<Package>()
             .HasQueryFilter(record => AclPackages.Any(acl =>

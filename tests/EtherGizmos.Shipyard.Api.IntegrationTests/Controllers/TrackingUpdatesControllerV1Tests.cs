@@ -4,7 +4,7 @@ using EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Specifications;
 
 namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers;
 
-internal class TrackingUpdatesControllerV1Tests
+internal class TrackingUpdatesControllerV1Tests : IntegrationTestBase
 {
     public static IEnumerable<AspectCase> All
         => EntityAspects.BuildAll(TrackingUpdatesControllerV1Spec.Instance);

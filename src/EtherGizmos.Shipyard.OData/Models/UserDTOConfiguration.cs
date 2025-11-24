@@ -33,6 +33,9 @@ public class UserDTOConfiguration : IModelConfiguration
             entity.Property(e => e.GivenName);
             entity.Property(e => e.FamilyName);
             entity.Property(e => e.FullName);
+            entity.Property(e => e.GroupId);
+            entity.HasRequired(e => e.Group);
+            entity.HasMany(e => e.Roles);
         }
     }
 }

@@ -21,8 +21,11 @@ public class TrackingUpdatesControllerV1Spec : IODataResourceSpec<TrackingUpdate
     public IReadOnlySet<ResourceFunctionality> Capabilities =>
         new HashSet<ResourceFunctionality>()
         {
+            //Actions
             ResourceFunctionality.Search,
             ResourceFunctionality.Get,
+
+            //Query options
             ResourceFunctionality.QueryCount,
             ResourceFunctionality.QueryExpand,
             ResourceFunctionality.QueryFilter,
@@ -30,6 +33,8 @@ public class TrackingUpdatesControllerV1Spec : IODataResourceSpec<TrackingUpdate
             ResourceFunctionality.QuerySelect,
             ResourceFunctionality.QuerySkip,
             ResourceFunctionality.QueryTop,
+
+            //Miscellaneous
             ResourceFunctionality.GroupFiltering,
         };
 
@@ -55,9 +60,10 @@ public class TrackingUpdatesControllerV1Spec : IODataResourceSpec<TrackingUpdate
 
         public async Task<(TrackingUpdateDTO Entity, int Id)> AcquireAsync(
             FixtureContext context,
-            AcquirePurpose purpose)
+            AcquirePurpose purpose,
+            Guid? createdByUserId = null)
         {
-            var (_, id) = await PackagesControllerV1Spec.Instance.Records.AcquireAsync(context, purpose);
+            var (_, id) = await PackagesControllerV1Spec.Instance.Records.AcquireAsync(context, purpose, createdByUserId);
 
             var uowFactory = Setup.Services.GetRequiredService<IUnitOfWorkFactory>();
             using var uow = uowFactory.Create();

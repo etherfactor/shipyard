@@ -16,8 +16,11 @@ public class RolesControllerV1Spec : IODataResourceSpec<RoleDTO, int>
     public IReadOnlySet<ResourceFunctionality> Capabilities =>
         new HashSet<ResourceFunctionality>()
         {
+            //Actions
             ResourceFunctionality.Search,
             ResourceFunctionality.Get,
+
+            //Query options
             ResourceFunctionality.QueryCount,
             ResourceFunctionality.QueryExpand,
             ResourceFunctionality.QueryFilter,
@@ -49,7 +52,8 @@ public class RolesControllerV1Spec : IODataResourceSpec<RoleDTO, int>
 
         public Task<(RoleDTO Entity, int Id)> AcquireAsync(
             FixtureContext context,
-            AcquirePurpose purpose)
+            AcquirePurpose purpose,
+            Guid? createdByUserId = null)
         {
             return Task.FromResult((new RoleDTO(), 1));
         }

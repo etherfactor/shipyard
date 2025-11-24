@@ -14,7 +14,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
+using OpenIddict.Abstractions;
 using Swashbuckle.AspNetCore.Filters;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace EtherGizmos.Shipyard.Api.Controllers;
 
@@ -174,7 +176,20 @@ public class PackagesController : AutoODataController
     }
 
     private IKeylessRequestBuilder<Package, PackageDTO> ForSet()
-        => ForSet<Package, PackageDTO>();
+        => ForSet<Package, PackageDTO>()
+            .OnCreating(async (db, dto) =>
+            {
+                using var uow = _uowFactory.AsUnfiltered().Create();
+                var userRepo = uow.Repository<User>();
+
+                Guid.TryParse(User.GetClaim(Claims.Subject), out var userId);
+                var groupId = await userRepo.Data
+                    .Where(e => e.Id == userId)
+                    .Select(e => e.GroupId)
+                    .SingleAsync();
+
+                db.GroupId = groupId;
+            });
 
     private IKeyedRequestBuilder<Package, PackageDTO> ForItem(
         int id)

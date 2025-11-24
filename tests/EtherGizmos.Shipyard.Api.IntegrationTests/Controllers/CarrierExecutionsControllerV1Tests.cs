@@ -4,7 +4,7 @@ using EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Specifications;
 
 namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers;
 
-internal class CarrierExecutionsControllerV1Tests
+internal class CarrierExecutionsControllerV1Tests : IntegrationTestBase
 {
     public static IEnumerable<AspectCase> All
         => EntityAspects.BuildAll(CarrierExecutionsControllerV1Spec.Instance);

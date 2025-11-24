@@ -3,16 +3,16 @@ using System.Net.Http.Json;
 
 namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Specifications;
 
-public class CarriersControllerV1Spec : IODataResourceSpec<CarrierDTO, int>
+public class UsersControllerV1Spec : IODataResourceSpec<UserDTO, Guid>
 {
-    public static CarriersControllerV1Spec Instance { get; }
+    public static UsersControllerV1Spec Instance { get; }
 
-    static CarriersControllerV1Spec()
+    static UsersControllerV1Spec()
     {
         Instance = new();
     }
 
-    public string BaseRoute => "api/v1/carriers";
+    public string BaseRoute => "api/v1/users";
 
     public IReadOnlySet<ResourceFunctionality> Capabilities =>
         new HashSet<ResourceFunctionality>()
@@ -24,7 +24,7 @@ public class CarriersControllerV1Spec : IODataResourceSpec<CarrierDTO, int>
             ResourceFunctionality.Update,
             ResourceFunctionality.Delete,
 
-            //Qeury options
+            //Query options
             ResourceFunctionality.QueryCount,
             ResourceFunctionality.QueryExpand,
             ResourceFunctionality.QueryFilter,
@@ -32,40 +32,42 @@ public class CarriersControllerV1Spec : IODataResourceSpec<CarrierDTO, int>
             ResourceFunctionality.QuerySelect,
             ResourceFunctionality.QuerySkip,
             ResourceFunctionality.QueryTop,
+
+            //Miscellaneous
+            ResourceFunctionality.GroupFiltering,
         };
 
-    public Func<CarrierDTO, int> Identity => carrier => carrier.Id;
+    public Func<UserDTO, Guid> Identity => user => user.Id;
 
-    public Func<int, string> Path => id => $"({id})";
+    public Func<Guid, string> Path => id => $"({id})";
 
-    public IRecordSource<CarrierDTO, int> Records => new CarriersControllerV1Source(this);
+    public IRecordSource<UserDTO, Guid> Records => new UsersControllerV1Source(this);
 
     public HttpContent Create() =>
         JsonContent.Create(new
         {
-            name = "Test Carrier",
-            slug = "test" + Guid.NewGuid().ToString("N").Substring(0, 16),
-            rules = new List<object>(),
-            steps = new List<object>(),
+            username = Guid.NewGuid().ToString(),
+            password = "Testing123!",
+            groupId = 1,
         });
 
-    public HttpContent Update(CarrierDTO entity) =>
+    public HttpContent Update(UserDTO entity) =>
         JsonContent.Create(new
         {
-            name = "New Name",
+            fullName = "Full Name",
         });
 
-    private class CarriersControllerV1Source : IRecordSource<CarrierDTO, int>
+    private class UsersControllerV1Source : IRecordSource<UserDTO, Guid>
     {
-        private readonly IODataResourceSpec<CarrierDTO, int> _specification;
+        private readonly IODataResourceSpec<UserDTO, Guid> _specification;
 
-        public CarriersControllerV1Source(
-            IODataResourceSpec<CarrierDTO, int> specification)
+        public UsersControllerV1Source(
+            IODataResourceSpec<UserDTO, Guid> specification)
         {
             _specification = specification;
         }
 
-        public async Task<(CarrierDTO Entity, int Id)> AcquireAsync(
+        public async Task<(UserDTO Entity, Guid Id)> AcquireAsync(
             FixtureContext context,
             AcquirePurpose purpose,
             Guid? createdByUserId = null)
@@ -74,7 +76,7 @@ public class CarriersControllerV1Spec : IODataResourceSpec<CarrierDTO, int>
             var client = context.GetClientWithCapabilities((createdByUserId ?? Setup.OwnerUserId).ToString());
             var response = await client.PostAsync(_specification.BaseRoute, body);
 
-            var entity = await response.Content.ReadFromJsonAsync<CarrierDTO>(JsonOptions.Default);
+            var entity = await response.Content.ReadFromJsonAsync<UserDTO>(JsonOptions.Default);
             return (entity!, entity!.Id);
         }
     }

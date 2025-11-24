@@ -1,17 +1,24 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
 using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Api.Services.Security;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
+using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Swagger;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.EntityFrameworkCore;
+using OpenIddict.Abstractions;
 using Swashbuckle.AspNetCore.Filters;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace EtherGizmos.Shipyard.Api.Controllers;
 
+[Authorize]
 public class UsersController : AutoODataController
 {
     private const string BaseRoute = "api/v{version:apiVersion}/users";
@@ -86,11 +93,53 @@ public class UsersController : AutoODataController
         => ForItem(id)
             .DeleteAsync(cancellationToken);
 
+    [ApiVersion(1.0)]
+    [HttpPost(BaseRoute + "({id})" + "/roles/$ref")]
+    [HasCapability(SecurableType.User, PermissionId.Write)]
+    [ProducesResponseType(204)]
+    public Task<IActionResult> CreateRefToRole(
+        Guid id,
+        [FromBody] Uri link,
+        CancellationToken cancellationToken = default)
+        => ForRoleRef(id, ParseRelatedKey<RoleDTO, int>(link, ErrorConstants.RequestTarget.Body))
+            .CreateAsync(cancellationToken);
+
+    [ApiVersion(1.0)]
+    [HttpDelete(BaseRoute + "({id})" + "/roles/$ref")]
+    [HasCapability(SecurableType.User, PermissionId.Write)]
+    [ProducesResponseType(204)]
+    public Task<IActionResult> DeleteRefToRole(
+        Guid id,
+        [FromQuery(Name = "$id")] Uri link,
+        CancellationToken cancellationToken = default)
+        => ForRoleRef(id, ParseRelatedKey<RoleDTO, int>(link, ErrorConstants.RequestTarget.Body))
+            .DeleteAsync(cancellationToken);
+
     private IKeylessRequestBuilder<User, UserDTO> ForSet()
-        => ForSet<User, UserDTO>();
+        => ForSet<User, UserDTO>()
+            .OnCreating(async (db, dto) =>
+            {
+                using var uow = _uowFactory.AsUnfiltered().Create();
+                var userRepo = uow.Repository<User>();
+
+                Guid.TryParse(User.GetClaim(Claims.Subject), out var userId);
+                var groupId = await userRepo.Data
+                    .Where(e => e.Id == userId)
+                    .Select(e => e.GroupId)
+                    .SingleAsync();
+
+                db.GroupId = groupId;
+            });
 
     private IKeyedRequestBuilder<User, UserDTO> ForItem(
         Guid id)
         => ForItem(
             KeyMapping<User, UserDTO, Guid>.Create(id, e => e.Id, e => e.Id));
+
+    private IReferenceRequestBuilder<Role, RoleDTO> ForRoleRef(
+        Guid id,
+        int roleId)
+        => ForItem(id).ForReference(
+            e => e.Roles,
+            KeyMapping<Role, RoleDTO, int>.Create(roleId, e => e.Id, e => e.Id));
 }

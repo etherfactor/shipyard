@@ -145,6 +145,10 @@ public abstract class AutoODataController : ODataController
         IKeyedRequestBuilder<TEntity, TDto> OnUpdating(Func<TEntity, TDto, Task> beforeSave);
 
         Task<IActionResult> PatchAsync(Delta<TDto> patch, ODataQueryOptions<TDto> queryOptions, CancellationToken cancellationToken = default);
+
+        IReferenceRequestBuilder<TFEntity, TFDto> ForReference<TFEntity, TFDto, TFKey>(Func<TEntity, ICollection<TFEntity>> findCollection, params KeyMapping<TFEntity, TFDto, TFKey>[] fkeys)
+            where TFEntity : class, IEntity
+            where TFDto : class, new();
     }
 
     protected class KeyMapping<TEntity, TDto, TKey>
@@ -285,14 +289,14 @@ public abstract class AutoODataController : ODataController
         public IKeylessRequestBuilder<TEntity, TDto> OnCreating(
             Func<TEntity, TDto, Task> beforeSave)
         {
-            _onUpdating.Add(beforeSave);
+            _onCreating.Add(beforeSave);
             return this;
         }
 
         public IKeyedRequestBuilder<TEntity, TDto> OnUpdating(
             Func<TEntity, TDto, Task> beforeSave)
         {
-            _onCreating.Add(beforeSave);
+            _onUpdating.Add(beforeSave);
             return this;
         }
 

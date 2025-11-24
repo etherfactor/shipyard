@@ -4,7 +4,7 @@ using EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Specifications;
 
 namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers;
 
-internal class GroupsControllerV1Tests
+internal class GroupsControllerV1Tests : IntegrationTestBase
 {
     public static IEnumerable<AspectCase> All
         => EntityAspects.BuildAll(GroupsControllerV1Spec.Instance);

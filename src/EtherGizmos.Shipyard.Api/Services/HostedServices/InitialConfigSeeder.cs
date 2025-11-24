@@ -65,6 +65,11 @@ public class InitialConfigSeeder : IHostedService
                 new(SecurableType: SecurableType.Role, PermissionId: PermissionId.Read, GrantType: PermissionGrantType.Full),
                 new(SecurableType: SecurableType.Role, PermissionId: PermissionId.Write, GrantType: PermissionGrantType.Full),
                 new(SecurableType: SecurableType.Role, PermissionId: PermissionId.Delete, GrantType: PermissionGrantType.Full),
+
+                //Global R/W/D on groups
+                new(SecurableType: SecurableType.Group, PermissionId: PermissionId.Read, GrantType: PermissionGrantType.Full),
+                new(SecurableType: SecurableType.Group, PermissionId: PermissionId.Write, GrantType: PermissionGrantType.Full),
+                new(SecurableType: SecurableType.Group, PermissionId: PermissionId.Delete, GrantType: PermissionGrantType.Full),
             ],
             cancellationToken: cancellationToken);
 

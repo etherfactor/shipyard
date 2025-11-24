@@ -17,11 +17,14 @@ public class PackagesControllerV1Spec : IODataResourceSpec<PackageDTO, int>
     public IReadOnlySet<ResourceFunctionality> Capabilities =>
         new HashSet<ResourceFunctionality>()
         {
+            //Actions
             ResourceFunctionality.Search,
             ResourceFunctionality.Get,
             ResourceFunctionality.Create,
             ResourceFunctionality.Update,
             ResourceFunctionality.Delete,
+
+            //Query options
             ResourceFunctionality.QueryCount,
             ResourceFunctionality.QueryExpand,
             ResourceFunctionality.QueryFilter,
@@ -29,6 +32,8 @@ public class PackagesControllerV1Spec : IODataResourceSpec<PackageDTO, int>
             ResourceFunctionality.QuerySelect,
             ResourceFunctionality.QuerySkip,
             ResourceFunctionality.QueryTop,
+
+            //Miscellaneous
             ResourceFunctionality.GroupFiltering,
         };
 
@@ -63,10 +68,11 @@ public class PackagesControllerV1Spec : IODataResourceSpec<PackageDTO, int>
 
         public async Task<(PackageDTO Entity, int Id)> AcquireAsync(
             FixtureContext context,
-            AcquirePurpose purpose)
+            AcquirePurpose purpose,
+            Guid? createdByUserId = null)
         {
             var body = _specification.Create();
-            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString());
+            var client = context.GetClientWithCapabilities((createdByUserId ?? Setup.OwnerUserId).ToString());
             var response = await client.PostAsync(_specification.BaseRoute, body);
 
             var entity = await response.Content.ReadFromJsonAsync<PackageDTO>(JsonOptions.Default);

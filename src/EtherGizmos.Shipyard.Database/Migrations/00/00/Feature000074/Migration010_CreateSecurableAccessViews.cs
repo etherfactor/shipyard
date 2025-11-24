@@ -235,10 +235,73 @@ public class Migration010_CreateSecurableAccessViews : MigrationExtension
                 inner join roles r
                	  on r.role_id = p.role_id;
             """);
+
+        /*
+         * Create [acl].[groups]
+         */
+        Execute.Sql("""
+            create view acl.groups as
+            with global_permissions as (
+              select a.principal_user_id,
+                r.group_id,
+                a.permission_id,
+                a.permission_grant_type_id
+                from groups r
+                  inner join acl.user_entries a
+                    on a.securable_type_id = 120
+            ),
+            record_permissions as (
+              select a.principal_user_id,
+                r.group_id,
+                a.permission_id,
+                a.permission_grant_type_id
+                from groups r
+                  inner join acl.user_entries a
+                    on a.securable_id = r.securable_id
+            ),
+            combined_permissions as (
+              select gp.principal_user_id,
+                gp.group_id,
+                gp.permission_id,
+                gp.permission_grant_type_id
+                from global_permissions gp
+                  where not exists (
+                    select 1
+                      from record_permissions rp
+                        where rp.principal_user_id = gp.principal_user_id
+                          and rp.group_id = gp.group_id
+                          and rp.permission_id = gp.permission_id
+                  )
+              union all
+              select rp.principal_user_id,
+                rp.group_id,
+                rp.permission_id,
+                rp.permission_grant_type_id
+                from record_permissions rp
+            )
+            select p.principal_user_id,
+              p.group_id,
+              p.permission_id,
+              p.permission_grant_type_id,
+              case when p.permission_grant_type_id = 1 then 1
+                when p.permission_grant_type_id = 2 and (
+                  r.group_id = u.group_id
+                ) then 1
+               	else 0 end as is_grant
+              from combined_permissions p
+                inner join groups r
+               	  on r.group_id = p.group_id
+                inner join users u
+                  on u.user_id = p.principal_user_id;
+            """);
     }
 
     public override void Down()
     {
+        Execute.Sql("""
+            drop view acl.groups;
+            """);
+
         Execute.Sql("""
             drop view acl.roles;
             """);

@@ -20,7 +20,7 @@ public class GroupDTO
 
     public string? Description { get; set; }
 
-    public List<GroupDTO> Users { get; set; } = [];
+    public List<UserDTO> Users { get; set; } = [];
 }
 
 public class GroupDTOProfile : Profile

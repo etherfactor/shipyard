@@ -31,7 +31,9 @@ public class UserDTO
 
     public int GroupId { get; set; }
 
-    public GroupDTO Group { get; set; } = null!;
+    public GroupDTO? Group { get; set; }
+
+    public List<RoleDTO> Roles { get; set; } = [];
 }
 
 public class UserDTOProfile : Profile
@@ -63,6 +65,7 @@ public class UserDTOProfile : Profile
         fromDto.MapMember(dest => dest.GivenName, src => src.GivenName);
         fromDto.MapMember(dest => dest.FamilyName, src => src.FamilyName);
         fromDto.MapMember(dest => dest.FullName, src => src.FullName);
+        fromDto.MapMember(dest => dest.GroupId, src => src.GroupId);
     })
     { }
 }

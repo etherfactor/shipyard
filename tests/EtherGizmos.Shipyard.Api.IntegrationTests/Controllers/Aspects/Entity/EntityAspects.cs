@@ -11,12 +11,13 @@ public static class EntityAspects
             =>
             [
                 new SearchAuthAspect<TEntity, TId>(),
-                //new SearchGroupFilterAspect<TEntity, TId>(),
+                new SearchGroupFilterAspect<TEntity, TId>(),
                 new SearchConformanceAspect<TEntity, TId>(),
                 new SearchSelectOptionAspect<TEntity, TId>(),
 
                 new GetAuthAspect<TEntity, TId>(),
                 new GetConformanceAspect<TEntity, TId>(),
+                new GetGroupFilterAspect<TEntity, TId>(),
                 new GetRecordNotFoundAspect<TEntity, TId>(),
                 new GetSelectOptionAspect<TEntity, TId>(),
 
@@ -26,11 +27,13 @@ public static class EntityAspects
 
                 new PatchAuthAspect<TEntity, TId>(),
                 new PatchConformanceAspect<TEntity, TId>(),
+                new PatchGroupFilterAspect<TEntity, TId>(),
                 new PatchRecordNotFoundAspect<TEntity, TId>(),
                 new PatchSelectOptionAspect<TEntity, TId>(),
 
                 new DeleteAuthAspect<TEntity, TId>(),
                 new DeleteConformanceAspect<TEntity, TId>(),
+                new DeleteGroupFilterAspect<TEntity, TId>(),
                 new DeleteRecordNotFoundAspect<TEntity, TId>(),
             ];
     }
