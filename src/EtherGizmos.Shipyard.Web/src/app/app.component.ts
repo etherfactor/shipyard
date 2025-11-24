@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NavbarComponent } from './features/app/components/navbar/navbar.component';
 import { UserSessionService } from './features/login/services/user-session/user-session.service';
@@ -23,6 +23,12 @@ export class AppComponent implements OnInit {
   readonly isSignedIn$$ = computed(() => this.$session.isSignedIn$$());
 
   title = 'EtherGizmos.Shipyard.Web';
+
+  constructor() {
+    effect(() => {
+      console.log(this.$oauth2.idTokenData$$());
+    });
+  }
 
   async ngOnInit() {
     this.$logger.information("App initializing");

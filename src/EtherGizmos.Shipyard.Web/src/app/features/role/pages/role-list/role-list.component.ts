@@ -8,17 +8,14 @@ import { DetailBoxComponent } from '../../../../shared/components/detail-box/det
 import { DetailHeaderComponent } from '../../../../shared/components/detail-header/detail-header.component';
 import { TableHeaderComponent } from '../../../../shared/components/table-header/table-header.component';
 import { TableComponent } from '../../../../shared/components/table/table.component';
-import { Bound } from '../../../../shared/utilities/bound/bound.util';
 import { SortColumn } from '../../../../shared/utilities/sort/sort.util';
 import { NavbarAction } from '../../../app/components/navbar-action/navbar-action.component';
-import { GroupService } from '../../../group/services/group/group.service';
 import { UserSessionService } from '../../../login/services/user-session/user-session.service';
-import { PermissionId } from '../../../security/models/permission-id';
-import { SecurableType } from '../../../security/models/securable-type';
-import { Group } from '../../models/group';
+import { Role } from '../../../role/models/role';
+import { RoleService } from '../../../role/services/role/role.service';
 
 @Component({
-  selector: 'app-group-list',
+  selector: 'app-role-list',
   imports: [
     DetailBoxComponent,
     DetailHeaderComponent,
@@ -28,12 +25,12 @@ import { Group } from '../../models/group';
     TableComponent,
     TableHeaderComponent,
   ],
-  templateUrl: './group-list.component.html',
-  styleUrl: './group-list.component.scss',
+  templateUrl: './role-list.component.html',
+  styleUrl: './role-list.component.scss',
 })
-export class GroupListComponent extends ListComponent<Group> {
+export class RoleListComponent extends ListComponent<Role> {
 
-  private readonly $group = inject(GroupService);
+  private readonly $role = inject(RoleService);
   private readonly $router = inject(Router);
   private readonly $session = inject(UserSessionService);
 
@@ -50,18 +47,10 @@ export class GroupListComponent extends ListComponent<Group> {
     ];
 
     if (!this.isLoading()) {
-      const hasWrite = this.$session.hasCapability(SecurableType.Group, PermissionId.Write);
       //actions.push({
       //  icon: 'bi-layout-three-columns',
       //  label: 'Edit Columns',
       //});
-      if (hasWrite) {
-        actions.push({
-          icon: 'bi-plus-square',
-          label: 'Add',
-          callback: this.new,
-        });
-      }
     }
 
     return actions;
@@ -73,14 +62,10 @@ export class GroupListComponent extends ListComponent<Group> {
     return columns;
   }
 
-  protected override getEntitySet(): EntitySet<Group> {
-    return this.$group.search()
+  protected override getEntitySet(): EntitySet<Role> {
+    return this.$role.search()
       .expand("users", e => e
         .select("id")
       );
-  }
-
-  @Bound new() {
-    this.$router.navigate(["/groups", "new"]);
   }
 }

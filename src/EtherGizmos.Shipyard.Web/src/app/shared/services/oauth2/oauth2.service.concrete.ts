@@ -17,7 +17,12 @@ export class ConcreteOAuth2Service extends OAuth2Service {
   private oidcReady$$ = signal(false);
   private onReadyResolve!: () => void;
   readonly onReady = new Promise<void>((resolve, reject) => {
-    this.onReadyResolve = resolve;
+    this.onReadyResolve = () => {
+      console.log("resolving...");
+      resolve();
+      console.log("resolved");
+      console.log(new Error().stack);
+    };
   });
   readonly isReady$$ = signal(false);
   readonly accessToken$$ = signal("");
@@ -35,11 +40,14 @@ export class ConcreteOAuth2Service extends OAuth2Service {
 
       this.accessToken$$.set(await firstValueFrom(this.$oidc.getAccessToken()));
       this.idToken$$.set(await firstValueFrom(this.$oidc.getIdToken()));
+      let idTokenData: object;
       if (auth.isAuthenticated) {
-        this.idTokenData$$.set(await firstValueFrom(this.$oidc.getPayloadFromIdToken()));
+        idTokenData = await firstValueFrom(this.$oidc.getPayloadFromIdToken());
       } else {
-        this.idTokenData$$.set({});
+        idTokenData = {};
       }
+      console.log("id token data", idTokenData);
+      this.idTokenData$$.set(idTokenData);
 
       if (oidcReady) {
         this.onReadyResolve();
@@ -63,7 +71,7 @@ export class ConcreteOAuth2Service extends OAuth2Service {
       if (response.isAuthenticated) {
         //If the session is authenticated, it will function as expected
         this.$logger.information("Session is currently authenticated");
-        this.onReadyResolve();
+        this.oidcReady$$.set(true);
       } else {
         this.$logger.information("Session is not currently authenticated; will wait for the next access token");
         const nowAccessToken = response.accessToken;

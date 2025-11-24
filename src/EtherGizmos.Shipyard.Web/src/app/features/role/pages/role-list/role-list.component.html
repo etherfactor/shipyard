@@ -2,8 +2,8 @@
 <div class="row">
   <div class="col-12 mt-3">
 
-    <detail-header text="Groups"
-                   subtext="Manage logical groups of users and view their members." />
+    <detail-header text="Roles"
+                   subtext="Manage security groups and view their members." />
 
   </div>
 </div>
@@ -12,8 +12,8 @@
 <div class="row">
   <div class="col-12 mt-3">
 
-    <detail-box icon="bi-people"
-                text="Groups List">
+    <detail-box icon="bi-shield-lock"
+                text="Roles List">
       <div class="mt-3">
         <app-table [data]="records" [minRows]="perPage" [isLoading]="isLoading()"
                    [sort]="activeSort" (sortChange)="onSortChange($event)"
@@ -53,7 +53,7 @@
               {{row.users?.length ?? 0}}
             </td>
             <td class="text-nowrap">
-              <a [routerLink]="['/groups/', row.id]">View</a>
+              <a [routerLink]="['/roles/', row.id]">View</a>
             </td>
           </ng-template>
         </app-table>

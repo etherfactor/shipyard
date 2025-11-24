@@ -38,6 +38,11 @@ export const APP_ROUTES: ExtendedRoute[] = [
     canActivate: [authenticationGuard],
   },
   {
+    path: "roles",
+    loadChildren: () => import("./features/role/role.routes").then(m => m.ROLE_ROUTES),
+    canActivate: [authenticationGuard],
+  },
+  {
     path: "",
     loadChildren: () => import("./features/error/error.routes").then(m => m.ERROR_ROUTES),
   },
