@@ -21,6 +21,10 @@ public class PackageConfiguration : IEntityTypeConfiguration<Package>
 
         entity.AuditProperties();
 
+        entity.HasOne(e => e.CreatedByUser)
+            .WithMany()
+            .HasForeignKey(e => e.CreatedByUserId);
+
         entity.Property(e => e.CarrierId)
             .HasColumnName("carrier_id");
 
@@ -56,5 +60,15 @@ public class PackageConfiguration : IEntityTypeConfiguration<Package>
         entity.HasMany(e => e.TrackingUpdates)
             .WithOne(e => e.Package)
             .HasForeignKey(e => e.PackageId);
+
+        entity.Property(e => e.GroupId)
+            .HasColumnName("group_id");
+
+        entity.HasOne(e => e.Group);
+
+        entity.Property(e => e.SecurableId)
+            .HasColumnName("securable_id");
+
+        entity.HasOne(e => e.Securable);
     }
 }

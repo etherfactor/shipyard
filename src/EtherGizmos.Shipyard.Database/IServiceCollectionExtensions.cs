@@ -1,5 +1,6 @@
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Configuration;
+using EtherGizmos.Common.Services;
 using EtherGizmos.Extensions.DependencyInjection;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Configuration;
@@ -8,6 +9,7 @@ using EtherGizmos.Shipyard.Services;
 using FluentMigrator.Runner;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Reflection;
@@ -75,6 +77,9 @@ public static class IServiceCollectionExtensions
             })
             .ImportLogging()
             .ForwardScoped<IMigrationRunner>();
+
+        @this.AddHttpContextAccessor();
+        @this.TryAddSingleton<IUserContext, UserContext>();
 
         return @this;
     }

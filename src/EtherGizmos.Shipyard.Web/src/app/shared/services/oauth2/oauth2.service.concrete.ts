@@ -14,6 +14,7 @@ export class ConcreteOAuth2Service extends OAuth2Service {
   private readonly $oidc = inject(OidcSecurityService);
   private readonly $router = inject(Router);
 
+  private oidcReady$$ = signal(false);
   private onReadyResolve!: () => void;
   readonly onReady = new Promise<void>((resolve, reject) => {
     this.onReadyResolve = resolve;
@@ -28,15 +29,24 @@ export class ConcreteOAuth2Service extends OAuth2Service {
 
     this.initialize();
 
-    effect(() => {
+    effect(async () => {
       const auth = this.$oidc.authenticated();
+      const oidcReady = this.oidcReady$$();
 
-      this.$oidc.getAccessToken().subscribe(token => this.accessToken$$.set(token));
-      this.$oidc.getIdToken().subscribe(token => this.idToken$$.set(token));
+      this.accessToken$$.set(await firstValueFrom(this.$oidc.getAccessToken()));
+
+      this.idToken$$.set(await firstValueFrom(this.$oidc.getIdToken()));
+
+      let idTokenData: object;
       if (auth.isAuthenticated) {
-        this.$oidc.getPayloadFromIdToken().subscribe(token => this.idTokenData$$.set(token));
+        idTokenData = await firstValueFrom(this.$oidc.getPayloadFromIdToken());
       } else {
-        this.idTokenData$$.set({});
+        idTokenData = {};
+      }
+      this.idTokenData$$.set(idTokenData);
+
+      if (oidcReady) {
+        this.onReadyResolve();
       }
     });
   }
@@ -47,7 +57,7 @@ export class ConcreteOAuth2Service extends OAuth2Service {
 
     if (refreshToken) {
       this.$logger.information("Found a refresh token");
-      let check = this.$oidc.checkAuthIncludingServer();
+      let check = this.$oidc.checkAuthIncludingServer();  
       check = check.pipe(
         catchError(() => timer(1000).pipe(
           switchMap(() => check),
@@ -57,7 +67,7 @@ export class ConcreteOAuth2Service extends OAuth2Service {
       if (response.isAuthenticated) {
         //If the session is authenticated, it will function as expected
         this.$logger.information("Session is currently authenticated");
-        this.onReadyResolve();
+        this.oidcReady$$.set(true);
       } else {
         this.$logger.information("Session is not currently authenticated; will wait for the next access token");
         const nowAccessToken = response.accessToken;
@@ -72,7 +82,7 @@ export class ConcreteOAuth2Service extends OAuth2Service {
         ).subscribe(() => {
           //We now have the access token and are ready to go
           this.$logger.information("Found a new access token");
-          this.onReadyResolve();
+          this.oidcReady$$.set(true);
         });
       }
     } else {
@@ -80,7 +90,7 @@ export class ConcreteOAuth2Service extends OAuth2Service {
       await firstValueFrom(this.$oidc.checkAuth());
 
       //There's no session, so we can start whenever
-      this.onReadyResolve();
+      this.oidcReady$$.set(true);
     }
   }
 

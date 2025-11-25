@@ -1,5 +1,7 @@
 using Asp.Versioning;
+using EtherGizmos.Shipyard.Api.Services.Security;
 using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +23,7 @@ public class TrackingUpdatesController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute)]
+    [HasCapability(SecurableType.Package, PermissionId.Read)]
     [ProducesResponseSet]
     [ProducesResponseType(200, Type = typeof(TrackingUpdateDTO)), SwaggerResponseExample(200, typeof(TrackingUpdateDTOExampleGet))]
     public Task<IActionResult> Search(
@@ -31,6 +34,7 @@ public class TrackingUpdatesController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute + "({id})")]
+    [HasCapability(SecurableType.Package, PermissionId.Read)]
     [ProducesResponseType(200, Type = typeof(TrackingUpdateDTO)), SwaggerResponseExample(200, typeof(TrackingUpdateDTOExampleGet))]
     public Task<IActionResult> Get(
         int id,

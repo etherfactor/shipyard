@@ -43,11 +43,11 @@ import { provideODataClient } from './app/shared/utilities/odata/odata.util';
           [ConsoleSink, HttpBatchLogSink, SourceContextEnricher, NumberDestructurer] as const,
           (consoleSink, httpBatchLogSink, sourceContextEnricher, numberDestructurer) =>
             new LoggerConfiguration()
-              .minimumLevel.information()
+              .minimumLevel.set(config.logging.minimumLevel)
               .writeTo.sink(consoleSink)
               .writeTo.sink(httpBatchLogSink)
               .enrich.with(sourceContextEnricher)
-              .destructure.destructure(numberDestructurer)
+              .destructure.with(numberDestructurer)
               .createLogger()
         ),
         provideSimpleConfig(HTTP_BATCH_LOG_SINK_OPTIONS, {

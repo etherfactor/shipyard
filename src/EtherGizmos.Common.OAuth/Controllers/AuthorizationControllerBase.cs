@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Extensions;
+﻿using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.ViewModels;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -21,6 +21,7 @@ public abstract class AuthorizationControllerBase : Controller
     private readonly IOpenIddictApplicationManager _applicationManager;
     private readonly IOpenIddictAuthorizationManager _authorizationManager;
     private readonly IOpenIddictScopeManager _scopeManager;
+    private readonly IOAuth2PrincipalFactory _principalFactory;
 
     protected virtual string ServerScheme => OpenIddictServerAspNetCoreDefaults.AuthenticationScheme;
 
@@ -32,6 +33,7 @@ public abstract class AuthorizationControllerBase : Controller
         _applicationManager = serviceProvider.GetRequiredService<IOpenIddictApplicationManager>();
         _authorizationManager = serviceProvider.GetRequiredService<IOpenIddictAuthorizationManager>();
         _scopeManager = serviceProvider.GetRequiredService<IOpenIddictScopeManager>();
+        _principalFactory = serviceProvider.GetRequiredService<IOAuth2PrincipalFactory>();
     }
 
     [IgnoreAntiforgeryToken]
@@ -86,19 +88,19 @@ public abstract class AuthorizationControllerBase : Controller
 
         if (consentIsImplicit || (!consentIsForced && existingAuthorization is not null))
         {
-            var identity = await CreateOAuth2PrincipalAsync(
-                user: result.Principal!,
-                request: result.Request,
-                applicationName: applicationName,
-                scopes: requestedScopes,
-                cancellationToken: cancellationToken);
+            var context = OAuth2PrincipalContext.FromAuthorizeEndpoint(
+                HttpContext,
+                result.Request,
+                result.Principal);
 
-            identity.SetScopes(requestedScopes);
+            var identity = await _principalFactory.CreateAsync(
+                ServerScheme,
+                context,
+                cancellationToken: cancellationToken);
 
             if (existingAuthorization is not null)
                 identity.SetAuthorizationId(await _authorizationManager.GetIdAsync(existingAuthorization, cancellationToken));
 
-            identity.SetDestinations(GetDestinations);
             return SignIn(new ClaimsPrincipal(identity), ServerScheme);
         }
 
@@ -131,15 +133,17 @@ public abstract class AuthorizationControllerBase : Controller
             .Select(e => e.Name)
             .ToImmutableArray();
 
-        var principal = await CreateOAuth2PrincipalAsync(
-            user: result.Principal!,
-            request: result.Request,
-            applicationName: applicationName,
-            scopes: acceptedScopes,
+        var context = OAuth2PrincipalContext.FromAuthorizeEndpoint(
+                HttpContext,
+                result.Request,
+                result.Principal);
+
+        var identity = await _principalFactory.CreateAsync(
+            ServerScheme,
+            context,
             cancellationToken: cancellationToken);
 
-        principal.SetScopes(acceptedScopes);
-        principal.SetDestinations(GetDestinations);
+        var principal = new ClaimsPrincipal(identity);
 
         var consentType = await _applicationManager.GetConsentTypeAsync(application, cancellationToken);
         var subject = result.Principal!.GetClaim(Claims.Subject)!;
@@ -181,14 +185,53 @@ public abstract class AuthorizationControllerBase : Controller
         var request = HttpContext.GetOpenIddictServerRequest()
             ?? throw new InvalidOperationException("No OpenIddict request could be retrieved.");
 
+        var result = await HttpContext.AuthenticateAsync(ServerScheme);
+        if (!result.Succeeded)
+            return Forbid(ServerScheme);
+
         if (request.IsAuthorizationCodeGrantType() || request.IsRefreshTokenGrantType())
         {
-            var result = await HttpContext.AuthenticateAsync(ServerScheme);
-            if (!result.Succeeded)
-                return Forbid(ServerScheme);
+            var context = OAuth2PrincipalContext.FromAuthorizationCode(
+                HttpContext,
+                request,
+                result.Principal);
 
-            var principal = result.Principal!;
-            await EnrichOAuth2PrincipalAsync(principal, request, cancellationToken);
+            var identity = await _principalFactory.CreateAsync(
+                ServerScheme,
+                context,
+                cancellationToken: cancellationToken);
+
+            var principal = new ClaimsPrincipal(identity);
+            return SignIn(principal, ServerScheme);
+        }
+        else if (request.IsRefreshTokenGrantType())
+        {
+            var context = OAuth2PrincipalContext.FromRefreshToken(
+                HttpContext,
+                request,
+                result.Principal);
+
+            var identity = await _principalFactory.CreateAsync(
+                ServerScheme,
+                context,
+                cancellationToken: cancellationToken);
+
+            var principal = new ClaimsPrincipal(identity);
+            return SignIn(principal, ServerScheme);
+        }
+        else if (request.IsClientCredentialsGrantType())
+        {
+            var context = OAuth2PrincipalContext.FromClientCredentials(
+                HttpContext,
+                request,
+                result.Principal);
+
+            var identity = await _principalFactory.CreateAsync(
+                ServerScheme,
+                context,
+                cancellationToken: cancellationToken);
+
+            var principal = new ClaimsPrincipal(identity);
             return SignIn(principal, ServerScheme);
         }
 
@@ -291,57 +334,6 @@ public abstract class AuthorizationControllerBase : Controller
         }
 
         return null;
-    }
-
-    protected virtual Task<ClaimsPrincipal> CreateOAuth2PrincipalAsync(
-        ClaimsPrincipal user,
-        OpenIddictRequest request,
-        string applicationName,
-        IEnumerable<string> scopes,
-        CancellationToken cancellationToken = default)
-    {
-        var identity = new ClaimsIdentity(
-            authenticationType: ServerScheme,
-            nameType: Claims.Name,
-            roleType: Claims.Role);
-
-        identity.AddClaim(Claims.Subject, user.GetClaim(Claims.Subject)!);
-        identity.TryAddClaim(Claims.Name, user.GetClaim(Claims.Name));
-        identity.TryAddClaim(Claims.GivenName, user.GetClaim(Claims.GivenName));
-        identity.TryAddClaim(Claims.FamilyName, user.GetClaim(Claims.FamilyName));
-        identity.TryAddClaim(Claims.Email, user.GetClaim(Claims.Email));
-        identity.TryAddClaim("client_name", applicationName);
-
-        identity.SetScopes(scopes);
-
-        //identity.SetAuthorizationId(user.GetAuthorizationId());
-
-        identity.SetDestinations(GetDestinations);
-
-        var principal = new ClaimsPrincipal(identity);
-        return Task.FromResult(principal);
-    }
-
-    protected virtual Task EnrichOAuth2PrincipalAsync(
-        ClaimsPrincipal principal,
-        OpenIddictRequest request,
-        CancellationToken ct)
-        => Task.CompletedTask;
-
-    protected virtual IEnumerable<string> GetDestinations(Claim claim)
-    {
-        switch (claim.Type)
-        {
-            case Claims.Name:
-            case Claims.GivenName:
-            case Claims.FamilyName:
-            case Claims.Email:
-                yield return Destinations.AccessToken;
-                yield return Destinations.IdentityToken;
-                yield break;
-        }
-
-        yield return Destinations.AccessToken;
     }
 
     protected virtual async Task<ConsentViewModel> BuildConsentViewModelAsync(

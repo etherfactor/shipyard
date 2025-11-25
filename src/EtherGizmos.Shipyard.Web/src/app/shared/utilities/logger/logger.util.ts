@@ -21,13 +21,27 @@ type InstancesOf<T extends readonly Type<any>[]> = {
  * The severity level of the log event.
  */
 export enum LogLevel {
-  None = 0,
-  Verbose = 1,
-  Debug = 2,
-  Information = 3,
-  Warning = 4,
-  Error = 5,
-  Fatal = 6,
+  None = "None",
+  Verbose = "Verbose",
+  Debug = "Debug",
+  Information = "Information",
+  Warning = "Warning",
+  Error = "Error",
+  Fatal = "Fatal",
+}
+
+const logLevelMap: Record<LogLevel, number> = {
+  None: 0,
+  Verbose: 1,
+  Debug: 2,
+  Information: 3,
+  Warning: 4,
+  Error: 5,
+  Fatal: 6,
+};
+
+function levelToOrder(level: LogLevel) {
+  return logLevelMap[level];
 }
 
 /**
@@ -174,7 +188,7 @@ export class LoggerConfiguration {
      * @param filter The filter to add.
      * @returns The builder.
     */
-    filter: (filter: FilterInput): this => {
+    with: (filter: FilterInput): this => {
       let filterInstance: LogFilter;
       if (typeof filter === "function") {
         if ("prototype" in filter && filter.prototype && "constructor" in filter.prototype) {
@@ -199,7 +213,7 @@ export class LoggerConfiguration {
      * @param destructurer The destructurer to add.
      * @returns The builder.
     */
-    destructure: (destructurer: DestructureInput): this => {
+    with: (destructurer: DestructureInput): this => {
       let destructurerInstance: LogDestructurer;
       if (typeof destructurer === "function") {
         if ("prototype" in destructurer && destructurer.prototype && "constructor" in destructurer.prototype) {
@@ -219,6 +233,14 @@ export class LoggerConfiguration {
    * Configures the minimum level of the logger. The most restrictive filter applies.
    */
   readonly minimumLevel = {
+    /**
+     * Sets the minimum level of the logger to the specified level.
+     * @returns The builder.
+    */
+    set: (level: LogLevel): this => {
+      this.setMinimumLevel(level);
+      return this;
+    },
     /**
      * Sets the minimum level of the logger to {@link LogLevel.Verbose}.
      * @returns The builder.
@@ -278,7 +300,7 @@ export class LoggerConfiguration {
   }
 
   private setMinimumLevel(level: LogLevel) {
-    if (this.options.minimumLevel < level) {
+    if (levelToOrder(this.options.minimumLevel) < levelToOrder(level)) {
       this.options.minimumLevel = level;
     }
   }
@@ -320,7 +342,7 @@ export class Logger {
   log(level: LogLevel, ex: Error, message: string, ...properties: any[]): void;
   log(level: LogLevel, message: string, ...properties: any[]): void;
   log(level: LogLevel, ...params: any[]) {
-    if (level < this.options.minimumLevel)
+    if (levelToOrder(level) < levelToOrder(this.options.minimumLevel))
       return;
 
     //Create a new log event

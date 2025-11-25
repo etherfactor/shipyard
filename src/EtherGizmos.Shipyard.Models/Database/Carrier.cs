@@ -17,4 +17,8 @@ public class Carrier : Auditable, IEntity
     public virtual List<CarrierRunbookStep> Steps { get; set; } = [];
 
     public virtual List<CarrierStatusRule> Rules { get; set; } = [];
+
+    public virtual Guid SecurableId { get; set; }
+
+    public virtual Securable Securable { get; set; } = new() { Type = Enums.SecurableType.Carrier };
 }

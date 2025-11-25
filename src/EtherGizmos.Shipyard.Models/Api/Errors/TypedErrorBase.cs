@@ -1,4 +1,3 @@
-using EtherGizmos.Shipyard.Models.Api.Errors;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 

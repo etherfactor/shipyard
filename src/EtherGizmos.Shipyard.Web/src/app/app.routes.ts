@@ -27,6 +27,25 @@ export const APP_ROUTES: ExtendedRoute[] = [
     loadChildren: () => import("./features/carrier/carrier.routes").then(m => m.CARRIER_ROUTES),
     canActivate: [authenticationGuard],
   },
+  {
+    path: "users",
+    loadChildren: () => import("./features/user/user.routes").then(m => m.USER_ROUTES),
+    canActivate: [authenticationGuard],
+  },
+  {
+    path: "groups",
+    loadChildren: () => import("./features/group/group.routes").then(m => m.GROUP_ROUTES),
+    canActivate: [authenticationGuard],
+  },
+  {
+    path: "roles",
+    loadChildren: () => import("./features/role/role.routes").then(m => m.ROLE_ROUTES),
+    canActivate: [authenticationGuard],
+  },
+  {
+    path: "",
+    loadChildren: () => import("./features/error/error.routes").then(m => m.ERROR_ROUTES),
+  },
 ];
 
 export type ExtendedRoute = ParentRoute | BreadedRoute;

@@ -24,5 +24,10 @@ public class CarrierConfiguration : IEntityTypeConfiguration<Carrier>
 
         entity.Property(e => e.Slug)
             .HasColumnName("slug");
+
+        entity.Property(e => e.SecurableId)
+            .HasColumnName("securable_id");
+
+        entity.HasOne(e => e.Securable);
     }
 }

@@ -68,6 +68,7 @@
               Carrier
             </label>
             <div class="col-sm-8">
+              @if (canViewCarriers$$()) {
               <ng-select id="carrierId" formControlName="carrierId" [readonly]="!isEditing$$()" [readonlyForm]="!isEditing$$()">
                 @for (carrier of carriers$$(); track carrier.id) {
                 <ng-option [value]="carrier.id">
@@ -75,6 +76,11 @@
                 </ng-option>
                 }
               </ng-select>
+              } @else {
+              <div ngbTooltip="You don't have permission to view or change carriers.">
+                <input type="text" readonly class="form-control-plaintext" value="(Hidden — insufficient permissions)" />
+              </div>
+              }
             </div>
           </div>
         </div>

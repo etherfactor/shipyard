@@ -31,6 +31,17 @@ public static class ErrorConstants
             public const string MissingToken = $"{Source.Client}.{Root}.missingToken";
         }
 
+        public static class Authorization
+        {
+            public const string Root = "authorization";
+
+            public const string CannotEditUser = $"{Source.Client}.{Root}.cannotEditUser";
+
+            public const string CannotGrantPermission = $"{Source.Client}.{Root}.cannotGrantPermission";
+
+            public const string MissingPermission = $"{Source.Client}.{Root}.missingPermission";
+        }
+
         public static class Reference
         {
             public const string Root = "reference";

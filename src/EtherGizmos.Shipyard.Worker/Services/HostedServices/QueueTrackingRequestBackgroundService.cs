@@ -2,6 +2,7 @@ using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
+using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +29,7 @@ public class QueueTrackingRequestBackgroundService : PeriodicBackgroundService
         IServiceProvider provider,
         CancellationToken stoppingToken)
     {
-        var uowFactory = provider.GetRequiredService<IUnitOfWorkFactory>();
+        var uowFactory = provider.GetRequiredService<IUnitOfWorkFactory>().AsUnfiltered();
         using var uow = uowFactory.Create();
 
         var packageRepo = uow.Repository<Package>();

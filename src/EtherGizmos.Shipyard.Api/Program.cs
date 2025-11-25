@@ -1,4 +1,5 @@
 using EtherGizmos.Common;
+using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Configuration;
 using EtherGizmos.Common.Services;
 using EtherGizmos.Shipyard;
@@ -9,6 +10,7 @@ using EtherGizmos.Shipyard.Api.Services.Health;
 using EtherGizmos.Shipyard.Api.Services.HostedServices;
 using EtherGizmos.Shipyard.Api.Services.Logging;
 using EtherGizmos.Shipyard.Api.Services.Middleware;
+using EtherGizmos.Shipyard.Api.Services.Pipeline.OAuth2;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Services;
@@ -77,9 +79,19 @@ builder.UseOAuth2()
             .GetSection("Security")
             .Bind(opt);
 
+        opt.ScanAssemblies =
+        [
+            typeof(ApplicationContext).Assembly,
+            typeof(User).Assembly,
+        ];
+
         opt.Cookie.LoginUrl = "/account/login";
         opt.Cookie.LogoutUrl = "/account/logout";
     });
+
+builder.Services.AddScoped<IClaimsPipelineStep<OAuth2PrincipalContext>, OAuth2SetUserCapabilitiesStep>();
+builder.Services.AddScoped<IClaimsPipelineStep<OAuth2PrincipalContext>, OAuth2SetUsernameStep>();
+builder.Services.AddScoped<IClaimsPipelineStep<OAuth2PrincipalContext>, OAuth2ApplyDestinationsStep>();
 
 // Database
 builder.Services

@@ -1,12 +1,11 @@
 using EtherGizmos.Common.Extensions;
-using EtherGizmos.Shipyard.Api.Errors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Net;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace EtherGizmos.Shipyard.Models.Api.Errors;
+namespace EtherGizmos.Shipyard.Api.Errors;
 
 partial class Error
 {

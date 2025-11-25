@@ -12,7 +12,10 @@ import { Bound } from '../../../../shared/utilities/bound/bound.util';
 import { TypedFormGroup, getDirtyFormValues } from '../../../../shared/utilities/form/form.util';
 import { o } from '../../../../shared/utilities/odata/odata.util';
 import { NavbarAction } from '../../../app/components/navbar-action/navbar-action.component';
+import { UserSessionService } from '../../../login/services/user-session/user-session.service';
 import { StatusType, getStatusTypeMetadata } from '../../../package/models/status-type';
+import { PermissionId } from '../../../security/models/permission-id';
+import { SecurableType } from '../../../security/models/securable-type';
 import { RunbookStepComponent } from '../../components/runbook-step/runbook-step.component';
 import { Carrier, carrierForm } from '../../models/carrier';
 import { CarrierExecution } from '../../models/carrier-execution';
@@ -44,6 +47,7 @@ export class CarrierDetailComponent {
   private readonly $navbarAction = inject(NavbarActionService);
   private readonly $route = inject(ActivatedRoute);
   private readonly $router = inject(Router);
+  private readonly $session = inject(UserSessionService);
 
   readonly id$$ = signal<number | undefined>(undefined);
   readonly carrier$$ = signal<Carrier | undefined>(undefined);
@@ -66,17 +70,23 @@ export class CarrierDetailComponent {
     //const record = this.record$$();
 
     if (!this.isLoading$$()) {
+      const hasWrite = this.$session.hasCapability(SecurableType.Carrier, PermissionId.Write);
+      const hasDelete = this.$session.hasCapability(SecurableType.Carrier, PermissionId.Delete);
       if (!this.isEditing$$()) {
-        actions.push({
-          icon: "bi-pencil",
-          label: "Edit",
-          callback: this.onEdit,
-        });
-        actions.push({
-          icon: "bi-trash",
-          label: "Delete",
-          callback: this.onDelete,
-        });
+        if (hasWrite) {
+          actions.push({
+            icon: "bi-pencil",
+            label: "Edit",
+            callback: this.onEdit,
+          });
+        }
+        if (hasDelete) {
+          actions.push({
+            icon: "bi-trash",
+            label: "Delete",
+            callback: this.onDelete,
+          });
+        }
       } else {
         actions.push({
           icon: "bi-save",

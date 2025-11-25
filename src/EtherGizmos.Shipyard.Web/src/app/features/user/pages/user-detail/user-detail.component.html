@@ -1,0 +1,191 @@
+@let record = user$$();
+@let form = form$$();
+
+<!-- Header -->
+<div class="row">
+  <div class="col-12 mt-3">
+    @if (record?.id) {
+    @let person = { handle: record?.username ?? undefined, given: record?.givenName ?? undefined, family: record?.familyName ?? undefined, full: record?.fullName ?? undefined };
+    <detail-header [text]="'User Details'"
+                   [subtext]="'Viewing ' + formatName(person, 'display')" />
+    } @else {
+    <detail-header [text]="'User Details'"
+                   [subtext]="'Creating new user'" />
+    }
+  </div>
+</div>
+
+@if (record && form) {
+
+<!-- Summary -->
+<div class="row" [formGroup]="form">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-person" text="User Summary">
+      <div class="row">
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="username" class="col-sm-4 col-form-label">
+              Username
+            </label>
+            <div class="col-sm-8">
+              <input id="username"
+                     type="text"
+                     formControlName="username"
+                     [readonlyForm]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="password" class="col-sm-4 col-form-label">
+              Change password
+            </label>
+            <div class="col-sm-8">
+              <input id="password"
+                     type="password"
+                     formControlName="password"
+                     [readonlyForm]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="email" class="col-sm-4 col-form-label">
+              Email address
+            </label>
+            <div class="col-sm-8">
+              <input id="email"
+                     type="email"
+                     formControlName="emailAddress"
+                     [readonlyForm]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="fullName" class="col-sm-4 col-form-label">
+              Full name
+            </label>
+            <div class="col-sm-8">
+              <input id="fullName"
+                     type="text"
+                     formControlName="fullName"
+                     [readonlyForm]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="givenName" class="col-sm-4 col-form-label">
+              Given name
+            </label>
+            <div class="col-sm-8">
+              <input id="givenName"
+                     type="text"
+                     formControlName="givenName"
+                     [readonlyForm]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="familyName" class="col-sm-4 col-form-label">
+              Family name
+            </label>
+            <div class="col-sm-8">
+              <input id="familyName"
+                     type="text"
+                     formControlName="familyName"
+                     [readonlyForm]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </detail-box>
+  </div>
+</div>
+
+<!-- Security -->
+<div class="row" [formGroup]="form">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-shield-lock" text="Security">
+      <div class="row">
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="groupId" class="col-sm-4 col-form-label">
+              Group
+            </label>
+            <div class="col-sm-8">
+              @if (canViewGroups$$()) {
+              <ng-select id="groupId"
+                         formControlName="groupId"
+                         [clearable]="false"
+                         [readonly]="!isEditing$$()"
+                         [readonlyForm]="!isEditing$$()">
+                @for (group of groups$$(); track group.id) {
+                <ng-option [value]="group.id">
+                  {{group.name}}
+                </ng-option>
+                }
+              </ng-select>
+              } @else {
+              <div ngbTooltip="You don't have permission to view or change groups.">
+                <input type="text" readonly class="form-control-plaintext" value="(Hidden — insufficient permissions)" />
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="roleIds" class="col-sm-4 col-form-label">
+              Roles
+            </label>
+            <div class="col-sm-8">
+              @if (canViewRoles$$()) {
+              <ng-select id="roleIds"
+                         [formControl]="newRoleIds$$()"
+                         [clearable]="false"
+                         [multiple]="true"
+                         [readonly]="!isEditing$$()"
+                         [readonlyForm]="!isEditing$$()">
+                @for (role of roles$$(); track role.id) {
+                <ng-option [value]="role.id">
+                  {{role.name}}
+                </ng-option>
+                }
+              </ng-select>
+              } @else {
+              <div ngbTooltip="You don't have permission to view or change roles.">
+                <input type="text" readonly class="form-control-plaintext" value="(Hidden — insufficient permissions)" />
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </detail-box>
+  </div>
+</div>
+}
+
+<!-- Loading Overlay (same pattern as carrier) -->
+@if (isLoading$$()) {
+<div style="position: fixed; top: 0; left: 0; height: 100%; width: 100%; background-color: color-mix(in srgb, var(--bs-body-bg) 50%, transparent); z-index: 100;">
+</div>
+<div style="position: fixed; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%); z-index: 100%;">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+}
