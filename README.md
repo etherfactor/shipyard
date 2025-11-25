@@ -11,6 +11,7 @@
 * **Dashboard view** for tracking package statuses at a glance
 * **Email notifications** (SMTP) for out-for-delivery and delivered updates
 * **Docker-first deployment** via a single `compose.yml` file
+* **User and role management** backed by an access control list
 
 ## Architecture
 
