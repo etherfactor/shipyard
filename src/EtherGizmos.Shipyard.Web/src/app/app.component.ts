@@ -1,6 +1,7 @@
 import { Component, computed, inject, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NavbarComponent } from './features/app/components/navbar/navbar.component';
+import { ToastComponent } from './features/app/components/toast/toast.component';
 import { UserSessionService } from './features/login/services/user-session/user-session.service';
 import { OAuth2Service } from './shared/services/oauth2/oauth2.service';
 import { Logger } from './shared/utilities/logger/logger.util';
@@ -10,6 +11,7 @@ import { Logger } from './shared/utilities/logger/logger.util';
   imports: [
     NavbarComponent,
     RouterModule,
+    ToastComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
