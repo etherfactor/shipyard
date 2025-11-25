@@ -124,6 +124,7 @@
               Group
             </label>
             <div class="col-sm-8">
+              @if (canViewGroups$$()) {
               <ng-select id="groupId"
                          formControlName="groupId"
                          [clearable]="false"
@@ -135,6 +136,11 @@
                 </ng-option>
                 }
               </ng-select>
+              } @else {
+              <div ngbTooltip="You don't have permission to view or change groups.">
+                <input type="text" readonly class="form-control-plaintext" value="(Hidden — insufficient permissions)" />
+              </div>
+              }
             </div>
           </div>
         </div>
@@ -145,6 +151,7 @@
               Roles
             </label>
             <div class="col-sm-8">
+              @if (canViewRoles$$()) {
               <ng-select id="roleIds"
                          [formControl]="newRoleIds$$()"
                          [clearable]="false"
@@ -157,6 +164,11 @@
                 </ng-option>
                 }
               </ng-select>
+              } @else {
+              <div ngbTooltip="You don't have permission to view or change roles.">
+                <input type="text" readonly class="form-control-plaintext" value="(Hidden — insufficient permissions)" />
+              </div>
+              }
             </div>
           </div>
         </div>

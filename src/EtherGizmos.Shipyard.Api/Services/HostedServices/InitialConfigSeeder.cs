@@ -43,7 +43,7 @@ public class InitialConfigSeeder : IHostedService
         var admin = await CreateOrUpdateRoleAsync(uow,
             systemId: new Guid("1706f63d-9bc5-4251-bf61-a50d5c705e08"),
             name: "System Owner",
-            description: "The System Owner has unrestricted access to all data and configuration in Shipyard. This role can manage carriers, users, roles, and groups across the entire instance and can see every package from every group.",
+            description: "The System Owner has unrestricted access to all data and configuration in Shipyard. This role can manage carriers, users, roles, and groups across the entire instance and can see and edit every package from every group.",
             permissions:
             [
                 //Global R/W/D on carriers
@@ -77,7 +77,7 @@ public class InitialConfigSeeder : IHostedService
         await CreateOrUpdateRoleAsync(uow,
             systemId: new Guid("a1008dc3-510a-47cf-a6fa-92cf13c9574c"),
             name: "Carrier Manager",
-            description: "The Carrier Manager can create, edit, and delete all carriers and tracking integrations. This role is meant for the \"tech person\" who maintains tracking logic without having full system ownership.",
+            description: "The Carrier Manager can create, edit, and delete all carriers and tracking integrations. Grant this role to a user to allow them to connect carriers without necessarily granting them full system access.",
             permissions:
             [
                 //Global R/W/D on carriers
@@ -85,7 +85,7 @@ public class InitialConfigSeeder : IHostedService
                 new(SecurableType: SecurableType.Carrier, PermissionId: PermissionId.Write, GrantType: PermissionGrantType.Full),
                 new(SecurableType: SecurableType.Carrier, PermissionId: PermissionId.Delete, GrantType: PermissionGrantType.Full),
 
-                //Filtered R
+                //Filtered R on packages
                 new(SecurableType: SecurableType.Package, PermissionId: PermissionId.Read, GrantType: PermissionGrantType.Filter),
             ],
             cancellationToken: cancellationToken);
@@ -94,7 +94,7 @@ public class InitialConfigSeeder : IHostedService
         await CreateOrUpdateRoleAsync(uow,
             systemId: new Guid("73b5274e-d972-4669-9a2f-8c1cfe0318dd"),
             name: "User Manager",
-            description: "The User Manager handles people, not data. This role can create, edit, and deactivate users across all groups and adjust their group memberships. They can see which roles exist, but cannot change roles, carriers, or any packages; it's focused purely on account and group membership administration.",
+            description: "The User Manager can create, edit, and deactivate users across all groups and adjust their roles and group memberships. Grant this role to a user to allow them to manage other users without necessarily granting them full system access.",
             permissions:
             [
                 //Global R/W/D on users
@@ -104,6 +104,9 @@ public class InitialConfigSeeder : IHostedService
 
                 //Global R on roles
                 new(SecurableType: SecurableType.Role, PermissionId: PermissionId.Read, GrantType: PermissionGrantType.Full),
+
+                //Global R on groups
+                new(SecurableType: SecurableType.Group, PermissionId: PermissionId.Read, GrantType: PermissionGrantType.Full),
             ],
             cancellationToken: cancellationToken);
 
@@ -111,7 +114,7 @@ public class InitialConfigSeeder : IHostedService
         await CreateOrUpdateRoleAsync(uow,
             systemId: new Guid("1a72edd6-cc8f-4cb6-b7c6-39364dc73d6f"),
             name: "Group Owner",
-            description: "The Group Owner manages everything within a single group. They can add, edit, or remove users in their group and fully manage that group's packages (including soft deletes).",
+            description: "The Group Owner manages everything within a single group. They can add, edit, or remove users in their group and fully manage that group's packages.",
             permissions:
             [
                 //Global R on carriers
@@ -129,6 +132,9 @@ public class InitialConfigSeeder : IHostedService
 
                 //Global R on roles
                 new(SecurableType: SecurableType.Role, PermissionId: PermissionId.Read, GrantType: PermissionGrantType.Full),
+
+                //Filtered R on roles
+                new(SecurableType: SecurableType.Group, PermissionId: PermissionId.Read, GrantType: PermissionGrantType.Filter),
             ],
             cancellationToken: cancellationToken);
 
@@ -136,7 +142,7 @@ public class InitialConfigSeeder : IHostedService
         await CreateOrUpdateRoleAsync(uow,
             systemId: new Guid("24f66204-1747-4e44-868c-b9fcd656a772"),
             name: "Member",
-            description: "Members are standard users in a group. They can create, edit, and soft-delete packages that belong to their own group, and they can view all carriers configured in the system. They cannot see or manage other groups, users, roles, or carrier configuration.",
+            description: "Members are standard users in a group. They can create, edit, and delete packages that belong to their own group, and they can view all carriers configured in the system. By default, they cannot see or manage other groups, users, roles, or carrier configuration.",
             permissions:
             [
                 //Global R on carriers

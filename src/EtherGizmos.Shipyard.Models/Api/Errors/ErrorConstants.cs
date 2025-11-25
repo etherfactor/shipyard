@@ -35,6 +35,10 @@ public static class ErrorConstants
         {
             public const string Root = "authorization";
 
+            public const string CannotEditUser = $"{Source.Client}.{Root}.cannotEditUser";
+
+            public const string CannotGrantPermission = $"{Source.Client}.{Root}.cannotGrantPermission";
+
             public const string MissingPermission = $"{Source.Client}.{Root}.missingPermission";
         }
 

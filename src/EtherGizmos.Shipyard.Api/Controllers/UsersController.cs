@@ -136,10 +136,129 @@ public class UsersController : AutoODataController
         => ForItem(
             KeyMapping<User, UserDTO, Guid>.Create(id, e => e.Id, e => e.Id));
 
-    private IReferenceRequestBuilder<Role, RoleDTO> ForRoleRef(
+    private IReferenceRequestBuilder<User, UserDTO, Role, RoleDTO> ForRoleRef(
         Guid id,
         int roleId)
         => ForItem(id).ForReference(
             e => e.Roles,
-            KeyMapping<Role, RoleDTO, int>.Create(roleId, e => e.Id, e => e.Id));
+            KeyMapping<Role, RoleDTO, int>.Create(roleId, e => e.Id, e => e.Id))
+            .OnCreating(ValidateUserRoleAsync)
+            .OnDeleting(ValidateUserRoleAsync);
+
+    private async Task ValidateUserRoleAsync(
+        User userDb,
+        UserDTO userDto,
+        Role roleDb,
+        RoleDTO roleDto)
+    {
+        using var uow = _uowFactory.AsUnfiltered().Create();
+        var userRepo = uow.Repository<User>();
+
+        Guid.TryParse(User.GetClaim(Claims.Subject), out var userId);
+        var actingUser = await userRepo.Data
+            .SingleAsync(e => e.Id == userId);
+
+        var originalUser = await userRepo.Data
+            .SingleAsync(e => e.Id == userDb.Id);
+
+        var editedUser = userDb;
+
+        var roleMatches = roleDb.Principal.AclEntries
+            .Where(r => r.SecurableType is not null)
+            .GroupJoin(actingUser.AclUserEntries,
+                r => new { r.SecurableType, r.PermissionId },
+                u => new { u.SecurableType, u.PermissionId },
+                (r, u) => new
+                {
+                    Role = r,
+                    User = u,
+                })
+            .SelectMany(
+                e => e.User.DefaultIfEmpty(null),
+                (group, user) => new
+                {
+                    Role = group.Role,
+                    RolePriority = group.Role.PermissionGrantType switch
+                    {
+                        PermissionGrantType.Deny => 100,
+                        PermissionGrantType.Full => 10,
+                        PermissionGrantType.Filter => 1,
+                        _ => 0,
+                    },
+                    User = user,
+                    UserPriority = user?.PermissionGrantType switch
+                    {
+                        PermissionGrantType.Deny => 100,
+                        PermissionGrantType.Full => 10,
+                        PermissionGrantType.Filter => 1,
+                        _ => 0,
+                    },
+                })
+            .ToList();
+
+        var roleMissing = roleMatches
+            .Where(e => e.RolePriority > e.UserPriority)
+            .ToList();
+
+        if (roleMissing.Any())
+        {
+            var error = new Error.Authorization.CannotGrantPermissionError();
+
+            foreach (var entry in roleMissing)
+            {
+                error.AddDetail(entry.Role.SecurableType!.Value, entry.Role.PermissionId, entry.Role.PermissionGrantType);
+            }
+
+            error.Return();
+        }
+
+        var userMatches = originalUser.AclUserEntries
+            .Where(r => r.SecurableType is not null)
+            .GroupJoin(actingUser.AclUserEntries,
+                r => new { r.SecurableType, r.PermissionId },
+                u => new { u.SecurableType, u.PermissionId },
+                (r, u) => new
+                {
+                    Role = r,
+                    User = u,
+                })
+            .SelectMany(
+                e => e.User.DefaultIfEmpty(null),
+                (group, user) => new
+                {
+                    Role = group.Role,
+                    RolePriority = group.Role.PermissionGrantType switch
+                    {
+                        PermissionGrantType.Deny => 100,
+                        PermissionGrantType.Full => 10,
+                        PermissionGrantType.Filter => 1,
+                        _ => 0,
+                    },
+                    User = user,
+                    UserPriority = user?.PermissionGrantType switch
+                    {
+                        PermissionGrantType.Deny => 100,
+                        PermissionGrantType.Full => 10,
+                        PermissionGrantType.Filter => 1,
+                        _ => 0,
+                    },
+                })
+            .ToList();
+
+        var userMissing = userMatches
+            .Where(e => e.RolePriority > e.UserPriority)
+            .ToList();
+
+        if (userMissing.Any())
+        {
+            var error = new Error.Authorization.CannotEditUserError();
+
+            foreach (var entry in userMissing)
+            {
+                error.AddDetail(entry.Role.SecurableType!.Value, entry.Role.PermissionId, entry.Role.PermissionGrantType);
+            }
+
+            error.Return();
+        }
+    }
 }

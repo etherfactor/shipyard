@@ -61,6 +61,7 @@ export class PackageDetailComponent implements OnInit {
     if (!this.isLoading$$()) {
       const hasWrite = this.$session.hasCapability(SecurableType.Package, PermissionId.Write);
       const hasDelete = this.$session.hasCapability(SecurableType.Package, PermissionId.Delete);
+      const hasReadCarrier = this.$session.hasCapability(SecurableType.Carrier, PermissionId.Read);
       if (!this.isEditing$$()) {
         if (this.id$$() && !record?.isDelivered && hasWrite) {
           actions.push({
@@ -69,7 +70,7 @@ export class PackageDetailComponent implements OnInit {
             callback: this.onRepoll,
           });
         }
-        if (hasWrite) {
+        if (hasWrite && hasReadCarrier) {
           actions.push({
             icon: "bi-pencil",
             label: "Edit",
@@ -108,6 +109,8 @@ export class PackageDetailComponent implements OnInit {
     const updates = record.trackingUpdates ?? [];
     return [...updates].reverse();
   }
+
+  readonly canViewCarriers$$ = signal(this.$session.hasCapability(SecurableType.Carrier, PermissionId.Read));
 
   constructor() {
     effect(() => this.$navbarAction.setActions(this.actions$$()));
@@ -165,7 +168,7 @@ export class PackageDetailComponent implements OnInit {
   }
 
   private async loadCarriers() {
-    if (!this.carriersLoaded) {
+    if (!this.carriersLoaded && this.canViewCarriers$$()) {
       this.carriersLoaded = true;
       const result = this.$carrier
         .search()

@@ -3,6 +3,7 @@ import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@ang
 import { ActivatedRoute, Router } from '@angular/router';
 import { EntitySingle } from '@ethergizmos/odata-fluent-client';
 import { parseGuid } from '@ethergizmos/odata-fluent-client/dist/src/types/guid';
+import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { DetailBoxComponent } from '../../../../shared/components/detail-box/detail-box.component';
 import { DetailHeaderComponent } from '../../../../shared/components/detail-header/detail-header.component';
@@ -29,6 +30,7 @@ import { UserService } from '../../services/user/user.service';
     DetailBoxComponent,
     DetailHeaderComponent,
     FormsModule,
+    NgbTooltipModule,
     NgSelectModule,
     ReactiveFormsModule,
     ReadonlyFormDirective,
@@ -73,8 +75,10 @@ export class UserDetailComponent {
     if (!this.isLoading$$()) {
       const hasWrite = this.$session.hasCapability(SecurableType.User, PermissionId.Write);
       const hasDelete = this.$session.hasCapability(SecurableType.User, PermissionId.Delete);
+      const hasReadGroup = this.$session.hasCapability(SecurableType.Group, PermissionId.Read);
+      const hasReadRole = this.$session.hasCapability(SecurableType.Role, PermissionId.Read);
       if (!this.isEditing$$()) {
-        if (hasWrite) {
+        if (hasWrite && hasReadGroup && hasReadRole) {
           actions.push({
             icon: "bi-pencil",
             label: "Edit",
@@ -104,6 +108,9 @@ export class UserDetailComponent {
 
     return actions;
   });
+
+  readonly canViewGroups$$ = signal(this.$session.hasCapability(SecurableType.Group, PermissionId.Read));
+  readonly canViewRoles$$ = signal(this.$session.hasCapability(SecurableType.Role, PermissionId.Read));
 
   constructor() {
     effect(() => this.$navbarAction.setActions(this.actions$$()));
@@ -147,23 +154,20 @@ export class UserDetailComponent {
 
     try {
       const exec = single
+        .expand("group")
         .expand("roles")
         .execute();
       const data = await exec.data;
 
       this.user$$.set(data);
       this.init();
-
-      if (this.groups$$().length === 0) {
-        this.groups$$.set([]);
-      }
     } finally {
       this.isLoadingStack$$.set(this.isLoadingStack$$() - 1);
     }
   }
 
   private async loadGroups() {
-    if (!this.groupsLoaded) {
+    if (!this.groupsLoaded && this.canViewGroups$$()) {
       this.groupsLoaded = true;
       const result = this.$group
         .search()
@@ -177,7 +181,7 @@ export class UserDetailComponent {
   }
 
   private async loadRoles() {
-    if (!this.rolesLoaded) {
+    if (!this.rolesLoaded && this.canViewRoles$$()) {
       this.rolesLoaded = true;
       const result = this.$role
         .search()
@@ -228,6 +232,7 @@ export class UserDetailComponent {
       } else {
         const create = this.$user.create(data).execute();
         const created = await create.data;
+        this.id$$.set(created.id);
         await this.saveRoles();
         this.$router.navigate(["/users", created.id]);
       }

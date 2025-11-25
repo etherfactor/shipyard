@@ -28,6 +28,7 @@ public class OAuth2SetUserCapabilitiesStep : IClaimsPipelineStep<OAuth2Principal
             var capabilities = user.Capabilities;
 
             var securableTypeMap = capabilities
+                .Where(e => e.IsAllowed == 1)
                 .OrderBy(e => e.SecurableType)
                 .GroupBy(e => e.SecurableType, e => e.PermissionId)
                 .Select(group => new

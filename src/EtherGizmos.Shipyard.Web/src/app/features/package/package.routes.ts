@@ -28,6 +28,7 @@ export const PACKAGE_ROUTES: ExtendedRoute[] = [
     canActivate: [
       authorizationGuard(SecurableType.Package, PermissionId.Read),
       authorizationGuard(SecurableType.Package, PermissionId.Write),
+      authorizationGuard(SecurableType.Carrier, PermissionId.Read),
     ],
     data: {
       breadcrumb: {

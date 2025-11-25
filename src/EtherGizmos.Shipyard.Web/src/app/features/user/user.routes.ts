@@ -28,6 +28,8 @@ export const USER_ROUTES: ExtendedRoute[] = [
     canActivate: [
       authorizationGuard(SecurableType.User, PermissionId.Read),
       authorizationGuard(SecurableType.User, PermissionId.Write),
+      authorizationGuard(SecurableType.Group, PermissionId.Read),
+      authorizationGuard(SecurableType.Role, PermissionId.Read),
     ],
     data: {
       breadcrumb: {

@@ -16,7 +16,8 @@ public class Migration010_CreateSecurableAccessViews : MigrationExtension
               select a.principal_user_id,
                 r.carrier_id,
                 a.permission_id,
-                a.permission_grant_type_id
+                a.permission_grant_type_id,
+                a.priority
                 from carriers r
                   inner join acl.user_entries a
                     on a.securable_type_id = 10
@@ -25,30 +26,40 @@ public class Migration010_CreateSecurableAccessViews : MigrationExtension
               select a.principal_user_id,
                 r.carrier_id,
                 a.permission_id,
-                a.permission_grant_type_id
+                a.permission_grant_type_id,
+                a.priority
                 from carriers r
                   inner join acl.user_entries a
                     on a.securable_id = r.securable_id
             ),
-            combined_permissions as (
+            all_permissions_base as (
               select gp.principal_user_id,
                 gp.carrier_id,
                 gp.permission_id,
-                gp.permission_grant_type_id
+                gp.permission_grant_type_id,
+                gp.priority
                 from global_permissions gp
-                  where not exists (
-                    select 1
-                      from record_permissions rp
-                        where rp.principal_user_id = gp.principal_user_id
-                          and rp.carrier_id = gp.carrier_id
-                          and rp.permission_id = gp.permission_id
-                  )
               union all
               select rp.principal_user_id,
                 rp.carrier_id,
                 rp.permission_id,
-                rp.permission_grant_type_id
+                rp.permission_grant_type_id,
+                rp.priority
                 from record_permissions rp
+            ),
+            all_permissions as (
+              select ap.principal_user_id,
+                ap.carrier_id,
+                ap.permission_id,
+                ap.permission_grant_type_id,
+                ap.priority,
+                row_number() over (
+                  partition by ap.principal_user_id,
+                    ap.carrier_id,
+            	    ap.permission_id
+                  order by ap.priority desc
+                ) as rownum
+                from all_permissions_base ap
             )
             select p.principal_user_id,
               p.carrier_id,
@@ -57,9 +68,10 @@ public class Migration010_CreateSecurableAccessViews : MigrationExtension
               case when p.permission_grant_type_id = 1 then 1
                 when p.permission_grant_type_id = 2 then 1
                	else 0 end as is_grant
-              from combined_permissions p
+              from all_permissions p
                 inner join carriers r
-               	  on r.carrier_id = p.carrier_id;
+               	  on r.carrier_id = p.carrier_id
+              where p.rownum = 1;
             """);
 
         /*
@@ -71,7 +83,8 @@ public class Migration010_CreateSecurableAccessViews : MigrationExtension
               select a.principal_user_id,
                 r.package_id,
                 a.permission_id,
-                a.permission_grant_type_id
+                a.permission_grant_type_id,
+                a.priority
                 from packages r
                   inner join acl.user_entries a
                     on a.securable_type_id = 20
@@ -80,30 +93,40 @@ public class Migration010_CreateSecurableAccessViews : MigrationExtension
               select a.principal_user_id,
                 r.package_id,
                 a.permission_id,
-                a.permission_grant_type_id
+                a.permission_grant_type_id,
+                a.priority
                 from packages r
                   inner join acl.user_entries a
                     on a.securable_id = r.securable_id
             ),
-            combined_permissions as (
+            all_permissions_base as (
               select gp.principal_user_id,
                 gp.package_id,
                 gp.permission_id,
-                gp.permission_grant_type_id
+                gp.permission_grant_type_id,
+                gp.priority
                 from global_permissions gp
-                  where not exists (
-                    select 1
-                      from record_permissions rp
-                        where rp.principal_user_id = gp.principal_user_id
-                          and rp.package_id = gp.package_id
-                          and rp.permission_id = gp.permission_id
-                  )
               union all
               select rp.principal_user_id,
                 rp.package_id,
                 rp.permission_id,
-                rp.permission_grant_type_id
+                rp.permission_grant_type_id,
+                rp.priority
                 from record_permissions rp
+            ),
+            all_permissions as (
+              select ap.principal_user_id,
+                ap.package_id,
+                ap.permission_id,
+                ap.permission_grant_type_id,
+                ap.priority,
+                row_number() over (
+                  partition by ap.principal_user_id,
+                    ap.package_id,
+            	    ap.permission_id
+                  order by ap.priority desc
+                ) as rownum
+                from all_permissions_base ap
             )
             select p.principal_user_id,
               p.package_id,
@@ -115,11 +138,12 @@ public class Migration010_CreateSecurableAccessViews : MigrationExtension
                   or r.group_id = u.group_id
                 ) then 1
                	else 0 end as is_grant
-              from combined_permissions p
+              from all_permissions p
                 inner join packages r
                	  on r.package_id = p.package_id
                 inner join users u
-                  on u.user_id = p.principal_user_id;
+                  on u.user_id = p.principal_user_id
+              where p.rownum = 1;
             """);
 
         /*
@@ -131,7 +155,8 @@ public class Migration010_CreateSecurableAccessViews : MigrationExtension
               select a.principal_user_id,
                 r.user_id,
                 a.permission_id,
-                a.permission_grant_type_id
+                a.permission_grant_type_id,
+                a.priority
                 from users r
                   inner join acl.user_entries a
                     on a.securable_type_id = 100
@@ -140,30 +165,40 @@ public class Migration010_CreateSecurableAccessViews : MigrationExtension
               select a.principal_user_id,
                 r.user_id,
                 a.permission_id,
-                a.permission_grant_type_id
+                a.permission_grant_type_id,
+                a.priority
                 from users r
                   inner join acl.user_entries a
                     on a.securable_id = r.securable_id
             ),
-            combined_permissions as (
+            all_permissions_base as (
               select gp.principal_user_id,
                 gp.user_id,
                 gp.permission_id,
-                gp.permission_grant_type_id
+                gp.permission_grant_type_id,
+                gp.priority
                 from global_permissions gp
-                  where not exists (
-                    select 1
-                      from record_permissions rp
-                        where rp.principal_user_id = gp.principal_user_id
-                          and rp.user_id = gp.user_id
-                          and rp.permission_id = gp.permission_id
-                  )
               union all
               select rp.principal_user_id,
                 rp.user_id,
                 rp.permission_id,
-                rp.permission_grant_type_id
+                rp.permission_grant_type_id,
+                rp.priority
                 from record_permissions rp
+            ),
+            all_permissions as (
+              select ap.principal_user_id,
+                ap.user_id,
+                ap.permission_id,
+                ap.permission_grant_type_id,
+                ap.priority,
+                row_number() over (
+                  partition by ap.principal_user_id,
+                    ap.user_id,
+            	    ap.permission_id
+                  order by ap.priority desc
+                ) as rownum
+                from all_permissions_base ap
             )
             select p.principal_user_id,
               p.user_id,
@@ -174,11 +209,12 @@ public class Migration010_CreateSecurableAccessViews : MigrationExtension
                   r.group_id = u.group_id
                 ) then 1
                	else 0 end as is_grant
-              from combined_permissions p
+              from all_permissions p
                 inner join users r
                	  on r.user_id = p.user_id
                 inner join users u
-                  on u.user_id = p.principal_user_id;
+                  on u.user_id = p.principal_user_id
+              where p.rownum = 1;
             """);
 
         /*
@@ -190,7 +226,8 @@ public class Migration010_CreateSecurableAccessViews : MigrationExtension
               select a.principal_user_id,
                 r.role_id,
                 a.permission_id,
-                a.permission_grant_type_id
+                a.permission_grant_type_id,
+                a.priority
                 from roles r
                   inner join acl.user_entries a
                     on a.securable_type_id = 110
@@ -199,30 +236,40 @@ public class Migration010_CreateSecurableAccessViews : MigrationExtension
               select a.principal_user_id,
                 r.role_id,
                 a.permission_id,
-                a.permission_grant_type_id
+                a.permission_grant_type_id,
+                a.priority
                 from roles r
                   inner join acl.user_entries a
                     on a.securable_id = r.securable_id
             ),
-            combined_permissions as (
+            all_permissions_base as (
               select gp.principal_user_id,
                 gp.role_id,
                 gp.permission_id,
-                gp.permission_grant_type_id
+                gp.permission_grant_type_id,
+                gp.priority
                 from global_permissions gp
-                  where not exists (
-                    select 1
-                      from record_permissions rp
-                        where rp.principal_user_id = gp.principal_user_id
-                          and rp.role_id = gp.role_id
-                          and rp.permission_id = gp.permission_id
-                  )
               union all
               select rp.principal_user_id,
                 rp.role_id,
                 rp.permission_id,
-                rp.permission_grant_type_id
+                rp.permission_grant_type_id,
+                rp.priority
                 from record_permissions rp
+            ),
+            all_permissions as (
+              select ap.principal_user_id,
+                ap.role_id,
+                ap.permission_id,
+                ap.permission_grant_type_id,
+                ap.priority,
+                row_number() over (
+                  partition by ap.principal_user_id,
+                    ap.role_id,
+            	    ap.permission_id
+                  order by ap.priority desc
+                ) as rownum
+                from all_permissions_base ap
             )
             select p.principal_user_id,
               p.role_id,
@@ -231,9 +278,10 @@ public class Migration010_CreateSecurableAccessViews : MigrationExtension
               case when p.permission_grant_type_id = 1 then 1
                 when p.permission_grant_type_id = 2 then 1
                	else 0 end as is_grant
-              from combined_permissions p
+              from all_permissions p
                 inner join roles r
-               	  on r.role_id = p.role_id;
+               	  on r.role_id = p.role_id
+              where p.rownum = 1;
             """);
 
         /*
@@ -245,7 +293,8 @@ public class Migration010_CreateSecurableAccessViews : MigrationExtension
               select a.principal_user_id,
                 r.group_id,
                 a.permission_id,
-                a.permission_grant_type_id
+                a.permission_grant_type_id,
+                a.priority
                 from groups r
                   inner join acl.user_entries a
                     on a.securable_type_id = 120
@@ -254,30 +303,40 @@ public class Migration010_CreateSecurableAccessViews : MigrationExtension
               select a.principal_user_id,
                 r.group_id,
                 a.permission_id,
-                a.permission_grant_type_id
+                a.permission_grant_type_id,
+                a.priority
                 from groups r
                   inner join acl.user_entries a
                     on a.securable_id = r.securable_id
             ),
-            combined_permissions as (
+            all_permissions_base as (
               select gp.principal_user_id,
                 gp.group_id,
                 gp.permission_id,
-                gp.permission_grant_type_id
+                gp.permission_grant_type_id,
+                gp.priority
                 from global_permissions gp
-                  where not exists (
-                    select 1
-                      from record_permissions rp
-                        where rp.principal_user_id = gp.principal_user_id
-                          and rp.group_id = gp.group_id
-                          and rp.permission_id = gp.permission_id
-                  )
               union all
               select rp.principal_user_id,
                 rp.group_id,
                 rp.permission_id,
-                rp.permission_grant_type_id
+                rp.permission_grant_type_id,
+                rp.priority
                 from record_permissions rp
+            ),
+            all_permissions as (
+              select ap.principal_user_id,
+                ap.group_id,
+                ap.permission_id,
+                ap.permission_grant_type_id,
+                ap.priority,
+                row_number() over (
+                  partition by ap.principal_user_id,
+                    ap.group_id,
+            	    ap.permission_id
+                  order by ap.priority desc
+                ) as rownum
+                from all_permissions_base ap
             )
             select p.principal_user_id,
               p.group_id,
@@ -288,11 +347,12 @@ public class Migration010_CreateSecurableAccessViews : MigrationExtension
                   r.group_id = u.group_id
                 ) then 1
                	else 0 end as is_grant
-              from combined_permissions p
+              from all_permissions p
                 inner join groups r
                	  on r.group_id = p.group_id
                 inner join users u
-                  on u.user_id = p.principal_user_id;
+                  on u.user_id = p.principal_user_id
+              where p.rownum = 1;
             """);
     }
 

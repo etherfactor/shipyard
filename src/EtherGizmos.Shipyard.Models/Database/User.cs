@@ -36,4 +36,6 @@ public class User : InternalUser<Guid>, IEntity, IAuditable
     public virtual Guid SecurableId { get; set; }
 
     public virtual Securable Securable { get; set; } = new() { Type = Enums.SecurableType.User };
+
+    public virtual List<AclUserEntry> AclUserEntries { get; set; } = [];
 }

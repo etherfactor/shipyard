@@ -62,5 +62,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasColumnName("securable_id");
 
         entity.HasOne(e => e.Securable);
+
+        entity.HasMany(e => e.AclUserEntries)
+            .WithOne(e => e.PrincipalUser)
+            .HasForeignKey(e => e.PrincipalUserId);
     }
 }

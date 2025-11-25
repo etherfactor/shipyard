@@ -50,11 +50,12 @@ export class PackageListComponent extends ListComponent<Package> {
 
     if (!this.isLoading()) {
       const hasWrite = this.$session.hasCapability(SecurableType.Package, PermissionId.Write);
+      const hasReadCarrier = this.$session.hasCapability(SecurableType.Carrier, PermissionId.Read);
       //actions.push({
       //  icon: 'bi-layout-three-columns',
       //  label: 'Edit Columns',
       //});
-      if (hasWrite) {
+      if (hasWrite && hasReadCarrier) {
         actions.push({
           icon: 'bi-plus-square',
           label: 'Add',

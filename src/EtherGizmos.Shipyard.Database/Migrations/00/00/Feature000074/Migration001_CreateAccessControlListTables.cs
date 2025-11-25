@@ -82,7 +82,8 @@ public class Migration001_CreateAccessControlListTables : AutoReversingMigration
             .WithColumn("securable_id").AsGuid().Nullable()
             .WithColumn("securable_type_id").AsInt32().Nullable()
             .WithColumn("permission_id").AsInt32().NotNullable()
-            .WithColumn("permission_grant_type_id").AsInt32().NotNullable();
+            .WithColumn("permission_grant_type_id").AsInt32().NotNullable()
+            .WithColumn("is_priority").AsBoolean().NotNullable().WithDefaultValue(false);
 
         Create.Index("IX_entries_principal_id")
             .OnTable("entries").InSchema("acl")
