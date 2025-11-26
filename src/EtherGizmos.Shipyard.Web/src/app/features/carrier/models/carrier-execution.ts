@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { DateTimeZ } from "../../../shared/types/datetime/datetime";
 import { formFactoryForModel } from "../../../shared/utilities/form/form.util";
+import { PackageZ } from "../../package/models/package";
 import { CarrierZ } from "./carrier";
 import { carrierExecutionArtifactForm, CarrierExecutionArtifactZ } from "./carrier-execution-artifact";
 import { ExecutionStatusType } from "./execution-status-type";
@@ -11,6 +12,8 @@ export const CarrierExecutionZ = z.object({
   modifiedAt: DateTimeZ,
   carrierId: z.number().int(),
   carrier: z.lazy(() => CarrierZ).nullish(),
+  packageId: z.number().int().nullish(),
+  package: z.lazy(() => PackageZ).nullish(),
   startedAt: DateTimeZ.nullish(),
   completedAt: DateTimeZ.nullish(),
   executionStatusType: z.nativeEnum(ExecutionStatusType),
@@ -21,13 +24,14 @@ export const CarrierExecutionZ = z.object({
 
 export interface CarrierExecution extends z.infer<typeof CarrierExecutionZ> { }
 
-export type CarrierExecutionF = Omit<CarrierExecution, "carrier">;
+export type CarrierExecutionF = Omit<CarrierExecution, "carrier" | "package">;
 
 export const carrierExecutionForm = formFactoryForModel<CarrierExecutionF>(($form, model) => ({
   id: [model.id],
   createdAt: [model.createdAt],
   modifiedAt: [model.modifiedAt],
   carrierId: [model.carrierId],
+  packageId: [model.packageId],
   startedAt: [model.startedAt],
   completedAt: [model.completedAt],
   executionStatusType: [model.executionStatusType],

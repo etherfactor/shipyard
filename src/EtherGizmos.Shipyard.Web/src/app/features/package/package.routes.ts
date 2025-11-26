@@ -64,4 +64,29 @@ export const PACKAGE_ROUTES: ExtendedRoute[] = [
       ],
     },
   },
+  {
+    path: ":packageId/executions",
+    pathMatch: "full",
+    loadComponent: () => import("./pages/package-execution-list/package-execution-list.component").then(m => m.PackageExecutionListComponent),
+    canActivate: [
+      authorizationGuard(SecurableType.Package, PermissionId.Read),
+      authorizationGuard(SecurableType.Carrier, PermissionId.Read),
+    ],
+    data: {
+      breadcrumb: {
+        label: "Execution List",
+        link: "/packages/{packageId}/executions",
+      },
+      parentBreadcrumbs: [
+        {
+          label: "Package List",
+          link: "/packages",
+        },
+        {
+          label: "Package #{packageId}",
+          link: "/packages/{packageId}",
+        },
+      ],
+    },
+  },
 ];
