@@ -150,6 +150,7 @@ public class PackagesController : AutoODataController
         var execution = new CarrierExecution()
         {
             CarrierId = package.CarrierId,
+            PackageId = package.Id,
             ExecutionStatus = ExecutionStatusType.Queued,
             StepCount = (short)package.Carrier.Steps.Count,
         };

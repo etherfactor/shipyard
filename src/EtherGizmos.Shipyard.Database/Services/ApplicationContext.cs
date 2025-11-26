@@ -106,6 +106,14 @@ public class ApplicationContext : DbContext
         //**********************************************************
         // Add Query Filters
 
+        modelBuilder.Entity<CarrierExecution>()
+            .HasQueryFilter(record => record.PackageId == null || AclPackages.Any(acl =>
+                _userContext.UserId != null
+                && acl.PrincipalUserId == _userContext.UserId
+                && acl.PermissionId == PermissionId.Read
+                && acl.IsGrant == 1
+                && acl.PackageId == record.PackageId));
+
         modelBuilder.Entity<Group>()
             .HasQueryFilter(record => AclGroups.Any(acl =>
                 _userContext.UserId != null
