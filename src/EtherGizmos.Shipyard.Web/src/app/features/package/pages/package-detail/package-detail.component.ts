@@ -185,29 +185,31 @@ export class PackageDetailComponent implements OnInit {
       this.package$$.set(data);
       this.init();
 
-      try {
-        this.isLoadingExecStack$$.set(this.isLoadingExecStack$$() + 1);
+      if (this.$session.hasCapability(SecurableType.Carrier, PermissionId.Read)) {
+        try {
+          this.isLoadingExecStack$$.set(this.isLoadingExecStack$$() + 1);
 
-        const exec = await this.$carrierExecution.search()
-          .filter(e =>
-            o.and(
-              o.eq(
-                e.prop("packageId"),
-                o.int(id)
-              ),
-              o.ne(
-                e.prop("startedAt"),
-                o.null()
+          const exec = await this.$carrierExecution.search()
+            .filter(e =>
+              o.and(
+                o.eq(
+                  e.prop("packageId"),
+                  o.int(id)
+                ),
+                o.ne(
+                  e.prop("startedAt"),
+                  o.null()
+                )
               )
             )
-          )
-          .orderBy("startedAt", "desc")
-          .execute()
-          .data;
+            .orderBy("startedAt", "desc")
+            .execute()
+            .data;
 
-        this.exec$$.set(exec[0]);
-      } finally {
-        this.isLoadingExecStack$$.set(this.isLoadingExecStack$$() - 1);
+          this.exec$$.set(exec[0]);
+        } finally {
+          this.isLoadingExecStack$$.set(this.isLoadingExecStack$$() - 1);
+        }
       }
     } finally {
       this.isLoadingStack$$.set(this.isLoadingStack$$() - 1);
