@@ -59,6 +59,11 @@ public static class IServiceCollectionExtensions
                     .AddScoped(iemailSender, services =>
                     {
                         var (connectionId, connection) = services.GetEmailConnection();
+                        if (connectionId == "<invalid>")
+                            return typeof(NullEmailNotificationSender<>)
+                                .MakeGenericType(@event)
+                                .GetConstructor([])!
+                                .Invoke([]);
 
                         return connection.Match(
                             _ => throw new InvalidOperationException($"The connection {connectionId} is not a valid email connection."),
@@ -89,14 +94,22 @@ public static class IServiceCollectionExtensions
     private static (string Id, OneOfEmailConnection Connection) GetEmailConnection(
         this IServiceProvider @this)
     {
-        var notifOptions = @this.GetRequiredService<IOptions<NotificationOptions>>()
+        var notifOptions = @this
+            .GetRequiredService<IOptions<NotificationOptions>>()
             .Value;
 
-        var connectionId = notifOptions.Email.ConnectionId;
+        if (notifOptions.IsEnabled && notifOptions.Email.IsEnabled)
+        {
+            var connectionId = notifOptions.Email.ConnectionId;
 
-        var resolver = @this.GetRequiredService<IConnectionResolver>();
-        var connection = resolver.GetEmailConnection(connectionId);
+            var resolver = @this.GetRequiredService<IConnectionResolver>();
+            var connection = resolver.GetEmailConnection(connectionId);
 
-        return (connectionId, connection);
+            return (connectionId, connection);
+        }
+        else
+        {
+            return ("<invalid>", new OneOfEmailConnection(new EmailConnectionOptions()));
+        }
     }
 }

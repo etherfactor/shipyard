@@ -135,11 +135,13 @@ export class CarrierDetailComponent {
   readonly execButtons$$ = computed<DetailBoxButton[]>(() => {
     const buttons: DetailBoxButton[] = [];
 
-    buttons.push({
-      color: "primary",
-      text: "View all",
-      callback: this.viewExecutions,
-    });
+    if (!this.isEditing$$()) {
+      buttons.push({
+        color: "primary",
+        text: "View all",
+        callback: this.viewExecutions,
+      });
+    }
 
     return buttons;
   });
