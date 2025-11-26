@@ -34,7 +34,8 @@ builder.Configuration
     .AddRemappedEnvironmentVariables(
         (new(@"(?<=[^:_])_(?=[^_])"), "."),
         (new(@"(?<=[^_]):_(?=[^_])"), " "),
-        (new(@"^ConnectionStrings:(?=[^_:])"), ""));
+        (new(@"^ConnectionStrings:(?=[^_:])"), ""))
+    .AddExpandedConnections(builder.Configuration);
 
 builder.Services
     .AddOptions<DatabaseReferenceOptions>()

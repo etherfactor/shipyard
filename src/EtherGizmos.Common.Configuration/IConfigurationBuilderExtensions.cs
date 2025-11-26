@@ -17,4 +17,16 @@ public static class IConfigurationBuilderExtensions
 
         return @this;
     }
+
+    public static IConfigurationBuilder AddExpandedConnections(
+        this IConfigurationBuilder @this,
+        IConfigurationRoot configuration)
+    {
+        @this.Add(new ExpandedConnectionsVariablesConfigurationSource()
+        {
+            Configuration = configuration,
+        });
+
+        return @this;
+    }
 }

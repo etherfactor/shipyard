@@ -51,9 +51,7 @@ internal static class Setup
         {
             ["Artifacts:BasePath"] = "artifacts",
             ["Artifacts:Database:ConnectionId"] = "TestDb",
-            ["Connections:TestDb:Type"] = "Database",
-            ["Connections:TestDb:PostgreSql:ConnectionString"] = _pgsqlCstr,
-            ["Database:ConnectionId"] = "TestDb",
+            ["Database:PostgreSql:ConnectionString"] = _pgsqlCstr,
             ["RabbitMq:ConnectionString"] = _rmqCstr,
             ["Security:Certificates:AuthSigning:Type"] = "Certificate",
             ["Security:Certificates:AuthSigning:Text:PublicKey"] = Certificates.TokenSigningPublicKey,
