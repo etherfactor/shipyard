@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EntitySingle } from '@ethergizmos/odata-fluent-client';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { DetailBoxComponent } from '../../../../shared/components/detail-box/detail-box.component';
@@ -28,6 +28,7 @@ import { PackageService } from '../../services/package/package.service';
     NgSelectModule,
     ReactiveFormsModule,
     ReadonlyFormDirective,
+    RouterModule,
   ],
   templateUrl: './package-detail.component.html',
   styleUrl: './package-detail.component.scss'
