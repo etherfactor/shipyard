@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EntitySingle } from '@ethergizmos/odata-fluent-client';
 import { parseGuid } from '@ethergizmos/odata-fluent-client/dist/src/types/guid';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
@@ -34,6 +34,7 @@ import { UserService } from '../../services/user/user.service';
     NgSelectModule,
     ReactiveFormsModule,
     ReadonlyFormDirective,
+    RouterModule,
   ],
   templateUrl: './user-detail.component.html',
   styleUrl: './user-detail.component.scss'
