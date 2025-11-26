@@ -53,6 +53,7 @@ Values in `.env` will override those in `compose.yml`.
 | SHIPYARD_API_PORT           | The port on which to run the Shipyard API.           | 7448                                  |
 | SHIPYARD_WEB_HOST           | The base URL hosting Shipyard UI.                    | http://localhost:7447                 |
 | SHIPYARD_WEB_PORT           | The port on which to run the Shipyard UI.            | 7447                                  |
+| SHIPYARD_DEFAULT_TZ         | The default IANA time zone for the app.              | America/Chicago                       |
 | SHIPYARD_ENC_TYPE           | How to load the encryption certificate: File or Text | File                                  |
 | SHIPYARD_ENC_PATH           | If File, the path to the encryption certificate      | /opt/certificates/auth-encryption.pfx |
 | SHIPYARD_ENC_CRT            | TEMP; if Text, encryption public key (.crt)          | (a certificate)                       |

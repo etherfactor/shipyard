@@ -80,7 +80,7 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
         var artifacts = new List<TrackingResultArtifact>();
 
         var index = 0;
-        ApplyLogger(runbook);
+        ApplyServices(runbook);
         foreach (var step in runbook)
         {
             step.Index = ++index;
@@ -179,16 +179,17 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
         return result;
     }
 
-    private void ApplyLogger(
+    private void ApplyServices(
         IEnumerable<ScrapingStep> steps)
     {
         foreach (var step in steps)
         {
+            step.ServiceProvider = _serviceProvider;
             step.Logger = _logger;
 
             if (step is ExtractListStep extractStep)
             {
-                ApplyLogger(extractStep.Steps);
+                ApplyServices(extractStep.Steps);
             }
         }
     }

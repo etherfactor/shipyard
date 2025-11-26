@@ -1,4 +1,5 @@
 ﻿using EtherGizmos.Common.Extensions;
+using EtherGizmos.Shipyard.Worker.Configuration;
 using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
 using HtmlAgilityPack;
 using HtmlAgilityPack.CssSelectors.NetCore;
@@ -7,7 +8,9 @@ using Jint.Native;
 using Jint.Runtime;
 using Jint.Runtime.Descriptors;
 using Jint.Runtime.Interop;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
@@ -23,7 +26,7 @@ internal class ScriptStep : ScrapingStep
     public override async Task Apply(IBrowserClient client, IDictionary<string, object> variables, IDictionary<string, object> results, CancellationToken cancellationToken = default)
     {
         var html = await client.GetHtmlAsync(cancellationToken);
-        var result = ScriptTransform.Run(html, Script, Logger);
+        var result = ScriptTransform.Run(html, Script, ServiceProvider, Logger);
 
         if (result.EstimatedDeliveryAt is not null)
         {
@@ -170,7 +173,7 @@ internal class ScriptStep : ScrapingStep
 
     public static class ScriptTransform
     {
-        public static TrackingResult Run(string html, string js, ILogger logger)
+        public static TrackingResult Run(string html, string js, IServiceProvider serviceProvider, ILogger logger)
         {
             var snapshot = HapSnapshot.FromHtml(html);
             var host = new HapHost(snapshot, logger);
@@ -301,6 +304,48 @@ internal class ScriptStep : ScrapingStep
                 });
             }));
 
+            engine.SetValue("normalizeLocalDate", (Func<int, int, int, int, int, int, string?, JsValue>)((a, b, c, d, e, f, g) =>
+            {
+                var result = NormalizeLocalDate(serviceProvider, a, b, c, d, e, f, g);
+                return JsValue.FromObject(engine, result);
+            }));
+
+            engine.Execute("""
+                function normalizeDateString(input) {
+                    if (!input) return input;
+
+                    let s = input.trim();
+
+                    //Collapse whitespace
+                    s = s.replace(/\s+/g, " ");
+
+                    //Normalize A.M. / P.M. → AM / PM
+                    s = s.replace(/A\.M\./gi, "AM")
+                         .replace(/P\.M\./gi, "PM");
+
+                    return s;
+                }
+
+                function parseDate(input, location) {
+                    const normalized = normalizeDateString(input);
+                    const date = new Date(normalized);
+                    console.log("Produced date", date, "from", input, "with ISO", date.toISOString());
+
+                    if (isNaN(date.getTime())) {
+                        throw new Error("Could not parse date: " + input);
+                    }
+
+                    const year = date.getFullYear();
+                    const month = date.getMonth() + 1; //For whatever reason, months are 0-indexed
+                    const day = date.getDate();
+                    const hour = date.getHours();
+                    const minute = date.getMinutes();
+                    const second = date.getSeconds();
+
+                    return normalizeLocalDate(year, month, day, hour, minute, second, location ?? null);
+                }
+                """);
+
             var console = engine.Intrinsics.Object.Construct(Arguments.Empty);
 
             console.Set("log", new ClrFunction(engine, "log", (thisObj, args) =>
@@ -336,5 +381,43 @@ internal class ScriptStep : ScrapingStep
                 Artifacts = [],
             };
         }
+    }
+
+    private static string NormalizeLocalDate(
+        IServiceProvider serviceProvider,
+        int year,
+        int month,
+        int day,
+        int hour,
+        int minute,
+        int second,
+        string? location)
+    {
+        var options = serviceProvider
+            .GetRequiredService<IOptionsMonitor<WorkerOptions>>()
+            .CurrentValue;
+
+        // 1. Interpret this as a wall-clock time in the *target* time zone
+        var localWallClock = new DateTime(year, month, day, hour, minute, second, DateTimeKind.Unspecified);
+
+        var targetTz = ResolveTimeZone(serviceProvider, location); // e.g. DefaultTimeZone = "America/Chicago"
+
+        // 2. Convert FROM target time zone TO UTC
+        var utc = TimeZoneInfo.ConvertTimeToUtc(localWallClock, targetTz);
+
+        // 3. Return an ISO 8601 UTC string
+        var dateString = utc.ToString("O");
+        return dateString;
+    }
+
+    private static TimeZoneInfo ResolveTimeZone(
+        IServiceProvider serviceProvider,
+        string? location)
+    {
+        var options = serviceProvider
+            .GetRequiredService<IOptionsMonitor<WorkerOptions>>()
+            .CurrentValue;
+
+        return TimeZoneInfo.FindSystemTimeZoneById(options.DefaultTimeZone);
     }
 }

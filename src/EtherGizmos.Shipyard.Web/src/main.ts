@@ -132,10 +132,7 @@ declare global {
   function selectAll(selector: string): TransformNode[];
   function selectOne(selector: string): TransformNode | null;
 
-  function parseDate(text: string, format: string, tz?: string): Instant;
-  function regexMatch(text: string, pattern: string): string[] | null;
-  function normalize(text: string): string;
-  function hash(text: string): string;
+  function parseDate(text: string, location: string): string;
 
   function recordEvent(event: TrackingEvent): void;
   function setEta(at: Timestamp): void;

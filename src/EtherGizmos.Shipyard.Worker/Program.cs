@@ -67,6 +67,16 @@ builder.Services
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
+builder.Services
+    .AddOptions<WorkerOptions>()
+    .Configure<IConfiguration>((opt, conf) =>
+    {
+        conf.GetSection("Worker")
+            .Bind(opt);
+    })
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
 //************************************************************
 // Services
 
