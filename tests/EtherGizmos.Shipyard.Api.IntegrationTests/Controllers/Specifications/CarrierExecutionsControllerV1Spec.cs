@@ -61,6 +61,7 @@ public class CarrierExecutionsControllerV1Spec : IODataResourceSpec<CarrierExecu
             Guid? createdByUserId = null)
         {
             var (_, id) = await CarriersControllerV1Spec.Instance.Records.AcquireAsync(context, purpose, createdByUserId);
+            var (_, packageId) = await PackagesControllerV1Spec.Instance.Records.AcquireAsync(context, purpose, createdByUserId);
 
             var uowFactory = Setup.Services.GetRequiredService<IUnitOfWorkFactory>();
             using var uow = uowFactory.Create();
@@ -70,6 +71,7 @@ public class CarrierExecutionsControllerV1Spec : IODataResourceSpec<CarrierExecu
             var execution = new CarrierExecution()
             {
                 CarrierId = id,
+                PackageId = packageId,
                 StepCount = 1,
                 ExecutionStatus = ExecutionStatusType.Successful,
             };
