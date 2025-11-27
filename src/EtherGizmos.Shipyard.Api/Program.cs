@@ -6,6 +6,7 @@ using EtherGizmos.Shipyard;
 using EtherGizmos.Shipyard.Api.Abstractions;
 using EtherGizmos.Shipyard.Api.Configuration;
 using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Api.Services.Formatters;
 using EtherGizmos.Shipyard.Api.Services.Health;
 using EtherGizmos.Shipyard.Api.Services.HostedServices;
 using EtherGizmos.Shipyard.Api.Services.Logging;
@@ -164,6 +165,14 @@ builder.Services
         opt.LowercaseUrls = true;
     })
     .AddControllersWithViews();
+
+builder.Services
+    .AddMvc(opt =>
+    {
+        opt.InputFormatters.Add(new YamlInputFormatter());
+        opt.OutputFormatters.Add(new YamlOutputFormatter());
+        opt.FormatterMappings.SetMediaTypeMappingForFormat("yaml", "application/yaml");
+    });
 
 builder.Services
     .AddOData((opt, conf) =>
