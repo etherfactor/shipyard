@@ -11,6 +11,10 @@ public class CarrierExecution : Auditable, IEntity
 
     public virtual Carrier Carrier { get; set; } = null!;
 
+    public virtual int? PackageId { get; set; }
+
+    public virtual Package? Package { get; set; }
+
     public virtual DateTimeOffset? StartedAt { get; set; }
 
     public virtual DateTimeOffset? CompletedAt { get; set; }

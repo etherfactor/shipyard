@@ -1,11 +1,16 @@
 using EtherGizmos.Common;
+using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Configuration;
 using EtherGizmos.Common.Services;
 using EtherGizmos.Shipyard;
+using EtherGizmos.Shipyard.Api.Abstractions;
+using EtherGizmos.Shipyard.Api.Configuration;
 using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Api.Services.Health;
 using EtherGizmos.Shipyard.Api.Services.HostedServices;
+using EtherGizmos.Shipyard.Api.Services.Logging;
 using EtherGizmos.Shipyard.Api.Services.Middleware;
+using EtherGizmos.Shipyard.Api.Services.Pipeline.OAuth2;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Services;
@@ -15,7 +20,6 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +41,8 @@ builder.Configuration
     .AddRemappedEnvironmentVariables(
         (new(@"(?<=[^:_])_(?=[^_])"), "."),
         (new(@"(?<=[^_]):_(?=[^_])"), " "),
-        (new(@"^ConnectionStrings:(?=[^_:])"), ""));
+        (new(@"^ConnectionStrings:(?=[^_:])"), ""))
+    .AddExpandedConnections(builder.Configuration);
 
 builder.Services
     .AddOptions<DatabaseReferenceOptions>()
@@ -48,6 +53,16 @@ builder.Services
     })
     .ValidateOnStart()
     .ValidateDataAnnotations();
+
+builder.Services
+    .AddOptions<LogIngestionOptions>()
+    .Configure<IConfiguration>((opt, config) =>
+    {
+        config.GetSection("LogIngestion")
+            .Bind(opt);
+    })
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 //**********************************************************
 // Services
@@ -65,9 +80,19 @@ builder.UseOAuth2()
             .GetSection("Security")
             .Bind(opt);
 
+        opt.ScanAssemblies =
+        [
+            typeof(ApplicationContext).Assembly,
+            typeof(User).Assembly,
+        ];
+
         opt.Cookie.LoginUrl = "/account/login";
         opt.Cookie.LogoutUrl = "/account/logout";
     });
+
+builder.Services.AddScoped<IClaimsPipelineStep<OAuth2PrincipalContext>, OAuth2SetUserCapabilitiesStep>();
+builder.Services.AddScoped<IClaimsPipelineStep<OAuth2PrincipalContext>, OAuth2SetUsernameStep>();
+builder.Services.AddScoped<IClaimsPipelineStep<OAuth2PrincipalContext>, OAuth2ApplyDestinationsStep>();
 
 // Database
 builder.Services
@@ -176,7 +201,7 @@ builder.Services
     });
 
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddSingleton<ISourceLoggerFactory, SourceLoggerFactory>();
 
 builder.Services.AddHostedService<InitialConfigSeeder>();
 builder.Services.AddHostedService<OAuth2Seeder>();

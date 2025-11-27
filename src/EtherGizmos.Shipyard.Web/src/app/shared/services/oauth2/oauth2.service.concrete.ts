@@ -1,6 +1,8 @@
 import { effect, inject, Injectable, Provider, signal } from "@angular/core";
 import { Router } from "@angular/router";
-import { EventTypes, OidcSecurityService, PublicEventsService } from "angular-auth-oidc-client";
+import { OidcSecurityService } from "angular-auth-oidc-client";
+import { catchError, filter, firstValueFrom, of, switchMap, take, timeout, timer } from "rxjs";
+import { Logger } from "../../utilities/logger/logger.util";
 import { OAuth2Service } from "./oauth2.service";
 
 @Injectable({
@@ -8,11 +10,11 @@ import { OAuth2Service } from "./oauth2.service";
 })
 export class ConcreteOAuth2Service extends OAuth2Service {
 
+  private readonly $logger = inject(Logger).forContext("OAuth2Service");
   private readonly $oidc = inject(OidcSecurityService);
-  private readonly $events = inject(PublicEventsService);
   private readonly $router = inject(Router);
 
-  private authTriggered = false;
+  private oidcReady$$ = signal(false);
   private onReadyResolve!: () => void;
   readonly onReady = new Promise<void>((resolve, reject) => {
     this.onReadyResolve = resolve;
@@ -24,31 +26,72 @@ export class ConcreteOAuth2Service extends OAuth2Service {
 
   constructor() {
     super();
-    this.$oidc.checkAuthIncludingServer().subscribe();
 
-    this.$events.registerForEvents().subscribe(e => {
-      if (e.type === EventTypes.CheckingAuthFinished) {
-        this.authTriggered = true;
-      } else if (e.type === EventTypes.CheckingAuthFinishedWithError) {
-        this.onReadyResolve();
-      }
-    });
+    this.initialize();
 
-    effect(() => {
+    effect(async () => {
       const auth = this.$oidc.authenticated();
+      const oidcReady = this.oidcReady$$();
 
-      this.$oidc.getAccessToken().subscribe(token => this.accessToken$$.set(token));
-      this.$oidc.getIdToken().subscribe(token => this.idToken$$.set(token));
+      this.accessToken$$.set(await firstValueFrom(this.$oidc.getAccessToken()));
+
+      this.idToken$$.set(await firstValueFrom(this.$oidc.getIdToken()));
+
+      let idTokenData: object;
       if (auth.isAuthenticated) {
-        this.$oidc.getPayloadFromIdToken().subscribe(token => this.idTokenData$$.set(token));
+        idTokenData = await firstValueFrom(this.$oidc.getPayloadFromIdToken());
       } else {
-        this.idTokenData$$.set({});
+        idTokenData = {};
       }
+      this.idTokenData$$.set(idTokenData);
 
-      if (this.authTriggered) {
+      if (oidcReady) {
         this.onReadyResolve();
       }
     });
+  }
+
+  private async initialize() {
+    this.$logger.information("OAuth 2.0 initializing...");
+    const refreshToken = await firstValueFrom(this.$oidc.getRefreshToken());
+
+    if (refreshToken) {
+      this.$logger.information("Found a refresh token");
+      let check = this.$oidc.checkAuthIncludingServer();  
+      check = check.pipe(
+        catchError(() => timer(1000).pipe(
+          switchMap(() => check),
+        )),
+      );
+      const response = await firstValueFrom(check);
+      if (response.isAuthenticated) {
+        //If the session is authenticated, it will function as expected
+        this.$logger.information("Session is currently authenticated");
+        this.oidcReady$$.set(true);
+      } else {
+        this.$logger.information("Session is not currently authenticated; will wait for the next access token");
+        const nowAccessToken = response.accessToken;
+
+        //The session expired, so we want to wait for the new access token to come back
+        timer(0, 200).pipe(
+          switchMap(() => this.$oidc.getAccessToken()),
+          filter(token => token !== nowAccessToken),
+          timeout(60000),
+          catchError(() => of("")),
+          take(1),
+        ).subscribe(() => {
+          //We now have the access token and are ready to go
+          this.$logger.information("Found a new access token");
+          this.oidcReady$$.set(true);
+        });
+      }
+    } else {
+      this.$logger.information("No refresh token found");
+      await firstValueFrom(this.$oidc.checkAuth());
+
+      //There's no session, so we can start whenever
+      this.oidcReady$$.set(true);
+    }
   }
 
   login(): void {

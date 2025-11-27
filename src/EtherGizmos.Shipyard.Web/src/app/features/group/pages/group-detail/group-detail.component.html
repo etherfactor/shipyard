@@ -1,0 +1,118 @@
+@let record = group$$();
+@let form = form$$();
+
+<!-- Header -->
+<div class="row">
+  <div class="col-12 mt-3">
+    @if (record?.id) {
+    <detail-header [text]="'Group Details'"
+                   [subtext]="record?.name" />
+    } @else {
+    <detail-header [text]="'Group Details'"
+                   [subtext]="'Creating new group'" />
+    }
+  </div>
+</div>
+
+@if (record && form) {
+
+<!-- Summary -->
+<div class="row" [formGroup]="form">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-people" text="Group Summary">
+      <div class="row">
+        <div class="col-md-6">
+          <!-- Name -->
+          <div class="row mt-3">
+            <label for="name" class="col-sm-4 col-form-label">
+              Name
+            </label>
+            <div class="col-sm-8">
+              <input id="name"
+                     type="text"
+                     formControlName="name"
+                     [readonlyForm]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <!-- Description -->
+          <div class="row mt-3">
+            <label for="description" class="col-sm-4 col-form-label">
+              Description
+            </label>
+            <div class="col-sm-8">
+              <textarea id="description"
+                        rows="3"
+                        formControlName="description"
+                        [readonlyForm]="!isEditing$$()"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </detail-box>
+  </div>
+</div>
+
+<!-- Members -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-people" text="Members">
+
+      @if (users$$().length > 0) {
+      <div class="table-responsive mt-3">
+        <table class="table table-sm table-transparent table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of users$$(); track user.id) {
+            @let person = { handle: user?.username ?? undefined, given: user?.givenName ?? undefined, family: user?.familyName ?? undefined, full: user?.fullName ?? undefined };
+            <tr>
+              <td>
+                {{user.username}}
+              </td>
+              <td>
+                {{formatName(person, 'display')}}
+              </td>
+              <td>
+                {{user.emailAddress}}
+              </td>
+              <td style="width: 0.1%; white-space: nowrap;">
+                <a [routerLink]="['/users', user.id]" [queryParams]="{append: 1}">
+                  <span class="bi bi-box-arrow-up-right"></span>
+                </a>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      } @else {
+      <ul class="mt-3 mb-0">
+        <li>
+          No members in this group
+        </li>
+      </ul>
+      }
+
+    </detail-box>
+  </div>
+</div>
+}
+
+@if (isLoading$$()) {
+<div style="position: fixed; top: 0; left: 0; height: 100%; width: 100%; background-color: color-mix(in srgb, var(--bs-body-bg) 50%, transparent); z-index: 100;">
+</div>
+<div style="position: fixed; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%); z-index: 100%;">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+}

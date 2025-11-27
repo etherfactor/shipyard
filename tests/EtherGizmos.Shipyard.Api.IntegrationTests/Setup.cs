@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Npgsql;
+using System.Data;
 using System.Text;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
@@ -49,9 +51,7 @@ internal static class Setup
         {
             ["Artifacts:BasePath"] = "artifacts",
             ["Artifacts:Database:ConnectionId"] = "TestDb",
-            ["Connections:TestDb:Type"] = "Database",
-            ["Connections:TestDb:PostgreSql:ConnectionString"] = _pgsqlCstr,
-            ["Database:ConnectionId"] = "TestDb",
+            ["Database:PostgreSql:ConnectionString"] = _pgsqlCstr,
             ["RabbitMq:ConnectionString"] = _rmqCstr,
             ["Security:Certificates:AuthSigning:Type"] = "Certificate",
             ["Security:Certificates:AuthSigning:Text:PublicKey"] = Certificates.TokenSigningPublicKey,
@@ -68,6 +68,26 @@ internal static class Setup
             {
                 builder.UseEnvironment("Integration");
             });
+
+        using var client = Client;
+
+        await client.GetAsync("/api/v1/packages");
+
+        using var connection = new NpgsqlConnection(_pgsqlCstr);
+        await connection.OpenAsync();
+
+        using var command = connection.CreateCommand();
+
+        command.CommandText = """
+            select user_id
+              from users
+              where username = 'admin';
+            """;
+
+        using var reader = await command.ExecuteReaderAsync();
+        await reader.ReadAsync();
+
+        OwnerUserId = reader.GetGuid("user_id");
     }
 
     [OneTimeTearDown]
@@ -76,6 +96,11 @@ internal static class Setup
         await _waf.DisposeAsync();
     }
 
-    public static HttpClient Client =>
-        _waf.CreateClient(new() { HandleCookies = true });
+    public static Guid OwnerUserId { get; private set; }
+
+    public static HttpClient Client
+        => _waf.CreateClient(new() { HandleCookies = true });
+
+    public static IServiceProvider Services
+        => _waf.Services;
 }

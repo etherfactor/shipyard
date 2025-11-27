@@ -5,7 +5,8 @@ public interface IRecordSource<TEntity, TId>
 {
     Task<(TEntity Entity, TId Id)> AcquireAsync(
         FixtureContext context,
-        AcquirePurpose purpose);
+        AcquirePurpose purpose,
+        Guid? createdByUserId = null);
 }
 
 public enum AcquirePurpose

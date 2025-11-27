@@ -35,5 +35,36 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         entity.Property(e => e.FullName)
             .HasColumnName("full_name");
+
+        entity.Ignore(e => e.Password);
+
+        entity.Property(e => e.GroupId)
+            .HasColumnName("group_id");
+
+        entity.HasOne(e => e.Group)
+            .WithMany(e => e.Users)
+            .HasForeignKey(e => e.GroupId);
+
+        entity.HasMany(e => e.Roles)
+            .WithMany(e => e.Users)
+            .UsingEntity<RoleUser>();
+
+        entity.HasMany(e => e.Capabilities)
+            .WithOne(e => e.PrincipalUser)
+            .HasForeignKey(e => e.PrincipalUserId);
+
+        entity.Property(e => e.PrincipalId)
+            .HasColumnName("principal_id");
+
+        entity.HasOne(e => e.Principal);
+
+        entity.Property(e => e.SecurableId)
+            .HasColumnName("securable_id");
+
+        entity.HasOne(e => e.Securable);
+
+        entity.HasMany(e => e.AclUserEntries)
+            .WithOne(e => e.PrincipalUser)
+            .HasForeignKey(e => e.PrincipalUserId);
     }
 }

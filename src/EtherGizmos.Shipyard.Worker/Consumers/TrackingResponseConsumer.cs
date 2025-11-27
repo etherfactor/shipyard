@@ -2,6 +2,7 @@ using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
+using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -22,7 +23,7 @@ public class TrackingResponseConsumer : IMessageConsumer<TrackingResponse>
         IMessageSender sender)
     {
         _logger = logger;
-        _uowFactory = uowFactory;
+        _uowFactory = uowFactory.AsUnfiltered();
         _sender = sender;
     }
 
@@ -35,7 +36,10 @@ public class TrackingResponseConsumer : IMessageConsumer<TrackingResponse>
         var message = context.Message;
         _logger.LogInformation("Received response message {@Message}", message);
 
-        var package = await packageRepo.Data.SingleAsync(e => e.Id == message.PackageId, cancellationToken: context.CancellationToken);
+        var package = await packageRepo.Data
+            .Include(e => e.Carrier)
+            .Include(e => e.TrackingUpdates)
+            .SingleAsync(e => e.Id == message.PackageId, cancellationToken: context.CancellationToken);
 
         var executionRepo = uow.Repository<CarrierExecution>();
         var execution = await executionRepo.Data.SingleOrDefaultAsync(e => e.Id == message.ExecutionId, cancellationToken: context.CancellationToken);

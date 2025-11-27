@@ -34,7 +34,8 @@ builder.Configuration
     .AddRemappedEnvironmentVariables(
         (new(@"(?<=[^:_])_(?=[^_])"), "."),
         (new(@"(?<=[^_]):_(?=[^_])"), " "),
-        (new(@"^ConnectionStrings:(?=[^_:])"), ""));
+        (new(@"^ConnectionStrings:(?=[^_:])"), ""))
+    .AddExpandedConnections(builder.Configuration);
 
 builder.Services
     .AddOptions<DatabaseReferenceOptions>()
@@ -61,6 +62,16 @@ builder.Services
     .Configure<IConfiguration>((opt, conf) =>
     {
         conf.GetSection("Selenium")
+            .Bind(opt);
+    })
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services
+    .AddOptions<WorkerOptions>()
+    .Configure<IConfiguration>((opt, conf) =>
+    {
+        conf.GetSection("Worker")
             .Bind(opt);
     })
     .ValidateDataAnnotations()

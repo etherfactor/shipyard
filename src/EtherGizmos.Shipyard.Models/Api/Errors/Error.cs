@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace EtherGizmos.Shipyard.Models.Api.Errors;
+namespace EtherGizmos.Shipyard.Api.Errors;
 
 public partial class Error
 {

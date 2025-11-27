@@ -1,8 +1,9 @@
 ﻿using Asp.Versioning;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Api.Services.Security;
 using EtherGizmos.Shipyard.Database;
-using EtherGizmos.Shipyard.Models.Api.Errors;
+using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +32,7 @@ public class CarrierExecutionsController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute)]
+    [HasCapability(SecurableType.Carrier, PermissionId.Read)]
     [ProducesResponseSet]
     [ProducesResponseType(200, Type = typeof(CarrierExecutionDTO)), SwaggerResponseExample(200, typeof(CarrierExecutionDTOExampleGet))]
     public Task<IActionResult> Search(
@@ -41,6 +43,7 @@ public class CarrierExecutionsController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute + "({id})")]
+    [HasCapability(SecurableType.Carrier, PermissionId.Read)]
     [ProducesResponseType(200, Type = typeof(CarrierExecutionDTO)), SwaggerResponseExample(200, typeof(CarrierExecutionDTOExampleGet))]
     public Task<IActionResult> Get(
         int id,
@@ -51,6 +54,7 @@ public class CarrierExecutionsController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute + "({id})" + "/readArtifact")]
+    [HasCapability(SecurableType.Carrier, PermissionId.Read)]
     [ProducesResponseType(200, Type = typeof(Stream))]
     public async Task<IActionResult> ReadArtifact(
         int id,

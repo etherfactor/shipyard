@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace EtherGizmos.Shipyard.Abstractions;
+namespace EtherGizmos.Common.Abstractions;
 
 public readonly record struct ArtifactUri
 {

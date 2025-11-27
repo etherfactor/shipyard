@@ -26,6 +26,13 @@ public class CarrierExecutionConfiguration : IEntityTypeConfiguration<CarrierExe
             .WithMany()
             .HasForeignKey(e => e.CarrierId);
 
+        entity.Property(e => e.PackageId)
+            .HasColumnName("package_id");
+
+        entity.HasOne(e => e.Package)
+            .WithMany()
+            .HasForeignKey(e => e.PackageId);
+
         entity.Property(e => e.StartedAt)
             .HasColumnName("started_at_utc");
 

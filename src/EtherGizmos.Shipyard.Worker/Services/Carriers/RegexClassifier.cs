@@ -1,6 +1,7 @@
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
+using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 
@@ -15,7 +16,7 @@ internal class RegexClassifier : IRegexClassifier
     public RegexClassifier(
         IUnitOfWorkFactory uowFactory)
     {
-        _uowFactory = uowFactory;
+        _uowFactory = uowFactory.AsUnfiltered();
     }
 
     public async Task<int> ClassifyStatusAsync(

@@ -1,0 +1,22 @@
+<div aria-live="polite" aria-atomic="true" class="position-absolute" style="right: 10px; bottom: 10px;">
+  @for (toast of toasts$$(); track toast) {
+  <ngb-toast [header]="toast.header"
+             [autohide]="!!toast.delay"
+             [delay]="toast.delay ?? 0"
+             (hidden)="hide(toast)">
+    <div>
+      {{toast.body}}
+    </div>
+
+    @if (toast.actions) {
+    <div class="d-flex justify-content-end" style="gap: 7.5px;">
+      @for (action of toast.actions; track action) {
+      <button class="btn btn-sm mt-2" [class]="'btn-' + action.color" (click)="action.execute()">
+        {{action.label}}
+      </button>
+      }
+    </div>
+    }
+  </ngb-toast>
+  }
+</div>

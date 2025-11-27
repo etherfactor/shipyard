@@ -3,7 +3,6 @@ using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Extensions;
-using EtherGizmos.Shipyard.Models.Api.Errors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -146,6 +145,10 @@ public abstract class AutoODataController : ODataController
         IKeyedRequestBuilder<TEntity, TDto> OnUpdating(Func<TEntity, TDto, Task> beforeSave);
 
         Task<IActionResult> PatchAsync(Delta<TDto> patch, ODataQueryOptions<TDto> queryOptions, CancellationToken cancellationToken = default);
+
+        IReferenceRequestBuilder<TEntity, TDto, TFEntity, TFDto> ForReference<TFEntity, TFDto, TFKey>(Func<TEntity, ICollection<TFEntity>> findCollection, params KeyMapping<TFEntity, TFDto, TFKey>[] fkeys)
+            where TFEntity : class, IEntity
+            where TFDto : class, new();
     }
 
     protected class KeyMapping<TEntity, TDto, TKey>
@@ -253,7 +256,7 @@ public abstract class AutoODataController : ODataController
             return _controller.NoContent();
         }
 
-        public IReferenceRequestBuilder<TFEntity, TFDto> ForReference<TFEntity, TFDto, TFKey>(
+        public IReferenceRequestBuilder<TEntity, TDto, TFEntity, TFDto> ForReference<TFEntity, TFDto, TFKey>(
             Func<TEntity, ICollection<TFEntity>> findCollection,
             params KeyMapping<TFEntity, TFDto, TFKey>[] fkeys)
             where TFEntity : class, IEntity
@@ -286,14 +289,14 @@ public abstract class AutoODataController : ODataController
         public IKeylessRequestBuilder<TEntity, TDto> OnCreating(
             Func<TEntity, TDto, Task> beforeSave)
         {
-            _onUpdating.Add(beforeSave);
+            _onCreating.Add(beforeSave);
             return this;
         }
 
         public IKeyedRequestBuilder<TEntity, TDto> OnUpdating(
             Func<TEntity, TDto, Task> beforeSave)
         {
-            _onCreating.Add(beforeSave);
+            _onUpdating.Add(beforeSave);
             return this;
         }
 
@@ -361,24 +364,34 @@ public abstract class AutoODataController : ODataController
         }
     }
 
-    protected interface IReferenceRequestBuilder<TFEntity, TFDto>
+    protected interface IReferenceRequestBuilder<TEntity, TDto, TFEntity, TFDto>
+        where TEntity : class
+        where TDto : class, new()
         where TFEntity : class
         where TFDto : class, new()
     {
         Task<IActionResult> CreateAsync(CancellationToken cancellationToken = default);
 
         Task<IActionResult> DeleteAsync(CancellationToken cancellationToken = default);
+
+        IReferenceRequestBuilder<TEntity, TDto, TFEntity, TFDto> OnCreating(Func<TEntity, TDto, TFEntity, TFDto, Task> beforeSave);
+
+        IReferenceRequestBuilder<TEntity, TDto, TFEntity, TFDto> OnDeleting(Func<TEntity, TDto, TFEntity, TFDto, Task> beforeSave);
     }
 
     private class SetReferenceRequestBuilder<TEntity, TDto, TKey, TFEntity, TFDto, TFKey> :
-        IReferenceRequestBuilder<TFEntity, TFDto>
+        IReferenceRequestBuilder<TEntity, TDto, TFEntity, TFDto>
         where TEntity : class, IEntity
         where TDto : class, new()
         where TFEntity : class, IEntity
         where TFDto : class, new()
     {
         private readonly AutoODataController _controller;
+        private readonly IMapper _mapper;
         private readonly IUnitOfWorkFactory _uowFactory;
+
+        private readonly List<Func<TEntity, TDto, TFEntity, TFDto, Task>> _onCreating = [];
+        private readonly List<Func<TEntity, TDto, TFEntity, TFDto, Task>> _onDeleting = [];
 
         public List<KeyMapping<TEntity, TDto, TKey>> Keys { get; }
 
@@ -393,6 +406,7 @@ public abstract class AutoODataController : ODataController
             params KeyMapping<TFEntity, TFDto, TFKey>[] fkeys)
         {
             _controller = controller;
+            _mapper = controller._serviceProvider.GetRequiredService<IMapper>();
             _uowFactory = _controller._serviceProvider.GetRequiredService<IUnitOfWorkFactory>();
 
             Keys = [.. keys];
@@ -414,6 +428,17 @@ public abstract class AutoODataController : ODataController
 
             FindCollection(record).Add(foreignRecord);
 
+            var recordAsDto = _mapper
+                .Map<TDto>(record);
+
+            var foreignRecordAsDto = _mapper
+                .Map<TFDto>(foreignRecord);
+
+            foreach (var beforeSave in _onCreating)
+            {
+                await beforeSave(record, recordAsDto, foreignRecord, foreignRecordAsDto);
+            }
+
             await uow.SaveChangesAsync(cancellationToken);
 
             return _controller.NoContent();
@@ -433,9 +458,34 @@ public abstract class AutoODataController : ODataController
 
             FindCollection(record).Remove(foreignRecord);
 
+            var recordAsDto = _mapper
+                .Map<TDto>(record);
+
+            var foreignRecordAsDto = _mapper
+                .Map<TFDto>(foreignRecord);
+
+            foreach (var beforeSave in _onDeleting)
+            {
+                await beforeSave(record, recordAsDto, foreignRecord, foreignRecordAsDto);
+            }
+
             await uow.SaveChangesAsync(cancellationToken);
 
             return _controller.NoContent();
+        }
+
+        public IReferenceRequestBuilder<TEntity, TDto, TFEntity, TFDto> OnCreating(
+            Func<TEntity, TDto, TFEntity, TFDto, Task> beforeSave)
+        {
+            _onCreating.Add(beforeSave);
+            return this;
+        }
+
+        public IReferenceRequestBuilder<TEntity, TDto, TFEntity, TFDto> OnDeleting(
+            Func<TEntity, TDto, TFEntity, TFDto, Task> beforeSave)
+        {
+            _onDeleting.Add(beforeSave);
+            return this;
         }
     }
 }

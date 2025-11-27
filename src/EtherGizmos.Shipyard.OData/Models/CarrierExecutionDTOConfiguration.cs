@@ -33,6 +33,8 @@ public class CarrierExecutionDTOConfiguration : IModelConfiguration
             /*  End Audit  */
             entity.Property(e => e.CarrierId);
             entity.HasRequired(e => e.Carrier);
+            entity.Property(e => e.PackageId);
+            entity.HasOptional(e => e.Package);
             entity.Property(e => e.StartedAt);
             entity.Property(e => e.CompletedAt);
             entity.EnumProperty(e => e.ExecutionStatusType);

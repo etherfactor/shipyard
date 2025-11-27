@@ -19,6 +19,10 @@ public class CarrierExecutionDTO
 
     public CarrierDTO? Carrier { get; set; }
 
+    public int? PackageId { get; set; }
+
+    public PackageDTO? Package { get; set; }
+
     public DateTimeOffset? StartedAt { get; set; }
 
     public DateTimeOffset? CompletedAt { get; set; }
@@ -45,6 +49,8 @@ public class CarrierExecutionDTOProfile : Profile
         /*  End Audit  */
         toDto.MapMember(dest => dest.CarrierId, src => src.CarrierId);
         toDto.MapMember(dest => dest.Carrier, src => src.Carrier, opt => opt.ExplicitExpansion());
+        toDto.MapMember(dest => dest.PackageId, src => src.PackageId);
+        toDto.MapMember(dest => dest.Package, src => src.Package, opt => opt.ExplicitExpansion());
         toDto.MapMember(dest => dest.StartedAt, src => src.StartedAt);
         toDto.MapMember(dest => dest.CompletedAt, src => src.CompletedAt);
         toDto.MapMember(dest => dest.ExecutionStatusType, src => src.ExecutionStatus);

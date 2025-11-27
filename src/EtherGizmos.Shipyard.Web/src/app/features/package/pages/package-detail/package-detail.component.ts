@@ -1,18 +1,25 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EntitySingle } from '@ethergizmos/odata-fluent-client';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { DetailBoxComponent } from '../../../../shared/components/detail-box/detail-box.component';
+import { DateTime, Duration } from 'luxon';
+import { DetailBoxButton, DetailBoxComponent } from '../../../../shared/components/detail-box/detail-box.component';
 import { DetailHeaderComponent } from '../../../../shared/components/detail-header/detail-header.component';
 import { ReadonlyFormDirective } from '../../../../shared/directives/readonly-form/readonly-form.directive';
 import { NavbarActionService } from '../../../../shared/services/navbar-action/navbar-action.service';
 import { Bound } from '../../../../shared/utilities/bound/bound.util';
 import { getDirtyFormValues, TypedFormGroup } from '../../../../shared/utilities/form/form.util';
+import { o } from '../../../../shared/utilities/odata/odata.util';
 import { NavbarAction } from '../../../app/components/navbar-action/navbar-action.component';
 import { Carrier } from '../../../carrier/models/carrier';
+import { CarrierExecution } from '../../../carrier/models/carrier-execution';
+import { ExecutionStatusType, getExecutionStatusTypeMetadata } from '../../../carrier/models/execution-status-type';
+import { CarrierExecutionService } from '../../../carrier/services/carrier-execution/carrier-execution.service';
 import { CarrierService } from '../../../carrier/services/carrier/carrier.service';
+import { UserSessionService } from '../../../login/services/user-session/user-session.service';
+import { PermissionId } from '../../../security/models/permission-id';
+import { SecurableType } from '../../../security/models/securable-type';
 import { Package, PackageF, packageForm } from '../../models/package';
 import { getStatusTypeMetadata, StatusType } from '../../models/status-type';
 import { PackageService } from '../../services/package/package.service';
@@ -20,13 +27,13 @@ import { PackageService } from '../../services/package/package.service';
 @Component({
   selector: 'app-package-detail',
   imports: [
-    CommonModule,
     DetailBoxComponent,
     DetailHeaderComponent,
     FormsModule,
     NgSelectModule,
     ReactiveFormsModule,
     ReadonlyFormDirective,
+    RouterModule,
   ],
   templateUrl: './package-detail.component.html',
   styleUrl: './package-detail.component.scss'
@@ -35,10 +42,12 @@ export class PackageDetailComponent implements OnInit {
 
   private readonly $package = inject(PackageService);
   private readonly $carrier = inject(CarrierService);
+  private readonly $carrierExecution = inject(CarrierExecutionService);
   private readonly $form = inject(FormBuilder);
   private readonly $navbarAction = inject(NavbarActionService);
   private readonly $route = inject(ActivatedRoute);
   private readonly $router = inject(Router);
+  private readonly $session = inject(UserSessionService);
 
   readonly id$$ = signal<number | undefined>(undefined);
   readonly package$$ = signal<Package | undefined>(undefined);
@@ -50,6 +59,11 @@ export class PackageDetailComponent implements OnInit {
   readonly isLoading$$ = computed(() => this.isLoadingStack$$() > 0);
   private readonly isLoadingStack$$ = signal(0);
 
+  readonly exec$$ = signal<CarrierExecution | undefined>(undefined);
+
+  readonly isLoadingExec$$ = computed(() => this.isLoadingExecStack$$() > 0);
+  private readonly isLoadingExecStack$$ = signal(0);
+
   readonly isEditing$$ = signal(false);
 
   readonly actions$$ = computed(() => {
@@ -57,25 +71,31 @@ export class PackageDetailComponent implements OnInit {
     const record = this.package$$();
 
     if (!this.isLoading$$()) {
-      if (this.id$$() && !record?.isDelivered) {
-        actions.push({
-          icon: "bi-arrow-repeat",
-          label: "Repoll",
-          callback: this.onRepoll,
-        });
-      }
-
+      const hasWrite = this.$session.hasCapability(SecurableType.Package, PermissionId.Write);
+      const hasDelete = this.$session.hasCapability(SecurableType.Package, PermissionId.Delete);
+      const hasReadCarrier = this.$session.hasCapability(SecurableType.Carrier, PermissionId.Read);
       if (!this.isEditing$$()) {
-        actions.push({
-          icon: "bi-pencil",
-          label: "Edit",
-          callback: this.onEdit,
-        });
-        actions.push({
-          icon: "bi-trash",
-          label: "Delete",
-          callback: this.onDelete,
-        });
+        if (this.id$$() && !record?.isDelivered && hasWrite) {
+          actions.push({
+            icon: "bi-arrow-repeat",
+            label: "Repoll",
+            callback: this.onRepoll,
+          });
+        }
+        if (hasWrite && hasReadCarrier) {
+          actions.push({
+            icon: "bi-pencil",
+            label: "Edit",
+            callback: this.onEdit,
+          });
+        }
+        if (hasDelete) {
+          actions.push({
+            icon: "bi-trash",
+            label: "Delete",
+            callback: this.onDelete,
+          });
+        }
       } else {
         actions.push({
           icon: "bi-save",
@@ -93,6 +113,20 @@ export class PackageDetailComponent implements OnInit {
     return actions;
   });
 
+  readonly execButtons$$ = computed<DetailBoxButton[]>(() => {
+    const buttons: DetailBoxButton[] = [];
+
+    if (!this.isEditing$$()) {
+      buttons.push({
+        color: "primary",
+        text: "View all",
+        callback: this.viewExecutions,
+      });
+    }
+
+    return buttons;
+  });
+
   get trackingUpdates() {
     const record = this.package$$();
     if (!record)
@@ -101,6 +135,8 @@ export class PackageDetailComponent implements OnInit {
     const updates = record.trackingUpdates ?? [];
     return [...updates].reverse();
   }
+
+  readonly canViewCarriers$$ = signal(this.$session.hasCapability(SecurableType.Carrier, PermissionId.Read));
 
   constructor() {
     effect(() => this.$navbarAction.setActions(this.actions$$()));
@@ -126,6 +162,8 @@ export class PackageDetailComponent implements OnInit {
   }
 
   private async load(single?: EntitySingle<Package>) {
+    this.loadCarriers();
+
     const id = this.id$$();
     if (!id)
       return;
@@ -147,11 +185,48 @@ export class PackageDetailComponent implements OnInit {
       this.package$$.set(data);
       this.init();
 
-      if (this.carriers$$().length === 0) {
-        this.carriers$$.set([data.carrier!]);
+      if (this.$session.hasCapability(SecurableType.Carrier, PermissionId.Read)) {
+        try {
+          this.isLoadingExecStack$$.set(this.isLoadingExecStack$$() + 1);
+
+          const exec = await this.$carrierExecution.search()
+            .filter(e =>
+              o.and(
+                o.eq(
+                  e.prop("packageId"),
+                  o.int(id)
+                ),
+                o.ne(
+                  e.prop("startedAt"),
+                  o.null()
+                )
+              )
+            )
+            .orderBy("startedAt", "desc")
+            .execute()
+            .data;
+
+          this.exec$$.set(exec[0]);
+        } finally {
+          this.isLoadingExecStack$$.set(this.isLoadingExecStack$$() - 1);
+        }
       }
     } finally {
       this.isLoadingStack$$.set(this.isLoadingStack$$() - 1);
+    }
+  }
+
+  private async loadCarriers() {
+    if (!this.carriersLoaded && this.canViewCarriers$$()) {
+      this.carriersLoaded = true;
+      const result = this.$carrier
+        .search()
+        .execute();
+
+      const data = await result.data;
+      data.sort((a, b) => a.name.localeCompare(b.name));
+
+      this.carriers$$.set(data);
     }
   }
 
@@ -175,18 +250,7 @@ export class PackageDetailComponent implements OnInit {
 
   @Bound async onEdit() {
     this.isEditing$$.set(true);
-
-    if (!this.carriersLoaded) {
-      this.carriersLoaded = true;
-      const result = this.$carrier
-        .search()
-        .execute();
-
-      const data = await result.data;
-      data.sort((a, b) => a.name.localeCompare(b.name));
-
-      this.carriers$$.set(data);
-    }
+    this.loadCarriers();
   }
 
   @Bound onDelete() {
@@ -229,5 +293,31 @@ export class PackageDetailComponent implements OnInit {
     } else {
       this.$router.navigate(["/packages"]);
     }
+  }
+
+  getExecutionStatusMetadata(statusType: ExecutionStatusType) {
+    return getExecutionStatusTypeMetadata(statusType);
+  }
+
+  getDiffTime(dateTime1: DateTime | null | undefined, dateTime2: DateTime | null | undefined) {
+    if (!dateTime1 || !dateTime2)
+      return "—";
+
+    let duration = Duration.fromMillis(dateTime2.toMillis() - dateTime1.toMillis())
+      .shiftTo("hours", "minutes", "seconds");
+
+    if (duration.hours === 0) {
+      duration = duration.shiftTo("minutes", "seconds");
+
+      if (duration.minutes === 0) {
+        duration = duration.shiftTo("seconds");
+      }
+    }
+
+    return duration.toHuman({ unitDisplay: "short" }).split(",")[0];
+  }
+
+  @Bound viewExecutions() {
+    this.$router.navigate(["/packages", this.id$$(), "executions"]);
   }
 }

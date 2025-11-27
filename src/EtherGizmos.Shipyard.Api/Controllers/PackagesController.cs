@@ -3,18 +3,20 @@ using AutoMapper;
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Api.Services.Security;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Messages;
-using EtherGizmos.Shipyard.Models.Api.Errors;
 using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
+using OpenIddict.Abstractions;
 using Swashbuckle.AspNetCore.Filters;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace EtherGizmos.Shipyard.Api.Controllers;
 
@@ -41,6 +43,7 @@ public class PackagesController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute)]
+    [HasCapability(SecurableType.Package, PermissionId.Read)]
     [ProducesResponseSet]
     [ProducesResponseType(200, Type = typeof(PackageDTO)), SwaggerResponseExample(200, typeof(PackageDTOExampleGet))]
     public Task<IActionResult> Search(
@@ -51,6 +54,7 @@ public class PackagesController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute + "({id})")]
+    [HasCapability(SecurableType.Package, PermissionId.Read)]
     [ProducesResponseType(200, Type = typeof(PackageDTO)), SwaggerResponseExample(200, typeof(PackageDTOExampleGet))]
     public Task<IActionResult> Get(
         int id,
@@ -61,6 +65,7 @@ public class PackagesController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpPost(BaseRoute)]
+    [HasCapability(SecurableType.Package, PermissionId.Write)]
     [Consumes(typeof(PackageDTO), "application/json"), SwaggerRequestExample(typeof(PackageDTO), typeof(PackageDTOExamplePost))]
     [ProducesResponseType(200, Type = typeof(PackageDTO)), SwaggerResponseExample(200, typeof(PackageDTOExamplePost))]
     public Task<IActionResult> Create(
@@ -72,6 +77,7 @@ public class PackagesController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpPatch(BaseRoute + "({id})")]
+    [HasCapability(SecurableType.Package, PermissionId.Write)]
     [Consumes(typeof(PackageDTO), "application/json"), SwaggerRequestExample(typeof(PackageDTO), typeof(PackageDTOExamplePatch))]
     [ProducesResponseType(200, Type = typeof(PackageDTO)), SwaggerResponseExample(200, typeof(PackageDTOExampleGet))]
     public Task<IActionResult> Patch(
@@ -84,6 +90,7 @@ public class PackagesController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpDelete(BaseRoute + "({id})")]
+    [HasCapability(SecurableType.Package, PermissionId.Delete)]
     [ProducesResponseType(204)]
     public Task<IActionResult> Delete(
         int id,
@@ -93,6 +100,7 @@ public class PackagesController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpGet("api/v{version:apiVersion}/findUpdatedPackages")]
+    [HasCapability(SecurableType.Package, PermissionId.Read)]
     [ProducesResponseSet]
     [ProducesResponseType(200, Type = typeof(PackageDTO)), SwaggerResponseExample(200, typeof(PackageDTOExampleGet))]
     public async Task<IActionResult> FindUpdatedPackages(
@@ -118,6 +126,7 @@ public class PackagesController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpPost(BaseRoute + "({id})" + "/schedulePoll")]
+    [HasCapability(SecurableType.Package, PermissionId.Write)]
     [ProducesResponseType(202)]
     public async Task<IActionResult> SchedulePoll(
         int id,
@@ -141,6 +150,7 @@ public class PackagesController : AutoODataController
         var execution = new CarrierExecution()
         {
             CarrierId = package.CarrierId,
+            PackageId = package.Id,
             ExecutionStatus = ExecutionStatusType.Queued,
             StepCount = (short)package.Carrier.Steps.Count,
         };
@@ -167,7 +177,20 @@ public class PackagesController : AutoODataController
     }
 
     private IKeylessRequestBuilder<Package, PackageDTO> ForSet()
-        => ForSet<Package, PackageDTO>();
+        => ForSet<Package, PackageDTO>()
+            .OnCreating(async (db, dto) =>
+            {
+                using var uow = _uowFactory.AsUnfiltered().Create();
+                var userRepo = uow.Repository<User>();
+
+                Guid.TryParse(User.GetClaim(Claims.Subject), out var userId);
+                var groupId = await userRepo.Data
+                    .Where(e => e.Id == userId)
+                    .Select(e => e.GroupId)
+                    .SingleAsync();
+
+                db.GroupId = groupId;
+            });
 
     private IKeyedRequestBuilder<Package, PackageDTO> ForItem(
         int id)

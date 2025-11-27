@@ -5,7 +5,7 @@ public interface IODataResourceSpec<TEntity, TId>
 {
     string BaseRoute { get; }
 
-    IReadOnlySet<ODataCapability> Capabilities { get; }
+    IReadOnlySet<ResourceFunctionality> Capabilities { get; }
 
     Func<TEntity, TId> Identity { get; }
 

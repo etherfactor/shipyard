@@ -6,6 +6,8 @@ public class Package : Auditable, IEntity
 {
     public virtual int Id { get; set; }
 
+    public virtual User? CreatedByUser { get; set; }
+
     public virtual int CarrierId { get; set; }
 
     public virtual Carrier Carrier { get; set; } = null!;
@@ -27,4 +29,12 @@ public class Package : Auditable, IEntity
     public virtual bool IsDelivered { get; set; }
 
     public virtual List<TrackingUpdate> TrackingUpdates { get; set; } = [];
+
+    public virtual int? GroupId { get; set; }
+
+    public virtual Group Group { get; set; } = null!;
+
+    public virtual Guid SecurableId { get; set; }
+
+    public virtual Securable Securable { get; set; } = new() { Type = Enums.SecurableType.Package };
 }

@@ -15,6 +15,8 @@ public abstract class ScrapingStep
 
     internal int Index { get; set; }
 
+    internal IServiceProvider ServiceProvider { get; set; } = null!;
+
     internal ILogger Logger { get; set; } = NullLogger.Instance;
 
     internal DateTimeOffset? Eta => _eta;

@@ -1,5 +1,6 @@
 import { InjectionToken } from "@angular/core";
 import { z } from "zod";
+import { LogLevel } from "../logger/logger.util";
 
 const AppConfigZ = z.object({
   production: z.boolean(),
@@ -8,6 +9,9 @@ const AppConfigZ = z.object({
     authority: z.string(),
     clientId: z.string(),
     scope: z.string(),
+  }),
+  logging: z.object({
+    minimumLevel: z.nativeEnum(LogLevel),
   }),
   version: z.string(),
 });

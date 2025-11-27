@@ -1,5 +1,7 @@
 using Asp.Versioning;
+using EtherGizmos.Shipyard.Api.Services.Security;
 using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +24,7 @@ public class CarriersController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute)]
+    [HasCapability(SecurableType.Carrier, PermissionId.Read)]
     [ProducesResponseSet]
     [ProducesResponseType(200, Type = typeof(CarrierDTO)), SwaggerResponseExample(200, typeof(CarrierDTOExampleGet))]
     public Task<IActionResult> Search(
@@ -32,6 +35,7 @@ public class CarriersController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute + "({id})")]
+    [HasCapability(SecurableType.Carrier, PermissionId.Read)]
     [ProducesResponseType(200, Type = typeof(CarrierDTO)), SwaggerResponseExample(200, typeof(CarrierDTOExampleGet))]
     public Task<IActionResult> Get(
         int id,
@@ -42,6 +46,7 @@ public class CarriersController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpPost(BaseRoute)]
+    [HasCapability(SecurableType.Carrier, PermissionId.Write)]
     [Consumes(typeof(CarrierDTO), "application/json"), SwaggerRequestExample(typeof(CarrierDTO), typeof(CarrierDTOExamplePost))]
     [ProducesResponseType(200, Type = typeof(CarrierDTO)), SwaggerResponseExample(200, typeof(CarrierDTOExamplePost))]
     public Task<IActionResult> Create(
@@ -53,6 +58,7 @@ public class CarriersController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpPatch(BaseRoute + "({id})")]
+    [HasCapability(SecurableType.Carrier, PermissionId.Write)]
     [Consumes(typeof(CarrierDTO), "application/json"), SwaggerRequestExample(typeof(CarrierDTO), typeof(CarrierDTOExamplePatch))]
     [ProducesResponseType(200, Type = typeof(CarrierDTO)), SwaggerResponseExample(200, typeof(CarrierDTOExampleGet))]
     public Task<IActionResult> Patch(
@@ -65,6 +71,7 @@ public class CarriersController : AutoODataController
 
     [ApiVersion(1.0)]
     [HttpDelete(BaseRoute + "({id})")]
+    [HasCapability(SecurableType.Carrier, PermissionId.Delete)]
     [ProducesResponseType(204)]
     public Task<IActionResult> Delete(
         int id,
