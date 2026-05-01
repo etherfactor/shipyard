@@ -26,6 +26,7 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Text.Json;
 
@@ -222,6 +223,36 @@ builder.Services
         name: "database",
         failureStatus: HealthStatus.Unhealthy,
         tags: ["database"]);
+
+// Documentation
+builder.Services
+    .AddSwaggerGen(opt =>
+    {
+        opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "Bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "Enter your JWT token",
+        });
+
+        opt.AddSecurityRequirement(new OpenApiSecurityRequirement()
+        {
+            {
+                new OpenApiSecurityScheme()
+                {
+                    Reference = new OpenApiReference()
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer",
+                    },
+                },
+                Array.Empty<string>()
+            },
+        });
+    });
 
 // Rendering
 builder.Services

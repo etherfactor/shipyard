@@ -47,7 +47,7 @@ public class YamlOutputFormatter : TextOutputFormatter
         TextWriter writer,
         TObject value)
     {
-        var bytes = YamlSerializer.Serialize(value);
+        var bytes = YamlSerializer.Serialize(value, new() { DefaultIgnoreCondition = YamlIgnoreCondition.WhenWritingNull });
         var asString = Encoding.UTF8.GetString(bytes.Span);
         writer.Write(asString);
     }

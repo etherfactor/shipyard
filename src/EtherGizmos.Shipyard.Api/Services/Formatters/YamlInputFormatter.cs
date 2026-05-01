@@ -34,7 +34,7 @@ public class YamlInputFormatter : TextInputFormatter
 
         var content = await reader.ReadToEndAsync();
 
-        var result = typeof(YamlOutputFormatter)
+        var result = typeof(YamlInputFormatter)
             .GetMethod(nameof(ReadObject), BindingFlags.NonPublic | BindingFlags.Static)!
             .MakeGenericMethod([context.ModelType])
             .Invoke(null, [content])!;
