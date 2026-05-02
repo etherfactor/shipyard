@@ -12,6 +12,7 @@ using EtherGizmos.Shipyard.Api.Services.HostedServices;
 using EtherGizmos.Shipyard.Api.Services.Logging;
 using EtherGizmos.Shipyard.Api.Services.Middleware;
 using EtherGizmos.Shipyard.Api.Services.Pipeline.OAuth2;
+using EtherGizmos.Shipyard.Api.Services.Validators;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Services;
@@ -157,7 +158,8 @@ builder.Services
     });
 
 // Models
-builder.Services.AddModelValidators();
+builder.Services.AddModelValidators()
+    .AddScoped<IModelValidator<Carrier>, CarrierValidator>();
 
 // Controllers
 builder.Services

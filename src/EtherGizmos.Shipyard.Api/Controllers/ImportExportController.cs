@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
+using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Converters;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
@@ -19,13 +20,16 @@ public class ImportExportController : ControllerBase
     private const string BaseRoute = "api/v{version:apiVersion}";
 
     private readonly IMapper _mapper;
+    private readonly IModelValidatorFactory _modelValidatorFactory;
     private readonly IUnitOfWorkFactory _uowFactory;
 
     public ImportExportController(
         IMapper mapper,
+        IModelValidatorFactory modelValidatorFactory,
         IUnitOfWorkFactory uowFactory)
     {
         _mapper = mapper;
+        _modelValidatorFactory = modelValidatorFactory;
         _uowFactory = uowFactory;
     }
 
@@ -99,6 +103,9 @@ public class ImportExportController : ControllerBase
             }
 
             carrierData.Apply(carrier);
+
+            var validator = _modelValidatorFactory.GetValidator<Carrier>();
+            await validator.ValidateAsync(carrier, cancellationToken);
 
             await uow.SaveChangesAsync(cancellationToken);
 

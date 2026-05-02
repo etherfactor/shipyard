@@ -1,7 +1,6 @@
 ﻿using EtherGizmos.Shipyard.Api.Enums;
 using EtherGizmos.Shipyard.Database;
 using System.ComponentModel.DataAnnotations;
-using VYaml.Annotations;
 
 namespace EtherGizmos.Shipyard.Api.Models;
 
@@ -37,8 +36,34 @@ public partial class CarrierExportV1
     {
         carrier.Name = Name;
         carrier.Slug = Slug;
-        carrier.Steps = [.. Steps.Select(e => e.Apply(new CarrierRunbookStep()))];
-        carrier.Rules = [.. Rules.Select(e => e.Apply(new CarrierStatusRule()))];
+
+        carrier.Steps = [.. carrier.Steps.Take(Steps.Count)];
+        for (var i = 0; i < Steps.Count; i++)
+        {
+            var current = carrier.Steps.Skip(i).FirstOrDefault();
+            if (current is null)
+            {
+                current = new();
+                carrier.Steps.Add(current);
+            }
+
+            var apply = Steps[i];
+            apply.Apply(current);
+        }
+
+        carrier.Rules = [.. carrier.Rules.Take(Rules.Count)];
+        for (var i = 0; i < Rules.Count; i++)
+        {
+            var current = carrier.Rules.Skip(i).FirstOrDefault();
+            if (current is null)
+            {
+                current = new();
+                carrier.Rules.Add(current);
+            }
+
+            var apply = Rules[i];
+            apply.Apply(current);
+        }
 
         return carrier;
     }
