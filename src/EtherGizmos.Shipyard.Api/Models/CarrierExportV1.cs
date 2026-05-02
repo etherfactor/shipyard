@@ -5,10 +5,10 @@ using VYaml.Annotations;
 
 namespace EtherGizmos.Shipyard.Api.Models;
 
-[YamlObject]
+//[YamlObject]
 public partial class CarrierExportV1
 {
-    [YamlConstructor]
+    //[YamlConstructor]
     public CarrierExportV1() { }
 
     public CarrierExportV1(
@@ -44,10 +44,10 @@ public partial class CarrierExportV1
     }
 }
 
-[YamlObject]
+//[YamlObject]
 public partial class CarrierStepExportV1
 {
-    [YamlConstructor]
+    //[YamlConstructor]
     public CarrierStepExportV1() { }
 
     public CarrierStepExportV1(
@@ -130,10 +130,10 @@ public partial class CarrierStepExportV1
     }
 }
 
-[YamlObject]
+//[YamlObject]
 public partial class CarrierRuleExportV1
 {
-    [YamlConstructor]
+    //[YamlConstructor]
     public CarrierRuleExportV1() { }
 
     public CarrierRuleExportV1(

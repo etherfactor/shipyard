@@ -35,20 +35,21 @@ public class YamlOutputFormatter : TextOutputFormatter
         var response = context.HttpContext.Response;
         using var writer = context.WriterFactory(response.Body, selectedEncoding);
 
-        typeof(YamlOutputFormatter)
-            .GetMethod(nameof(WriteObject), BindingFlags.NonPublic | BindingFlags.Static)!
+        var task = (Task)typeof(YamlOutputFormatter)
+            .GetMethod(nameof(WriteObjectAsync), BindingFlags.NonPublic | BindingFlags.Static)!
             .MakeGenericMethod([context.ObjectType!])
-            .Invoke(null, [writer, context.Object]);
+            .Invoke(null, [writer, context.Object])!;
+        await task;
 
         await writer.FlushAsync();
     }
 
-    private static void WriteObject<TObject>(
+    private static async Task WriteObjectAsync<TObject>(
         TextWriter writer,
         TObject value)
     {
         var bytes = YamlSerializer.Serialize(value, new() { DefaultIgnoreCondition = YamlIgnoreCondition.WhenWritingNull });
         var asString = Encoding.UTF8.GetString(bytes.Span);
-        writer.Write(asString);
+        await writer.WriteAsync(asString);
     }
 }
