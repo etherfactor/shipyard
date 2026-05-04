@@ -5,7 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EtherGizmos.Common.Messaging.RabbitMQ" Version="0.1.0-alpha.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\EtherGizmos.Common.Utilities\EtherGizmos.Common.Utilities.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Shipyard.Database\EtherGizmos.Shipyard.Database.csproj" />
   </ItemGroup>
 
 </Project>

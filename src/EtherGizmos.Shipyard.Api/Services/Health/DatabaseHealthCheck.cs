@@ -1,6 +1,6 @@
 ﻿using EtherGizmos.Common;
 using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Shipyard.Configuration;
+using EtherGizmos.Common.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Npgsql;
@@ -10,11 +10,11 @@ namespace EtherGizmos.Shipyard.Api.Services.Health;
 
 internal class DatabaseHealthCheck : IHealthCheck
 {
-    private readonly IOptions<DatabaseReferenceOptions> _dbOptions;
+    private readonly IOptions<ConnectionReferenceOptions> _dbOptions;
     private readonly IConnectionResolver _connectionResolver;
 
     public DatabaseHealthCheck(
-        IOptions<DatabaseReferenceOptions> dbOptions,
+        IOptions<ConnectionReferenceOptions> dbOptions,
         IConnectionResolver connectionResolver)
     {
         _dbOptions = dbOptions;

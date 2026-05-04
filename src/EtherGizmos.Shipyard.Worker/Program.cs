@@ -38,7 +38,7 @@ builder.Configuration
     .AddModularConfigurations(builder.Configuration);
 
 builder.Services
-    .AddOptions<DatabaseReferenceOptions>()
+    .AddOptions<ConnectionReferenceOptions>()
     .Configure<IConfiguration>((opt, conf) =>
     {
         conf.GetSection("Database")
@@ -108,7 +108,7 @@ builder.Services
         opt.Listeners.AddTopic("notification-package-delivered", "notification.package.delivered", subscription: "email");
         opt.Publishers.AddTopic("notification-package-delivered", "notification.package.delivered");
     })
-    .UseConnection(builder.Configuration["MessageBus:ConnectionId"]!)
+    .UseConnection(builder.Configuration["MessageBus:ConnectionId"] ?? "!Unknown")
     .AddConsumersFromAssemblies(typeof(Program).Assembly);
 
 builder.Services

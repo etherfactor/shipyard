@@ -15,7 +15,6 @@ using EtherGizmos.Shipyard.Api.Services.Middleware;
 using EtherGizmos.Shipyard.Api.Services.Pipeline.OAuth2;
 using EtherGizmos.Shipyard.Api.Services.Security;
 using EtherGizmos.Shipyard.Api.Services.Validators;
-using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Services;
 using JavaScriptEngineSwitcher.Extensions.MsDependencyInjection;
@@ -24,7 +23,6 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -50,24 +48,22 @@ builder.Configuration
     .AddModularConfigurations(builder.Configuration);
 
 builder.Services
-    .AddOptions<DatabaseReferenceOptions>()
-    .Configure<IConfiguration>((opt, conf) =>
-    {
-        conf.GetSection("Database")
-            .Bind(opt);
-    })
+    .AddOptions<ConnectionReferenceOptions>("Database")
+    .Bind(builder.Configuration.GetSection("Database"))
+    .ValidateOnStart()
+    .ValidateDataAnnotations();
+
+builder.Services
+    .AddOptions<ConnectionReferenceOptions>("MessageBroker")
+    .Bind(builder.Configuration.GetSection("MessageBroker"))
     .ValidateOnStart()
     .ValidateDataAnnotations();
 
 builder.Services
     .AddOptions<LogIngestionOptions>()
-    .Configure<IConfiguration>((opt, config) =>
-    {
-        config.GetSection("LogIngestion")
-            .Bind(opt);
-    })
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+    .Bind(builder.Configuration.GetSection("LogIngestion"))
+    .ValidateOnStart()
+    .ValidateDataAnnotations();
 
 //**********************************************************
 // Services
@@ -107,7 +103,7 @@ builder.Services
         opt.UseLazyLoadingProxies();
         opt.EnableSensitiveDataLogging();
 
-        var dbOptions = services.GetRequiredService<IOptions<DatabaseReferenceOptions>>()
+        var dbOptions = services.GetRequiredService<IOptions<ConnectionReferenceOptions>>()
             .Value;
 
         var connectionId = dbOptions.ConnectionId;
@@ -129,7 +125,7 @@ builder.Services
     {
         opt.Publishers.AddQueue("tracking-poll-request", "tracking.poll.request");
     })
-    .UseConnection(builder.Configuration["MessageBroker:ConnectionId"]!)
+    .UseConnection(builder.Configuration["MessageBroker:ConnectionId"] ?? "!Unknown")
     .AddConsumersFromAssemblies(typeof(Program).Assembly);
 
 builder.Services
@@ -202,7 +198,6 @@ builder.Services
         opt.ResponseBodyLogLimit = 1024;
     });
 
-builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 builder.Services.AddSingleton<ISourceLoggerFactory, SourceLoggerFactory>();
 
 builder.Services.AddHostedService<InitialConfigSeeder>();

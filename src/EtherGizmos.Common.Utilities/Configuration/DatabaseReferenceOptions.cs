@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace EtherGizmos.Shipyard.Configuration;
+namespace EtherGizmos.Common.Configuration;
 
-public class DatabaseReferenceOptions
+public class ConnectionReferenceOptions
 {
     [Required]
     public string ConnectionId { get; set; } = null!;
