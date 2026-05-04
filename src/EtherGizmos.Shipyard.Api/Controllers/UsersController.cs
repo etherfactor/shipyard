@@ -1,11 +1,11 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
-using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Common;
+using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Api.Services.Security;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
-using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

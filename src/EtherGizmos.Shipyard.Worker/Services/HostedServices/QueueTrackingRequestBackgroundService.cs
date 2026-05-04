@@ -1,8 +1,7 @@
+using EtherGizmos.Common;
 using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
-using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -53,7 +52,7 @@ public class QueueTrackingRequestBackgroundService : PeriodicBackgroundService
                 StepCount = (short)package.Carrier.Steps.Count,
             };
 
-            executionRepo.Create(execution);
+            executionRepo.Add(execution);
 
             await subUow.SaveChangesAsync(ct);
 

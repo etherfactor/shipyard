@@ -28,11 +28,14 @@ public static class IOAuth2BuilderExtensions
         tempOptions.OAuth2.DbContextType = typeof(TContext);
 
         var tempServices = new ServiceCollection()
-            .AddSingleton<IConfiguration>(@this.Builder.Configuration)
-            .AddCertificates();
+            .AddSingleton<IConfiguration>(@this.Builder.Configuration);
+
+        tempServices
+            .AddKeyResolver()
+            .WithCertificates();
 
         using var provider = tempServices.BuildServiceProvider();
-        var resolver = provider.GetRequiredService<ICertificateResolver>();
+        var resolver = provider.GetRequiredService<IKeyResolver>();
 
         var encryptionId = tempOptions.OAuth2.EncryptionCertificate.CertificateId;
         var encryption = resolver.LoadCertificate(encryptionId);

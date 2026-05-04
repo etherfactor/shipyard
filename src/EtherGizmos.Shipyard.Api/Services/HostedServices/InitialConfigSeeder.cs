@@ -1,7 +1,7 @@
-﻿using EtherGizmos.Shipyard.Abstractions;
+﻿using EtherGizmos.Common;
+using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
-using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace EtherGizmos.Shipyard.Api.Services.HostedServices;
@@ -207,7 +207,7 @@ public class InitialConfigSeeder : IHostedService
             if (user is null)
             {
                 user = new User();
-                userRepo.Create(user);
+                userRepo.Add(user);
             }
 
             user.Username = username;
@@ -235,7 +235,7 @@ public class InitialConfigSeeder : IHostedService
                 Description = description,
                 SystemId = systemId,
             };
-            groupRepo.Create(group);
+            groupRepo.Add(group);
         }
 
         return group;
@@ -260,7 +260,7 @@ public class InitialConfigSeeder : IHostedService
             {
                 SystemId = systemId,
             };
-            roleRepo.Create(role);
+            roleRepo.Add(role);
         }
 
         role.Name = name;

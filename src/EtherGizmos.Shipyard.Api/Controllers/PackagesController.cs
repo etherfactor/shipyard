@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using AutoMapper;
+using EtherGizmos.Common;
 using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Api.Services.Security;
 using EtherGizmos.Shipyard.Database;
@@ -107,7 +107,7 @@ public class PackagesController : AutoODataController
         ODataQueryOptions<PackageDTO> queryOptions,
         CancellationToken cancellationToken = default)
     {
-        using var uow = _uowFactory.Create(useRequestScope: true);
+        using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
         var packageRepo = uow.Repository<Package>();
 
         var dbData = await packageRepo.Data
@@ -132,7 +132,7 @@ public class PackagesController : AutoODataController
         int id,
         CancellationToken cancellationToken = default)
     {
-        using var uow = _uowFactory.Create(useRequestScope: true);
+        using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
         var packageRepo = uow.Repository<Package>();
 
         var package = await packageRepo.Data
@@ -155,7 +155,7 @@ public class PackagesController : AutoODataController
             StepCount = (short)package.Carrier.Steps.Count,
         };
 
-        executionRepo.Create(execution);
+        executionRepo.Add(execution);
 
         await uow.SaveChangesAsync(cancellationToken);
 

@@ -1,4 +1,5 @@
-﻿using EtherGizmos.Common.Extensions;
+﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Common.Extensions;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Models;
@@ -69,7 +70,7 @@ internal class FileArtifactWriter : IArtifactWriter
         using var uow = _uowFactory.Create();
         var artifactRepo = uow.Repository<Artifact>();
 
-        artifactRepo.Create(artifact);
+        artifactRepo.Add(artifact);
 
         await uow.SaveChangesAsync(cancellationToken);
 

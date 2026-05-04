@@ -1,11 +1,10 @@
-﻿using EtherGizmos.Common.Abstractions;
+﻿using EtherGizmos.Common;
+using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Converters;
-using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Abstractions;
 using EtherGizmos.Shipyard.Api.Models;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
-using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
@@ -53,7 +52,7 @@ internal class CarrierImporter : IExportDocumentImporter
             isNew = true;
 
             carrier = new();
-            carrierRepo.Create(carrier);
+            carrierRepo.Add(carrier);
         }
 
         carrierData.Apply(carrier);

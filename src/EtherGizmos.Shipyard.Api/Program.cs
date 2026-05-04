@@ -29,7 +29,7 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Serilog;
 using System.Text.Json;
 
@@ -44,10 +44,10 @@ builder.Services.AddSerilog((services, logger) =>
 builder.Configuration
     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
     .AddRemappedEnvironmentVariables(
-        (new(@"(?<=[^:_])_(?=[^_])"), "."),
-        (new(@"(?<=[^_]):_(?=[^_])"), " "),
-        (new(@"^ConnectionStrings:(?=[^_:])"), ""))
-    .AddExpandedConnections(builder.Configuration);
+        new(new(@"(?<=[^:_])_(?=[^_])"), "."),
+        new(new(@"(?<=[^_]):_(?=[^_])"), " "),
+        new(new(@"^ConnectionStrings:(?=[^_:])"), ""))
+    .AddModularConfigurations(builder.Configuration);
 
 builder.Services
     .AddOptions<DatabaseReferenceOptions>()
@@ -74,8 +74,6 @@ builder.Services
 
 // General
 builder.AddServiceDefaults();
-
-builder.Services.AddServiceConnections();
 
 // Security
 builder.UseOAuth2()
@@ -117,15 +115,7 @@ builder.Services
         var resolver = services.GetRequiredService<IConnectionResolver>();
         var connection = resolver.GetDatabaseConnection(connectionId);
 
-        connection.Match(
-            _ => throw new InvalidOperationException($"The connection {connectionId} is not a valid database connection."),
-            postgreSql =>
-            {
-                return opt.UseNpgsql(
-                    postgreSql.ConnectionString,
-                    o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
-            }
-        );
+        opt.UseConnection(services, connectionId);
     })
     .AddUnitOfWork(opt =>
     {
@@ -139,11 +129,7 @@ builder.Services
     {
         opt.Publishers.AddQueue("tracking-poll-request", "tracking.poll.request");
     })
-    .UseRabbitMQ((opt, conf) =>
-    {
-        conf.GetSection("RabbitMq")
-            .Bind(opt);
-    })
+    .UseConnection(builder.Configuration["MessageBroker:ConnectionId"]!)
     .AddConsumersFromAssemblies(typeof(Program).Assembly);
 
 builder.Services
@@ -249,19 +235,9 @@ builder.Services
             Description = "Enter your JWT token",
         });
 
-        opt.AddSecurityRequirement(new OpenApiSecurityRequirement()
+        opt.AddSecurityRequirement(document => new OpenApiSecurityRequirement()
         {
-            {
-                new OpenApiSecurityScheme()
-                {
-                    Reference = new OpenApiReference()
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer",
-                    },
-                },
-                Array.Empty<string>()
-            },
+            [new OpenApiSecuritySchemeReference("Bearer", document)] = [],
         });
     });
 

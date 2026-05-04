@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Abstractions;
+﻿using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Api.Enums;
 using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
 using EtherGizmos.Shipyard.Database;
@@ -76,7 +76,7 @@ public class TrackingUpdatesControllerV1Spec : IODataResourceSpec<TrackingUpdate
                 StatusTypeId = StatusTypeId.Delivered,
             };
 
-            updateRepo.Create(update);
+            updateRepo.Add(update);
 
             await uow.SaveChangesAsync();
 

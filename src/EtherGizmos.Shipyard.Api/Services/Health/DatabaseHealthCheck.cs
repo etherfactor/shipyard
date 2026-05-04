@@ -1,4 +1,5 @@
-﻿using EtherGizmos.Common.Configuration;
+﻿using EtherGizmos.Common;
+using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
@@ -28,10 +29,7 @@ internal class DatabaseHealthCheck : IHealthCheck
 
         try
         {
-            var connection = _connectionResolver.GetDatabaseConnection(dbOptions.ConnectionId);
-            using var dbConnection = connection.Match(
-                _ => throw new InvalidOperationException(),
-                psql => (DbConnection)new NpgsqlConnection(psql.ConnectionString));
+            var dbConnection = _connectionResolver.CreateDbConnection(dbOptions.ConnectionId);
 
             await dbConnection.OpenAsync(cancellationToken);
 

@@ -1,86 +1,92 @@
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace EtherGizmos.Shipyard.Swagger;
 
 public class ResponseSetFilter : IOperationFilter
 {
+    private ThreadLocal<Dictionary<string, OpenApiSchemaReference>> _schemas = new();
+
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
+        //Only want to apply this if we are actually returning a result set, otherwise this will break the model
         if (context.MethodInfo.GetCustomAttribute<ProducesResponseSetAttribute>() is null)
             return;
 
+        operation.Responses ??= [];
         foreach (var response in operation.Responses)
         {
+            //No content we can edit
+            if (response.Value.Content is null)
+                continue;
+
             foreach (var content in response.Value.Content)
             {
-                var anyExample = content.Value.Example;
-                if (anyExample is null)
+                var example = content.Value.Example;
+                if (example is null)
                     continue;
 
-                if (anyExample is OpenApiString stringExample)
+                if (example is not null && IsODataError(example))
                 {
-                    var deserialized = JsonNode.Parse(stringExample.Value);
-                    if (deserialized is not null)
+                    var cloned = example.DeepClone();
+
+                    var newArray = new JsonArray()
                     {
-                        var newArray = new JsonArray()
-                        {
-                            deserialized,
-                        };
+                        cloned,
+                    };
 
-                        var newObject = new JsonObject()
-                        {
-                            { "@odata.count", 1 },
-                            { "value", newArray },
-                        };
+                    var newObject = new JsonObject()
+                    {
+                        { "@odata.count", 1 },
+                        { "value", newArray },
+                    };
 
-                        var serialized = newObject.ToJsonString();
+                    content.Value.Example = newObject;
 
-                        var newExample = new OpenApiString(serialized);
+                    var currentSchema = (content.Value.Schema as OpenApiSchemaReference)!;
+                    var key = currentSchema.Reference.Id!;
 
-                        content.Value.Example = newExample;
-
-                        var currentSchema = content.Value.Schema;
-                        var key = currentSchema.Reference.Id;
-
+                    _schemas.Value ??= new();
+                    if (!_schemas.Value.ContainsKey(key))
+                    {
                         var keySet = key + "Set";
-                        OpenApiSchema newCollectionReference;
-                        if (!context.SchemaRepository.Schemas.ContainsKey(keySet))
-                        {
-                            var newCollectionSchema = new OpenApiSchema()
-                            {
-                                Title = keySet,
-                                AdditionalPropertiesAllowed = false,
-                                Properties = new Dictionary<string, OpenApiSchema>()
-                                {
-                                    { "@odata.count", new OpenApiSchema() { Type = "integer", Description = "The number of items in the result set." } },
-                                    { "value", new OpenApiSchema() { Type = "array", Items = currentSchema } },
-                                },
-                                Required = { "value" },
-                                Type = "object",
-                            };
 
-                            newCollectionReference = context.SchemaRepository.AddDefinition(newCollectionSchema.Title, newCollectionSchema);
-                        }
-                        else
+                        var newCollectionSchema = new OpenApiSchema()
                         {
-                            newCollectionReference = new()
+                            Title = keySet,
+                            AdditionalPropertiesAllowed = false,
+                            Properties = new Dictionary<string, IOpenApiSchema>()
                             {
-                                Reference = new OpenApiReference
-                                {
-                                    Type = ReferenceType.Schema,
-                                    Id = keySet,
-                                }
-                            };
-                        }
+                                { "@odata.count", new OpenApiSchema() { Type = JsonSchemaType.Integer, Description = "The number of items in the result set." } },
+                                { "value", new OpenApiSchema() { Type = JsonSchemaType.Array, Items = currentSchema } },
+                            },
+                            Required = new HashSet<string>() { "value" },
+                            Type = JsonSchemaType.Object,
+                        };
 
-                        content.Value.Schema = newCollectionReference;
+                        var newCollectionReference = context.SchemaRepository.AddDefinition(newCollectionSchema.Title, newCollectionSchema);
+                        _schemas.Value.TryAdd(key, newCollectionReference);
                     }
+
+                    var schema = _schemas.Value[key];
+                    content.Value.Schema = schema;
                 }
             }
         }
+    }
+
+    private bool IsODataError(
+        JsonNode node)
+    {
+        if (node.GetValueKind() != JsonValueKind.Object)
+            return false;
+
+        var obj = node.AsObject();
+        var error = obj["error"];
+        return error is not null
+            && error["code"] is not null;
     }
 }

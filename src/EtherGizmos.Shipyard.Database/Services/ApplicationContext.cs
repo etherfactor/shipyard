@@ -1,6 +1,5 @@
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Converters;
-using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Extensions;

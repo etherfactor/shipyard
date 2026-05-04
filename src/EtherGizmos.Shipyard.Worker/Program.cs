@@ -32,10 +32,10 @@ builder.Configuration
     .AddJsonFile($"appsettings.{builder.Environment}.json", optional: true, reloadOnChange: true)
     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
     .AddRemappedEnvironmentVariables(
-        (new(@"(?<=[^:_])_(?=[^_])"), "."),
-        (new(@"(?<=[^_]):_(?=[^_])"), " "),
-        (new(@"^ConnectionStrings:(?=[^_:])"), ""))
-    .AddExpandedConnections(builder.Configuration);
+        new(new(@"(?<=[^:_])_(?=[^_])"), "."),
+        new(new(@"(?<=[^_]):_(?=[^_])"), " "),
+        new(new(@"^ConnectionStrings:(?=[^_:])"), ""))
+    .AddModularConfigurations(builder.Configuration);
 
 builder.Services
     .AddOptions<DatabaseReferenceOptions>()
@@ -83,8 +83,6 @@ builder.Services
 // General
 builder.AddServiceDefaults();
 
-builder.Services.AddServiceConnections();
-
 // Database
 builder.Services
     .AddDatabase()
@@ -110,11 +108,7 @@ builder.Services
         opt.Listeners.AddTopic("notification-package-delivered", "notification.package.delivered", subscription: "email");
         opt.Publishers.AddTopic("notification-package-delivered", "notification.package.delivered");
     })
-    .UseRabbitMQ((opt, conf) =>
-    {
-        conf.GetSection("RabbitMq")
-            .Bind(opt);
-    })
+    .UseConnection(builder.Configuration["MessageBus:ConnectionId"]!)
     .AddConsumersFromAssemblies(typeof(Program).Assembly);
 
 builder.Services

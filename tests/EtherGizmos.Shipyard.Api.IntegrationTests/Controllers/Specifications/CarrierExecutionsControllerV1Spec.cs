@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Abstractions;
+﻿using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Api.Enums;
 using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
 using EtherGizmos.Shipyard.Database;
@@ -76,7 +76,7 @@ public class CarrierExecutionsControllerV1Spec : IODataResourceSpec<CarrierExecu
                 ExecutionStatus = ExecutionStatusType.Successful,
             };
 
-            executionRepo.Create(execution);
+            executionRepo.Add(execution);
 
             await uow.SaveChangesAsync();
 

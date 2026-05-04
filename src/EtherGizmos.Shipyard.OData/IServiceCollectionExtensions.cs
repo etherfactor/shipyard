@@ -87,7 +87,10 @@ public static class IServiceCollectionExtensions
         var fakeOptions = new ODataOptions();
         configureOptions(fakeOptions, new ConfigurationManager());
 
-        @this.AddAutoMapper(fakeOptions.ModelAssemblies);
+        @this.AddAutoMapper(opt =>
+        {
+            opt.AddMaps(fakeOptions.ModelAssemblies);
+        });
 
         @this.AddEndpointsApiExplorer();
         @this.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();

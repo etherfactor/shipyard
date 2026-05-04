@@ -1,6 +1,6 @@
 ﻿using EtherGizmos.Common;
+using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Controllers;
-using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.ViewModels;
 using EtherGizmos.Shipyard.Database;
 using Microsoft.AspNetCore.Authorization;
@@ -49,7 +49,7 @@ public class InternalAuthenticationController : InternalAuthenticationController
             return View(nameof(ChangePassword), model);
         }
 
-        using var uow = _uowFactory.Create(useRequestScope: true);
+        using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
         var userRepo = uow.Repository<User>();
 
         var subject = Guid.Parse(User.GetClaim(Claims.Subject)!);

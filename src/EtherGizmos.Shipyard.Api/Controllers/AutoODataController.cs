@@ -1,6 +1,5 @@
 using AutoMapper;
 using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -211,7 +210,7 @@ public abstract class AutoODataController : ODataController
         {
             queryOptions.EnsureValidForSingle();
 
-            using var uow = _uowFactory.Create(useRequestScope: true);
+            using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
             var repository = uow.Repository<TEntity>();
 
             var validator = _modelValidatorFactory.GetValidator<TDto>();
@@ -226,7 +225,7 @@ public abstract class AutoODataController : ODataController
             var dbValidator = _modelValidatorFactory.GetValidator<TEntity>();
             await dbValidator.ValidateAsync(record, cancellationToken);
 
-            repository.Create(record);
+            repository.Add(record);
 
             await uow.SaveChangesAsync(cancellationToken: cancellationToken);
 
@@ -244,12 +243,12 @@ public abstract class AutoODataController : ODataController
         public async Task<IActionResult> DeleteAsync(
             CancellationToken cancellationToken = default)
         {
-            using var uow = _uowFactory.Create(useRequestScope: true);
+            using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
             var repository = uow.Repository<TEntity>();
 
             var record = await _controller.LoadRecordAsync(uow, Keys, cancellationToken: cancellationToken);
 
-            repository.Delete(record);
+            repository.Remove(record);
 
             await uow.SaveChangesAsync(cancellationToken: cancellationToken);
 
@@ -272,7 +271,7 @@ public abstract class AutoODataController : ODataController
         {
             queryOptions.EnsureValidForSingle();
 
-            using var uow = _uowFactory.Create(useRequestScope: true);
+            using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
             var repository = uow.Repository<TEntity>();
 
             var record = await _controller.LoadRecordAsync(uow, Keys, cancellationToken: cancellationToken);
@@ -307,7 +306,7 @@ public abstract class AutoODataController : ODataController
         {
             queryOptions.EnsureValidForSingle();
 
-            using var uow = _uowFactory.Create(useRequestScope: true);
+            using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
             var repository = uow.Repository<TEntity>();
 
             var testRecord = new TDto();
@@ -351,7 +350,7 @@ public abstract class AutoODataController : ODataController
             ODataQueryOptions<TDto> queryOptions,
             CancellationToken cancellationToken = default)
         {
-            using var uow = _uowFactory.Create(useRequestScope: true);
+            using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
             var repository = uow.Repository<TEntity>();
 
             var finished = await _mapper
@@ -417,7 +416,7 @@ public abstract class AutoODataController : ODataController
         public async Task<IActionResult> CreateAsync(
             CancellationToken cancellationToken = default)
         {
-            using var uow = _uowFactory.Create(useRequestScope: true);
+            using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
             var repository = uow.Repository<TEntity>();
 
             var record = await _controller.LoadRecordAsync(uow, Keys, cancellationToken: cancellationToken);
@@ -447,7 +446,7 @@ public abstract class AutoODataController : ODataController
         public async Task<IActionResult> DeleteAsync(
             CancellationToken cancellationToken = default)
         {
-            using var uow = _uowFactory.Create(useRequestScope: true);
+            using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
             var repository = uow.Repository<TEntity>();
 
             var record = await _controller.LoadRecordAsync(uow, Keys, cancellationToken: cancellationToken);

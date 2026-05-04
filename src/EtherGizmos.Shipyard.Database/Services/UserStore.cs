@@ -1,7 +1,6 @@
-﻿using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Shipyard.Abstractions;
+﻿using EtherGizmos.Common;
+using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Database;
-using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Identity = Microsoft.AspNetCore.Identity;
 
