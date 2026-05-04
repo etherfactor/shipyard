@@ -6,6 +6,7 @@ using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Extensions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace EtherGizmos.Shipyard.Api.Services.Validators;
 
@@ -86,6 +87,17 @@ internal class CarrierValidator : IModelValidator<Carrier>
                 case StepTypeDTO.Replace:
                     if (!IsValid(var)) AddRequiredFor(returnError, path, "var");
                     if (!IsValid(from)) AddRequiredFor(returnError, path, "from");
+                    if (IsValid(from) && isRegex as bool? == true)
+                    {
+                        try
+                        {
+                            _ = new Regex(from as string ?? "");
+                        }
+                        catch
+                        {
+                            returnError.AddDetail($"{from}pattern", $"Invalid regex pattern: {from}");
+                        }
+                    }
                     if (!IsValid(to)) AddRequiredFor(returnError, path, "to");
                     if (!IsValid(isRegex)) AddRequiredFor(returnError, path, "isRegex");
                     if (!IsValid(trim)) AddRequiredFor(returnError, path, "trim");
@@ -121,8 +133,20 @@ internal class CarrierValidator : IModelValidator<Carrier>
             var priority = rule.Priority;
 
             var path = $"rules[{i}].";
-            if (!IsValid(pattern)) AddRequiredFor(returnError, pattern, "pattern");
-            if (!IsValid(statusType)) AddRequiredFor(returnError, pattern, "statusType");
+            if (!IsValid(pattern)) AddRequiredFor(returnError, path, "pattern");
+            if (IsValid(pattern))
+            {
+                try
+                {
+                    _ = new Regex(pattern);
+                }
+                catch
+                {
+                    returnError.AddDetail($"{path}pattern", $"Invalid regex pattern: {pattern}");
+                }
+            }
+
+            if (!IsValid(statusType)) AddRequiredFor(returnError, path, "statusType");
             if (!IsValid(priority)) AddRequiredFor(returnError, path, "priority");
         }
 

@@ -1,0 +1,10 @@
+﻿using EtherGizmos.Shipyard.Database.Enums;
+
+namespace EtherGizmos.Shipyard.Api.Abstractions;
+
+public interface ICapabilityAuthorizer
+{
+    void EnsureAuthorized(
+        SecurableType securableType,
+        int permissionId);
+}

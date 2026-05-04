@@ -1,10 +1,9 @@
-﻿using System.Text.Json.Nodes;
-using VYaml.Annotations;
+﻿using VYaml.Annotations;
 
 namespace EtherGizmos.Shipyard.Api.Models;
 
 [YamlObject]
-public partial class ExportDocument
+public partial record ExportDocument
 {
     [YamlConstructor]
     public ExportDocument() { }

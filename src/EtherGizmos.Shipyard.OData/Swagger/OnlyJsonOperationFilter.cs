@@ -17,8 +17,8 @@ public class OnlyJsonOperationFilter : IOperationFilter
 
             if (operation.Tags[0].Name == "ImportExport")
             {
-                response.Value.Content.Add("application/yaml", new() { });
-                response.Value.Content.Add("application/json", new() { });
+                response.Value.Content.TryAdd("application/yaml", new() { });
+                response.Value.Content.TryAdd("application/json", new() { });
             }
         }
     }

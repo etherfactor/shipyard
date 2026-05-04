@@ -6,12 +6,14 @@ using EtherGizmos.Shipyard;
 using EtherGizmos.Shipyard.Api.Abstractions;
 using EtherGizmos.Shipyard.Api.Configuration;
 using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Api.Services.Export;
 using EtherGizmos.Shipyard.Api.Services.Formatters;
 using EtherGizmos.Shipyard.Api.Services.Health;
 using EtherGizmos.Shipyard.Api.Services.HostedServices;
 using EtherGizmos.Shipyard.Api.Services.Logging;
 using EtherGizmos.Shipyard.Api.Services.Middleware;
 using EtherGizmos.Shipyard.Api.Services.Pipeline.OAuth2;
+using EtherGizmos.Shipyard.Api.Services.Security;
 using EtherGizmos.Shipyard.Api.Services.Validators;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Database;
@@ -96,6 +98,8 @@ builder.UseOAuth2()
 builder.Services.AddScoped<IClaimsPipelineStep<OAuth2PrincipalContext>, OAuth2SetUserCapabilitiesStep>();
 builder.Services.AddScoped<IClaimsPipelineStep<OAuth2PrincipalContext>, OAuth2SetUsernameStep>();
 builder.Services.AddScoped<IClaimsPipelineStep<OAuth2PrincipalContext>, OAuth2ApplyDestinationsStep>();
+
+builder.Services.AddSingleton<ICapabilityAuthorizer, CapabilityAuthorizer>();
 
 // Database
 builder.Services
@@ -217,6 +221,11 @@ builder.Services.AddSingleton<ISourceLoggerFactory, SourceLoggerFactory>();
 
 builder.Services.AddHostedService<InitialConfigSeeder>();
 builder.Services.AddHostedService<OAuth2Seeder>();
+
+// Export & Import
+builder.Services.AddSingleton<IExportDocumentMigrator, ExportDocumentMigrator>();
+builder.Services.AddScoped<IExportDocumentImporterRegistry, ExportDocumentImporterRegistry>();
+builder.Services.AddScoped<IExportDocumentImporter, CarrierImporter>();
 
 // Health
 builder.Services

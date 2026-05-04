@@ -5,12 +5,12 @@ using System.ComponentModel.DataAnnotations;
 namespace EtherGizmos.Shipyard.Api.Models;
 
 //[YamlObject]
-public partial class CarrierExportV1
+public partial class CarrierExport
 {
     //[YamlConstructor]
-    public CarrierExportV1() { }
+    public CarrierExport() { }
 
-    public CarrierExportV1(
+    public CarrierExport(
         Carrier carrier)
     {
         Name = carrier.Name;

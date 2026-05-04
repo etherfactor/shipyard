@@ -1,14 +1,17 @@
 ﻿using Asp.Versioning;
-using AutoMapper;
-using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Converters;
 using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Api.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Api.Exceptions;
 using EtherGizmos.Shipyard.Api.Models;
+using EtherGizmos.Shipyard.Api.Services.Security;
 using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -19,23 +22,26 @@ public class ImportExportController : ControllerBase
 {
     private const string BaseRoute = "api/v{version:apiVersion}";
 
-    private readonly IMapper _mapper;
-    private readonly IModelValidatorFactory _modelValidatorFactory;
+    private readonly ICapabilityAuthorizer _authorizer;
+    private readonly IExportDocumentImporterRegistry _importerRegistry;
+    private readonly IExportDocumentMigrator _migrator;
     private readonly IUnitOfWorkFactory _uowFactory;
 
     public ImportExportController(
-        IMapper mapper,
-        IModelValidatorFactory modelValidatorFactory,
+        ICapabilityAuthorizer authorizer,
+        IExportDocumentImporterRegistry importerRegistry,
+        IExportDocumentMigrator migrator,
         IUnitOfWorkFactory uowFactory)
     {
-        _mapper = mapper;
-        _modelValidatorFactory = modelValidatorFactory;
+        _authorizer = authorizer;
+        _importerRegistry = importerRegistry;
+        _migrator = migrator;
         _uowFactory = uowFactory;
     }
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute + "/carriers({id})/export")]
-    //[HasCapability(SecurableType.Carrier, PermissionId.Read)]
+    [HasCapability(SecurableType.Carrier, PermissionId.Read)]
     [Produces("application/yaml", "application/json")]
     [ProducesResponseType(200)]
     public async Task<IActionResult> ExportAsync(
@@ -55,7 +61,7 @@ public class ImportExportController : ControllerBase
                 .Return();
         }
 
-        var carrierExport = new CarrierExportV1(carrier);
+        var carrierExport = new CarrierExport(carrier);
         var node = JsonSerializer.SerializeToNode(carrierExport, JsonSerializerOptions.Web)!;
 
         var jsonOptions = new JsonSerializerOptions();
@@ -70,53 +76,59 @@ public class ImportExportController : ControllerBase
     }
 
     [ApiVersion(1.0)]
-    [HttpPut(BaseRoute + "/import")]
+    [HttpPost(BaseRoute + "/import")]
     //[HasCapability(SecurableType.Carrier, PermissionId.Write)]
     [Consumes("application/yaml", "application/json")]
-    //[ProducesResponseType(200, Type = typeof(CarrierDTO)), SwaggerResponseExample(200, typeof(CarrierDTOExampleGet))]
-    //[ProducesResponseType(201, Type = typeof(CarrierDTO)), SwaggerResponseExample(200, typeof(CarrierDTOExampleGet))]
+    [ProducesResponseType(201, Type = typeof(ImporterResultDTO)), SwaggerResponseExample(201, typeof(ImporterResultDTOExampleGet))]
+    [ProducesResponseType(200, Type = typeof(ImporterResultDTO)), SwaggerResponseExample(200, typeof(ImporterResultDTOExampleGet))]
     public async Task<IActionResult> ImportAsync(
         ExportDocument data,
         CancellationToken cancellationToken = default)
     {
-        var jsonOptions = new JsonSerializerOptions();
-        jsonOptions.Converters.Add(new ObjectToInferredTypesConverter());
-
-        if (data.Kind == "carrier" && data.SchemaVersion == 1)
+        var resultDto = new ImporterResultDTO()
         {
-            var node = JsonSerializer.SerializeToNode(data.Data, jsonOptions)!.ToJsonString();
-            var carrierData = JsonSerializer.Deserialize<CarrierExportV1>(node, JsonSerializerOptions.Web)!;
+            Kind = data.Kind,
+            SchemaVersion = data.SchemaVersion,
+            Id = null,
+            Identifier = null,
+            Status = ImporterResultStatusType.Error,
+            ErrorMessage = $"Unknown schema type: {data.Kind}.",
+        };
 
-            using var uow = _uowFactory.AsUnfiltered().Create();
-            var carrierRepo = uow.Repository<Carrier>();
+        try
+        {
+            data = _migrator.MigrateDataToCurrent(data);
 
-            var carrier = await carrierRepo.Data
-                .SingleOrDefaultAsync(e => e.Slug == carrierData.Slug, cancellationToken: cancellationToken);
+            var importer = _importerRegistry.GetImporter(data.Kind);
 
-            var isNew = false;
-            if (carrier is null)
+            if (importer is not null)
             {
-                isNew = true;
+                _authorizer.EnsureAuthorized(importer.SecurableType, PermissionId.Write);
 
-                carrier = new();
-                carrierRepo.Create(carrier);
+                var result = await importer.ImportAsync(data, cancellationToken);
+
+                resultDto = new ImporterResultDTO()
+                {
+                    Kind = result.Kind,
+                    SchemaVersion = result.SchemaVersion,
+                    Id = result.Id,
+                    Identifier = result.Identifier,
+                    Status = result.Status,
+                    ErrorMessage = result.ErrorMessage,
+                };
             }
-
-            carrierData.Apply(carrier);
-
-            var validator = _modelValidatorFactory.GetValidator<Carrier>();
-            await validator.ValidateAsync(carrier, cancellationToken);
-
-            await uow.SaveChangesAsync(cancellationToken);
-
-            var finished = _mapper
-                .MapExplicitly(carrier)
-                .To<CarrierDTO>()
-                .Execute();
-
-            return isNew ? Created() : NoContent();
+        }
+        catch (UnsupportedExportSchemaException ex)
+        {
+            resultDto.ErrorMessage = ex.Message;
         }
 
-        return BadRequest();
+        return resultDto.Status switch
+        {
+            ImporterResultStatusType.Created => StatusCode(StatusCodes.Status201Created, resultDto),
+            ImporterResultStatusType.Updated => Ok(resultDto),
+            ImporterResultStatusType.Error => BadRequest(resultDto),
+            _ => BadRequest(resultDto),
+        };
     }
 }
