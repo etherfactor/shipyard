@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="EtherGizmos.Common.Cryptography.Certificates" Version="0.1.0-alpha.1" />
+    <PackageReference Include="EtherGizmos.Common.Data.Migrations" Version="0.1.0-alpha.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.7" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="7.5.0" />
     <PackageReference Include="OpenIddict.Server.AspNetCore" Version="7.5.0" />

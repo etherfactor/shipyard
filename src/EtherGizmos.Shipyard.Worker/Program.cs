@@ -1,5 +1,7 @@
 using EtherGizmos.Common;
+using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Configuration;
+using EtherGizmos.Common.Services;
 using EtherGizmos.Shipyard;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Models;
@@ -8,10 +10,13 @@ using EtherGizmos.Shipyard.Worker.Configuration;
 using EtherGizmos.Shipyard.Worker.Services.Carriers;
 using EtherGizmos.Shipyard.Worker.Services.HostedServices;
 using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Serilog;
 using System.Text.Json;
 
@@ -38,42 +43,32 @@ builder.Configuration
     .AddModularConfigurations(builder.Configuration);
 
 builder.Services
-    .AddOptions<ConnectionReferenceOptions>()
-    .Configure<IConfiguration>((opt, conf) =>
-    {
-        conf.GetSection("Database")
-            .Bind(opt);
-    })
+    .AddOptions<ConnectionReferenceOptions>("Database")
+    .Bind(builder.Configuration.GetSection("Database"))
+    .ValidateOnStart()
+    .ValidateDataAnnotations();
+
+builder.Services
+    .AddOptions<ConnectionReferenceOptions>("MessageBroker")
+    .Bind(builder.Configuration.GetSection("MessageBroker"))
     .ValidateOnStart()
     .ValidateDataAnnotations();
 
 builder.Services
     .AddOptions<NotificationOptions>()
-    .Configure<IConfiguration>((opt, conf) =>
-    {
-        conf.GetSection("Notifications")
-            .Bind(opt);
-    })
+    .Bind(builder.Configuration.GetSection("Notifications"))
     .ValidateOnStart()
     .ValidateDataAnnotations();
 
 builder.Services
     .AddOptions<SeleniumDriverOptions>()
-    .Configure<IConfiguration>((opt, conf) =>
-    {
-        conf.GetSection("Selenium")
-            .Bind(opt);
-    })
+    .Bind(builder.Configuration.GetSection("Selenium"))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
 builder.Services
     .AddOptions<WorkerOptions>()
-    .Configure<IConfiguration>((opt, conf) =>
-    {
-        conf.GetSection("Worker")
-            .Bind(opt);
-    })
+    .Bind(builder.Configuration.GetSection("Worker"))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
@@ -83,14 +78,41 @@ builder.Services
 // General
 builder.AddServiceDefaults();
 
+builder.Services.AddConnectionResolver()
+    .WithPostgreSql()
+    .WithRabbitMQ();
+
 // Database
 builder.Services
-    .AddDatabase()
+    .AddDbContext<ApplicationContext>((services, opt) =>
+    {
+        opt.UseLazyLoadingProxies();
+        opt.EnableSensitiveDataLogging();
+
+        var dbOptions = services
+            .GetRequiredService<IOptionsMonitor<ConnectionReferenceOptions>>()
+            .Get("Database");
+
+        var connectionId = dbOptions.ConnectionId;
+
+        var resolver = services.GetRequiredService<IConnectionResolver>();
+
+        opt.UseConnection(services, connectionId);
+    })
     .AddUnitOfWork(opt =>
     {
         opt.BindDbContext<ApplicationContext>();
         opt.BindDbContext<ArtifactContext>();
     });
+
+builder.Services.AddScoped<IFilterContext, FilterContext>();
+
+builder.Services
+    .AddMigrations("Application", typeof(ApplicationContext).Assembly)
+    .UseConnection(builder.Configuration["Database:ConnectionId"] ?? "!Unknown");
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.TryAddSingleton<IUserContext, UserContext>();
 
 // Messaging
 builder.Services
@@ -108,7 +130,7 @@ builder.Services
         opt.Listeners.AddTopic("notification-package-delivered", "notification.package.delivered", subscription: "email");
         opt.Publishers.AddTopic("notification-package-delivered", "notification.package.delivered");
     })
-    .UseConnection(builder.Configuration["MessageBus:ConnectionId"] ?? "!Unknown")
+    .UseConnection(builder.Configuration["MessageBroker:ConnectionId"] ?? "!Unknown")
     .AddConsumersFromAssemblies(typeof(Program).Assembly);
 
 builder.Services

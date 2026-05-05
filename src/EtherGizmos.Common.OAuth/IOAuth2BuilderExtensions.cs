@@ -37,10 +37,10 @@ public static class IOAuth2BuilderExtensions
         using var provider = tempServices.BuildServiceProvider();
         var resolver = provider.GetRequiredService<IKeyResolver>();
 
-        var encryptionId = tempOptions.OAuth2.EncryptionCertificate.CertificateId;
+        var encryptionId = tempOptions.OAuth2.EncryptionCertificate.KeyId;
         var encryption = resolver.LoadCertificate(encryptionId);
 
-        var signingId = tempOptions.OAuth2.SigningCertificate.CertificateId;
+        var signingId = tempOptions.OAuth2.SigningCertificate.KeyId;
         var signing = resolver.LoadCertificate(signingId);
 
         @this.Builder.Services.AddOpenIddict()

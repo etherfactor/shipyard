@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
@@ -71,6 +72,11 @@ builder.Services
 // General
 builder.AddServiceDefaults();
 
+builder.Services.AddConnectionResolver()
+    .WithPostgreSql()
+    .WithRabbitMQ()
+    .WithSmtp();
+
 // Security
 builder.UseOAuth2()
     .AsAuthorizationServer<AuthorizationContext>(opt =>
@@ -97,14 +103,29 @@ builder.Services.AddSingleton<ICapabilityAuthorizer, CapabilityAuthorizer>();
 
 // Database
 builder.Services
-    .AddDatabase()
+    .AddDbContext<ApplicationContext>((services, opt) =>
+    {
+        opt.UseLazyLoadingProxies();
+        opt.EnableSensitiveDataLogging();
+
+        var dbOptions = services
+            .GetRequiredService<IOptionsMonitor<ConnectionReferenceOptions>>()
+            .Get("Database");
+
+        var connectionId = dbOptions.ConnectionId;
+
+        var resolver = services.GetRequiredService<IConnectionResolver>();
+
+        opt.UseConnection(services, connectionId);
+    })
     .AddDbContext<AuthorizationContext>((services, opt) =>
     {
         opt.UseLazyLoadingProxies();
         opt.EnableSensitiveDataLogging();
 
-        var dbOptions = services.GetRequiredService<IOptions<ConnectionReferenceOptions>>()
-            .Value;
+        var dbOptions = services
+            .GetRequiredService<IOptionsMonitor<ConnectionReferenceOptions>>()
+            .Get("Database");
 
         var connectionId = dbOptions.ConnectionId;
 
@@ -118,6 +139,15 @@ builder.Services
         opt.BindDbContext<ApplicationContext>();
         opt.BindDbContext<ArtifactContext>();
     });
+
+builder.Services.AddScoped<IFilterContext, FilterContext>();
+
+builder.Services
+    .AddMigrations("Application", typeof(ApplicationContext).Assembly)
+    .UseConnection(builder.Configuration["Database:ConnectionId"] ?? "!Unknown");
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.TryAddSingleton<IUserContext, UserContext>();
 
 // Messaging
 builder.Services

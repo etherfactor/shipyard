@@ -7,12 +7,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 
 namespace EtherGizmos.Shipyard.Services;
 
 public class ApplicationContext : DbContext
 {
+    private readonly IFilterContext _filterContext;
     private readonly IUserContext _userContext;
 
     public IUserContext UserContext => _userContext;
@@ -53,9 +55,11 @@ public class ApplicationContext : DbContext
 
     public ApplicationContext(
         DbContextOptions<ApplicationContext> options,
-        IMigrationManager migrationManager,
+        [FromKeyedServices("Application")] IMigrationManager migrationManager,
+        IFilterContext filterContext,
         IUserContext userContext) : base(options)
     {
+        _filterContext = filterContext;
         _userContext = userContext;
 
         migrationManager.EnsureMigratedAsync()
@@ -106,7 +110,7 @@ public class ApplicationContext : DbContext
         // Add Query Filters
 
         modelBuilder.Entity<CarrierExecution>()
-            .HasQueryFilter(record => AclPackages.Any(acl =>
+            .HasQueryFilter(record => _filterContext.Disabled || AclPackages.Any(acl =>
                 _userContext.UserId != null
                 && acl.PrincipalUserId == _userContext.UserId
                 && acl.PermissionId == PermissionId.Read
@@ -114,7 +118,7 @@ public class ApplicationContext : DbContext
                 && acl.PackageId == record.PackageId));
 
         modelBuilder.Entity<Group>()
-            .HasQueryFilter(record => AclGroups.Any(acl =>
+            .HasQueryFilter(record => _filterContext.Disabled || AclGroups.Any(acl =>
                 _userContext.UserId != null
                 && acl.PrincipalUserId == _userContext.UserId
                 && acl.PermissionId == PermissionId.Read
@@ -122,7 +126,7 @@ public class ApplicationContext : DbContext
                 && acl.GroupId == record.Id));
 
         modelBuilder.Entity<Package>()
-            .HasQueryFilter(record => AclPackages.Any(acl =>
+            .HasQueryFilter(record => _filterContext.Disabled || AclPackages.Any(acl =>
                 _userContext.UserId != null
                 && acl.PrincipalUserId == _userContext.UserId
                 && acl.PermissionId == PermissionId.Read
@@ -130,7 +134,7 @@ public class ApplicationContext : DbContext
                 && acl.PackageId == record.Id));
 
         modelBuilder.Entity<TrackingUpdate>()
-            .HasQueryFilter(record => AclPackages.Any(acl =>
+            .HasQueryFilter(record => _filterContext.Disabled || AclPackages.Any(acl =>
                 _userContext.UserId != null
                 && acl.PrincipalUserId == _userContext.UserId
                 && acl.PermissionId == PermissionId.Read
@@ -138,7 +142,7 @@ public class ApplicationContext : DbContext
                 && acl.PackageId == record.PackageId));
 
         modelBuilder.Entity<User>()
-            .HasQueryFilter(record => AclUsers.Any(acl =>
+            .HasQueryFilter(record => _filterContext.Disabled || AclUsers.Any(acl =>
                 _userContext.UserId != null
                 && acl.PrincipalUserId == _userContext.UserId
                 && acl.PermissionId == PermissionId.Read

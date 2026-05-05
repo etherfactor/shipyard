@@ -22,8 +22,7 @@ public static class IServiceCollectionArtifactExtensions
             .ValidateOnStart()
             .ValidateDataAnnotations();
 
-        @this.AddDatabase()
-            .AddDbContext<ArtifactContext>((services, opt) =>
+        @this.AddDbContext<ArtifactContext>((services, opt) =>
             {
                 opt.UseLazyLoadingProxies();
                 opt.EnableSensitiveDataLogging();
@@ -50,8 +49,7 @@ public static class IServiceCollectionArtifactExtensions
             .ValidateOnStart()
             .ValidateDataAnnotations();
 
-        @this.AddDatabase()
-            .AddDbContext<ArtifactContext>((services, opt) =>
+        @this.AddDbContext<ArtifactContext>((services, opt) =>
             {
                 opt.UseLazyLoadingProxies();
                 opt.EnableSensitiveDataLogging();

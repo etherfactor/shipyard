@@ -16,18 +16,27 @@ selenium.WithHttpEndpoint(targetPort: 4444, name: "endpoint");
 
 var api = builder.AddProject<Projects.EtherGizmos_Shipyard_Api>("api");
 api.WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development");
-api.WaitFor(database).WithReference(database, connectionName: "Connections:AspireDb:PostgreSql:ConnectionString");
-api.WaitFor(rabbitmq).WithReference(rabbitmq, connectionName: "RabbitMq:ConnectionString");
-api.WithEnvironment("Connections:AspireDb:Type", "Database");
+
 api.WithEnvironment("Database:ConnectionId", "AspireDb");
+api.WithEnvironment("Connections:AspireDb:Type", "Database");
+api.WaitFor(database).WithReference(database, connectionName: "Connections:AspireDb:PostgreSql:ConnectionString");
+
+api.WithEnvironment("MessageBroker:ConnectionId", "AspireBus");
+api.WithEnvironment("Connections:AspireBus:Type", "MessageBroker");
+api.WaitFor(rabbitmq).WithReference(rabbitmq, connectionName: "Connections:AspireBus:RabbitMQ:ConnectionString");
 
 var worker = builder.AddProject<Projects.EtherGizmos_Shipyard_Worker>("worker");
 worker.WithEnvironment("DOTNET_ENVIRONMENT", "Development");
 worker.WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development");
-worker.WaitFor(database).WithReference(database, connectionName: "Connections:AspireDb:PostgreSql:ConnectionString");
-worker.WaitFor(rabbitmq).WithReference(rabbitmq, connectionName: "RabbitMq:ConnectionString");
-worker.WaitFor(selenium).WithEnvironment("Selenium:ConnectionString", () => selenium.GetEndpoint("endpoint").Url + "/wd/hub");
-worker.WithEnvironment("Connections:AspireDb:Type", "Database");
+
 worker.WithEnvironment("Database:ConnectionId", "AspireDb");
+worker.WithEnvironment("Connections:AspireDb:Type", "Database");
+worker.WaitFor(database).WithReference(database, connectionName: "Connections:AspireDb:PostgreSql:ConnectionString");
+
+worker.WithEnvironment("MessageBroker:ConnectionId", "AspireBus");
+worker.WithEnvironment("Connections:AspireBus:Type", "MessageBroker");
+worker.WaitFor(rabbitmq).WithReference(rabbitmq, connectionName: "Connections:AspireBus:RabbitMQ:ConnectionString");
+
+worker.WaitFor(selenium).WithEnvironment("Selenium:ConnectionString", () => selenium.GetEndpoint("endpoint").Url + "/wd/hub");
 
 builder.Build().Run();

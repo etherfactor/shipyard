@@ -122,38 +122,38 @@ public class TrackingResponseConsumer : IMessageConsumer<TrackingResponse>
 
             if (initialStatus != package.LastStatusTypeId)
             {
-                if (package.LastStatusTypeId == StatusTypeId.OutForDelivery)
-                {
-                    var update = package.TrackingUpdates.OrderBy(e => e.OccurredAt).Last();
-                    await _sender.SendAsync("notification-package-outfordelivery", new PackageOutForDelivery()
-                    {
-                        PackageId = message.PackageId,
-                        CarrierId = package.Carrier.Id,
-                        CarrierName = package.Carrier.Name,
-                        TrackingNumber = package.TrackingNumber,
-                        Contents = package.Contents,
-                        OccurredAt = update.OccurredAt,
-                        Location = update.Location,
-                        Description = update.Description,
-                        EstimatedDeliveryAt = package.EstimatedDeliveryAt,
-                    }, cancellationToken: context.CancellationToken);
-                }
-                else if (package.LastStatusTypeId == StatusTypeId.Delivered)
-                {
-                    var update = package.TrackingUpdates.OrderBy(e => e.OccurredAt).Last();
-                    await _sender.SendAsync("notification-package-delivered", new PackageDelivered()
-                    {
-                        PackageId = message.PackageId,
-                        CarrierId = package.Carrier.Id,
-                        CarrierName = package.Carrier.Name,
-                        TrackingNumber = package.TrackingNumber,
-                        Contents = package.Contents,
-                        OccurredAt = update.OccurredAt,
-                        Location = update.Location,
-                        Description = update.Description,
-                        EstimatedDeliveryAt = package.EstimatedDeliveryAt,
-                    }, cancellationToken: context.CancellationToken);
-                }
+                //if (package.LastStatusTypeId == StatusTypeId.OutForDelivery)
+                //{
+                //    var update = package.TrackingUpdates.OrderBy(e => e.OccurredAt).Last();
+                //    await _sender.SendAsync("notification-package-outfordelivery", new PackageOutForDelivery()
+                //    {
+                //        PackageId = message.PackageId,
+                //        CarrierId = package.Carrier.Id,
+                //        CarrierName = package.Carrier.Name,
+                //        TrackingNumber = package.TrackingNumber,
+                //        Contents = package.Contents,
+                //        OccurredAt = update.OccurredAt,
+                //        Location = update.Location,
+                //        Description = update.Description,
+                //        EstimatedDeliveryAt = package.EstimatedDeliveryAt,
+                //    }, cancellationToken: context.CancellationToken);
+                //}
+                //else if (package.LastStatusTypeId == StatusTypeId.Delivered)
+                //{
+                //    var update = package.TrackingUpdates.OrderBy(e => e.OccurredAt).Last();
+                //    await _sender.SendAsync("notification-package-delivered", new PackageDelivered()
+                //    {
+                //        PackageId = message.PackageId,
+                //        CarrierId = package.Carrier.Id,
+                //        CarrierName = package.Carrier.Name,
+                //        TrackingNumber = package.TrackingNumber,
+                //        Contents = package.Contents,
+                //        OccurredAt = update.OccurredAt,
+                //        Location = update.Location,
+                //        Description = update.Description,
+                //        EstimatedDeliveryAt = package.EstimatedDeliveryAt,
+                //    }, cancellationToken: context.CancellationToken);
+                //}
             }
         }
         else

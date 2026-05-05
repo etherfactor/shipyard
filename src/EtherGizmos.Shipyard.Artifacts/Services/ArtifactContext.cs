@@ -5,6 +5,7 @@ using EtherGizmos.Shipyard.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 
 namespace EtherGizmos.Shipyard.Services;
@@ -15,7 +16,7 @@ public class ArtifactContext : DbContext
 
     public ArtifactContext(
         DbContextOptions<ArtifactContext> options,
-        IMigrationManager migrationManager) : base(options)
+        [FromKeyedServices("Application")] IMigrationManager migrationManager) : base(options)
     {
         migrationManager.EnsureMigratedAsync()
             .GetAwaiter()
