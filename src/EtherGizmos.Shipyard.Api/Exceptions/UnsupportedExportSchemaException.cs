@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Api.Exceptions;
+﻿namespace EtherGizmos.Shipyard.Exceptions;
 
 public class UnsupportedExportSchemaException : Exception
 {

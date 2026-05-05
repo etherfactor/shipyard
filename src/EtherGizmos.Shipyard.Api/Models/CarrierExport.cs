@@ -2,7 +2,7 @@
 using EtherGizmos.Shipyard.Database;
 using System.ComponentModel.DataAnnotations;
 
-namespace EtherGizmos.Shipyard.Api.Models;
+namespace EtherGizmos.Shipyard.Models;
 
 //[YamlObject]
 public partial class CarrierExport

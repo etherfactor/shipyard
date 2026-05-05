@@ -1,9 +1,9 @@
-using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
+using EtherGizmos.Shipyard.Services.WebDrivers;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
+namespace EtherGizmos.Shipyard.Services.Carriers.Scraping;
 
 public abstract class ScrapingStep
 {

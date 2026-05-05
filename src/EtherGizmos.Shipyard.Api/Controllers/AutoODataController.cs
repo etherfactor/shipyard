@@ -12,7 +12,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using System.Linq.Expressions;
 
-namespace EtherGizmos.Shipyard.Api.Controllers;
+namespace EtherGizmos.Shipyard.Controllers;
 
 public abstract class AutoODataController : ODataController
 {

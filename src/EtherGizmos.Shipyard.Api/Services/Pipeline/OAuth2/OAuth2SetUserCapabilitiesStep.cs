@@ -2,7 +2,7 @@
 using EtherGizmos.Shipyard.Database;
 using OpenIddict.Abstractions;
 
-namespace EtherGizmos.Shipyard.Api.Services.Pipeline.OAuth2;
+namespace EtherGizmos.Shipyard.Services.Pipeline.OAuth2;
 
 public class OAuth2SetUserCapabilitiesStep : IClaimsPipelineStep<OAuth2PrincipalContext>
 {

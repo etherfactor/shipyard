@@ -1,11 +1,11 @@
-﻿using EtherGizmos.Shipyard.Api.Abstractions;
-using EtherGizmos.Shipyard.Api.Configuration;
+﻿using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Configuration;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Core;
 using System.Collections.Concurrent;
 
-namespace EtherGizmos.Shipyard.Api.Services.Logging;
+namespace EtherGizmos.Shipyard.Services.Logging;
 
 internal class SourceLoggerFactory : ISourceLoggerFactory
 {

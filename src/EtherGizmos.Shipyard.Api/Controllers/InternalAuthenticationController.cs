@@ -1,8 +1,8 @@
 ﻿using EtherGizmos.Common;
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Controllers;
-using EtherGizmos.Shipyard.Api.ViewModels;
 using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace EtherGizmos.Shipyard.Api.Controllers;
+namespace EtherGizmos.Shipyard.Controllers;
 
 public class InternalAuthenticationController : InternalAuthenticationControllerBase<User>
 {

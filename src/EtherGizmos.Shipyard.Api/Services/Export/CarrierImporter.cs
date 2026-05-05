@@ -1,14 +1,15 @@
 ﻿using EtherGizmos.Common;
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Converters;
-using EtherGizmos.Shipyard.Api.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Models;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
+using EtherGizmos.Shipyard.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
-namespace EtherGizmos.Shipyard.Api.Services.Export;
+namespace EtherGizmos.Shipyard.Services.Export;
 
 internal class CarrierImporter : IExportDocumentImporter
 {

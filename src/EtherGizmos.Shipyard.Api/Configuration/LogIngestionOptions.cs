@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace EtherGizmos.Shipyard.Api.Configuration;
+namespace EtherGizmos.Shipyard.Configuration;
 
 public class LogIngestionOptions
 {

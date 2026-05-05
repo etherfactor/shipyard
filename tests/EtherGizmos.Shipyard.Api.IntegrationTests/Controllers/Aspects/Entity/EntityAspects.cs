@@ -1,6 +1,6 @@
-﻿using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
+﻿using EtherGizmos.Shipyard.Abstractions;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Aspects.Entity;
+namespace EtherGizmos.Shipyard.Controllers.Aspects.Entity;
 
 public static class EntityAspects
 {

@@ -2,10 +2,10 @@ using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Extensions;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Messages;
-using EtherGizmos.Shipyard.Worker.Services.Carriers;
+using EtherGizmos.Shipyard.Services.Carriers;
 using Microsoft.Extensions.Logging;
 
-namespace EtherGizmos.Shipyard.Worker.Consumers;
+namespace EtherGizmos.Shipyard.Consumers;
 
 public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
 {

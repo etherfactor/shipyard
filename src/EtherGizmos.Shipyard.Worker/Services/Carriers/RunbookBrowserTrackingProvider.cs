@@ -4,8 +4,8 @@ using EtherGizmos.Common.Extensions;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
-using EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
-using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
+using EtherGizmos.Shipyard.Services.Carriers.Scraping;
+using EtherGizmos.Shipyard.Services.WebDrivers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -14,7 +14,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace EtherGizmos.Shipyard.Worker.Services.Carriers;
+namespace EtherGizmos.Shipyard.Services.Carriers;
 
 internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
 {

@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
+﻿namespace EtherGizmos.Shipyard.Abstractions;
 
 public interface IODataResourceSpec<TEntity, TId>
     where TEntity : class, new()

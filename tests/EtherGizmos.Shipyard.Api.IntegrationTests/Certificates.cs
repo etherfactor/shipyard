@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Api.IntegrationTests;
+﻿namespace EtherGizmos.Shipyard;
 
 internal static class Certificates
 {

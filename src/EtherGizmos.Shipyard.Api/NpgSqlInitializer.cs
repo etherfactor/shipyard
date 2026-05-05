@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace EtherGizmos.Shipyard.Api;
+namespace EtherGizmos.Shipyard;
 
 public static class NpgSqlInitializer
 {

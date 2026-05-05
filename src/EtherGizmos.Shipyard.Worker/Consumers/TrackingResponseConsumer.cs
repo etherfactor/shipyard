@@ -6,7 +6,7 @@ using EtherGizmos.Shipyard.Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace EtherGizmos.Shipyard.Worker.Consumers;
+namespace EtherGizmos.Shipyard.Consumers;
 
 public class TrackingResponseConsumer : IMessageConsumer<TrackingResponse>
 {

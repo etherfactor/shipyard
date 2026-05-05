@@ -3,10 +3,8 @@ using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
-using Npgsql;
-using System.Data.Common;
 
-namespace EtherGizmos.Shipyard.Api.Services.Health;
+namespace EtherGizmos.Shipyard.Services.Health;
 
 internal class DatabaseHealthCheck : IHealthCheck
 {

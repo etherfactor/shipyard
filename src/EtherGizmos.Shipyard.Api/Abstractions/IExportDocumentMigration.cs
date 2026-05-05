@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Nodes;
 
-namespace EtherGizmos.Shipyard.Api.Abstractions;
+namespace EtherGizmos.Shipyard.Abstractions;
 
 public interface IExportDocumentMigration
 {

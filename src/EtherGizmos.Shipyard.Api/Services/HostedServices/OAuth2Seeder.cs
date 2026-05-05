@@ -2,7 +2,7 @@
 using System.Text.Json;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace EtherGizmos.Shipyard.Api.Services.HostedServices;
+namespace EtherGizmos.Shipyard.Services.HostedServices;
 
 public class OAuth2Seeder : IHostedService
 {

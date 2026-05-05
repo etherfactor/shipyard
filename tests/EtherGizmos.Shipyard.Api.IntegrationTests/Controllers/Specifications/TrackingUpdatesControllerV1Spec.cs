@@ -1,11 +1,12 @@
 ﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Api;
 using EtherGizmos.Shipyard.Api.Enums;
-using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Specifications;
+namespace EtherGizmos.Shipyard.Controllers.Specifications;
 
 public class TrackingUpdatesControllerV1Spec : IODataResourceSpec<TrackingUpdateDTO, int>
 {

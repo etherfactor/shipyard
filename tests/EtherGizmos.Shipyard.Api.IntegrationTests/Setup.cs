@@ -6,7 +6,7 @@ using System.Text;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests;
+namespace EtherGizmos.Shipyard;
 
 [SetUpFixture]
 internal static class Setup

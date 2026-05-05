@@ -3,7 +3,7 @@ using System.Net.Mime;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace EtherGizmos.Shipyard.Api.Services.Health;
+namespace EtherGizmos.Shipyard.Services.Health;
 
 public class HealthExtensions
 {

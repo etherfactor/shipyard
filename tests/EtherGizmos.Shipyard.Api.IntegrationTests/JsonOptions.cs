@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests;
+namespace EtherGizmos.Shipyard;
 
 internal static class JsonOptions
 {

@@ -2,12 +2,13 @@ using Asp.Versioning;
 using AutoMapper;
 using EtherGizmos.Common;
 using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Api;
 using EtherGizmos.Shipyard.Api.Errors;
-using EtherGizmos.Shipyard.Api.Services.Security;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Messages;
+using EtherGizmos.Shipyard.Services.Security;
 using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ using OpenIddict.Abstractions;
 using Swashbuckle.AspNetCore.Filters;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace EtherGizmos.Shipyard.Api.Controllers;
+namespace EtherGizmos.Shipyard.Controllers;
 
 [Authorize]
 public class PackagesController : AutoODataController

@@ -1,15 +1,14 @@
 ﻿using EtherGizmos.Common;
 using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography.X509Certificates;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers;
+namespace EtherGizmos.Shipyard.Controllers;
 
 internal class JwtTokenMinter : ITokenMinter
 {

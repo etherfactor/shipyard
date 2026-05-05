@@ -1,10 +1,10 @@
 ﻿using EtherGizmos.Common.Converters;
-using EtherGizmos.Shipyard.Api.Abstractions;
-using EtherGizmos.Shipyard.Api.Exceptions;
+using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Models;
+using EtherGizmos.Shipyard.Exceptions;
 using System.Text.Json;
 
-namespace EtherGizmos.Shipyard.Api.Services.Export;
+namespace EtherGizmos.Shipyard.Services.Export;
 
 internal class ExportDocumentMigrator : IExportDocumentMigrator
 {

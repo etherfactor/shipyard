@@ -5,7 +5,7 @@ using EtherGizmos.Shipyard.Database.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 
-namespace EtherGizmos.Shipyard.Worker.Services.Carriers;
+namespace EtherGizmos.Shipyard.Services.Carriers;
 
 internal class RegexClassifier : IRegexClassifier
 {

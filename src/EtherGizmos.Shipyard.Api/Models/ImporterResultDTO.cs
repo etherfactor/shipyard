@@ -1,7 +1,7 @@
 ﻿using Swashbuckle.AspNetCore.Filters;
 using System.Diagnostics.CodeAnalysis;
 
-namespace EtherGizmos.Shipyard.Api.Models;
+namespace EtherGizmos.Shipyard.Models;
 
 public class ImporterResultDTO
 {

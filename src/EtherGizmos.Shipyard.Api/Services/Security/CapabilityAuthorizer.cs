@@ -1,9 +1,9 @@
-﻿using EtherGizmos.Shipyard.Api.Abstractions;
+﻿using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Database.Enums;
 using OpenIddict.Abstractions;
 
-namespace EtherGizmos.Shipyard.Api.Services.Security;
+namespace EtherGizmos.Shipyard.Services.Security;
 
 internal class CapabilityAuthorizer : ICapabilityAuthorizer
 {

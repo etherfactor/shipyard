@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace EtherGizmos.Shipyard.Worker.Services.HostedServices;
+namespace EtherGizmos.Shipyard.Services.HostedServices;
 
 public class QueueTrackingRequestBackgroundService : PeriodicBackgroundService
 {

@@ -4,7 +4,7 @@ using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace EtherGizmos.Shipyard.Api.Services.HostedServices;
+namespace EtherGizmos.Shipyard.Services.HostedServices;
 
 public class InitialConfigSeeder : IHostedService
 {

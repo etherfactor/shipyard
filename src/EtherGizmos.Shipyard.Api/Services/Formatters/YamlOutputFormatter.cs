@@ -4,7 +4,7 @@ using System.Text;
 using VYaml.Annotations;
 using VYaml.Serialization;
 
-namespace EtherGizmos.Shipyard.Api.Services.Formatters;
+namespace EtherGizmos.Shipyard.Services.Formatters;
 
 public class YamlOutputFormatter : TextOutputFormatter
 {
