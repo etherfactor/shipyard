@@ -21,8 +21,7 @@ internal static class Setup
     {
         try
         {
-            var pgsql = new PostgreSqlBuilder()
-                .WithImage("postgres:17")
+            var pgsql = new PostgreSqlBuilder("postgres:17")
                 .WithResourceMapping(
                     Encoding.UTF8.GetBytes("""
                         create extension if not exists "uuid-ossp";
@@ -34,8 +33,7 @@ internal static class Setup
 
             _pgsqlCstr = pgsql.GetConnectionString();
 
-            var rmq = new RabbitMqBuilder()
-                .WithImage("rabbitmq:4")
+            var rmq = new RabbitMqBuilder("rabbitmq:4")
                 .Build();
 
             await rmq.StartAsync();
@@ -51,16 +49,20 @@ internal static class Setup
         {
             ["Artifacts:BasePath"] = "artifacts",
             ["Artifacts:Database:ConnectionId"] = "TestDb",
-            ["Database:PostgreSql:ConnectionString"] = _pgsqlCstr,
-            ["RabbitMq:ConnectionString"] = _rmqCstr,
-            ["Security:Certificates:AuthSigning:Type"] = "Certificate",
-            ["Security:Certificates:AuthSigning:Text:PublicKey"] = Certificates.TokenSigningPublicKey,
-            ["Security:Certificates:AuthSigning:Text:PrivateKey"] = Certificates.TokenSigningPrivateKey,
-            ["Security:Certificates:AuthEncryption:Type"] = "Certificate",
-            ["Security:Certificates:AuthEncryption:Text:PublicKey"] = Certificates.TokenEncryptionPublicKey,
-            ["Security:Certificates:AuthEncryption:Text:PrivateKey"] = Certificates.TokenEncryptionPrivateKey,
-            ["Security:OAuth2:SigningCertificate:CertificateId"] = "AuthSigning",
-            ["Security:OAuth2:EncryptionCertificate:CertificateId"] = "AuthEncryption",
+            ["Database:ConnectionId"] = "TestDatabase",
+            ["Connections:TestDatabase:Type"] = "Database",
+            ["Connections:TestDatabase:PostgreSql:ConnectionString"] = _pgsqlCstr,
+            ["MessageBroker:ConnectionId"] = "TestMessageBroker",
+            ["Connections:TestMessageBroker:Type"] = "MessageBroker",
+            ["Connections:TestMessageBroker:RabbitMQ:ConnectionString"] = _rmqCstr,
+            ["Keys:AuthSigning:Type"] = "Asymmetric",
+            ["Keys:AuthSigning:PfxFile:Path"] = Certificates.TokenSigningPath,
+            ["Keys:AuthSigning:PfxFile:AutoGenerate"] = "true",
+            ["Keys:AuthEncryption:Type"] = "Asymmetric",
+            ["Keys:AuthEncryption:PfxFile:Path"] = Certificates.TokenEncryptionPath,
+            ["Keys:AuthEncryption:PfxFile:AutoGenerate"] = "true",
+            ["Security:OAuth2:SigningCertificate:KeyId"] = "AuthSigning",
+            ["Security:OAuth2:EncryptionCertificate:KeyId"] = "AuthEncryption",
         };
 
         _waf = new ConfiguredWebApplicationFactory<Program>(preSettings)

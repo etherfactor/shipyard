@@ -1,4 +1,8 @@
-﻿using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
+﻿using EtherGizmos.Common;
+using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -9,6 +13,34 @@ namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers;
 
 internal class JwtTokenMinter : ITokenMinter
 {
+    private readonly IKeyResolver _keyResolver;
+
+    public JwtTokenMinter()
+    {
+        var services = new ServiceCollection();
+
+        services.AddKeyResolver()
+            .WithCertificates();
+
+        var configuration = new ConfigurationManager();
+
+        configuration.AddInMemoryCollection(new Dictionary<string, string?>()
+        {
+            ["Keys:AuthSigning:Type"] = "Asymmetric",
+            ["Keys:AuthSigning:PfxFile:Path"] = Certificates.TokenSigningPath,
+            ["Keys:AuthSigning:PfxFile:AutoGenerate"] = "true",
+            ["Keys:AuthEncryption:Type"] = "Asymmetric",
+            ["Keys:AuthEncryption:PfxFile:Path"] = Certificates.TokenEncryptionPath,
+            ["Keys:AuthEncryption:PfxFile:AutoGenerate"] = "true",
+        });
+
+        services.AddSingleton<IConfiguration>(configuration);
+
+        var provider = services.BuildServiceProvider();
+
+        _keyResolver = provider.GetRequiredService<IKeyResolver>();
+    }
+
     public string Mint(
         TokenRequest request)
     {
@@ -18,10 +50,10 @@ internal class JwtTokenMinter : ITokenMinter
             .. request.Claims?.Select(e => new Claim(e.Key, e.Value)) ?? [],
         ];
 
-        var signingCertificate = X509Certificate2.CreateFromPem(Certificates.TokenSigningPublicKey, Certificates.TokenSigningPrivateKey);
+        var signingCertificate = _keyResolver.LoadCertificate("AuthSigning");
         var signingCredentials = new X509SigningCredentials(signingCertificate);
 
-        var encryptingCertificate = X509Certificate2.CreateFromPem(Certificates.TokenEncryptionPublicKey, Certificates.TokenEncryptionPrivateKey);
+        var encryptingCertificate = _keyResolver.LoadCertificate("AuthEncryption");
         var encryptingCredentials = new X509EncryptingCredentials(encryptingCertificate);
 
         var handler = new JwtSecurityTokenHandler();
