@@ -221,10 +221,19 @@ public abstract class AuthorizationControllerBase : Controller
         }
         else if (request.IsClientCredentialsGrantType())
         {
+            var application = (await _applicationManager.FindByClientIdAsync(request.ClientId!, cancellationToken))!;
+            var properties = await _applicationManager.GetPropertiesAsync(application, cancellationToken);
+            var userId = properties["user_id"].ToString();
+
+            var useIdentity = new ClaimsIdentity(result.Principal.Claims);
+            useIdentity.AddClaim(Claims.Subject, userId);
+
+            var usePrincipal = new ClaimsPrincipal(useIdentity);
+
             var context = OAuth2PrincipalContext.FromClientCredentials(
                 HttpContext,
                 request,
-                result.Principal);
+                usePrincipal);
 
             var identity = await _principalFactory.CreateAsync(
                 ServerScheme,

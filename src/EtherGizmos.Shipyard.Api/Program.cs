@@ -8,6 +8,7 @@ using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Services;
+using EtherGizmos.Shipyard.Services.Bootstrappers;
 using EtherGizmos.Shipyard.Services.Export;
 using EtherGizmos.Shipyard.Services.Formatters;
 using EtherGizmos.Shipyard.Services.Health;
@@ -230,8 +231,9 @@ builder.Services
 
 builder.Services.AddSingleton<ISourceLoggerFactory, SourceLoggerFactory>();
 
-builder.Services.AddHostedService<InitialConfigSeeder>();
-builder.Services.AddHostedService<OAuth2Seeder>();
+builder.Services.AddHostedService<BootstrapSeeder>();
+builder.Services.AddSingleton<IBootstrapper, AppBootstrapper>();
+builder.Services.AddSingleton<IBootstrapper, OAuth2Bootstrapper>();
 
 // Export & Import
 builder.Services.AddSingleton<IExportDocumentMigrator, ExportDocumentMigrator>();

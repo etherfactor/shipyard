@@ -55,6 +55,8 @@ public static class IOAuth2BuilderExtensions
                 opt.AllowAuthorizationCodeFlow()
                     .RequireProofKeyForCodeExchange();
 
+                opt.AllowClientCredentialsFlow();
+
                 opt.AllowRefreshTokenFlow();
 
                 opt.AddEncryptionCertificate(encryption);

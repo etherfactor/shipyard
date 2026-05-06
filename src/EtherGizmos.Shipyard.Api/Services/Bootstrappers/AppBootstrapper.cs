@@ -1,17 +1,20 @@
 ﻿using EtherGizmos.Common;
 using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace EtherGizmos.Shipyard.Services.HostedServices;
+namespace EtherGizmos.Shipyard.Services.Bootstrappers;
 
-public class InitialConfigSeeder : IHostedService
+internal class AppBootstrapper : IBootstrapper
 {
+    public int Order => 100;
+
     private readonly IConfiguration _configuration;
     private readonly IUnitOfWorkFactory _uowFactory;
 
-    public InitialConfigSeeder(
+    public AppBootstrapper(
         IConfiguration configuration,
         IUnitOfWorkFactory uowFactory)
     {
@@ -19,7 +22,8 @@ public class InitialConfigSeeder : IHostedService
         _uowFactory = uowFactory.AsUnfiltered();
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public async Task ExecuteAsync(
+        CancellationToken cancellationToken = default)
     {
         using var uow = _uowFactory.Create();
 
@@ -29,7 +33,7 @@ public class InitialConfigSeeder : IHostedService
 
         //Create a default user group
         var defaultGroup = await GetOrCreateGroupAsync(uow,
-            systemId: new Guid("86c51dd9-c62d-49a5-9fa1-87dbd5a95cb5"),
+            systemId: AppConstants.Groups.DefaultSystemId,
             name: "Default",
             description: "The default group.",
             cancellationToken: cancellationToken);
@@ -41,7 +45,7 @@ public class InitialConfigSeeder : IHostedService
 
         //Create system role: System Owner
         var admin = await CreateOrUpdateRoleAsync(uow,
-            systemId: new Guid("1706f63d-9bc5-4251-bf61-a50d5c705e08"),
+            systemId: AppConstants.Roles.SystemOwnerSystemId,
             name: "System Owner",
             description: "The System Owner has unrestricted access to all data and configuration in Shipyard. This role can manage carriers, users, roles, and groups across the entire instance and can see and edit every package from every group.",
             permissions:
@@ -75,7 +79,7 @@ public class InitialConfigSeeder : IHostedService
 
         //Create system role: Carrier Manager
         await CreateOrUpdateRoleAsync(uow,
-            systemId: new Guid("a1008dc3-510a-47cf-a6fa-92cf13c9574c"),
+            systemId: AppConstants.Roles.CarrierManagerSystemId,
             name: "Carrier Manager",
             description: "The Carrier Manager can create, edit, and delete all carriers and tracking integrations. Grant this role to a user to allow them to connect carriers without necessarily granting them full system access.",
             permissions:
@@ -92,7 +96,7 @@ public class InitialConfigSeeder : IHostedService
 
         //Create system role: User Manager
         await CreateOrUpdateRoleAsync(uow,
-            systemId: new Guid("73b5274e-d972-4669-9a2f-8c1cfe0318dd"),
+            systemId: AppConstants.Roles.UserManagerSystemId,
             name: "User Manager",
             description: "The User Manager can create, edit, and deactivate users across all groups and adjust their roles and group memberships. Grant this role to a user to allow them to manage other users without necessarily granting them full system access.",
             permissions:
@@ -112,7 +116,7 @@ public class InitialConfigSeeder : IHostedService
 
         //Create system role: Group Owner
         await CreateOrUpdateRoleAsync(uow,
-            systemId: new Guid("1a72edd6-cc8f-4cb6-b7c6-39364dc73d6f"),
+            systemId: AppConstants.Roles.GroupOwnerSystemId,
             name: "Group Owner",
             description: "The Group Owner manages everything within a single group. They can add, edit, or remove users in their group and fully manage that group's packages.",
             permissions:
@@ -140,7 +144,7 @@ public class InitialConfigSeeder : IHostedService
 
         //Create system role: Member
         await CreateOrUpdateRoleAsync(uow,
-            systemId: new Guid("24f66204-1747-4e44-868c-b9fcd656a772"),
+            systemId: AppConstants.Roles.MemberSystemId,
             name: "Member",
             description: "Members are standard users in a group. They can create, edit, and delete packages that belong to their own group, and they can view all carriers configured in the system. By default, they cannot see or manage other groups, users, roles, or carrier configuration.",
             permissions:
@@ -157,7 +161,7 @@ public class InitialConfigSeeder : IHostedService
 
         //Create system role: Viewer
         await CreateOrUpdateRoleAsync(uow,
-            systemId: new Guid("c1f04075-4c1a-493d-a71b-0177c4d8def1"),
+            systemId: AppConstants.Roles.ViewerSystemId,
             name: "Viewer",
             description: "Viewers can see packages in their own group and view all carriers, but cannot create, edit, or delete anything. This role is ideal for users who just need to check the status of shipments without making any changes.",
             permissions:
@@ -175,6 +179,14 @@ public class InitialConfigSeeder : IHostedService
         //Ensure there is at least one administrator
         await BootstrapUserRolesAsync(uow,
             role: admin,
+            cancellationToken: cancellationToken);
+
+        //Ensure the worker exists
+        await CreateOrUpdateSystemUserAsync(uow,
+            systemId: AppConstants.Users.WorkerSystemId,
+            username: "sys_worker",
+            group: defaultGroup,
+            roles: [admin],
             cancellationToken: cancellationToken);
 
         //Ensure all users belong to a group
@@ -212,6 +224,62 @@ public class InitialConfigSeeder : IHostedService
 
             user.Username = username;
             user.Password = password;
+        }
+
+        return user;
+    }
+
+    private async Task<User?> CreateOrUpdateSystemUserAsync(
+        IUnitOfWork uow,
+        Guid systemId,
+        string username,
+        Group group,
+        List<Role> roles,
+        CancellationToken cancellationToken = default)
+    {
+        var userRepo = uow.Repository<User>();
+
+        var user = await userRepo.Data
+            .Include(e => e.Group)
+            .SingleOrDefaultAsync(e => e.SystemId == systemId, cancellationToken: cancellationToken);
+        
+        if (user is null)
+        {
+            user = new();
+            userRepo.Add(user);
+        }
+
+        user.SystemId = systemId;
+        user.Username = username;
+        user.Group = group;
+        user.IsSystemManaged = true;
+        user.IsInteractiveLoginEnabled = false;
+
+        if (user.PasswordHash is null)
+        {
+            user.Password = "";
+        }
+
+        var desiredRoleIds = roles.Select(e => e.Id).ToHashSet();
+
+        var toRemove = user.Roles
+            .Where(e => !desiredRoleIds.Contains(e.Id))
+            .ToList();
+
+        foreach (var role in toRemove)
+        {
+            user.Roles.Remove(role);
+        }
+
+        var existingRoleIds = user.Roles.Select(e => e.Id).ToHashSet();
+
+        var toAdd = roles
+            .Where(e => !existingRoleIds.Contains(e.Id))
+            .ToList();
+
+        foreach (var role in toAdd)
+        {
+            user.Roles.Add(role);
         }
 
         return user;
@@ -276,7 +344,7 @@ public class InitialConfigSeeder : IHostedService
                 grantType: permission.GrantType);
         }
 
-        var desiredKeySet = role.Principal.AclEntries
+        var desiredKeySet = permissions
             .Select(e => (e.PermissionId, e.SecurableId, e.SecurableType))
             .ToHashSet();
 
@@ -363,9 +431,6 @@ public class InitialConfigSeeder : IHostedService
 
         entry.PermissionGrantType = grantType;
     }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-        => Task.CompletedTask;
 
     private record RolePermission(
         int PermissionId,
