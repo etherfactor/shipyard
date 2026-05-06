@@ -1,21 +1,17 @@
 using EtherGizmos.Common;
-using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Configuration;
-using EtherGizmos.Common.Services;
 using EtherGizmos.Shipyard;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Models;
 using EtherGizmos.Shipyard.Services;
 using EtherGizmos.Shipyard.Services.Carriers;
+using EtherGizmos.Shipyard.Services.Handlers;
 using EtherGizmos.Shipyard.Services.HostedServices;
 using EtherGizmos.Shipyard.Services.WebDrivers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Serilog;
 using System.Text.Json;
 
@@ -40,6 +36,12 @@ builder.Configuration
         new(new(@"(?<=[^_]):_(?=[^_])"), " "),
         new(new(@"^ConnectionStrings:(?=[^_:])"), ""))
     .AddModularConfigurations(builder.Configuration);
+
+builder.Services
+    .AddOptions<ApiOptions>()
+    .Bind(builder.Configuration.GetSection("Api"))
+    .ValidateOnStart()
+    .ValidateDataAnnotations();
 
 builder.Services
     .AddOptions<ConnectionReferenceOptions>("Database")
@@ -81,37 +83,11 @@ builder.Services.AddConnectionResolver()
     .WithPostgreSql()
     .WithRabbitMQ();
 
-// Database
-builder.Services
-    .AddDbContext<ApplicationContext>((services, opt) =>
-    {
-        opt.UseLazyLoadingProxies();
-        opt.EnableSensitiveDataLogging();
+// Http
+builder.Services.AddHttpClient("API")
+    .AddHttpMessageHandler(provider => provider.GetRequiredService<ApiAuthenticationHandler>());
 
-        var dbOptions = services
-            .GetRequiredService<IOptionsMonitor<ConnectionReferenceOptions>>()
-            .Get("Database");
-
-        var connectionId = dbOptions.ConnectionId;
-
-        var resolver = services.GetRequiredService<IConnectionResolver>();
-
-        opt.UseConnection(services, connectionId);
-    })
-    .AddUnitOfWork(opt =>
-    {
-        opt.BindDbContext<ApplicationContext>();
-        opt.BindDbContext<ArtifactContext>();
-    });
-
-builder.Services.AddScoped<IFilterContext, FilterContext>();
-
-builder.Services
-    .AddMigrations("Application", typeof(ApplicationContext).Assembly)
-    .UseConnection(builder.Configuration["Database:ConnectionId"] ?? "!Unknown");
-
-builder.Services.AddHttpContextAccessor();
-builder.Services.TryAddSingleton<IUserContext, UserContext>();
+builder.Services.AddSingleton<ApiAuthenticationHandler>();
 
 // Messaging
 builder.Services
