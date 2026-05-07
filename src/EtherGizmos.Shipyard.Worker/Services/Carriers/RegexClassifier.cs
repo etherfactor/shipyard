@@ -7,39 +7,39 @@ using System.Text.RegularExpressions;
 
 namespace EtherGizmos.Shipyard.Services.Carriers;
 
-internal class RegexClassifier : IRegexClassifier
-{
-    private readonly IUnitOfWorkFactory _uowFactory;
+//internal class RegexClassifier : IRegexClassifier
+//{
+//    private readonly IUnitOfWorkFactory _uowFactory;
 
-    private Carrier? _carrier;
+//    private Carrier? _carrier;
 
-    public RegexClassifier(
-        IUnitOfWorkFactory uowFactory)
-    {
-        _uowFactory = uowFactory.AsUnfiltered();
-    }
+//    public RegexClassifier(
+//        IUnitOfWorkFactory uowFactory)
+//    {
+//        _uowFactory = uowFactory.AsUnfiltered();
+//    }
 
-    public async Task<int> ClassifyStatusAsync(
-        int carrierId,
-        string description,
-        CancellationToken cancellationToken = default)
-    {
-        using var uow = _uowFactory.Create();
+//    public async Task<int> ClassifyStatusAsync(
+//        int carrierId,
+//        string description,
+//        CancellationToken cancellationToken = default)
+//    {
+//        using var uow = _uowFactory.Create();
 
-        var carrierRepo = uow.Repository<Carrier>();
+//        var carrierRepo = uow.Repository<Carrier>();
 
-        _carrier ??= await carrierRepo.Data
-            .SingleAsync(e => e.Id == carrierId, cancellationToken: cancellationToken);
+//        _carrier ??= await carrierRepo.Data
+//            .SingleAsync(e => e.Id == carrierId, cancellationToken: cancellationToken);
 
-        foreach (var rule in _carrier.Rules.OrderBy(e => e.Priority))
-        {
-            var regex = new Regex(rule.Pattern);
-            if (regex.IsMatch(description))
-            {
-                return rule.StatusTypeId;
-            }
-        }
+//        foreach (var rule in _carrier.Rules.OrderBy(e => e.Priority))
+//        {
+//            var regex = new Regex(rule.Pattern);
+//            if (regex.IsMatch(description))
+//            {
+//                return rule.StatusTypeId;
+//            }
+//        }
 
-        return StatusTypeId.Unknown;
-    }
-}
+//        return StatusTypeId.Unknown;
+//    }
+//}

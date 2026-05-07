@@ -84,7 +84,7 @@ builder.Services.AddConnectionResolver()
     .WithRabbitMQ();
 
 // Http
-builder.Services.AddHttpClient("API")
+builder.Services.AddHttpClient(string.Empty) //("API")
     .AddHttpMessageHandler(provider => provider.GetRequiredService<ApiAuthenticationHandler>());
 
 builder.Services.AddSingleton<ApiAuthenticationHandler>();
@@ -116,27 +116,27 @@ builder.Services
     });
 
 // Storage
-builder.Services
-    .AddArtifactWriter((opt, conf) =>
-    {
-        conf.GetSection("Artifacts")
-            .Bind(opt);
-    });
+//builder.Services
+//    .AddArtifactWriter((opt, conf) =>
+//    {
+//        conf.GetSection("Artifacts")
+//            .Bind(opt);
+//    });
 
 // Tracking
-builder.Services
-    .AddTransient<SeleniumChromiumClient>()
-    .AddTransient<IBrowserClient>(e =>
-    {
-        var client = e.GetRequiredService<SeleniumChromiumClient>();
-        _ = client.StartAsync();
+//builder.Services
+//    .AddTransient<SeleniumChromiumClient>()
+//    .AddTransient<IBrowserClient>(e =>
+//    {
+//        var client = e.GetRequiredService<SeleniumChromiumClient>();
+//        _ = client.StartAsync();
 
-        return client;
-    });
+//        return client;
+//    });
 
-builder.Services
-    .AddSingleton<ITrackingProviderFactory, TrackingProviderFactory>()
-    .AddTransient<IRegexClassifier, RegexClassifier>();
+//builder.Services
+//    .AddSingleton<ITrackingProviderFactory, TrackingProviderFactory>()
+//    .AddTransient<IRegexClassifier, RegexClassifier>();
 
 // Notifications
 builder.Services.AddNotifications(typeof(Program).Assembly, typeof(NotificationEvent).Assembly);

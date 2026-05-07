@@ -64,7 +64,7 @@ internal class ApiAuthenticationHandler : DelegatingHandler
             ["scope"] = string.Join(" ",
             [
                 "carrier.read",
-                "package.update",
+                "package.write",
                 "tracking-update.read",
             ]),
         });
