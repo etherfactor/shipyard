@@ -4,14 +4,13 @@ using EtherGizmos.Shipyard;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Models;
 using EtherGizmos.Shipyard.Services;
-using EtherGizmos.Shipyard.Services.Carriers;
 using EtherGizmos.Shipyard.Services.Handlers;
 using EtherGizmos.Shipyard.Services.HostedServices;
-using EtherGizmos.Shipyard.Services.WebDrivers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Serilog;
 using System.Text.Json;
 
@@ -84,7 +83,14 @@ builder.Services.AddConnectionResolver()
     .WithRabbitMQ();
 
 // Http
-builder.Services.AddHttpClient(string.Empty) //("API")
+builder.Services.AddHttpClient("API")
+    .ConfigureHttpClient((provider, client) =>
+    {
+        var apiOptions = provider.GetRequiredService<IOptionsMonitor<ApiOptions>>()
+            .CurrentValue;
+
+        client.BaseAddress = new(apiOptions.BaseUrl);
+    })
     .AddHttpMessageHandler(provider => provider.GetRequiredService<ApiAuthenticationHandler>());
 
 builder.Services.AddSingleton<ApiAuthenticationHandler>();

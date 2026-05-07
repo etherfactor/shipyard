@@ -172,6 +172,11 @@ builder.Services
     {
         conf.GetSection("Artifacts")
             .Bind(opt);
+    })
+    .AddArtifactWriter((opt, conf) =>
+    {
+        conf.GetSection("Artifacts")
+            .Bind(opt);
     });
 
 // Models
