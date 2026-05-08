@@ -5,5 +5,5 @@ public interface IBootstrapper
     int Order { get; }
 
     Task ExecuteAsync(
-        CancellationToken cancellationToken  = default);
+        CancellationToken cancellationToken = default);
 }

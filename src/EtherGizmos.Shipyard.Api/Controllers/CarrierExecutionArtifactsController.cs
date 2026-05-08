@@ -70,7 +70,7 @@ public class CarrierExecutionArtifactsController : ControllerBase
     [ProducesResponseType(202)]
     public async Task<IActionResult> WriteArtifact(
         int id,
-        [FromForm] WriteArtifactDTO request,
+        [FromForm] ArtifactRequestDTO request,
         CancellationToken cancellationToken = default)
     {
         using var uow = _uowFactory.Create();
@@ -106,6 +106,12 @@ public class CarrierExecutionArtifactsController : ControllerBase
 
         await uow.SaveChangesAsync(cancellationToken);
 
-        return Accepted();
+        return StatusCode(201, new ArtifactResponseDTO()
+        {
+            ArtifactUri = descriptor.Uri.Value,
+            ContentType = descriptor.ContentType,
+            FileName = descriptor.FileName,
+            Bytes = descriptor.Bytes,
+        });
     }
 }

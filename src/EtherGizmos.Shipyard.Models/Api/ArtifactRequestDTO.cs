@@ -2,7 +2,7 @@
 
 namespace EtherGizmos.Shipyard.Api;
 
-public class WriteArtifactDTO
+public class ArtifactRequestDTO
 {
     public IFormFile File { get; set; } = default!;
 }

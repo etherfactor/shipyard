@@ -1,43 +1,29 @@
-using EtherGizmos.Common;
-using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Common.Extensions;
 using EtherGizmos.Shipyard.Abstractions;
-using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Api;
 using EtherGizmos.Shipyard.Database.Enums;
+using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Services.Carriers.Scraping;
 using EtherGizmos.Shipyard.Services.WebDrivers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace EtherGizmos.Shipyard.Services.Carriers;
 
 internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
 {
-    private static readonly JsonSerializerOptions _jsonOptions;
-
     private readonly ILogger _logger;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IUnitOfWorkFactory _uowFactory;
     private readonly IBrowserClient _browserClient;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly int _carrierId;
     private readonly int _executionId;
 
     private bool _disposed;
-
-    static RunbookBrowserTrackingProvider()
-    {
-        _jsonOptions = new()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
-        _jsonOptions.Converters.Add(new JsonStringEnumConverter());
-        _jsonOptions.Converters.Add(new ScrapingStepConverter());
-    }
 
     public RunbookBrowserTrackingProvider(
         IServiceProvider serviceProvider,
@@ -46,18 +32,25 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
     {
         _serviceProvider = serviceProvider;
         _logger = serviceProvider.GetRequiredService<ILogger<RunbookBrowserTrackingProvider>>();
-        _uowFactory = serviceProvider.GetRequiredService<IUnitOfWorkFactory>().AsUnfiltered();
         _browserClient = serviceProvider.GetRequiredService<IBrowserClient>();
+        _httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
         _carrierId = carrierId;
         _executionId = executionId;
     }
 
     public async Task<TrackingResult> TrackAsync(string trackingNumber, CancellationToken cancellationToken = default)
     {
-        using var uow = _uowFactory.Create();
-        var carrierRepo = uow.Repository<Carrier>();
+        using var client = _httpClientFactory.CreateClient("API");
 
-        var carrier = await carrierRepo.Data.SingleAsync(e => e.Id == _carrierId, cancellationToken: cancellationToken);
+        using var response = await client.GetAsync(
+            $"/api/v1/carriers({_carrierId})",
+            cancellationToken: cancellationToken);
+
+        response.EnsureSuccessStatusCode();
+
+        var carrier = (await response.Content.ReadFromJsonAsync<CarrierDTO>(
+            JsonSerializerOptions.App,
+            cancellationToken: cancellationToken))!;
 
         var runbookRaw = carrier
             .Steps
@@ -66,8 +59,8 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
                 .ToDictionary())
             .ToList();
 
-        var runbookJson = JsonSerializer.Serialize(runbookRaw, _jsonOptions);
-        var runbook = JsonSerializer.Deserialize<List<ScrapingStep>>(runbookJson, _jsonOptions) ?? [];
+        var runbookJson = JsonSerializer.Serialize(runbookRaw, JsonSerializerOptions.App);
+        var runbook = JsonSerializer.Deserialize<List<ScrapingStep>>(runbookJson, JsonSerializerOptions.App) ?? [];
 
         var variables = new Dictionary<string, object>()
         {
@@ -76,32 +69,39 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
         var results = new Dictionary<string, object>();
 
         var runId = _executionId;
-        var artifactWriter = _serviceProvider.GetRequiredService<IArtifactWriter>();
         var artifactSender = _serviceProvider.GetRequiredService<IArtifactSender>();
 
         var index = 0;
         ApplyServices(runbook);
         foreach (var step in runbook)
         {
-            step.Index = ++index;
-            using var stepmark = _logger.BeginScope("Step", step.Index);
-            using (_logger.BeginScope("FLAG", "STEP_START"))
-                _logger.LogInformation("[step={Step}] {StepName}", step.Index, step.StepName);
-
             var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                step.Index = ++index;
+                using var stepmark = _logger.BeginScope("Step", step.Index);
+                using (_logger.BeginScope("FLAG", "STEP_START"))
+                    _logger.LogInformation("[step={Step}] {StepName}", step.Index, step.StepName);
 
-            await step.Apply(_browserClient, variables, results, cancellationToken);
+                await step.Apply(_browserClient, variables, results, cancellationToken);
 
-            var html = await _browserClient.GetHtmlAsync(cancellationToken);
-            using var webp = await _browserClient.GetScreenshotAsync(cancellationToken);
+                var html = await _browserClient.GetHtmlAsync(cancellationToken);
+                using var webp = await _browserClient.GetScreenshotAsync(cancellationToken);
 
-            using var htmlStream = new MemoryStream(Encoding.UTF8.GetBytes(html));
+                using var htmlStream = new MemoryStream(Encoding.UTF8.GetBytes(html));
 
-            await artifactSender.SendAsync(runId, "text/html", $"page-{step.Index}.html", htmlStream, cancellationToken: cancellationToken);
-            await artifactSender.SendAsync(runId, "image/webp", $"screenshot-{step.Index}.webp", webp, cancellationToken: cancellationToken);
+                await artifactSender.SendAsync(runId, "text/html", $"page-{step.Index}.html", htmlStream, cancellationToken: cancellationToken);
+                await artifactSender.SendAsync(runId, "image/webp", $"screenshot-{step.Index}.webp", webp, cancellationToken: cancellationToken);
 
-            using (_logger.BeginScope("FLAG", "STEP_END"))
-                _logger.LogInformation("[step={Step}] completed in {StepDuration}ms", step.Index, stopwatch.ElapsedMilliseconds);
+                using (_logger.BeginScope("FLAG", "STEP_END"))
+                    _logger.LogInformation("[step={Step}] completed in {StepDuration}ms", step.Index, stopwatch.ElapsedMilliseconds);
+            }
+            catch
+            {
+                using (_logger.BeginScope("FLAG", "STEP_END"))
+                    _logger.LogInformation("[step={Step}] failed after {StepDuration}ms", step.Index, stopwatch.ElapsedMilliseconds);
+                throw;
+            }
         }
 
         var estimatedAt = results.TryGetValue("estimatedAt", out object? estimatedAtObj)

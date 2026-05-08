@@ -1,6 +1,10 @@
 ﻿using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Api;
+using EtherGizmos.Shipyard.Extensions;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace EtherGizmos.Shipyard.Services.Api;
 
@@ -39,10 +43,14 @@ internal class ArtifactSender : IArtifactSender
 
         response.EnsureSuccessStatusCode();
 
-        var artifactFileName = fileName;
-        var artifactContentType = contentType;
-        var artifactUri = "";
-        var artifactSize = 0;
+        var data = (await response.Content.ReadFromJsonAsync<ArtifactResponseDTO>(
+            JsonSerializerOptions.App,
+            cancellationToken: cancellationToken))!;
+
+        var artifactFileName = data.FileName;
+        var artifactContentType = data.ContentType;
+        var artifactUri = data.ArtifactUri;
+        var artifactSize = data.Bytes;
 
         var logSize = artifactSize * 1.0m;
         var logSizeUnit = "B";
@@ -68,12 +76,7 @@ internal class ArtifactSender : IArtifactSender
         logSize = Math.Round(logSize, 1);
 
         using (_logger.BeginScope("FLAG", "ARTIFACT"))
-        {
             _logger.LogInformation("Created artifact {ArtifactName} ({ArtifactContentType}) with URI {ArtifactUri}, occupying {ArtifactSize}",
-                artifactFileName,
-                artifactContentType,
-                artifactUri,
-                $"{logSize} {logSizeUnit}");
-        }
+                artifactFileName, artifactContentType, artifactUri, $"{logSize} {logSizeUnit}");
     }
 }

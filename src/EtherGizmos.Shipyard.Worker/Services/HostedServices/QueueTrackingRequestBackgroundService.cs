@@ -1,10 +1,10 @@
 using EtherGizmos.Shipyard.Api;
+using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace EtherGizmos.Shipyard.Services.HostedServices;
 
@@ -34,10 +34,10 @@ public class QueueTrackingRequestBackgroundService : PeriodicBackgroundService
             $"&$expand=carrier",
             cancellationToken: stoppingToken);
 
-        var jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
-        jsonOptions.Converters.Add(new JsonStringEnumConverter());
+        var set = (await response.Content.ReadFromJsonAsync<ODataResultSet<PackageDTO>>(
+            JsonSerializerOptions.App,
+            cancellationToken: stoppingToken))!;
 
-        var set = (await response.Content.ReadFromJsonAsync<ODataResultSet<PackageDTO>>(jsonOptions, cancellationToken: stoppingToken))!;
         var ready = set.Value;
 
         var parallelOptions = new ParallelOptions() { CancellationToken = stoppingToken };

@@ -1,9 +1,9 @@
 using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Common.Extensions;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Messages;
 using EtherGizmos.Shipyard.Services.Carriers;
 using Microsoft.Extensions.Logging;
+using System.Net.Http.Json;
 
 namespace EtherGizmos.Shipyard.Consumers;
 
@@ -32,6 +32,8 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
     public async Task ConsumeAsync(
         IMessageContext<TrackingRequest> context)
     {
+        using var client = _httpClientFactory.CreateClient("API");
+
         var message = context.Message;
         _logger.LogInformation("Received request message {@Message}", message);
 
@@ -40,6 +42,16 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
         var ndjson = new MemoryStream();
         using var tee = _teeScopeFactory.Begin(ndjson);
 
+        using var startResponse = await client.PatchAsJsonAsync(
+            $"/api/v1/carrierExecutions({message.ExecutionId})",
+            new
+            {
+                startedAt = DateTimeOffset.UtcNow,
+                executionStatusType = "Running",
+            }, cancellationToken: context.CancellationToken);
+
+        startResponse.EnsureSuccessStatusCode();
+
         using var tracker = _trackingProviderFactory.CreateProvider(message.CarrierId, message.ExecutionId);
 
         var started = DateTimeOffset.UtcNow;
@@ -47,13 +59,29 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
         {
             var result = await tracker.TrackAsync(message.TrackingNumber, context.CancellationToken);
 
-            //Have to post results back
+            using var endResponse = await client.PatchAsJsonAsync(
+                $"/api/v1/carrierExecutions({message.ExecutionId})",
+                new
+                {
+                    completedAt = DateTimeOffset.UtcNow,
+                    executionStatusType = "Successful",
+                }, cancellationToken: context.CancellationToken);
+
+            endResponse.EnsureSuccessStatusCode();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to process the tracking request");
 
-            //Have to post results back
+            using var endResponse = await client.PatchAsJsonAsync(
+                $"/api/v1/carrierExecutions({message.ExecutionId})",
+                new
+                {
+                    completedAt = DateTimeOffset.UtcNow,
+                    executionStatusType = "Failed",
+                }, cancellationToken: context.CancellationToken);
+
+            endResponse.EnsureSuccessStatusCode();
         }
         finally
         {

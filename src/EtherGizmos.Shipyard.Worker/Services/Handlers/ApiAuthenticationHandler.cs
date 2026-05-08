@@ -1,7 +1,9 @@
 ﻿using EtherGizmos.Shipyard.Configuration;
+using EtherGizmos.Shipyard.Extensions;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace EtherGizmos.Shipyard.Services.Handlers;
@@ -84,7 +86,10 @@ internal class ApiAuthenticationHandler : DelegatingHandler
         var response = await client.PostAsync("/oauth/v2.0/token", content, cancellationToken);
         response.EnsureSuccessStatusCode();
 
-        var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>(cancellationToken: cancellationToken);
+        var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>(
+            JsonSerializerOptions.App,
+            cancellationToken: cancellationToken);
+
         if (tokenResponse?.AccessToken is null) throw new InvalidOperationException();
 
         return new(

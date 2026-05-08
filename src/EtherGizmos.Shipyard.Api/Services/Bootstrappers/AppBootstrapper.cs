@@ -242,7 +242,7 @@ internal class AppBootstrapper : IBootstrapper
         var user = await userRepo.Data
             .Include(e => e.Group)
             .SingleOrDefaultAsync(e => e.SystemId == systemId, cancellationToken: cancellationToken);
-        
+
         if (user is null)
         {
             user = new();

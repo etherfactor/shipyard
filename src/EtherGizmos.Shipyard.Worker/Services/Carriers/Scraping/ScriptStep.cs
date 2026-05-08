@@ -1,5 +1,4 @@
-﻿using EtherGizmos.Common.Extensions;
-using EtherGizmos.Shipyard.Configuration;
+﻿using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Services.WebDrivers;
 using HtmlAgilityPack;
 using HtmlAgilityPack.CssSelectors.NetCore;
