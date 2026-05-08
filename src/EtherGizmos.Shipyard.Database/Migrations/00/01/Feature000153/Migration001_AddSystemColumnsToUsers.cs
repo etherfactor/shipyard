@@ -3,7 +3,7 @@ using FluentMigrator;
 
 namespace EtherGizmos.Shipyard.Migrations._00._01.Feature000153;
 
-[CreatedAt(year: 2025, month: 05, day: 05, hour: 18, minute: 00, description: "Add system columns to users", trackingId: 153)]
+[CreatedAt(year: 2026, month: 05, day: 05, hour: 18, minute: 00, description: "Add system columns to users", trackingId: 153)]
 public class Migration001_AddSystemColumnsToUsers : AutoReversingMigration
 {
     public override void Up()

@@ -1,11 +1,15 @@
 using EtherGizmos.Common;
 using EtherGizmos.Common.Configuration;
 using EtherGizmos.Shipyard;
+using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Models;
 using EtherGizmos.Shipyard.Services;
+using EtherGizmos.Shipyard.Services.Api;
+using EtherGizmos.Shipyard.Services.Carriers;
 using EtherGizmos.Shipyard.Services.Handlers;
 using EtherGizmos.Shipyard.Services.HostedServices;
+using EtherGizmos.Shipyard.Services.WebDrivers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -93,7 +97,9 @@ builder.Services.AddHttpClient("API")
     })
     .AddHttpMessageHandler(provider => provider.GetRequiredService<ApiAuthenticationHandler>());
 
-builder.Services.AddSingleton<ApiAuthenticationHandler>();
+builder.Services.AddTransient<ApiAuthenticationHandler>();
+
+builder.Services.AddSingleton<IArtifactSender, ArtifactSender>();
 
 // Messaging
 builder.Services
@@ -130,19 +136,19 @@ builder.Services
 //    });
 
 // Tracking
-//builder.Services
-//    .AddTransient<SeleniumChromiumClient>()
-//    .AddTransient<IBrowserClient>(e =>
-//    {
-//        var client = e.GetRequiredService<SeleniumChromiumClient>();
-//        _ = client.StartAsync();
+builder.Services
+    .AddTransient<SeleniumChromiumClient>()
+    .AddTransient<IBrowserClient>(e =>
+    {
+        var client = e.GetRequiredService<SeleniumChromiumClient>();
+        _ = client.StartAsync();
 
-//        return client;
-//    });
+        return client;
+    });
 
-//builder.Services
-//    .AddSingleton<ITrackingProviderFactory, TrackingProviderFactory>()
-//    .AddTransient<IRegexClassifier, RegexClassifier>();
+builder.Services
+    .AddSingleton<ITrackingProviderFactory, TrackingProviderFactory>()
+    .AddTransient<IRegexClassifier, RegexClassifier>();
 
 // Notifications
 builder.Services.AddNotifications(typeof(Program).Assembly, typeof(NotificationEvent).Assembly);

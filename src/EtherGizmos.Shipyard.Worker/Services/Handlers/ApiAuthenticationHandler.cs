@@ -11,7 +11,8 @@ internal class ApiAuthenticationHandler : DelegatingHandler
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IOptionsMonitor<ApiOptions> _apiOptions;
 
-    private AccessToken? _accessToken;
+    private static AccessToken? _accessToken;
+    private static readonly SemaphoreSlim _semaphore = new(1, 1);
 
     public ApiAuthenticationHandler(
         IHttpClientFactory httpClientFactory,
@@ -30,8 +31,19 @@ internal class ApiAuthenticationHandler : DelegatingHandler
         {
             if (_accessToken is null || _accessToken.Expires < DateTimeOffset.UtcNow)
             {
-                var apiOptions = _apiOptions.CurrentValue;
-                _accessToken = await GenerateAccessTokenAsync(cancellationToken);
+                await _semaphore.WaitAsync(cancellationToken);
+                try
+                {
+                    if (_accessToken is null || _accessToken.Expires < DateTimeOffset.UtcNow)
+                    {
+                        var apiOptions = _apiOptions.CurrentValue;
+                        _accessToken = await GenerateAccessTokenAsync(cancellationToken);
+                    }
+                }
+                finally
+                {
+                    _semaphore.Release();
+                }
             }
 
             request.Headers.Authorization = new("Bearer", _accessToken.Value);

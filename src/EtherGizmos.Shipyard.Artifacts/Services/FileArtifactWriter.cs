@@ -1,5 +1,4 @@
 ﻿using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Common.Extensions;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Models;
@@ -67,7 +66,7 @@ internal class FileArtifactWriter : IArtifactWriter
             PhysicalPath = fullPath,
         };
 
-        using var uow = _uowFactory.Create();
+        using var uow = _uowFactory.Create(); //TODO: Use ambient unit of work, if possible, so all data saves together
         var artifactRepo = uow.Repository<Artifact>();
 
         artifactRepo.Add(artifact);
@@ -95,36 +94,6 @@ internal class FileArtifactWriter : IArtifactWriter
         await uow.SaveChangesAsync(cancellationToken);
 
         scope.Complete();
-
-        var logSize = artifact.Bytes * 1.0m;
-        var logSizeUnit = "B";
-
-        if (logSize >= 1024)
-        {
-            logSize /= 1024;
-            logSizeUnit = "KB";
-        }
-
-        if (logSize >= 1024)
-        {
-            logSize /= 1024;
-            logSizeUnit = "MB";
-        }
-
-        if (logSize >= 1024)
-        {
-            logSize /= 1024;
-            logSizeUnit = "GB";
-        }
-
-        logSize = Math.Round(logSize, 1);
-
-        using (_logger.BeginScope("FLAG", "ARTIFACT"))
-            _logger.LogInformation("Created artifact {ArtifactName} ({ArtifactContentType}) with URI {ArtifactUri}, occupying {ArtifactSize}",
-                recordFileName,
-                artifact.ContentType,
-                artifact.Uri.ToString(),
-                $"{logSize} {logSizeUnit}");
 
         return new(new(artifact.Uri), artifact.ContentType, recordFileName, artifact.Bytes);
     }

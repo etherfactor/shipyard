@@ -1,21 +1,21 @@
 ﻿namespace EtherGizmos.Shipyard.Services.Carriers;
 
-//internal class TrackingProviderFactory : ITrackingProviderFactory
-//{
-//    private readonly IServiceProvider _serviceProvider;
+internal class TrackingProviderFactory : ITrackingProviderFactory
+{
+    private readonly IServiceProvider _serviceProvider;
 
-//    public TrackingProviderFactory(
-//        IServiceProvider serviceProvider)
-//    {
-//        _serviceProvider = serviceProvider;
-//    }
+    public TrackingProviderFactory(
+        IServiceProvider serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+    }
 
-//    public ITrackingProvider CreateProvider(
-//        int carrierId,
-//        int executionId)
-//    {
-//        var provider = new RunbookBrowserTrackingProvider(_serviceProvider, carrierId, executionId);
+    public ITrackingProvider CreateProvider(
+        int carrierId,
+        int executionId)
+    {
+        var provider = new RunbookBrowserTrackingProvider(_serviceProvider, carrierId, executionId);
 
-//        return new ClassifierTrackingProvider(_serviceProvider, carrierId, provider);
-//    }
-//}
+        return new ClassifierTrackingProvider(_serviceProvider, carrierId, provider);
+    }
+}
