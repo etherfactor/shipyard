@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using EtherGizmos.Common;
 using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Common.Converters;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api;
 using EtherGizmos.Shipyard.Api.Errors;

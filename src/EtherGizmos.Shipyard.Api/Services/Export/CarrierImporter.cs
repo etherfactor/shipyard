@@ -69,9 +69,9 @@ internal class CarrierImporter : IExportDocumentImporter
             {
                 isNew = true;
 
-            carrier = new();
-            carrierRepo.Add(carrier);
-        }
+                carrier = new();
+                carrierRepo.Add(carrier);
+            }
 
             carrierData.Apply(carrier);
 
