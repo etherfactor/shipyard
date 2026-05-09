@@ -1,5 +1,4 @@
 ﻿using Asp.Versioning;
-using EtherGizmos.Common.Converters;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
@@ -62,16 +61,14 @@ public class ImportExportController : ControllerBase
         }
 
         var carrierExport = new CarrierExport(carrier);
-        var node = JsonSerializer.SerializeToNode(carrierExport, JsonSerializerOptions.Web)!;
-
-        var jsonOptions = new JsonSerializerOptions();
-        jsonOptions.Converters.Add(new ObjectToInferredTypesConverter());
+        var node = JsonSerializer.SerializeToNode(carrierExport, JsonSerializerOptions.Export)!;
 
         var export = new ExportDocument(
             "carrier",
             1,
-            JsonSerializer.Deserialize<IDictionary<string, object?>>(JsonNode.Parse($"{{\"exportedAt\":\"{DateTimeOffset.UtcNow}\"}}")!.AsObject(), jsonOptions),
-            JsonSerializer.Deserialize<IDictionary<string, object?>>(node, jsonOptions)!);
+            JsonSerializer.Deserialize<IDictionary<string, object?>>(JsonNode.Parse($"{{\"exportedAt\":\"{DateTimeOffset.UtcNow}\"}}")!.AsObject(), JsonSerializerOptions.Export),
+            JsonSerializer.Deserialize<IDictionary<string, object?>>(node, JsonSerializerOptions.Export)!);
+
         return Ok(export);
     }
 

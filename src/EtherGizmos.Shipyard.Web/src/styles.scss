@@ -98,6 +98,12 @@ body {
   height: calc(100vh - $navbar-height);
   top: unset;
   bottom: 0;
+
+  .list-group-item.active {
+    @extend .text-bg-primary;
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+  }
 }
 
 ul.pagination {
