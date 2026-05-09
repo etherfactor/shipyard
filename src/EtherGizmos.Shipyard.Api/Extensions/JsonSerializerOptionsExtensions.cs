@@ -15,6 +15,7 @@ public static class JsonSerializerOptionsExtensions
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             Converters =
             {
+                new JsonStringEnumConverter(),
                 new ObjectToInferredTypesConverter(),
             },
         };

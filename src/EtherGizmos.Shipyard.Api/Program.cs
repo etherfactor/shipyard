@@ -32,6 +32,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -171,7 +172,11 @@ builder.Services
     {
         opt.LowercaseUrls = true;
     })
-    .AddControllersWithViews();
+    .AddControllersWithViews()
+    .AddJsonOptions(opt =>
+    {
+        opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 builder.Services
     .AddMvc(opt =>

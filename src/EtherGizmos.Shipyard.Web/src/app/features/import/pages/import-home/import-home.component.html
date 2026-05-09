@@ -1,0 +1,336 @@
+<!-- Header -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-header [text]="'Import'"
+                   [subtext]="'Import YAML or JSON configuration into Shipyard'" />
+  </div>
+</div>
+
+<!-- Import file -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-upload" text="Import Source">
+
+      <div class="row mt-3">
+        <div class="col-md-4">
+          <label class="form-label">Import method</label>
+
+          <ng-select [(ngModel)]="sourceType"
+                     [clearable]="false"
+                     [selectOnTab]="true">
+            <ng-option value="file">
+              <span class="bi bi-file-earmark-arrow-up me-1"></span>
+              Upload file
+            </ng-option>
+            <ng-option value="paste">
+              <span class="bi bi-clipboard me-1"></span>
+              Paste document
+            </ng-option>
+          </ng-select>
+        </div>
+
+        <div class="col-md-8">
+          @if (sourceType === 'file') {
+          <label for="importFile" class="form-label">File</label>
+          <input id="importFile"
+                 type="file"
+                 class="form-control"
+                 accept=".yaml,.yml,.json,application/yaml,application/json" />
+
+          <div class="form-text">
+            Upload a Shipyard export document in YAML or JSON format.
+          </div>
+          } @else {
+          <label for="importText" class="form-label">Document</label>
+          <textarea id="importText"
+                    class="form-control font-monospace"
+                    rows="12"
+                    placeholder="kind: carrier&#10;schemaVersion: 1&#10;data: ..."></textarea>
+          }
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end mt-3">
+        <button type="button" class="btn btn-primary">
+          <span class="bi bi-check2-square me-1"></span>
+          Validate
+        </button>
+      </div>
+
+    </detail-box>
+  </div>
+</div>
+
+@let document = document$$();
+@if (document) {
+<!-- Preview -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-file-earmark-code" text="Detected Document">
+
+      <div class="row mt-3">
+        <div class="col-12">
+          <div class="col-md-6">
+            <div class="row mt-3">
+              <label class="col-sm-4 col-form-label">Kind</label>
+              <div class="col-sm-8">
+                <input type="text" [value]="document.kind ?? '—'" [readonlyForm]="true" />
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="row mt-3">
+              <label class="col-sm-4 col-form-label">Schema Version</label>
+              <div class="col-sm-8">
+                <input type="text" [value]="document.schemaVersion ?? '—'" [readonlyForm]="true" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </detail-box>
+  </div>
+</div>
+}
+
+<!-- Source -->
+<!--<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-upload" text="Import Source">
+        <div class="row mt-3">
+          <div class="col-md-4">
+            <label class="form-label">Import method</label>
+
+            <ng-select [ngModel]="sourceType$$()"
+                       [clearable]="false"
+                       [selectOnTab]="true"
+                       (ngModelChange)="sourceType$$.set($event)">
+              <ng-option value="file">
+                <span class="bi bi-file-earmark-arrow-up me-1"></span>
+                Upload file
+              </ng-option>
+              <ng-option value="paste">
+                <span class="bi bi-clipboard me-1"></span>
+                Paste document
+              </ng-option>
+            </ng-select>
+          </div>
+
+          <div class="col-md-8">
+            @if (sourceType$$() === 'file') {
+            <label for="importFile" class="form-label">File</label>
+            <input id="importFile"
+                   type="file"
+                   class="form-control"
+                   accept=".yaml,.yml,.json,application/yaml,application/json"
+                   (change)="onFileSelected($event)" />
+
+            <div class="form-text">
+              Upload a Shipyard export document in YAML or JSON format.
+            </div>
+            } @else {
+            <label for="importText" class="form-label">Document</label>
+            <textarea id="importText"
+                      class="form-control font-monospace"
+                      rows="12"
+                      [ngModel]="sourceText$$()"
+                      (ngModelChange)="sourceText$$.set($event)"
+                      placeholder="kind: carrier&#10;schemaVersion: 1&#10;metadata: ...">
+        </textarea>
+            }
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button type="button" class="btn btn-outline-secondary" (click)="clearImport()">
+            <span class="bi bi-x-circle me-1"></span>
+            Clear
+          </button>
+
+          <button type="button" class="btn btn-primary" (click)="validateImport()" [disabled]="!canValidate$$()">
+            <span class="bi bi-check2-square me-1"></span>
+            Validate
+          </button>
+        </div>
+      </detail-box>
+  </div>
+</div>-->
+
+<!-- Detected document -->
+<!--@if (documentInfo$$()) {
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-file-earmark-code" text="Detected Document">
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <div class="row mt-3">
+              <label class="col-sm-4 col-form-label">Kind</label>
+              <div class="col-sm-8">
+                <input type="text" [value]="documentInfo$$()?.kind ?? '—'" [readonlyForm]="true" />
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="row mt-3">
+              <label class="col-sm-4 col-form-label">Schema Version</label>
+              <div class="col-sm-8">
+                <input type="text" [value]="documentInfo$$()?.schemaVersion ?? '—'" [readonlyForm]="true" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        @if (documentInfo$$()?.kind === 'carrier') {
+        <div class="row">
+          <div class="col-md-6">
+            <div class="row mt-3">
+              <label class="col-sm-4 col-form-label">Name</label>
+              <div class="col-sm-8">
+                <input type="text" [value]="documentInfo$$()?.data?.name ?? '—'" [readonlyForm]="true" />
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="row mt-3">
+              <label class="col-sm-4 col-form-label">Slug</label>
+              <div class="col-sm-8">
+                <input type="text" [value]="documentInfo$$()?.data?.slug ?? '—'" [readonlyForm]="true" />
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+
+        <div class="alert mt-3 mb-0" [class]="documentStatusClass$$()">
+          <span class="bi me-1" [class]="documentStatusIcon$$()"></span>
+          {{documentStatusMessage$$()}}
+        </div>
+      </detail-box>
+  </div>
+</div>
+}-->
+
+<!-- Preview -->
+<!--@if (preview$$()) {
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-eye" text="Import Preview">
+        @if (documentInfo$$()?.kind === 'carrier') {
+        <div class="row mt-3">
+          <div class="col-md-3">
+            <div class="text-muted small">Carrier</div>
+            <div class="fw-semibold">{{documentInfo$$()?.data?.name}}</div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="text-muted small">Slug</div>
+            <div class="font-monospace">{{documentInfo$$()?.data?.slug}}</div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="text-muted small">Tracking Steps</div>
+            <div class="fw-semibold">{{documentInfo$$()?.data?.steps?.length ?? 0}}</div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="text-muted small">Tracking Rules</div>
+            <div class="fw-semibold">{{documentInfo$$()?.data?.rules?.length ?? 0}}</div>
+          </div>
+        </div>
+
+        <hr />
+
+        <h6 class="mt-3">
+          <span class="bi bi-list-task me-1"></span>
+          Steps
+        </h6>
+
+        <div class="table-responsive">
+          <table class="table table-sm table-transparent table-striped table-hover mb-0">
+            <thead>
+              <tr>
+                <th style="width: 80px;">#</th>
+                <th>Step Type</th>
+                <th>Summary</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (step of documentInfo$$()?.data?.steps ?? []; let i = $index; track i) {
+              <tr>
+                <td class="text-muted">{{i + 1}}</td>
+                <td class="font-monospace">{{step.stepType}}</td>
+                <td class="font-monospace small">{{getStepSummary(step)}}</td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <h6 class="mt-4">
+          <span class="bi bi-filter-circle me-1"></span>
+          Rules
+        </h6>
+
+        <div class="table-responsive">
+          <table class="table table-sm table-transparent table-striped table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Pattern</th>
+                <th>Status Type</th>
+                <th>Priority</th>
+                <th>Active</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (rule of documentInfo$$()?.data?.rules ?? []; track rule.pattern) {
+              <tr>
+                <td class="font-monospace small">{{rule.pattern}}</td>
+                <td>{{rule.statusType}}</td>
+                <td>{{rule.priority}}</td>
+                <td>
+                  @if (rule.isActive) {
+                  <span class="badge text-bg-success">Yes</span>
+                  } @else {
+                  <span class="badge text-bg-secondary">No</span>
+                  }
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        }
+      </detail-box>
+  </div>
+</div>
+}-->
+
+<!-- Result -->
+<!--@if (result$$()) {
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-check2-circle" text="Import Result">
+      <div class="d-flex justify-content-between align-items-center mt-4">
+        <div class="text-muted small">
+          Imports may create or update records depending on the importer for this document kind.
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-outline-secondary" (click)="clearImport()">
+            Cancel
+          </button>
+
+          <button type="button" class="btn btn-primary" (click)="import()" [disabled]="!canImport$$()">
+            <span class="bi bi-upload me-1"></span>
+            Import
+          </button>
+        </div>
+      </div>
+    </detail-box>
+  </div>
+</div>
+}-->

@@ -18,18 +18,8 @@ export const APP_ROUTES: ExtendedRoute[] = [
     canActivate: [authenticationGuard],
   },
   {
-    path: "packages",
-    loadChildren: () => import("./features/package/package.routes").then(m => m.PACKAGE_ROUTES),
-    canActivate: [authenticationGuard],
-  },
-  {
     path: "carriers",
     loadChildren: () => import("./features/carrier/carrier.routes").then(m => m.CARRIER_ROUTES),
-    canActivate: [authenticationGuard],
-  },
-  {
-    path: "users",
-    loadChildren: () => import("./features/user/user.routes").then(m => m.USER_ROUTES),
     canActivate: [authenticationGuard],
   },
   {
@@ -38,8 +28,23 @@ export const APP_ROUTES: ExtendedRoute[] = [
     canActivate: [authenticationGuard],
   },
   {
+    path: "import",
+    loadChildren: () => import("./features/import/import.routes").then(m => m.IMPORT_ROUTES),
+    canActivate: [authenticationGuard],
+  },
+  {
+    path: "packages",
+    loadChildren: () => import("./features/package/package.routes").then(m => m.PACKAGE_ROUTES),
+    canActivate: [authenticationGuard],
+  },
+  {
     path: "roles",
     loadChildren: () => import("./features/role/role.routes").then(m => m.ROLE_ROUTES),
+    canActivate: [authenticationGuard],
+  },
+  {
+    path: "users",
+    loadChildren: () => import("./features/user/user.routes").then(m => m.USER_ROUTES),
     canActivate: [authenticationGuard],
   },
   {

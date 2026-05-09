@@ -31,6 +31,7 @@
     "bootstrap": "^5.3.7",
     "bootstrap-icons": "^1.13.1",
     "jest-editor-support": "*",
+    "js-yaml": "^4.1.1",
     "luxon": "^3.6.1",
     "moderndash": "^4.0.0",
     "monaco-editor": "^0.52.2",
