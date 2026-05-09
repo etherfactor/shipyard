@@ -3,11 +3,12 @@
   <ngb-toast [header]="toast.header"
              [autohide]="!!toast.delay"
              [delay]="toast.delay ?? 0"
-             (hidden)="hide(toast)">
-    <div>
-      {{toast.body}}
-    </div>
-
+             (hidden)="hide(toast)"
+             [class]="toast.theme ? [toast.theme] : []"
+             role="alert"
+             aria-live="assertive"
+             aria-atomic="true">
+    <div style="white-space: pre-wrap;">{{toast.body}}</div>
     @if (toast.actions) {
     <div class="d-flex justify-content-end" style="gap: 7.5px;">
       @for (action of toast.actions; track action) {
@@ -18,5 +19,26 @@
     </div>
     }
   </ngb-toast>
+  @if (toast.theme === 'danger' || toast.theme === 'warning') {
+  } @else {
+  <ngb-toast [header]="toast.header"
+             [autohide]="!!toast.delay"
+             [delay]="toast.delay ?? 0"
+             (hidden)="hide(toast)"
+             [class]="toast.theme ? [toast.theme] : []"
+             role="status"
+             aria-live="polite">
+    <div style="white-space: pre-wrap;">{{toast.body}}</div>
+    @if (toast.actions) {
+    <div class="d-flex justify-content-end" style="gap: 7.5px;">
+      @for (action of toast.actions; track action) {
+      <button class="btn btn-sm mt-2" [class]="'btn-' + action.color" (click)="action.execute()">
+        {{action.label}}
+      </button>
+      }
+    </div>
+    }
+  </ngb-toast>
+  }
   }
 </div>

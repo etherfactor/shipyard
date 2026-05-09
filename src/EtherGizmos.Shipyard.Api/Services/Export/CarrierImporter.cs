@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common;
+using EtherGizmos.Common;
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Converters;
 using EtherGizmos.Shipyard.Abstractions;
@@ -31,43 +31,72 @@ internal class CarrierImporter : IExportDocumentImporter
         _jsonOptions.Converters.Add(new ObjectToInferredTypesConverter());
     }
 
-    public async Task<ImporterResult> ImportAsync(
+    public Task<ImporterResult> VerifyAsync(
         ExportDocument document,
+        CancellationToken cancellationToken = default)
+    {
+        return ImportCoreAsync(document, saveChanges: false, cancellationToken);
+    }
+
+    public Task<ImporterResult> ImportAsync(
+        ExportDocument document,
+        CancellationToken cancellationToken = default)
+    {
+        return ImportCoreAsync(document, saveChanges: true, cancellationToken);
+    }
+
+    private async Task<ImporterResult> ImportCoreAsync(
+        ExportDocument document,
+        bool saveChanges,
         CancellationToken cancellationToken = default)
     {
         if (!Kind.Equals(document.Kind, StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException($"Only supports {Kind}");
 
-        using var uow = _uowFactory.AsUnfiltered().Create();
-        var carrierRepo = uow.Repository<Carrier>();
-
-        var node = JsonSerializer.SerializeToNode(document.Data, _jsonOptions)!.ToJsonString();
-        var carrierData = JsonSerializer.Deserialize<CarrierExport>(node, JsonSerializerOptions.Web)!;
-
-        var carrier = await carrierRepo.Data
-            .SingleOrDefaultAsync(e => e.Slug == carrierData.Slug, cancellationToken: cancellationToken);
-
-        var isNew = false;
-        if (carrier is null)
+        try
         {
-            isNew = true;
+            using var uow = _uowFactory.AsUnfiltered().Create();
+            var carrierRepo = uow.Repository<Carrier>();
+
+            var node = JsonSerializer.SerializeToNode(document.Data, _jsonOptions)!.ToJsonString();
+            var carrierData = JsonSerializer.Deserialize<CarrierExport>(node, JsonSerializerOptions.Export)!;
+
+            var carrier = await carrierRepo.Data
+                .SingleOrDefaultAsync(e => e.Slug == carrierData.Slug, cancellationToken: cancellationToken);
+
+            var isNew = false;
+            if (carrier is null)
+            {
+                isNew = true;
 
             carrier = new();
             carrierRepo.Add(carrier);
         }
 
-        carrierData.Apply(carrier);
+            carrierData.Apply(carrier);
 
-        var validator = _modelValidatorFactory.GetValidator<Carrier>();
-        await validator.ValidateAsync(carrier, cancellationToken);
+            var validator = _modelValidatorFactory.GetValidator<Carrier>();
+            await validator.ValidateAsync(carrier, cancellationToken);
 
-        await uow.SaveChangesAsync(cancellationToken);
+            if (saveChanges)
+                await uow.SaveChangesAsync(cancellationToken);
 
-        return new(
-            document.Kind,
-            document.SchemaVersion,
-            carrier.Id,
-            carrier.Slug,
-            isNew ? ImporterResultStatusType.Created : ImporterResultStatusType.Updated);
+            return new(
+                document.Kind,
+                document.SchemaVersion,
+                saveChanges ? carrier.Id : isNew ? null : carrier.Id,
+                carrier.Slug,
+                isNew ? ImporterResultStatusType.Created : ImporterResultStatusType.Updated);
+        }
+        catch (JsonException ex)
+        {
+            return new(
+                document.Kind,
+                document.SchemaVersion,
+                null,
+                null,
+                ImporterResultStatusType.Error,
+                ex.Message);
+        }
     }
 }

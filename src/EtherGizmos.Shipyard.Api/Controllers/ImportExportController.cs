@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using EtherGizmos.Common;
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Converters;
@@ -46,7 +46,7 @@ public class ImportExportController : ControllerBase
     [HasCapability(SecurableType.Carrier, PermissionId.Read)]
     [Produces("application/yaml", "application/json")]
     [ProducesResponseType(200)]
-    public async Task<IActionResult> ExportAsync(
+    public async Task<IActionResult> Export(
         int id,
         CancellationToken cancellationToken = default)
     {
@@ -64,26 +64,23 @@ public class ImportExportController : ControllerBase
         }
 
         var carrierExport = new CarrierExport(carrier);
-        var node = JsonSerializer.SerializeToNode(carrierExport, JsonSerializerOptions.Web)!;
-
-        var jsonOptions = new JsonSerializerOptions();
-        jsonOptions.Converters.Add(new ObjectToInferredTypesConverter());
+        var node = JsonSerializer.SerializeToNode(carrierExport, JsonSerializerOptions.Export)!;
 
         var export = new ExportDocument(
             "carrier",
             1,
-            JsonSerializer.Deserialize<IDictionary<string, object?>>(JsonNode.Parse($"{{\"exportedAt\":\"{DateTimeOffset.UtcNow}\"}}")!.AsObject(), jsonOptions),
-            JsonSerializer.Deserialize<IDictionary<string, object?>>(node, jsonOptions)!);
+            JsonSerializer.Deserialize<IDictionary<string, object?>>(JsonNode.Parse($"{{\"exportedAt\":\"{DateTimeOffset.UtcNow}\"}}")!.AsObject(), JsonSerializerOptions.Export),
+            JsonSerializer.Deserialize<IDictionary<string, object?>>(node, JsonSerializerOptions.Export)!);
+
         return Ok(export);
     }
 
     [ApiVersion(1.0)]
     [HttpPost(BaseRoute + "/import")]
-    //[HasCapability(SecurableType.Carrier, PermissionId.Write)]
     [Consumes("application/yaml", "application/json")]
     [ProducesResponseType(201, Type = typeof(ImporterResultDTO)), SwaggerResponseExample(201, typeof(ImporterResultDTOExampleGet))]
     [ProducesResponseType(200, Type = typeof(ImporterResultDTO)), SwaggerResponseExample(200, typeof(ImporterResultDTOExampleGet))]
-    public async Task<IActionResult> ImportAsync(
+    public async Task<IActionResult> Import(
         ExportDocument data,
         CancellationToken cancellationToken = default)
     {
@@ -108,6 +105,62 @@ public class ImportExportController : ControllerBase
                 _authorizer.EnsureAuthorized(importer.SecurableType, PermissionId.Write);
 
                 var result = await importer.ImportAsync(data, cancellationToken);
+
+                resultDto = new ImporterResultDTO()
+                {
+                    Kind = result.Kind,
+                    SchemaVersion = result.SchemaVersion,
+                    Id = result.Id,
+                    Identifier = result.Identifier,
+                    Status = result.Status,
+                    ErrorMessage = result.ErrorMessage,
+                };
+            }
+        }
+        catch (UnsupportedExportSchemaException ex)
+        {
+            resultDto.ErrorMessage = ex.Message;
+        }
+
+        return resultDto.Status switch
+        {
+            ImporterResultStatusType.Created => StatusCode(StatusCodes.Status201Created, resultDto),
+            ImporterResultStatusType.Updated => Ok(resultDto),
+            ImporterResultStatusType.Error => BadRequest(resultDto),
+            _ => BadRequest(resultDto),
+        };
+    }
+
+    [ApiVersion(1.0)]
+    [HttpPost(BaseRoute + "/import/verify")]
+    [Consumes("application/yaml", "application/json")]
+    [ProducesResponseType(201, Type = typeof(ImporterResultDTO)), SwaggerResponseExample(201, typeof(ImporterResultDTOExampleGet))]
+    [ProducesResponseType(200, Type = typeof(ImporterResultDTO)), SwaggerResponseExample(200, typeof(ImporterResultDTOExampleGet))]
+    public async Task<IActionResult> VerifyImport(
+        ExportDocument data,
+        CancellationToken cancellationToken = default)
+    {
+        var resultDto = new ImporterResultDTO()
+        {
+            Kind = data.Kind,
+            SchemaVersion = data.SchemaVersion,
+            Id = null,
+            Identifier = null,
+            Status = ImporterResultStatusType.Error,
+            ErrorMessage = $"Unknown schema type: {data.Kind}.",
+        };
+
+        try
+        {
+            data = _migrator.MigrateDataToCurrent(data);
+
+            var importer = _importerRegistry.GetImporter(data.Kind);
+
+            if (importer is not null)
+            {
+                _authorizer.EnsureAuthorized(importer.SecurableType, PermissionId.Write);
+
+                var result = await importer.VerifyAsync(data, cancellationToken);
 
                 resultDto = new ImporterResultDTO()
                 {

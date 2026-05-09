@@ -13,4 +13,8 @@ public interface IExportDocumentImporter
     Task<ImporterResult> ImportAsync(
         ExportDocument document,
         CancellationToken cancellationToken = default);
+
+    Task<ImporterResult> VerifyAsync(
+        ExportDocument document,
+        CancellationToken cancellationToken = default);
 }
