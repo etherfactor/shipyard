@@ -129,11 +129,11 @@ public class ImportExportController : ControllerBase
     }
 
     [ApiVersion(1.0)]
-    [HttpPost(BaseRoute + "/import/validate")]
+    [HttpPost(BaseRoute + "/import/verify")]
     [Consumes("application/yaml", "application/json")]
     [ProducesResponseType(201, Type = typeof(ImporterResultDTO)), SwaggerResponseExample(201, typeof(ImporterResultDTOExampleGet))]
     [ProducesResponseType(200, Type = typeof(ImporterResultDTO)), SwaggerResponseExample(200, typeof(ImporterResultDTOExampleGet))]
-    public async Task<IActionResult> ImportValidate(
+    public async Task<IActionResult> VerifyImport(
         ExportDocument data,
         CancellationToken cancellationToken = default)
     {
@@ -157,7 +157,7 @@ public class ImportExportController : ControllerBase
             {
                 _authorizer.EnsureAuthorized(importer.SecurableType, PermissionId.Write);
 
-                var result = await importer.ImportAsync(data, cancellationToken);
+                var result = await importer.VerifyAsync(data, cancellationToken);
 
                 resultDto = new ImporterResultDTO()
                 {

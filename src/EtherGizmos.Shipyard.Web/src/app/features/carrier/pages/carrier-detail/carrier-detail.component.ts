@@ -241,7 +241,7 @@ export class CarrierDetailComponent {
     if (!id)
       return;
 
-    const content = this.$carrier.export(id, "application/json");
+    const content = this.$carrier.export(id, "application/yaml");
     openModal({ modal: this.$modal, options: { size: "xl" } }, ExportModalComponent, "Export Carrier", content, `carrier-${id}.yml`);
   }
 
