@@ -83,7 +83,6 @@ builder.Services
 builder.AddServiceDefaults();
 
 builder.Services.AddConnectionResolver()
-    .WithPostgreSql()
     .WithRabbitMQ();
 
 // Http
@@ -126,14 +125,6 @@ builder.Services
     {
         opt.Converters.Add(new ArtifactUriConverter());
     });
-
-// Storage
-//builder.Services
-//    .AddArtifactWriter((opt, conf) =>
-//    {
-//        conf.GetSection("Artifacts")
-//            .Bind(opt);
-//    });
 
 // Tracking
 builder.Services

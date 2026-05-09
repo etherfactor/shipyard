@@ -155,7 +155,6 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
             TrackingNumber = trackingNumber,
             EstimatedDeliveryAt = estimatedAt,
             Details = [.. details],
-            Artifacts = [],
         };
 
         return result;

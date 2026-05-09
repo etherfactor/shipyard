@@ -1,9 +1,13 @@
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Api;
+using EtherGizmos.Shipyard.Api.Enums;
+using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Messages;
 using EtherGizmos.Shipyard.Services.Carriers;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace EtherGizmos.Shipyard.Consumers;
 
@@ -58,6 +62,81 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
         try
         {
             var result = await tracker.TrackAsync(message.TrackingNumber, context.CancellationToken);
+
+            var resultUpdates = result.Details
+                .Select(e => new TrackingUpdateDTO()
+                {
+                    OccurredAt = e.OccurredAt,
+                    StatusType = (StatusTypeDTO)e.StatusTypeId,
+                    Location = e.Location,
+                    Description = e.Description,
+                    PackageId = message.PackageId,
+                });
+
+            var package = (await client.GetFromJsonAsync<PackageDTO>(
+                $"/api/v1/packages({message.PackageId})?$expand=trackingUpdates",
+                JsonSerializerOptions.App,
+                cancellationToken: context.CancellationToken))!;
+
+            var updates = package.TrackingUpdates
+                .GroupBy(e => e.OccurredAt)
+                .ToDictionary(e => e.Key, e => e.First());
+
+            var toCreateOrUpdate = new List<TrackingUpdateDTO>();
+            foreach (var update in resultUpdates)
+            {
+                if (updates.TryAdd(update.OccurredAt, update))
+                {
+                    toCreateOrUpdate.Add(update);
+                }
+
+                var current = updates[update.OccurredAt];
+                update.Id = current.Id;
+
+                if (current.StatusType != update.StatusType
+                    || current.Location != update.Location
+                    || current.Description != update.Description)
+                {
+                    toCreateOrUpdate.Add(update);
+                }
+            }
+
+            foreach (var update in toCreateOrUpdate)
+            {
+                if (update.Id == 0)
+                {
+                    await client.PostAsJsonAsync(
+                        $"/api/v1/trackingUpdates",
+                        new
+                        {
+                            occurredAt = update.OccurredAt,
+                            statusType = update.StatusType.ToString(),
+                            location = update.Location,
+                            description = update.Description,
+                            packageId = update.PackageId,
+                        }, cancellationToken: context.CancellationToken);
+                }
+                else
+                {
+                    await client.PatchAsJsonAsync(
+                        $"/api/v1/trackingUpdates({update.Id})",
+                        new
+                        {
+                            occurredAt = update.OccurredAt,
+                            statusType = update.StatusType.ToString(),
+                            location = update.Location,
+                            description = update.Description,
+                            packageId = update.PackageId,
+                        }, cancellationToken: context.CancellationToken);
+                }
+            }
+
+            var regenResponse = await client.PatchAsJsonAsync(
+                $"/api/v1/packages({message.PackageId})",
+                new { }, //Intentional no-op; updating the package causes it to recalculate the last status
+                cancellationToken: context.CancellationToken);
+
+            regenResponse.EnsureSuccessStatusCode();
 
             using var endResponse = await client.PatchAsJsonAsync(
                 $"/api/v1/carrierExecutions({message.ExecutionId})",

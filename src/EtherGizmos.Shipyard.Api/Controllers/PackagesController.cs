@@ -196,5 +196,14 @@ public class PackagesController : AutoODataController
     private IKeyedRequestBuilder<Package, PackageDTO> ForItem(
         int id)
         => ForItem(
-            KeyMapping<Package, PackageDTO, int>.Create(id, e => e.Id, e => e.Id));
+            KeyMapping<Package, PackageDTO, int>.Create(id, e => e.Id, e => e.Id))
+            .OnUpdating((db, dto) =>
+            {
+                db.LastStatusTypeId = db.TrackingUpdates
+                    .OrderByDescending(e => e.OccurredAt)
+                    .Select(e => e.StatusTypeId)
+                    .FirstOrDefault();
+
+                return Task.CompletedTask;
+            });
 }

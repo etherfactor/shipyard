@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EtherGizmos.Common.Data.PostgreSql" Version="0.1.0-alpha.1" />
     <PackageReference Include="EtherGizmos.Common.Messaging.RabbitMQ" Version="0.1.0-alpha.1" />
     <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
     <PackageReference Include="HtmlAgilityPack.CssSelectors.NetCore" Version="1.2.1" />

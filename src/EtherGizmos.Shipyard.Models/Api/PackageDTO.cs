@@ -59,7 +59,7 @@ public class PackageDTOProfile : Profile
         toDto.MapMember(dest => dest.NextPollAt, src => src.NextPollAt);
         toDto.MapMember(dest => dest.LastStatusType, src => src.LastStatusTypeId);
         toDto.MapMember(dest => dest.IsDelivered, src => src.IsDelivered);
-        toDto.MapMember(dest => dest.TrackingUpdates, src => src.TrackingUpdates);
+        toDto.MapMember(dest => dest.TrackingUpdates, src => src.TrackingUpdates, opt => opt.ExplicitExpansion());
 
         var fromDto = mapper.CreateMap<PackageDTO, Package>();
         fromDto.IgnoreAllMembers();

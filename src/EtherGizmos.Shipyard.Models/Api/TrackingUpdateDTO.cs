@@ -22,6 +22,10 @@ public class TrackingUpdateDTO
     public string? Location { get; set; }
 
     public string? Description { get; set; }
+
+    public int PackageId { get; set; }
+
+    public PackageDTO? Package { get; set; }
 }
 
 public class TrackingUpdateDTOProfile : Profile
@@ -39,6 +43,16 @@ public class TrackingUpdateDTOProfile : Profile
         toDto.MapMember(dest => dest.StatusType, src => src.StatusTypeId);
         toDto.MapMember(dest => dest.Location, src => src.Location);
         toDto.MapMember(dest => dest.Description, src => src.Description);
+        toDto.MapMember(dest => dest.PackageId, src => src.PackageId);
+        toDto.MapMember(dest => dest.Package, src => src.Package, opt => opt.ExplicitExpansion());
+
+        var fromDto = mapper.CreateMap<TrackingUpdateDTO, TrackingUpdate>();
+        fromDto.IgnoreAllMembers();
+        fromDto.MapMember(dest => dest.OccurredAt, src => src.OccurredAt);
+        fromDto.MapMember(dest => dest.StatusTypeId, src => src.StatusType);
+        fromDto.MapMember(dest => dest.Location, src => src.Location);
+        fromDto.MapMember(dest => dest.Description, src => src.Description);
+        fromDto.MapMember(dest => dest.PackageId, src => src.PackageId);
     })
     { }
 }
