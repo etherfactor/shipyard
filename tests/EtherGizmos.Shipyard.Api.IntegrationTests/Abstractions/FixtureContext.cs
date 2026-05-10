@@ -1,4 +1,5 @@
 using EtherGizmos.Shipyard.Controllers;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace EtherGizmos.Shipyard.Abstractions;
 

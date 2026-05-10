@@ -63,6 +63,7 @@ internal static class Setup
             ["Keys:AuthEncryption:PfxFile:AutoGenerate"] = "true",
             ["Security:OAuth2:SigningCertificate:KeyId"] = "AuthSigning",
             ["Security:OAuth2:EncryptionCertificate:KeyId"] = "AuthEncryption",
+            ["Security:OAuth2:WorkerClientSecret"] = "cGFyYWdyYXBoYmVzdHJhaXNlY29weW1lZGljaW5lc2lja3BlcmhhcHNhZnRlcm5vb24=",
         };
 
         _waf = new ConfiguredWebApplicationFactory<Program>(preSettings)

@@ -1,5 +1,5 @@
-﻿using FluentMigrator.Model;
-using FluentMigrator.Runner.Generators;
+﻿using FluentMigrator.Generation;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 using FluentMigrator.Runner.Generators.Postgres;
 using System.Reflection;
