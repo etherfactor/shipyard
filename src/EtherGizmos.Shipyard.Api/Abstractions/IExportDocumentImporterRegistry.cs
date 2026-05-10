@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Abstractions;
+namespace EtherGizmos.Shipyard.Abstractions;
 
 public interface IExportDocumentImporterRegistry
 {

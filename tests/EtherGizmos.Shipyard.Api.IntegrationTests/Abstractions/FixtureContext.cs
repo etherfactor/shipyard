@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Controllers;
+using EtherGizmos.Shipyard.Controllers;
 
 namespace EtherGizmos.Shipyard.Abstractions;
 
@@ -38,6 +38,7 @@ public static class FixtureContextExtensions
             Claims = new Dictionary<string, string>()
             {
                 ["cap"] = capabilities,
+                [Claims.Username] = "admin",
             },
         });
     }

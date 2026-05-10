@@ -33,6 +33,12 @@ public class OnlyJsonOperationFilter : IOperationFilter
                         break;
                 }
             }
+
+            if (operation.Tags[0].Name == "ImportExport")
+            {
+                response.Value.Content.TryAdd("application/yaml", new() { });
+                response.Value.Content.TryAdd("application/json", new() { });
+            }
         }
     }
 }

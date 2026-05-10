@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Api.Models;
+using EtherGizmos.Shipyard.Api.Models;
 
 namespace EtherGizmos.Shipyard.Abstractions;
 

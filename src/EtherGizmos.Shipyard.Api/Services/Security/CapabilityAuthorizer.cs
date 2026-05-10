@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Database.Enums;
 using OpenIddict.Abstractions;

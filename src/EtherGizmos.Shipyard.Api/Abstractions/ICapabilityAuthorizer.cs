@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Database.Enums;
+using EtherGizmos.Shipyard.Database.Enums;
 
 namespace EtherGizmos.Shipyard.Abstractions;
 

@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Models;
+namespace EtherGizmos.Shipyard.Models;
 
 public record ImporterResult(
     string Kind,

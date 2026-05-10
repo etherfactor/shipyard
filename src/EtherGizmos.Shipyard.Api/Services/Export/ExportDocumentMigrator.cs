@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Converters;
+using EtherGizmos.Common.Converters;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Models;
 using EtherGizmos.Shipyard.Exceptions;

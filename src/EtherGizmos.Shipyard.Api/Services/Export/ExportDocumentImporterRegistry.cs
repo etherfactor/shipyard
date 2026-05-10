@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
 
 namespace EtherGizmos.Shipyard.Services.Export;
 

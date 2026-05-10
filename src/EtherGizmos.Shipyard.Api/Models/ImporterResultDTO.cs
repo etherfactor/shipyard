@@ -1,4 +1,4 @@
-﻿using Swashbuckle.AspNetCore.Filters;
+using Swashbuckle.AspNetCore.Filters;
 using System.Diagnostics.CodeAnalysis;
 
 namespace EtherGizmos.Shipyard.Models;

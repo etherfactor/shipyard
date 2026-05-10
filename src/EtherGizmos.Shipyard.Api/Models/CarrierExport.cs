@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Api.Enums;
+using EtherGizmos.Shipyard.Api.Enums;
 using EtherGizmos.Shipyard.Database;
 using System.ComponentModel.DataAnnotations;
 

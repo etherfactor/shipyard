@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Api;
 using EtherGizmos.Shipyard.Api.Enums;
