@@ -1,4 +1,5 @@
 ﻿using EtherGizmos.Shipyard.Api.IntegrationTests.Controllers;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
 
@@ -38,6 +39,7 @@ public static class FixtureContextExtensions
             Claims = new Dictionary<string, string>()
             {
                 ["cap"] = capabilities,
+                [Claims.Username] = "admin",
             },
         });
     }

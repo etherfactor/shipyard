@@ -10,9 +10,11 @@ using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OpenIddict.Abstractions;
 using Swashbuckle.AspNetCore.Filters;
+using System.Reflection;
 using System.Text.Json;
-using System.Text.Json.Nodes;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace EtherGizmos.Shipyard.Api.Controllers;
 
@@ -66,7 +68,7 @@ public class ImportExportController : ControllerBase
         var export = new ExportDocument(
             "carrier",
             1,
-            JsonSerializer.Deserialize<IDictionary<string, object?>>(JsonNode.Parse($"{{\"exportedAt\":\"{DateTimeOffset.UtcNow}\"}}")!.AsObject(), JsonSerializerOptions.Export),
+            GetMetadata(),
             JsonSerializer.Deserialize<IDictionary<string, object?>>(node, JsonSerializerOptions.Export)!);
 
         return Ok(export);
@@ -181,6 +183,22 @@ public class ImportExportController : ControllerBase
             ImporterResultStatusType.Updated => Ok(resultDto),
             ImporterResultStatusType.Error => BadRequest(resultDto),
             _ => BadRequest(resultDto),
+        };
+    }
+
+    private IDictionary<string, object?>? GetMetadata()
+    {
+        return new Dictionary<string, object?>()
+        {
+            ["exportedAt"] = DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+            ["exportedBy"] = User.GetClaim(Claims.Username),
+            ["source"] = new Dictionary<string, object?>()
+            {
+                ["application"] = "Shipyard",
+                ["version"] = Assembly.GetExecutingAssembly()?
+                        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                        .InformationalVersion,
+            },
         };
     }
 }
