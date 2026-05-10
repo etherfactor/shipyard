@@ -7,6 +7,7 @@ using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Migrations.Core;
 using EtherGizmos.Shipyard.Services;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Generators.Postgres;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -74,6 +75,9 @@ public static class IServiceCollectionExtensions
                                 .WithGlobalConnectionString(postgreSql.ConnectionString)
                         );
                     });
+
+                child.Decorate<IPostgresTypeMap, PostgresTypeMap>();
+                child.Decorate<Postgres15_0Generator, CustomPostgresGenerator>();
             })
             .ImportLogging()
             .ForwardScoped<IMigrationRunner>();
