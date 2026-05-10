@@ -7,7 +7,7 @@ public static class EntityAspects
     private static class Generic<TEntity, TId>
         where TEntity : class, new()
     {
-        public static IEnumerable<IAspect<TEntity, TId>> All 
+        public static IEnumerable<IAspect<TEntity, TId>> All
             =>
             [
                 new SearchAuthAspect<TEntity, TId>(),
