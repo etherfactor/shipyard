@@ -9,10 +9,16 @@ public class OnlyJsonOperationFilter : IOperationFilter
     {
         foreach (var response in operation.Responses)
         {
-            var removeKeys = response.Value.Content.Keys.Where(e => e != "application/json");
+            var removeKeys = response.Value.Content.Keys.Where(e => e != "application/json" && e != "application/yaml");
             foreach (var removeKey in removeKeys)
             {
                 response.Value.Content.Remove(removeKey);
+            }
+
+            if (operation.Tags[0].Name == "ImportExport")
+            {
+                response.Value.Content.TryAdd("application/yaml", new() { });
+                response.Value.Content.TryAdd("application/json", new() { });
             }
         }
     }

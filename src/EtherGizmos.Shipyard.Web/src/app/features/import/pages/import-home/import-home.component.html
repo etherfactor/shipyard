@@ -1,0 +1,213 @@
+<!-- Header -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-header [text]="'Import'"
+                   [subtext]="'Import YAML or JSON configuration into Shipyard'" />
+  </div>
+</div>
+
+@let document = document$$();
+@let result = result$$();
+@if (!result) {
+@if (!document) {
+<!-- Import file -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-upload" text="Import Source" [formGroup]="form">
+
+      <div class="row mt-3">
+        <div class="col-md-4">
+          <label class="form-label">Import method</label>
+
+          <ng-select formControlName="sourceType"
+                     [clearable]="false"
+                     [selectOnTab]="true">
+            <ng-option value="file">
+              <span class="bi bi-file-earmark-arrow-up"></span>
+              Upload file
+            </ng-option>
+            <ng-option value="raw">
+              <span class="bi bi-clipboard"></span>
+              Paste document
+            </ng-option>
+          </ng-select>
+        </div>
+
+        <div class="col-md-8">
+          @if (form.value.sourceType === 'file') {
+          <label for="importFile" class="form-label">File</label>
+          <input id="importFile"
+                 type="file"
+                 class="form-control"
+                 accept=".yaml,.yml,.json,application/yaml,application/json"
+                 formControlName="documentFile"
+                 (change)="onFileSelect($event)" />
+
+          <div class="form-text">
+            Upload a Shipyard export document in YAML or JSON format.
+          </div>
+          } @else {
+          <label for="importText" class="form-label">Document</label>
+          <textarea id="importText"
+                    class="form-control font-monospace"
+                    rows="12"
+                    placeholder="kind: carrier&#10;schemaVersion: 1&#10;data: ..."
+                    formControlName="documentRaw"></textarea>
+          }
+        </div>
+      </div>
+
+      <div class="row justify-content-end">
+        <div class="col-auto mt-3" style="width: 120px;">
+          @if (!isSaving$$()) {
+          <button type="button" class="btn btn-primary w-100" (click)="tryValidate()">
+            <span class="bi bi-check2-square"></span>
+            Validate
+          </button>
+          } @else {
+          <button type="button" class="btn btn-primary w-100" disabled>
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            <span class="visually-hidden" role="status">Loading...</span>
+          </button>
+          }
+        </div>
+      </div>
+
+    </detail-box>
+  </div>
+</div>
+} @else {
+<!-- Preview -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-file-earmark-code" text="Verify Import">
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label class="col-sm-4 col-form-label">Kind</label>
+            <div class="col-sm-8">
+              <input type="text" [value]="document.kind ?? '—'" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label class="col-sm-4 col-form-label">Schema version</label>
+            <div class="col-sm-8">
+              <input type="text" [value]="document.schemaVersion ?? '—'" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-12">
+          @let language = documentRawJson$$() ? "json" : "yaml";
+          <ngx-monaco-editor style="height: 520px;" [options]="{ theme: 'vs-dark', language: language, readOnly: true }" [ngModel]="documentRaw$$()" readonly="true"></ngx-monaco-editor>
+        </div>
+      </div>
+
+      <div class="row justify-content-end">
+        <div class="col-auto mt-3" style="width: 100px;">
+          @if (!isSaving$$()) {
+          <button type="button" class="btn btn-danger w-100" (click)="clear()">
+            <span class="bi bi-trash"></span>
+            Clear
+          </button>
+          } @else {
+          <button type="button" class="btn btn-danger w-100" disabled>
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            <span class="visually-hidden" role="status">Loading...</span>
+          </button>
+          }
+        </div>
+        <div class="col-auto mt-3" style="width: 115px;">
+          @if (!isSaving$$()) {
+          <button type="button" class="btn btn-primary w-100" (click)="import()">
+            <span class="bi bi-upload"></span>
+            Import
+          </button>
+          } @else {
+          <button type="button" class="btn btn-primary w-100" disabled>
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            <span class="visually-hidden" role="status">Loading...</span>
+          </button>
+          }
+        </div>
+      </div>
+
+    </detail-box>
+  </div>
+</div>
+}
+} @else {
+<!-- Result -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-check2-square" text="Import Successful">
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label class="col-sm-4 col-form-label">Kind</label>
+            <div class="col-sm-8">
+              <input type="text" [value]="result.kind ?? '—'" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label class="col-sm-4 col-form-label">Schema version</label>
+            <div class="col-sm-8">
+              <input type="text" [value]="result.schemaVersion ?? '—'" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label class="col-sm-4 col-form-label">Status</label>
+            <div class="col-sm-8">
+              <input type="text" [value]="result.status ?? '—'" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label class="col-sm-4 col-form-label">Record id</label>
+            <div class="col-sm-8">
+              <input type="text" [value]="result.id ?? '—'" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row justify-content-end">
+        <div class="col-auto mt-3" style="width: 135px;">
+          <button type="button" class="btn btn-danger w-100" (click)="clear()">
+            <span class="bi bi-arrow-clockwise"></span>
+            Start Over
+          </button>
+        </div>
+        <div class="col-auto mt-3" style="width: 150px;">
+          @switch (result.kind) {
+          @case ('carrier') {
+          <a class="btn btn-primary w-100" [routerLink]="['/carriers', result.id]">
+            <span class="bi bi-box-arrow-up-right"></span>
+            View Carrier
+          </a>
+          }
+          }
+        </div>
+      </div>
+
+    </detail-box>
+  </div>
+</div>
+}

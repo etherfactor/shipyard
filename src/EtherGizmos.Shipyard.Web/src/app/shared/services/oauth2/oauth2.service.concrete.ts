@@ -1,7 +1,7 @@
 import { effect, inject, Injectable, Provider, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { OidcSecurityService } from "angular-auth-oidc-client";
-import { catchError, filter, firstValueFrom, of, switchMap, take, timeout, timer } from "rxjs";
+import { catchError, filter, firstValueFrom, of, switchMap, take, throwError, timeout, timer } from "rxjs";
 import { Logger } from "../../utilities/logger/logger.util";
 import { OAuth2Service } from "./oauth2.service";
 
@@ -59,9 +59,17 @@ export class ConcreteOAuth2Service extends OAuth2Service {
       this.$logger.information("Found a refresh token");
       let check = this.$oidc.checkAuthIncludingServer();  
       check = check.pipe(
-        catchError(() => timer(1000).pipe(
-          switchMap(() => check),
-        )),
+        catchError(err => {
+          const message: unknown = err.message;
+          if (typeof message === "string" && message.includes("please login")) {
+            this.logout();
+            return throwError(() => err);
+          }
+
+          return timer(1000).pipe(
+            switchMap(() => check),
+          );
+        }),
       );
       const response = await firstValueFrom(check);
       if (response.isAuthenticated) {

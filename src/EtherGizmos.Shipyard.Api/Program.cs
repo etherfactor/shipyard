@@ -6,11 +6,15 @@ using EtherGizmos.Shipyard;
 using EtherGizmos.Shipyard.Api.Abstractions;
 using EtherGizmos.Shipyard.Api.Configuration;
 using EtherGizmos.Shipyard.Api.Errors;
+using EtherGizmos.Shipyard.Api.Services.Export;
+using EtherGizmos.Shipyard.Api.Services.Formatters;
 using EtherGizmos.Shipyard.Api.Services.Health;
 using EtherGizmos.Shipyard.Api.Services.HostedServices;
 using EtherGizmos.Shipyard.Api.Services.Logging;
 using EtherGizmos.Shipyard.Api.Services.Middleware;
 using EtherGizmos.Shipyard.Api.Services.Pipeline.OAuth2;
+using EtherGizmos.Shipyard.Api.Services.Security;
+using EtherGizmos.Shipyard.Api.Services.Validators;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Services;
@@ -25,8 +29,10 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,6 +100,8 @@ builder.Services.AddScoped<IClaimsPipelineStep<OAuth2PrincipalContext>, OAuth2Se
 builder.Services.AddScoped<IClaimsPipelineStep<OAuth2PrincipalContext>, OAuth2SetUsernameStep>();
 builder.Services.AddScoped<IClaimsPipelineStep<OAuth2PrincipalContext>, OAuth2ApplyDestinationsStep>();
 
+builder.Services.AddSingleton<ICapabilityAuthorizer, CapabilityAuthorizer>();
+
 // Database
 builder.Services
     .AddDatabase()
@@ -155,7 +163,8 @@ builder.Services
     });
 
 // Models
-builder.Services.AddModelValidators();
+builder.Services.AddModelValidators()
+    .AddScoped<IModelValidator<Carrier>, CarrierValidator>();
 
 // Controllers
 builder.Services
@@ -163,7 +172,19 @@ builder.Services
     {
         opt.LowercaseUrls = true;
     })
-    .AddControllersWithViews();
+    .AddControllersWithViews()
+    .AddJsonOptions(opt =>
+    {
+        opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
+builder.Services
+    .AddMvc(opt =>
+    {
+        opt.InputFormatters.Add(new YamlInputFormatter());
+        opt.OutputFormatters.Add(new YamlOutputFormatter());
+        opt.FormatterMappings.SetMediaTypeMappingForFormat("yaml", "application/yaml");
+    });
 
 builder.Services
     .AddOData((opt, conf) =>
@@ -206,6 +227,11 @@ builder.Services.AddSingleton<ISourceLoggerFactory, SourceLoggerFactory>();
 builder.Services.AddHostedService<InitialConfigSeeder>();
 builder.Services.AddHostedService<OAuth2Seeder>();
 
+// Export & Import
+builder.Services.AddSingleton<IExportDocumentMigrator, ExportDocumentMigrator>();
+builder.Services.AddScoped<IExportDocumentImporterRegistry, ExportDocumentImporterRegistry>();
+builder.Services.AddScoped<IExportDocumentImporter, CarrierImporter>();
+
 // Health
 builder.Services
     .AddHealthChecks()
@@ -213,6 +239,36 @@ builder.Services
         name: "database",
         failureStatus: HealthStatus.Unhealthy,
         tags: ["database"]);
+
+// Documentation
+builder.Services
+    .AddSwaggerGen(opt =>
+    {
+        opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "Bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "Enter your JWT token",
+        });
+
+        opt.AddSecurityRequirement(new OpenApiSecurityRequirement()
+        {
+            {
+                new OpenApiSecurityScheme()
+                {
+                    Reference = new OpenApiReference()
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer",
+                    },
+                },
+                Array.Empty<string>()
+            },
+        });
+    });
 
 // Rendering
 builder.Services
