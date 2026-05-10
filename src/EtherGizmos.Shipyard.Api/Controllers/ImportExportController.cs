@@ -45,7 +45,7 @@ public class ImportExportController : ControllerBase
     [HasCapability(SecurableType.Carrier, PermissionId.Read)]
     [Produces("application/yaml", "application/json")]
     [ProducesResponseType(200)]
-    public async Task<IActionResult> Export(
+    public async Task<IActionResult> ExportCarrier(
         int id,
         CancellationToken cancellationToken = default)
     {
