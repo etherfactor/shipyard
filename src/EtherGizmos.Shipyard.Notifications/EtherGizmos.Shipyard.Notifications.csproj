@@ -1,13 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Notifications", ""))</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MailKit" Version="4.16.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.7" />
+    <PackageReference Include="EtherGizmos.Common.Notifications.Email" Version="0.1.0-alpha.1" />
+    <PackageReference Include="EtherGizmos.Common.Notifications.Webhook" Version="0.1.0-alpha.1" />
   </ItemGroup>
 
   <ItemGroup>

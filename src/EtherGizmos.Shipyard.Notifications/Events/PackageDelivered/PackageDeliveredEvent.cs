@@ -1,0 +1,22 @@
+﻿using EtherGizmos.Common.Abstractions;
+
+namespace EtherGizmos.Shipyard.Events;
+
+public record PackageDeliveredEvent : IDomainEvent
+{
+    public required int PackageId { get; init; }
+
+    public required int CarrierId { get; init; }
+
+    public required string CarrierName { get; init; }
+
+    public required string TrackingNumber { get; init; }
+
+    public required string? Contents { get; init; }
+
+    public required DateTimeOffset OccurredAt { get; init; }
+
+    public required string? Location { get; init; }
+
+    public required string? Details { get; init; }
+}
