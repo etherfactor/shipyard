@@ -1,8 +1,7 @@
-﻿using EtherGizmos.Common.Abstractions;
-
+﻿#pragma warning disable IDE0130
 namespace EtherGizmos.Shipyard.Events;
 
-public record PackageDeliveredEvent : IDomainEvent
+public record PackageDeliveredEvent : ShipyardEvent
 {
     public required int PackageId { get; init; }
 

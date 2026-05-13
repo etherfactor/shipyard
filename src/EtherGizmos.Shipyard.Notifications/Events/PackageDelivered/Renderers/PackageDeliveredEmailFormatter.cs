@@ -3,13 +3,15 @@ using EtherGizmos.Common.Models;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
 
-namespace EtherGizmos.Shipyard.Events.PackageDelivered.Renderers;
+#pragma warning disable IDE0130
+namespace EtherGizmos.Shipyard.Events;
 
-public class PackageDeliveredEmailRenderer : EmailNotificationChannelFormatter<ImmediateSchedule, PackageDeliveredEvent>
+public class PackageDeliveredEmailFormatter
+    : EmailNotificationChannelFormatter<ImmediateSchedule, PackageDeliveredEvent>
 {
     private readonly IUnitOfWorkFactory _uowFactory;
 
-    public PackageDeliveredEmailRenderer(
+    public PackageDeliveredEmailFormatter(
         IUnitOfWorkFactory uowFactory)
     {
         _uowFactory = uowFactory;
