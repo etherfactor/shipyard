@@ -26,7 +26,6 @@
     <ProjectReference Include="..\EtherGizmos.Shipyard.Artifacts\EtherGizmos.Shipyard.Artifacts.csproj" />
     <ProjectReference Include="..\EtherGizmos.Shipyard.Messaging\EtherGizmos.Shipyard.Messaging.csproj" />
     <ProjectReference Include="..\EtherGizmos.Shipyard.Models\EtherGizmos.Shipyard.Models.csproj" />
-    <ProjectReference Include="..\EtherGizmos.Shipyard.Notifications\EtherGizmos.Shipyard.Notifications.csproj" />
   </ItemGroup>
 
   <ItemGroup>

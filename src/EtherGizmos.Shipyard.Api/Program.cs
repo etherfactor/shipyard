@@ -7,6 +7,7 @@ using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Events;
 using EtherGizmos.Shipyard.Services;
 using EtherGizmos.Shipyard.Services.Bootstrappers;
 using EtherGizmos.Shipyard.Services.Export;
@@ -249,6 +250,27 @@ builder.Services.AddSingleton<IBootstrapper, OAuth2Bootstrapper>();
 builder.Services.AddSingleton<IExportDocumentMigrator, ExportDocumentMigrator>();
 builder.Services.AddScoped<IExportDocumentImporterRegistry, ExportDocumentImporterRegistry>();
 builder.Services.AddScoped<IExportDocumentImporter, CarrierImporter>();
+
+// Notifications
+builder.Services.AddNotifications(
+    builder.Configuration["Database:ConnectionId"]!,
+    builder.Configuration["MessageBroker:ConnectionId"]!,
+    opt =>
+    {
+        opt.AddWebhookChannel();
+
+        var emailConnectionId = builder.Configuration["Email:ConnectionId"];
+        if (emailConnectionId is not null)
+            opt.AddEmailChannel(emailConnectionId);
+
+        opt.AddNotification<PackageDeliveredEvent, PackageDeliveredRouter>(
+            "package.delivered",
+            evt =>
+            {
+                evt.Supports<PackageDeliveredEvent, EmailChannel, PackageDeliveredEmailFormatter>();
+                evt.Supports<PackageDeliveredEvent, WebhookChannel, PackageDeliveredWebhookFormatter>();
+            });
+    });
 
 // Health
 builder.Services

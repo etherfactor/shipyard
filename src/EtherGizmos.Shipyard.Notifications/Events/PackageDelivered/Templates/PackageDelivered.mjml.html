@@ -1,0 +1,96 @@
+{{capture title}}
+{{subject}}
+{{end}}
+
+{{capture content}}
+<mj-text padding-bottom="20px">
+  <span style="background: #efe8ff; color: #731dd8; font-size: 12px; font-weight: bold; text-transform: uppercase; padding: 5px 10px; border-radius: 999px;">
+    <a href="{{trackingUrl}}" style="text-decoration: none;">Tracking #{{trackingNumber}}</a>
+  </span>
+</mj-text>
+<mj-text>
+  <h1>Your tracked package should have arrived.</h1>
+</mj-text>
+<mj-text font-size="16px" line-height="25px" padding-bottom="25px">
+  Hi {{name}}, Shipyard received a delivery update from <b>{{carrierName}}</b>. It looks like the package reached its destination.
+</mj-text>
+<mj-table css-class="detail-table" container-background-color="#faf8ff" border="1px solid #e6ddf7;" padding="0">
+  <tr>
+    <td style="padding: 20px;">
+      <div style="text-transform: uppercase; letter-spacing: 0.05em; color: #777777; font-size: 12px; font-weight: 700;">
+        Status
+      </div>
+      <div style="font-size: 16px;">
+        <b>Delivered</b>
+      </div>
+    </td>
+    <td style="padding: 20px;">
+      <div style="text-transform: uppercase; letter-spacing: 0.05em; color: #777777; font-size: 12px; font-weight: 700;">
+        Delivered at
+      </div>
+      <div style="font-size: 16px;">
+        <b>{{deliveredAt}}</b>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 20px; padding-top: 0px;">
+      <div style="text-transform: uppercase; letter-spacing: 0.05em; color: #777777; font-size: 12px; font-weight: 700;">
+        Carrier
+      </div>
+      <div style="font-size: 16px;">
+        {{carrierName}}
+      </div>
+    </td>
+    <td style="padding: 20px; padding-top: 0px;">
+      <div style="text-transform: uppercase; letter-spacing: 0.05em; color: #777777; font-size: 12px; font-weight: 700;">
+        Last update
+      </div>
+      <div style="font-size: 16px;">
+        {{details}}
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" style="padding: 20px; padding-top: 0px;">
+      <div style="text-transform: uppercase; letter-spacing: 0.05em; color: #777777; font-size: 12px; font-weight: 700;">
+        Contents
+      </div>
+      <div style="font-size: 16px;">
+        {{contents}}
+      </div>
+    </td>
+  </tr>
+</mj-table>
+<mj-divider border-width="1px" padding="25px 5px 25px 5px" border-color="#cccccc"></mj-divider>
+<mj-text>
+  <b>Recent tracking activity</b>
+</mj-text>
+<mj-table vertical-align="top" padding="10px 0 0 0">
+  {{for update in trackingUpdates}}
+  <tr>
+    <td width="20" style="padding-top: 4px; vertical-align: top;">
+      {{if for.first}}
+      <div style="width: 10px; height: 10px; border-radius: 50%; background: #731dd8; margin: 0 auto;"></div>
+      {{else}}
+      <div style="width: 10px; height: 10px; border-radius: 50%; background: #cab8ea; margin: 0 auto;"></div>
+      {{end}}
+    </td>
+    <td style="padding: 0 0 10px 10px; line-height: 18px;">
+      <b>{{update.details}}</b>
+      <br />
+      {{update.occurredAt}}
+    </td>
+  </tr>
+  {{end}}
+</mj-table>
+<mj-button href="{{shipyardUrl}}/packages/{{packageId}}" background-color="#731dd8" border-radius="10px" font-size="16px" padding-bottom="20px">
+  View more details
+</mj-button>
+<mj-divider border-width="1px" padding="5px 5px 25px 5px" border-color="#cccccc"></mj-divider>
+<mj-text line-height="18px" color="#777777">
+  This notification is based on the latest tracking event Shipyard collected for this package. If the package is not where you expected, check the carrier's tracking page for additional details.
+</mj-text>
+{{end}}
+
+{{include "_layout"}}

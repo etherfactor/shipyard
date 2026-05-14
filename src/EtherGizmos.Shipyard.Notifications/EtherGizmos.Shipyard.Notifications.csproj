@@ -5,8 +5,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Events\Base\_layout.mjml.html" />
+    <None Remove="Events\PackageDelivered\Templates\PackageDelivered.mjml.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Events\Base\Templates\_layout.mjml.html" />
+    <EmbeddedResource Include="Events\PackageDelivered\Templates\PackageDelivered.mjml.html" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="EtherGizmos.Common.Notifications.Email" Version="0.1.0-alpha.1" />
     <PackageReference Include="EtherGizmos.Common.Notifications.Webhook" Version="0.1.0-alpha.1" />
+    <PackageReference Include="Mjml.Net" Version="4.11.0" />
+    <PackageReference Include="Scriban" Version="7.2.0" />
   </ItemGroup>
 
   <ItemGroup>

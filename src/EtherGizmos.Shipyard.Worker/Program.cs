@@ -1,9 +1,7 @@
 using EtherGizmos.Common;
-using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Configuration;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Configuration;
-using EtherGizmos.Shipyard.Events;
 using EtherGizmos.Shipyard.Services;
 using EtherGizmos.Shipyard.Services.Api;
 using EtherGizmos.Shipyard.Services.Carriers;
@@ -134,29 +132,6 @@ builder.Services
 builder.Services
     .AddSingleton<ITrackingProviderFactory, TrackingProviderFactory>()
     .AddTransient<IRegexClassifier, RegexClassifier>();
-
-// Notifications
-builder.Services.AddNotifications(
-    builder.Configuration["Database:ConnectionId"]!,
-    builder.Configuration["MessageBroker:ConnectionId"]!,
-    opt =>
-    {
-        opt.AddWebhookChannel();
-
-        var emailConnectionId = builder.Configuration["Email:ConnectionId"];
-        if (emailConnectionId is not null)
-        {
-            opt.AddEmailChannel(emailConnectionId);
-        }
-
-        opt.AddNotification<PackageDeliveredEvent, PackageDeliveredRouter>(
-            "package.delivered",
-            evt =>
-            {
-                evt.Supports<PackageDeliveredEvent, EmailChannel, PackageDeliveredEmailFormatter>();
-                evt.Supports<PackageDeliveredEvent, WebhookChannel, PackageDeliveredWebhookFormatter>();
-            });
-    });
 
 // Hosted Services
 builder.Services.AddHostedService<QueueTrackingRequestBackgroundService>();
