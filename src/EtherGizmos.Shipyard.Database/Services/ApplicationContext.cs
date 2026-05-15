@@ -5,6 +5,7 @@ using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,7 @@ public class ApplicationContext : DbContext
 {
     private readonly IFilterContext _filterContext;
     private readonly IUserContext _userContext;
+    private readonly IEnumerable<IInterceptor> _interceptors;
 
     public IUserContext UserContext => _userContext;
 
@@ -57,10 +59,12 @@ public class ApplicationContext : DbContext
         DbContextOptions<ApplicationContext> options,
         [FromKeyedServices("Application")] IMigrationManager migrationManager,
         IFilterContext filterContext,
-        IUserContext userContext) : base(options)
+        IUserContext userContext,
+        IEnumerable<IInterceptor> interceptors) : base(options)
     {
         _filterContext = filterContext;
         _userContext = userContext;
+        _interceptors = interceptors;
 
         migrationManager.EnsureMigratedAsync()
             .GetAwaiter()
@@ -70,6 +74,7 @@ public class ApplicationContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.ReplaceService<IModelCacheKeyFactory, UserContextModelCacheKeyFactory>();
+        optionsBuilder.AddInterceptors(_interceptors);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -43,13 +43,13 @@ public class PackageDeliveredEmailFormatter
                 name = user.GivenName ?? user.Username,
                 carrierName = model.CarrierName,
                 deliveredAt = updates.LastOrDefault()?.OccurredAt.ToString(),
-                details = updates.LastOrDefault()?.Details,
+                details = updates.LastOrDefault()?.Description,
                 contents = model.Contents,
                 packageId = model.PackageId,
                 updates = model.Updates.Select(e => new
                 {
                     occurredAt = e.OccurredAt,
-                    details = e.Details,
+                    details = e.Description,
                 }),
                 shipyardUrl = "https://shipyard.example.com",
                 unsubscribeKey = "invalid",

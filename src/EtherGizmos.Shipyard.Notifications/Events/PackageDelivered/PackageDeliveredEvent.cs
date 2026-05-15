@@ -13,8 +13,6 @@ public record PackageDeliveredEvent : ShipyardEvent
 
     public required string? Contents { get; init; }
 
-    public required DateTimeOffset OccurredAt { get; init; }
-
     public required List<PackageDeliveredEventUpdate> Updates { get; init; }
 }
 
@@ -26,5 +24,5 @@ public record PackageDeliveredEventUpdate
 
     public required string? Location { get; init; }
 
-    public required string? Details { get; init; }
+    public required string? Description { get; init; }
 }

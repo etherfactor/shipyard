@@ -1,6 +1,9 @@
-﻿#pragma warning disable IDE0130
-using EtherGizmos.Common.Abstractions;
+﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Database;
+using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
+#pragma warning disable IDE0130
 namespace EtherGizmos.Shipyard.Events;
 
 public class PackageDeliveredRouter : IDomainEventRouter<PackageDeliveredEvent>
@@ -13,12 +16,32 @@ public class PackageDeliveredRouter : IDomainEventRouter<PackageDeliveredEvent>
         _uowFactory = uowFactory;
     }
 
-    public IAsyncEnumerable<string> FilterScopeAsync(
+    public async IAsyncEnumerable<string> FilterScopeAsync(
         PackageDeliveredEvent @event,
         IEnumerable<AudienceKey> audiences,
         IEnumerable<string> userIds,
-        CancellationToken cancellationToken = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        using var uow = _uowFactory.Create(new() { AmbientMode = UnitOfWorkAmbientMode.JoinAmbientOrCreate });
+        var aclRepo = uow.Repository<AclPackage>();
+
+        var packageIdList = audiences
+            .Where(e => "package".Equals(e.Kind, StringComparison.OrdinalIgnoreCase))
+            .Select(e => int.TryParse(e.Id, out var i) ? i : default);
+
+        var userIdList = userIds
+            .Select(e => Guid.TryParse(e, out var g) ? g : default)
+            .Where(e => e != default)
+            .ToHashSet();
+
+        var entries = await aclRepo.Data
+            .Where(e => userIdList.Contains(e.PrincipalUserId)
+                && packageIdList.Contains(e.PackageId))
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        foreach (var entry in entries)
+        {
+            yield return entry.PrincipalUserId.ToString();
+        }
     }
 }

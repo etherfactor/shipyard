@@ -263,6 +263,8 @@ builder.Services.AddNotifications(
         if (emailConnectionId is not null)
             opt.AddEmailChannel(emailConnectionId);
 
+        opt.AddShipyardExtractors();
+
         opt.AddNotification<PackageDeliveredEvent, PackageDeliveredRouter>(
             "package.delivered",
             evt =>
