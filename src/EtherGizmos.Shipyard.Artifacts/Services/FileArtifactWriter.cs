@@ -25,83 +25,76 @@ internal class FileArtifactWriter : IArtifactWriter
         _uowFactory = uowFactory;
     }
 
-    public Task<ArtifactDescriptor> WriteAsync(
+    public async Task<ArtifactDescriptor> WriteAsync(
         string container,
         ArtifactFormat type,
         string fileName,
         Stream data,
         CancellationToken cancellationToken = default)
     {
-        using var _ = ExecutionContext.SuppressFlow();
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        var result = Task.Run<ArtifactDescriptor>(async () =>
+        var id = Guid.NewGuid();
+
+        var useFileName = fileName;
+
+        if (!useFileName.EndsWith(type.Extension))
+            useFileName += $".{type.Extension}";
+
+        var recordFileName = useFileName;
+
+        if (type.ShouldGzip)
+            useFileName += ".gz";
+
+        useFileName = $"{id}-{useFileName}";
+
+        var basePath = _options.CurrentValue.BasePath;
+        var fullPath = Path.GetFullPath(Path.Combine(basePath, container, useFileName));
+
+        var directory = Path.GetDirectoryName(fullPath)!;
+        if (!Directory.Exists(directory))
         {
-            using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+            Directory.CreateDirectory(directory);
+        }
 
-            var id = Guid.NewGuid();
+        var artifact = new Artifact()
+        {
+            Uri = $"artifact://{container}/{id}",
+            ContentType = type.ContentType,
+            Bytes = 0,
+            FileName = recordFileName,
+            PhysicalPath = fullPath,
+        };
 
-            var useFileName = fileName;
+        using var uow = _uowFactory.Create(); //TODO: Use ambient unit of work, if possible, so all data saves together
+        var artifactRepo = uow.Repository<Artifact>();
 
-            if (!useFileName.EndsWith(type.Extension))
-                useFileName += $".{type.Extension}";
+        artifactRepo.Add(artifact);
 
-            var recordFileName = useFileName;
+        await uow.SaveChangesAsync(cancellationToken);
 
-            if (type.ShouldGzip)
-                useFileName += ".gz";
+        using var fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write);
+        var writeToTmp = fs as Stream;
 
-            useFileName = $"{id}-{useFileName}";
+        if (type.ShouldGzip)
+        {
+            var gz = new GZipStream(fs, CompressionLevel.SmallestSize);
+            writeToTmp = gz;
+        }
 
-            var basePath = _options.CurrentValue.BasePath;
-            var fullPath = Path.GetFullPath(Path.Combine(basePath, container, useFileName));
+        using var writeTo = writeToTmp;
 
-            var directory = Path.GetDirectoryName(fullPath)!;
-            if (!Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
+        await data.CopyToAsync(writeTo, cancellationToken);
 
-            var artifact = new Artifact()
-            {
-                Uri = $"artifact://{container}/{id}",
-                ContentType = type.ContentType,
-                Bytes = 0,
-                FileName = recordFileName,
-                PhysicalPath = fullPath,
-            };
+        writeTo.Dispose();
 
-            using var uow = _uowFactory.Create(); //TODO: Use ambient unit of work, if possible, so all data saves together
-            var artifactRepo = uow.Repository<Artifact>();
+        var info = new FileInfo(fullPath);
+        artifact.Bytes = info.Length;
 
-            artifactRepo.Add(artifact);
+        await uow.SaveChangesAsync(cancellationToken);
 
-            await uow.SaveChangesAsync(cancellationToken);
+        scope.Complete();
 
-            using var fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write);
-            var writeToTmp = fs as Stream;
-
-            if (type.ShouldGzip)
-            {
-                var gz = new GZipStream(fs, CompressionLevel.SmallestSize);
-                writeToTmp = gz;
-            }
-
-            using var writeTo = writeToTmp;
-
-            await data.CopyToAsync(writeTo, cancellationToken);
-
-            writeTo.Dispose();
-
-            var info = new FileInfo(fullPath);
-            artifact.Bytes = info.Length;
-
-            await uow.SaveChangesAsync(cancellationToken);
-
-            scope.Complete();
-
-            return new(new(artifact.Uri), artifact.ContentType, recordFileName, artifact.Bytes);
-        }).Result;
-
-        return Task.FromResult(result);
+        return new(new(artifact.Uri), artifact.ContentType, recordFileName, artifact.Bytes);
     }
 }

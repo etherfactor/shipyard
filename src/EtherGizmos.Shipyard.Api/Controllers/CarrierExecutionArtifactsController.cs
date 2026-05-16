@@ -20,18 +20,15 @@ public class CarrierExecutionArtifactsController : ControllerBase
     private readonly IUnitOfWorkFactory _uowFactory;
     private readonly IArtifactReader _artifactReader;
     private readonly IArtifactWriter _artifactWriter;
-    private readonly IUnitOfWorkAccessor _uowAccessor;
 
     public CarrierExecutionArtifactsController(
         IUnitOfWorkFactory uowFactory,
         IArtifactReader artifactReader,
-        IArtifactWriter artifactWriter,
-        IUnitOfWorkAccessor uowAccessor)
+        IArtifactWriter artifactWriter)
     {
         _uowFactory = uowFactory;
         _artifactReader = artifactReader;
         _artifactWriter = artifactWriter;
-        _uowAccessor = uowAccessor;
     }
 
     [ApiVersion(1.0)]
@@ -107,7 +104,6 @@ public class CarrierExecutionArtifactsController : ControllerBase
             Bytes = descriptor.Bytes,
         });
 
-        var a = _uowAccessor;
         await uow.SaveChangesAsync(cancellationToken);
 
         return StatusCode(201, new ArtifactResponseDTO()
