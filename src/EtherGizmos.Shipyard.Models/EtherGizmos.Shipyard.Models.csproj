@@ -8,6 +8,7 @@
     <PackageReference Include="Asp.Versioning.Abstractions" />
     <PackageReference Include="AutoMapper" />
     <PackageReference Include="EtherGizmos.Common.Data.UnitOfWork" />
+    <PackageReference Include="EtherGizmos.Common.Notifications" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" />

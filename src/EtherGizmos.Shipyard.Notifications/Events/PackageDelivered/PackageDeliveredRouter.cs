@@ -1,5 +1,6 @@
 ﻿using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Database.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 
@@ -22,6 +23,9 @@ public class PackageDeliveredRouter : IDomainEventRouter<PackageDeliveredEvent>
         IEnumerable<string> userIds,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        if (!audiences.Any()) yield break;
+        if (!userIds.Any()) yield break;
+
         using var uow = _uowFactory.Create(new() { AmbientMode = UnitOfWorkAmbientMode.JoinOrCreateAmbient });
         var aclRepo = uow.Repository<AclPackage>();
 
@@ -36,7 +40,8 @@ public class PackageDeliveredRouter : IDomainEventRouter<PackageDeliveredEvent>
 
         var entries = await aclRepo.Data
             .Where(e => userIdList.Contains(e.PrincipalUserId)
-                && packageIdList.Contains(e.PackageId))
+                && packageIdList.Contains(e.PackageId)
+                && e.PermissionId == PermissionId.Read)
             .ToListAsync(cancellationToken: cancellationToken);
 
         foreach (var entry in entries)

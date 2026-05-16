@@ -18,6 +18,7 @@
     <PackageVersion Include="EtherGizmos.Common.Data.PostgreSql" Version="0.1.0-alpha.3" />
     <PackageVersion Include="EtherGizmos.Common.Data.UnitOfWork" Version="0.1.0-alpha.3" />
     <PackageVersion Include="EtherGizmos.Common.Messaging.RabbitMQ" Version="0.1.0-alpha.3" />
+    <PackageVersion Include="EtherGizmos.Common.Notifications" Version="0.1.0-alpha.3" />
     <PackageVersion Include="EtherGizmos.Common.Notifications.Email" Version="0.1.0-alpha.3" />
     <PackageVersion Include="EtherGizmos.Common.Notifications.Webhook" Version="0.1.0-alpha.3" />
     <PackageVersion Include="FluentMigrator.Runner.Postgres" Version="8.0.1" />

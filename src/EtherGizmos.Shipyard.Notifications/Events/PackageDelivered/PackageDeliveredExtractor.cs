@@ -17,14 +17,13 @@ internal class PackageDeliveredExtractor : IDomainEventExtractor
         IUnitOfWork unitOfWork,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        if (entry is not EntityEntry<Package> typed)
-            yield break;
-
-        var property = typed.Property(e => e.LastStatusTypeId);
-        if (property.CurrentValue == StatusTypeId.Delivered
-            && property.CurrentValue != property.OriginalValue)
+        var property = entry.Property(nameof(Package.LastStatusTypeId));
+        var current = property.CurrentValue as int?;
+        var original = property.OriginalValue as int?;
+        if (current == StatusTypeId.Delivered
+            && current != original)
         {
-            var package = (Package)typed.CurrentValues.ToObject();
+            var package = (Package)entry.CurrentValues.ToObject();
             var @event = new PackageDeliveredEvent()
             {
                 ShipyardUrl = "https://shipyard.ethergizmos.com",
