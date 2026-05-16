@@ -5,12 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Asp.Versioning.Abstractions" Version="8.1.0" />
-    <PackageReference Include="AutoMapper" Version="16.1.1" />
-    <PackageReference Include="EtherGizmos.Common.Data.UnitOfWork" Version="0.1.0-alpha.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.3.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.9" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="10.0.1" />
+    <PackageReference Include="Asp.Versioning.Abstractions" />
+    <PackageReference Include="AutoMapper" />
+    <PackageReference Include="EtherGizmos.Common.Data.UnitOfWork" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Filters" />
   </ItemGroup>
 
   <ItemGroup>

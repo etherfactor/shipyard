@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EtherGizmos.Common.Messaging.RabbitMQ" Version="0.1.0-alpha.1" />
+    <PackageReference Include="EtherGizmos.Common.Messaging.RabbitMQ" />
   </ItemGroup>
 
   <ItemGroup>

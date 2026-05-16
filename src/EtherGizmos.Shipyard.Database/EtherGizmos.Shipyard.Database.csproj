@@ -1,17 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Database", ""))</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EtherGizmos.Common.Data.Migrations" Version="0.1.0-alpha.1" />
-    <PackageReference Include="EtherGizmos.Common.Data.UnitOfWork" Version="0.1.0-alpha.1" />
-    <PackageReference Include="EtherGizmos.Extensions.DependencyInjection.ChildContainers" Version="0.1.0-ci.2" />
-    <PackageReference Include="FluentMigrator.Runner.Postgres" Version="8.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="10.0.7" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
+    <PackageReference Include="EtherGizmos.Common.Composition.ChildContainers" />
+    <PackageReference Include="EtherGizmos.Common.Data.Migrations" />
+    <PackageReference Include="EtherGizmos.Common.Data.UnitOfWork" />
+    <PackageReference Include="FluentMigrator.Runner.Postgres" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
   </ItemGroup>
 
   <ItemGroup>

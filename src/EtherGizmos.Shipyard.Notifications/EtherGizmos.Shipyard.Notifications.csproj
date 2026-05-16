@@ -15,10 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EtherGizmos.Common.Notifications.Email" Version="0.1.0-alpha.1" />
-    <PackageReference Include="EtherGizmos.Common.Notifications.Webhook" Version="0.1.0-alpha.1" />
-    <PackageReference Include="Mjml.Net" Version="4.11.0" />
-    <PackageReference Include="Scriban" Version="7.2.0" />
+    <PackageReference Include="EtherGizmos.Common.Notifications.Email" />
+    <PackageReference Include="EtherGizmos.Common.Notifications.Webhook" />
+    <PackageReference Include="Mjml.Net" />
+    <PackageReference Include="Scriban" />
   </ItemGroup>
 
   <ItemGroup>

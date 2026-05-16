@@ -22,7 +22,7 @@ public class PackageDeliveredRouter : IDomainEventRouter<PackageDeliveredEvent>
         IEnumerable<string> userIds,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        using var uow = _uowFactory.Create(new() { AmbientMode = UnitOfWorkAmbientMode.JoinAmbientOrCreate });
+        using var uow = _uowFactory.Create(new() { AmbientMode = UnitOfWorkAmbientMode.JoinOrCreateAmbient });
         var aclRepo = uow.Repository<AclPackage>();
 
         var packageIdList = audiences
