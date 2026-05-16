@@ -12,7 +12,7 @@ internal class LiquidTemplateLoader : ITemplateLoader
     public string? Load(TemplateContext context, SourceSpan callerSpan, string templatePath)
     {
         var assembly = typeof(LiquidTemplateLoader).Assembly;
-        using var stream = assembly.GetManifestResourceStream($"EtherGizmos.Common.Events.Base.{templatePath}");
+        using var stream = assembly.GetManifestResourceStream($"EtherGizmos.Shipyard.Events.Base.Templates.{templatePath}");
         if (stream is null)
             return null;
 
@@ -23,7 +23,7 @@ internal class LiquidTemplateLoader : ITemplateLoader
     public async ValueTask<string?> LoadAsync(TemplateContext context, SourceSpan callerSpan, string templatePath)
     {
         var assembly = typeof(LiquidTemplateLoader).Assembly;
-        using var stream = assembly.GetManifestResourceStream($"EtherGizmos.Common.Events.Base.{templatePath}");
+        using var stream = assembly.GetManifestResourceStream($"EtherGizmos.Shipyard.Events.Base.Templates.{templatePath}");
         if (stream is null)
             return null;
 

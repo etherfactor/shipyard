@@ -1,10 +1,11 @@
 ﻿using Mjml.Net;
 using Scriban;
 using Scriban.Runtime;
+using System.Text.RegularExpressions;
 
 namespace EtherGizmos.Shipyard.Services;
 
-internal static class LiquidMjmlRenderer
+internal static partial class LiquidMjmlRenderer
 {
     public static string Render(
         string templateName,
@@ -12,16 +13,19 @@ internal static class LiquidMjmlRenderer
     {
         var liquid = LoadTemplate(templateName);
         var mjml = RenderLiquid(liquid, model);
-        var final = RenderMjml(mjml);
+        var full = RenderMjml(mjml);
 
-        return final;
+        var reduced = ExtraWhitespace()
+            .Replace(full, " ");
+
+        return reduced;
     }
 
     private static string LoadTemplate(
         string templateName)
     {
         var assembly = typeof(LiquidTemplateLoader).Assembly;
-        using var stream = assembly.GetManifestResourceStream($"EtherGizmos.Common.Events.{templateName}.mjml.html")!;
+        using var stream = assembly.GetManifestResourceStream($"EtherGizmos.Shipyard.Events.{templateName}.mjml.html")!;
         using var reader = new StreamReader(stream);
         var liquid = reader.ReadToEnd();
 
@@ -52,4 +56,7 @@ internal static class LiquidMjmlRenderer
 
         return html;
     }
+
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex ExtraWhitespace();
 }

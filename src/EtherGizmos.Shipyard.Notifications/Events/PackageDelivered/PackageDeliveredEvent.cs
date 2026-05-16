@@ -11,6 +11,8 @@ public record PackageDeliveredEvent : ShipyardEvent
 
     public required string TrackingNumber { get; init; }
 
+    public required string? TrackingUrl { get; init; }
+
     public required string? Contents { get; init; }
 
     public required List<PackageDeliveredEventUpdate> Updates { get; init; }

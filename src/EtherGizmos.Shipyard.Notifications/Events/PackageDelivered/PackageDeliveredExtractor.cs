@@ -1,7 +1,9 @@
 ﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Common.Configuration;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.Options;
 using System.Runtime.CompilerServices;
 
 #pragma warning disable IDE0130
@@ -9,8 +11,16 @@ namespace EtherGizmos.Shipyard.Events;
 
 internal class PackageDeliveredExtractor : IDomainEventExtractor
 {
+    private readonly IOptionsMonitor<WebUIOptions> _selfOptions;
+
     public bool CanHandle(EntityEntry entry)
         => entry.Metadata.ClrType == typeof(Package);
+
+    public PackageDeliveredExtractor(
+        IOptionsMonitor<WebUIOptions> selfOptions)
+    {
+        _selfOptions = selfOptions;
+    }
 
     public async IAsyncEnumerable<DomainEventEmission> ExtractAsync(
         EntityEntry entry,
@@ -23,16 +33,18 @@ internal class PackageDeliveredExtractor : IDomainEventExtractor
         if (current == StatusTypeId.Delivered
             && current != original)
         {
-            var package = (Package)entry.CurrentValues.ToObject();
+            var uri = new Uri(_selfOptions.CurrentValue.BaseUrl);
+            var package = (Package)entry.Entity;
             var @event = new PackageDeliveredEvent()
             {
-                ShipyardUrl = "https://shipyard.ethergizmos.com",
+                ShipyardUrl = $"{uri.Scheme}://{uri.Authority}",
                 UnsubscribeKey = "invalid",
 
                 PackageId = package.Id,
                 CarrierId = package.CarrierId,
                 CarrierName = package.Carrier.Name,
                 TrackingNumber = package.TrackingNumber,
+                TrackingUrl = TryGetTrackingUrl(package),
                 Contents = package.Contents,
                 Updates = [.. package.TrackingUpdates.Select(e => new PackageDeliveredEventUpdate()
                 {
@@ -47,5 +59,21 @@ internal class PackageDeliveredExtractor : IDomainEventExtractor
 
             yield return new(@event, [audience]);
         }
+    }
+
+    private string? TryGetTrackingUrl(
+        Package package)
+    {
+        foreach (var step in package.Carrier.Steps)
+        {
+            if (step.StepType != StepType.Navigate)
+                continue;
+
+            step.Payload.TryGetValue("url", out var test);
+            if (test is string url)
+                return url.Replace("{trackingNumber}", package.TrackingNumber);
+        }
+
+        return null;
     }
 }

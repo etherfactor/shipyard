@@ -52,6 +52,12 @@ builder.Configuration
     .AddModularConfigurations(builder.Configuration);
 
 builder.Services
+    .AddOptions<WebUIOptions>()
+    .Bind(builder.Configuration.GetSection("WebUI"))
+    .ValidateOnStart()
+    .ValidateDataAnnotations();
+
+builder.Services
     .AddOptions<ConnectionReferenceOptions>("Database")
     .Bind(builder.Configuration.GetSection("Database"))
     .ValidateOnStart()
@@ -272,6 +278,13 @@ builder.Services.AddNotifications(
                 evt.Supports<PackageDeliveredEvent, EmailChannel, PackageDeliveredEmailFormatter>();
                 evt.Supports<PackageDeliveredEvent, WebhookChannel, PackageDeliveredWebhookFormatter>();
             });
+    });
+
+builder.Services
+    .AddKeyedTransient(NotificationChannels.Email.Key, (provider, _) =>
+    {
+        var resolver = provider.GetRequiredService<IConnectionResolver>();
+        return resolver.CreateEmailSender(builder.Configuration["Email:ConnectionId"]!);
     });
 
 // Health

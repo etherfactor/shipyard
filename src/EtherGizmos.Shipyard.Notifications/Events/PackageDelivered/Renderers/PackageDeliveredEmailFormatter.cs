@@ -29,7 +29,7 @@ public class PackageDeliveredEmailFormatter
         var userId = new Guid(notification.NotificationSubscription.UserId);
         var user = userRepo.Data.Single(e => e.Id == userId);
 
-        var updates = model.Updates.OrderByDescending(e => e.OccurredAt);
+        var updates = model.Updates.OrderBy(e => e.OccurredAt);
 
         var subject = "Package Delivered";
 
@@ -38,26 +38,27 @@ public class PackageDeliveredEmailFormatter
             new
             {
                 subject = subject,
-                trackingUrl = string.Empty,
                 trackingNumber = model.TrackingNumber,
+                trackingUrl = model.TrackingUrl,
                 name = user.GivenName ?? user.Username,
                 carrierName = model.CarrierName,
                 deliveredAt = updates.LastOrDefault()?.OccurredAt.ToString(),
                 details = updates.LastOrDefault()?.Description,
                 contents = model.Contents,
                 packageId = model.PackageId,
-                updates = model.Updates.Select(e => new
+                updates = updates.Reverse().Take(5).Select(e => new
                 {
                     occurredAt = e.OccurredAt,
                     details = e.Description,
                 }),
-                shipyardUrl = "https://shipyard.example.com",
+                shipyardUrl = model.ShipyardUrl,
                 unsubscribeKey = "invalid",
             });
 
         var message = new EmailMessage()
         {
             Subject = subject,
+            From = new("shipyard@localhost"),
             To = [new(user.EmailAddress ?? "test@domain.com")],
             HtmlBody = html,
         };

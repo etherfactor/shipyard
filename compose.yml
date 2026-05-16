@@ -52,6 +52,7 @@ services:
       SHIPYARD_BOOTSTRAP_USER: "${SHIPYARD_BOOTSTRAP_USER:-admin}"
       SHIPYARD_BOOTSTRAP_PASSWORD: "${SHIPYARD_BOOTSTRAP_PASSWORD:-password}"
       # SHIPYARD_BOOTSTRAP_FORCE: true
+      WebUI__BaseUrl: ${SHIPYARD_WEB_HOST:-http://localhost:7447}
       Database__ConnectionId: ComposeDb
       MessageBroker__ConnectionId: ComposeAmqp
       Artifacts__BasePath: /opt/artifacts

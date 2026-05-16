@@ -8,11 +8,11 @@ namespace EtherGizmos.Shipyard.Services.Health;
 
 internal class DatabaseHealthCheck : IHealthCheck
 {
-    private readonly IOptions<ConnectionReferenceOptions> _dbOptions;
+    private readonly IOptionsMonitor<ConnectionReferenceOptions> _dbOptions;
     private readonly IConnectionResolver _connectionResolver;
 
     public DatabaseHealthCheck(
-        IOptions<ConnectionReferenceOptions> dbOptions,
+        IOptionsMonitor<ConnectionReferenceOptions> dbOptions,
         IConnectionResolver connectionResolver)
     {
         _dbOptions = dbOptions;
@@ -23,7 +23,7 @@ internal class DatabaseHealthCheck : IHealthCheck
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {
-        var dbOptions = _dbOptions.Value;
+        var dbOptions = _dbOptions.Get("Database");
 
         try
         {

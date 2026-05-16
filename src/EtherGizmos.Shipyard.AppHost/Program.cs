@@ -14,8 +14,12 @@ rabbitmq.WithManagementPlugin();
 var selenium = builder.AddContainer("selenium", "selenium/standalone-chromium:137.0");
 selenium.WithHttpEndpoint(targetPort: 4444, name: "endpoint");
 
+var mailpit = builder.AddMailPit("mailpit");
+
 var api = builder.AddProject<Projects.EtherGizmos_Shipyard_Api>("api");
+api.WithHttpHealthCheck(path: "/health");
 api.WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development");
+api.WithEnvironment("WebUI:BaseUrl", "https://localhost:53906");
 
 api.WithEnvironment("Database:ConnectionId", "AspireDb");
 api.WithEnvironment("Connections:AspireDb:Type", "Database");
@@ -25,13 +29,17 @@ api.WithEnvironment("MessageBroker:ConnectionId", "AspireBus");
 api.WithEnvironment("Connections:AspireBus:Type", "MessageBroker");
 api.WaitFor(rabbitmq).WithReference(rabbitmq, connectionName: "Connections:AspireBus:RabbitMQ:ConnectionString");
 
+api.WithEnvironment("Email:ConnectionId", "AspireEmail");
+api.WithEnvironment("Connections:AspireEmail:Type", "Email");
+api.WaitFor(mailpit).WithEnvironment("Connections:AspireEmail:Smtp:Host", () => mailpit.GetEndpoint("smtp").Host)
+    .WithEnvironment("Connections:AspireEmail:Smtp:Port", () => mailpit.GetEndpoint("smtp").Port.ToString())
+    .WithEnvironment("Connections:AspireEmail:Smtp:UseSsl", "false");
+
 var worker = builder.AddProject<Projects.EtherGizmos_Shipyard_Worker>("worker");
 worker.WithEnvironment("DOTNET_ENVIRONMENT", "Development");
 worker.WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development");
 
-worker.WithEnvironment("Database:ConnectionId", "AspireDb");
-worker.WithEnvironment("Connections:AspireDb:Type", "Database");
-worker.WaitFor(database).WithReference(database, connectionName: "Connections:AspireDb:PostgreSql:ConnectionString");
+worker.WaitFor(api);
 
 worker.WithEnvironment("MessageBroker:ConnectionId", "AspireBus");
 worker.WithEnvironment("Connections:AspireBus:Type", "MessageBroker");

@@ -21,7 +21,7 @@ public class DynamicBagDTOConfiguration : IModelConfiguration
         {
             /* Begin Audit */
             /*  End Audit  */
-            
+
             //complex.HasDynamicProperties(e => e.Data);
         }
     }
