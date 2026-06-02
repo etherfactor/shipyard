@@ -1,0 +1,63 @@
+<!-- Header -->
+<div class="row">
+  <div class="col-12 mt-3">
+
+    <detail-header text="Notifications"
+                   subtext="View your received notifications." />
+
+  </div>
+</div>
+
+<!-- List -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-mailbox"
+                text="Notification Inbox"
+                [buttons]="notificationButtons$$()">
+
+      <div class="list-group mt-3">
+        <!--<div class="list-group-item" style="background-color: color-mix(in srgb, rgba(var(--bs-primary-rgb), 0.1), var(--bs-list-group-bg)); border-left: 5px solid var(--bs-primary);">
+          <div>
+            <div class="row">
+              <div class="col-auto d-flex align-items-center">
+                <span class="bi bi-circle-fill text-center text-primary" style="font-size: 0.5rem;"></span>
+              </div>
+              <div class="col">
+                <div class="fw-semibold">Package is out for delivery</div>
+                <div class="small text-muted">Tracking #940011189922385622 — USPS expects delivery today.</div>
+                <a [routerLink]="['/packages', 1]" class="small">
+                  View package
+                  <span class="bi bi-box-arrow-in-up-right"></span>
+                </a>
+              </div>
+              <div class="col-auto">
+                <button class="btn btn-primary btn-sm">
+                  <span class="bi bi-envelope-open"></span>
+                </button>
+              </div>
+              <div class="col-auto text-end">
+                <div class="badge text-bg-primary">Unread</div>
+                <div>10:42 AM</div>
+              </div>
+            </div>
+          </div>
+        </div>-->
+        <app-notification-row />
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <div class="compact-muted">Showing 3 of 18 notifications</div>
+        <nav aria-label="Notification pages">
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item disabled"><a class="page-link">Previous</a></li>
+            <li class="page-item active"><a class="page-link">1</a></li>
+            <li class="page-item"><a class="page-link">2</a></li>
+            <li class="page-item"><a class="page-link">3</a></li>
+            <li class="page-item"><a class="page-link">Next</a></li>
+          </ul>
+        </nav>
+      </div>
+
+    </detail-box>
+  </div>
+</div>

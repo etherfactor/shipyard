@@ -1,0 +1,15 @@
+:host {
+  &.unread {
+    box-shadow: inset 4px 0 0 var(--bs-primary);
+  }
+}
+
+.notification-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(var(--bs-primary-rgb), 0.25);
+  color: var(--bs-primary);
+}

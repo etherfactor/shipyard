@@ -27,7 +27,7 @@ internal class DatabaseHealthCheck : IHealthCheck
 
         try
         {
-            var dbConnection = _connectionResolver.CreateDbConnection(dbOptions.ConnectionId);
+            using var dbConnection = _connectionResolver.CreateDbConnection(dbOptions.ConnectionId);
 
             await dbConnection.OpenAsync(cancellationToken);
 

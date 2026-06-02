@@ -37,6 +37,32 @@
 
   </div>
 
+  <!-- Notifications -->
+  <div class="px-3 pt-3 pb-1 text-uppercase text-muted small fw-semibold">
+    Notifications
+  </div>
+
+  <div class="list-group list-group-flush">
+
+    <!-- Notifications -->
+    <a [routerLink]="['/notifications']"
+       routerLinkActive="active"
+       class="list-group-item list-group-item-action d-flex align-items-center"
+       (click)="dismiss(0)">
+      <i class="bi bi-mailbox-flag me-2"></i>
+      Inbox
+    </a>
+
+    <!-- Subscriptions -->
+    <a [routerLink]="['/notifications/subscriptions']"
+       class="list-group-item list-group-item-action d-flex align-items-center"
+       (click)="dismiss(0)">
+      <i class="bi bi-bell me-2"></i>
+      Subscriptions
+    </a>
+
+  </div>
+
   <!-- Configuration -->
   <div class="px-3 pt-3 pb-1 text-uppercase text-muted small fw-semibold">
     Configuration
@@ -107,22 +133,6 @@
       Roles
     </a>
     }
-
-    <!-- Notification Logs -->
-    <!--<a [routerLink]="['/notifications']" class="list-group-item list-group-item-action d-flex align-items-center" (click)="dismiss(0)">
-      <i class="bi bi-bell me-2"></i>
-      Notifications
-    </a>-->
-    <!-- Settings -->
-    <!--<a [routerLink]="['/settings']" class="list-group-item list-group-item-action d-flex align-items-center" (click)="dismiss(0)">
-      <i class="bi bi-gear me-2"></i>
-      Settings
-    </a>-->
-    <!-- System/Debug Info -->
-    <!--<a [routerLink]="['/system']" class="list-group-item list-group-item-action d-flex align-items-center" (click)="dismiss(0)">
-      <i class="bi bi-hdd-network me-2"></i>
-      System Info
-    </a>-->
 
   </div>
 

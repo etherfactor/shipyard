@@ -3,6 +3,7 @@ using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Models;
 using EtherGizmos.Shipyard.Api;
 using EtherGizmos.Shipyard.Swagger;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
@@ -10,6 +11,7 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace EtherGizmos.Shipyard.Controllers;
 
+[Authorize]
 public class NotificationSubscriptionsController : AutoODataController
 {
     private const string BaseRoute = "api/v{version:apiVersion}/notificationSubscriptions";
