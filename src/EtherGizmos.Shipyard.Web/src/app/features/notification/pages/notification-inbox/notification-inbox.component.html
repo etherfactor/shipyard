@@ -8,12 +8,45 @@
   </div>
 </div>
 
+<!-- Search -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-funnel"
+                text="Notification Search">
+      <div class="row align-items-end">
+        <div class="col-md-3 mt-3">
+          <label>State</label>
+          <select class="form-select">
+            <option>Unread</option>
+            <option>All</option>
+          </select>
+        </div>
+        <div class="col-md-3 mt-3">
+          <label>Event type</label>
+          <select class="form-select">
+            <option>All</option>
+            <option>Package delivered</option>
+          </select>
+        </div>
+        <div class="col-md-3 mt-3">
+          <label>Contents</label>
+          <input type="text" class="form-control" placeholder="Tracking # or contents" />
+        </div>
+        <div class="col-md-3 mt-3">
+          <button class="btn btn-primary w-100">
+            Search
+          </button>
+        </div>
+      </div>
+    </detail-box>
+  </div>
+</div>
+
 <!-- List -->
 <div class="row">
   <div class="col-12 mt-3">
     <detail-box icon="bi-mailbox"
-                text="Notification Inbox"
-                [buttons]="notificationButtons$$()">
+                text="Notification Inbox">
 
       <div class="list-group mt-3">
         <!--<div class="list-group-item" style="background-color: color-mix(in srgb, rgba(var(--bs-primary-rgb), 0.1), var(--bs-list-group-bg)); border-left: 5px solid var(--bs-primary);">
@@ -42,7 +75,7 @@
             </div>
           </div>
         </div>-->
-        <app-notification-row />
+        <app-notification-row [notification]="notification" />
       </div>
 
       <div class="d-flex justify-content-between align-items-center mt-3">

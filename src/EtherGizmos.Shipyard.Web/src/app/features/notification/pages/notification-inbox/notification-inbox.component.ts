@@ -1,8 +1,10 @@
-import { Component, computed } from "@angular/core";
+import { Component } from "@angular/core";
 import { RouterModule } from "@angular/router";
-import { DetailBoxButton, DetailBoxComponent } from "../../../../shared/components/detail-box/detail-box.component";
+import { DateTime } from "luxon";
+import { DetailBoxComponent } from "../../../../shared/components/detail-box/detail-box.component";
 import { DetailHeaderComponent } from "../../../../shared/components/detail-header/detail-header.component";
 import { NotificationRowComponent } from "../../components/notification-row/notification-row.component";
+import { Notification } from "../../models/notification";
 
 @Component({
   selector: "app-notification-inbox",
@@ -16,21 +18,10 @@ import { NotificationRowComponent } from "../../components/notification-row/noti
   styleUrl: "./notification-inbox.component.scss",
 })
 export class NotificationInboxComponent {
-  readonly notificationButtons$$ = computed<DetailBoxButton[]>(() => {
-    const buttons: DetailBoxButton[] = [];
-
-    buttons.push({
-      color: "primary",
-      text: "Unread",
-      callback: () => { },
-    });
-
-    buttons.push({
-      color: "outline-primary",
-      text: "All",
-      callback: () => { },
-    });
-
-    return buttons;
-  });
+  notification: Notification = {
+    id: 1,
+    createdAt: DateTime.now(),
+    notificationSubscriptionId: 1,
+    payload: {},
+  };
 }

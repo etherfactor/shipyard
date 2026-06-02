@@ -8,6 +8,5 @@
     <BuildOutputFolder>$(MSBuildProjectDirectory)\dist\EtherGizmos.Shipyard.Web\browser\</BuildOutputFolder>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="src\app\features\app\" />
   </ItemGroup>
 </Project>

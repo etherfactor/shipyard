@@ -7,7 +7,7 @@ export const NotificationZ = z.object({
   createdAt: DateTimeZ,
   sentAt: DateTimeZ.nullish(),
   notificationSubscriptionId: z.number().int(),
-  notificationSubscription: z.lazy(() => NotificationSubscriptionZ),
+  notificationSubscription: z.lazy(() => NotificationSubscriptionZ).nullish(),
   //isRead: z.boolean(),
   payload: z.object({}).passthrough(),
 });
