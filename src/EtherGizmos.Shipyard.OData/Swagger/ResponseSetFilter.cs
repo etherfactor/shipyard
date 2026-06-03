@@ -1,7 +1,7 @@
+using EtherGizmos.Shipyard.Extensions;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace EtherGizmos.Shipyard.Swagger;
@@ -29,7 +29,7 @@ public class ResponseSetFilter : IOperationFilter
                 if (example is null)
                     continue;
 
-                if (example is not null && IsODataError(example))
+                if (example is not null && !example.IsODataError())
                 {
                     var cloned = example.DeepClone();
 
@@ -76,17 +76,5 @@ public class ResponseSetFilter : IOperationFilter
                 }
             }
         }
-    }
-
-    private bool IsODataError(
-        JsonNode node)
-    {
-        if (node.GetValueKind() != JsonValueKind.Object)
-            return false;
-
-        var obj = node.AsObject();
-        var error = obj["error"];
-        return error is not null
-            && error["code"] is not null;
     }
 }

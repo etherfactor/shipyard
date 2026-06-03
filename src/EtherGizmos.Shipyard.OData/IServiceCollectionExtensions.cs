@@ -115,6 +115,8 @@ public static class IServiceCollectionExtensions
                 opt.OperationFilter<OnlyJsonOperationFilter>();
                 opt.ExampleFilters();
                 opt.OperationFilter<ResponseSetFilter>();
+                opt.OperationFilter<ODataContextOperationFilter>();
+                opt.OperationFilter<ODataParametersOperationFilter>();
             });
 
         return @this;
