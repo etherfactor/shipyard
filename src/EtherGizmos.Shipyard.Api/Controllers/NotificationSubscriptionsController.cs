@@ -16,13 +16,16 @@ public class NotificationSubscriptionsController : AutoODataController
 {
     private const string BaseRoute = "api/v{version:apiVersion}/notificationSubscriptions";
 
+    private readonly INotificationCatalogProvider _catalogProvider;
     private readonly IUserContext _userContext;
 
     public NotificationSubscriptionsController(
         IServiceProvider serviceProvider,
+        INotificationCatalogProvider catalogProvider,
         IUserContext userContext)
         : base(serviceProvider)
     {
+        _catalogProvider = catalogProvider;
         _userContext = userContext;
     }
 
