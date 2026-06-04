@@ -35,8 +35,14 @@ internal class PackageDeliveredExtractor : IDomainEventExtractor
         {
             var uri = new Uri(_selfOptions.CurrentValue.BaseUrl);
             var package = (Package)entry.Entity;
+
+            var lastUpdate = package.TrackingUpdates.OrderBy(e => e.OccurredAt).LastOrDefault();
+            var message = $"{package.Carrier.Name} package containing {package.Contents} was delivered with status: {lastUpdate?.Description}."
+                .Replace("..", ".");
+            
             var @event = new PackageDeliveredEvent()
             {
+                Message = message,
                 ShipyardUrl = $"{uri.Scheme}://{uri.Authority}",
                 UnsubscribeKey = "invalid",
 

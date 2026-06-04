@@ -1,1 +1,125 @@
-<p>notification-subscription-list works!</p>
+<!-- Header -->
+<div class="row">
+  <div class="col-12 mt-3">
+
+    <detail-header text="Notification Subscriptions"
+                   subtext="Configure the events Shipyard should notify you about." />
+
+  </div>
+</div>
+
+<!-- Table -->
+<div class="row">
+  <div class="col-12 mt-3">
+
+    <detail-box icon="bi-broadcast"
+                text="Notification Subscriptions List">
+      <div class="mt-3">
+        <app-table [data]="records" [minRows]="perPage" [isLoading]="isLoading()"
+                   [sort]="activeSort" (sortChange)="onSortChange($event)"
+                   (filterChange)="onFilterChange($event)">
+          <ng-template #headers>
+            <th app-table-header="eventType" class="text-nowrap"
+                type="string"
+                [sortable]="true"
+                [filterable]="true"
+                [operators]="['equals', 'not_equals']"
+                [enumValues]="eventEnum$$()">
+              Event
+            </th>
+            <th app-table-header="channelKey" class="text-nowrap"
+                type="string"
+                [sortable]="true"
+                [filterable]="true"
+                [operators]="['equals', 'not_equals']"
+                [enumValues]="channelEnum$$()">
+              Channel
+            </th>
+            <th app-table-header="scheduleType" class="text-nowrap"
+                type="number"
+                [sortable]="true"
+                [filterable]="true"
+                [operators]="['equals', 'not_equals']"
+                [enumValues]="scheduleEnum$$()">
+              Schedule
+            </th>
+            <th app-table-header="isActive"
+                type="boolean"
+                [sortable]="true"
+                [filterable]="true"
+                [operators]="['equals', 'not_equals']"
+                [enumValues]="isActiveEnum$$()">
+              Is active?
+            </th>
+            <th class="text-nowrap">
+              Actions
+            </th>
+          </ng-template>
+
+          <ng-template #rows let-row>
+            <td class="text-nowrap">
+              @switch (row.eventType) {
+              @case ('package.delivered') {
+              <span class="bi bi-box-seam text-success"></span> Package Delivered
+              }
+              @default {
+              {{row.eventType}}
+              }
+              }
+            </td>
+            <td class="text-nowrap">
+              @switch (row.channelKey) {
+              @case ('email') {
+              <span class="bi bi-envelope text-success"></span> Email
+              }
+              @case ('webpush') {
+              <span class="bi bi-phone text-info"></span> Web Push
+              }
+              @case ('webhook') {
+              <span class="bi bi-globe text-warning"></span> Webhook
+              }
+              @default {
+              {{row.channelKey}}
+              }
+              }
+            </td>
+            <td class="text-nowrap">
+              @switch (row.scheduleType) {
+              @case ('immediate') {
+              <span class="bi bi-lightning text-warning"></span> Immediate
+              }
+              @case ('digest') {
+              <span class="bi bi-clock-history text-info"></span> Digest
+              }
+              @default {
+              {{row.scheduleType}}
+              }
+              }
+            </td>
+            <td class="text-nowrap">
+              @if (row.isActive) {
+              <span class="bi bi-check-circle text-success"></span> Yes
+              } @else {
+              <span class="bi bi-x-circle text-danger"></span> No
+              }
+            </td>
+            <td class="text-nowrap">
+              <a [routerLink]="['/groups/', row.id]">View</a>
+            </td>
+          </ng-template>
+        </app-table>
+      </div>
+      <div class="mt-3 d-flex justify-content-center">
+        <ngb-pagination [collectionSize]="count"
+                        [pageSize]="perPage"
+                        [page]="page"
+                        (pageChange)="page = $event; search()"
+                        [maxSize]="5"
+                        [rotate]="true"
+                        [boundaryLinks]="true"
+                        [directionLinks]="true"></ngb-pagination>
+      </div>
+    </detail-box>
+
+  </div>
+</div>

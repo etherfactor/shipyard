@@ -1,11 +1,108 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from "@angular/core";
+import { Router, RouterModule } from "@angular/router";
+import { EntitySet } from "@ethergizmos/odata-fluent-client";
+import { NgbPaginationModule } from "@ng-bootstrap/ng-bootstrap";
+import { ListComponent, TableColumn } from "../../../../shared/components/_base/list/list.component";
+import { DetailBoxComponent } from "../../../../shared/components/detail-box/detail-box.component";
+import { DetailHeaderComponent } from "../../../../shared/components/detail-header/detail-header.component";
+import { TableHeaderComponent } from "../../../../shared/components/table-header/table-header.component";
+import { TableComponent } from "../../../../shared/components/table/table.component";
+import { Bound } from "../../../../shared/utilities/bound/bound.util";
+import { FilterValue } from "../../../../shared/utilities/filter/filter.util";
+import { SortColumn } from "../../../../shared/utilities/sort/sort.util";
+import { NavbarAction } from "../../../app/components/navbar-action/navbar-action.component";
+import { UserSessionService } from "../../../login/services/user-session/user-session.service";
+import { NotificationSubscription } from "../../models/notification-subscription";
+import { NotificationSubscriptionService } from "../../services/notification-subscription/notification-subscription.service";
 
 @Component({
-  selector: 'app-notification-subscription-list',
-  imports: [],
-  templateUrl: './notification-subscription-list.component.html',
-  styleUrl: './notification-subscription-list.component.scss',
+  selector: "app-notification-subscription-list",
+  imports: [
+    DetailBoxComponent,
+    DetailHeaderComponent,
+    NgbPaginationModule,
+    RouterModule,
+    TableComponent,
+    TableHeaderComponent,
+  ],
+  templateUrl: "./notification-subscription-list.component.html",
+  styleUrl: "./notification-subscription-list.component.scss",
 })
-export class NotificationSubscriptionListComponent {
+export class NotificationSubscriptionListComponent extends ListComponent<NotificationSubscription> {
 
+  private readonly $notificationSubscription = inject(NotificationSubscriptionService);
+  private readonly $router = inject(Router);
+  private readonly $session = inject(UserSessionService);
+
+  readonly eventEnum$$ = computed<[string, FilterValue][]>(() => {
+    return [
+      ['<span class="bi bi-box-seam text-success"></span> Package Delivered', "package.delivered"],
+    ];
+  });
+
+  readonly channelEnum$$ = computed<[string, FilterValue][]>(() => {
+    return [
+      ['<span class="bi bi-envelope text-success"></span> Email', "email"],
+      ['<span class="bi bi-phone text-info"></span> Web Push', "webpush"],
+      ['<span class="bi bi-globe text-warning"></span> Webhook', "webhook"],
+    ];
+  });
+
+  readonly scheduleEnum$$ = computed<[string, FilterValue][]>(() => {
+    return [
+      ['<span class="bi bi-lightning text-warning"></span> Immediate', "immediate"],
+      ['<span class="bi bi-clock-history text-info"></span> Digest', "digest"],
+    ];
+  });
+
+  readonly isActiveEnum$$ = computed<[string, FilterValue][]>(() => {
+    return [
+      ['<span class="bi bi-check-circle text-success"></span> Yes', true],
+      ['<span class="bi bi-x-circle text-danger"></span> No', false],
+    ];
+  });
+
+  override readonly perPage: number = 10;
+
+  override activeSort: SortColumn = {
+    column: "eventType",
+    direction: "asc",
+  };
+
+  protected override get actions(): NavbarAction[] {
+    const actions: NavbarAction[] = [
+
+    ];
+
+    if (!this.isLoading()) {
+      const hasWrite = true;
+      //actions.push({
+      //  icon: 'bi-layout-three-columns',
+      //  label: 'Edit Columns',
+      //});
+      if (hasWrite) {
+        actions.push({
+          icon: 'bi-plus-square',
+          label: 'Add',
+          callback: this.new,
+        });
+      }
+    }
+
+    return actions;
+  }
+
+  protected override get columns(): TableColumn[] {
+    const columns: TableColumn[] = [];
+
+    return columns;
+  }
+
+  protected override getEntitySet(): EntitySet<NotificationSubscription> {
+    return this.$notificationSubscription.search();
+  }
+
+  @Bound new() {
+    this.$router.navigate(["/notifications/subscriptions", "new"]);
+  }
 }

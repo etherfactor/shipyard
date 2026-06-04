@@ -25,6 +25,7 @@ namespace EtherGizmos.Shipyard.Controllers;
 public class PackagesController : AutoODataController
 {
     private const string BaseRoute = "api/v{version:apiVersion}/packages";
+    private readonly TimeSpan BaseDelay = TimeSpan.FromHours(6); //TODO: Make this adjustable
 
     private readonly IUnitOfWorkFactory _uowFactory;
     private readonly IMapper _mapper;
@@ -170,7 +171,7 @@ public class PackagesController : AutoODataController
 
         package.LastPollAt = DateTimeOffset.UtcNow;
         package.NextPollAt = package.LastPollAt
-            + TimeSpan.FromHours(6) * (double)package.LastStatusType.PollingFactor;
+            + BaseDelay * (double)package.LastStatusType.PollingFactor;
 
         await uow.SaveChangesAsync(cancellationToken);
 
@@ -197,13 +198,24 @@ public class PackagesController : AutoODataController
         int id)
         => ForItem(
             KeyMapping<Package, PackageDTO, int>.Create(id, e => e.Id, e => e.Id))
-            .OnUpdating((db, dto) =>
+            .OnUpdating(async (db, dto) =>
             {
+                var prevStatusTypeId = db.LastStatusTypeId;
                 db.LastStatusTypeId = db.TrackingUpdates
                     .OrderByDescending(e => e.OccurredAt)
                     .Select(e => e.StatusTypeId)
                     .FirstOrDefault();
 
-                return Task.CompletedTask;
+                using var uow = _uowFactory.Create();
+                var statusRepo = uow.Repository<StatusType>();
+
+                var status = await statusRepo.Data
+                    .SingleAsync(e => e.Id == db.LastStatusTypeId);
+
+                var nextTime = status.IsFinal
+                    ? DateTimeOffset.MaxValue
+                    : db.LastPollAt + BaseDelay * (double)status.PollingFactor;
+
+                db.NextPollAt = nextTime;
             });
 }

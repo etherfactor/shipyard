@@ -36,7 +36,13 @@
           <ng-select [formControl]="control"
                      [selectOnTab]="true">
             @for (enumValue of enumValues; track enumValue) {
+            @if (isNamedFilter(enumValue)) {
+            <ng-option [value]="enumValue[1]">
+              <div [innerHtml]="enumValue[0]"></div>
+            </ng-option>
+            } @else {
             <ng-option [value]="enumValue">{{enumValue}}</ng-option>
+            }
             }
           </ng-select>
           } @else {
