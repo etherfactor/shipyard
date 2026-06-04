@@ -1,9 +1,12 @@
 import { Component, HostBinding, Input } from "@angular/core";
+import { RouterModule } from "@angular/router";
 import { Notification } from "../../models/notification";
 
 @Component({
   selector: "app-notification-row",
-  imports: [],
+  imports: [
+    RouterModule,
+  ],
   host: {
     class: "list-group-item",
   },

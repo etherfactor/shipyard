@@ -275,6 +275,7 @@ builder.Services.AddNotifications(
             "package.delivered",
             evt =>
             {
+                evt.HasDisplayName("Package Delivered");
                 evt.Supports<PackageDeliveredEvent, EmailChannel, PackageDeliveredEmailFormatter>();
                 evt.Supports<PackageDeliveredEvent, WebhookChannel, PackageDeliveredWebhookFormatter>();
             });

@@ -28,8 +28,10 @@
         <div class="col-md-3 mt-3">
           <label>Event type</label>
           <select class="form-select">
-            <option>All</option>
-            <option>Package delivered</option>
+            <option [value]="''">All</option>
+            @for (event of events; track event.id) {
+            <option [value]="event.id">{{event.name}}</option>
+            }
           </select>
         </div>
         <div class="col-md-3 mt-3">
@@ -50,33 +52,9 @@
                 [buttons]="notificationInboxButtons$$()">
 
       <div class="list-group mt-3">
-        <!--<div class="list-group-item" style="background-color: color-mix(in srgb, rgba(var(--bs-primary-rgb), 0.1), var(--bs-list-group-bg)); border-left: 5px solid var(--bs-primary);">
-          <div>
-            <div class="row">
-              <div class="col-auto d-flex align-items-center">
-                <span class="bi bi-circle-fill text-center text-primary" style="font-size: 0.5rem;"></span>
-              </div>
-              <div class="col">
-                <div class="fw-semibold">Package is out for delivery</div>
-                <div class="small text-muted">Tracking #940011189922385622 — USPS expects delivery today.</div>
-                <a [routerLink]="['/packages', 1]" class="small">
-                  View package
-                  <span class="bi bi-box-arrow-in-up-right"></span>
-                </a>
-              </div>
-              <div class="col-auto">
-                <button class="btn btn-primary btn-sm">
-                  <span class="bi bi-envelope-open"></span>
-                </button>
-              </div>
-              <div class="col-auto text-end">
-                <div class="badge text-bg-primary">Unread</div>
-                <div>10:42 AM</div>
-              </div>
-            </div>
-          </div>
-        </div>-->
+        @for (notification of notifications; track notification.id) {
         <app-notification-row [notification]="notification" />
+        }
       </div>
 
       <div class="d-flex justify-content-between align-items-center mt-3">
