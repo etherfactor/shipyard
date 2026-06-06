@@ -58,17 +58,19 @@
 
           <ng-template #rows let-row>
             <td class="text-nowrap">
-              @switch (row.eventType) {
+              <div [innerHtml]="formatStyleSpan(NotificationEventTheme, row.eventType, row.name)"></div>
+              <!--@switch (row.eventType) {
               @case ('package.delivered') {
               <span class="bi bi-box-seam text-success"></span> Package Delivered
               }
               @default {
               {{row.eventType}}
               }
-              }
+              }-->
             </td>
             <td class="text-nowrap">
-              @switch (row.channelKey) {
+              <div [innerHtml]="formatStyleSpan(NotificationChannelTheme, row.channelKey, row.name)"></div>
+              <!--@switch (row.channelKey) {
               @case ('email') {
               <span class="bi bi-envelope text-success"></span> Email
               }
@@ -81,10 +83,11 @@
               @default {
               {{row.channelKey}}
               }
-              }
+              }-->
             </td>
             <td class="text-nowrap">
-              @switch (row.scheduleType) {
+              <div [innerHtml]="formatStyleSpan(NotificationScheduleTheme, row.scheduleType, row.name)"></div>
+              <!--@switch (row.scheduleType) {
               @case ('immediate') {
               <span class="bi bi-lightning text-warning"></span> Immediate
               }
@@ -94,7 +97,7 @@
               @default {
               {{row.scheduleType}}
               }
-              }
+              }-->
             </td>
             <td class="text-nowrap">
               @if (row.isActive) {

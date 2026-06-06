@@ -160,4 +160,8 @@ export class NotificationSubscriptionListComponent extends ListComponent<Notific
       return `<span class="bi bi-question-circle text-secondary"></span> ${name}`;
     }
   }
+
+  NotificationEventTheme = NotificationEventTheme;
+  NotificationChannelTheme = NotificationChannelTheme;
+  NotificationScheduleTheme = NotificationScheduleTheme;
 }
