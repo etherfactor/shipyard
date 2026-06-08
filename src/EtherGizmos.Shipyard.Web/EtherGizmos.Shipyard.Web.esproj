@@ -7,6 +7,4 @@
     <!-- Folder where production build objects will be placed -->
     <BuildOutputFolder>$(MSBuildProjectDirectory)\dist\EtherGizmos.Shipyard.Web\browser\</BuildOutputFolder>
   </PropertyGroup>
-  <ItemGroup>
-  </ItemGroup>
 </Project>
