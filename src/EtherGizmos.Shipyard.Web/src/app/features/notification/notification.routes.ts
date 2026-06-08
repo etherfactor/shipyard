@@ -29,4 +29,44 @@ export const NOTIFICATION_ROUTES: ExtendedRoute[] = [
       ],
     },
   },
+  {
+    path: "subscriptions/new",
+    loadComponent: () => import("./pages/notification-subscription-detail/notification-subscription-detail.component").then(m => m.NotificationSubscriptionDetailComponent),
+    data: {
+      breadcrumb: {
+        label: "New Subscription",
+        link: "/notifications/subscriptions/new",
+      },
+      parentBreadcrumbs: [
+        {
+          label: "Notification Inbox",
+          link: "/notifications",
+        },
+        {
+          label: "Notification Subscriptions",
+          link: "/notifications/subscriptions",
+        },
+      ],
+    },
+  },
+  {
+    path: "subscriptions/:subscriptionId",
+    loadComponent: () => import("./pages/notification-subscription-detail/notification-subscription-detail.component").then(m => m.NotificationSubscriptionDetailComponent),
+    data: {
+      breadcrumb: {
+        label: "Subscription #{subscriptionId}",
+        link: "/notifications/subscriptions/:subscriptionId",
+      },
+      parentBreadcrumbs: [
+        {
+          label: "Notification Inbox",
+          link: "/notifications",
+        },
+        {
+          label: "Notification Subscriptions",
+          link: "/notifications/subscriptions",
+        },
+      ],
+    },
+  },
 ];
