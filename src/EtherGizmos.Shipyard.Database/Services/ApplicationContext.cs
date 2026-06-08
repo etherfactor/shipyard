@@ -43,6 +43,14 @@ public class ApplicationContext : DbContext
 
     public virtual DbSet<Group> Groups { get; set; }
 
+    public virtual DbSet<Database.NotificationChannel> NotificationChannels { get; set; }
+
+    public virtual DbSet<NotificationEvent> NotificationEvents { get; set; }
+
+    public virtual DbSet<NotificationEventChannelSchedule> NotificationEventChannelSchedules { get; set; }
+
+    public virtual DbSet<Database.NotificationSchedule> NotificationSchedules { get; set; }
+
     public virtual DbSet<Package> Packages { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
@@ -58,6 +66,7 @@ public class ApplicationContext : DbContext
     public ApplicationContext(
         DbContextOptions<ApplicationContext> options,
         [FromKeyedServices("Application")] IMigrationManager migrationManager,
+        [FromKeyedServices("Notification")] IMigrationManager migrationManager1,
         IFilterContext filterContext,
         IUserContext userContext,
         IEnumerable<IInterceptor> interceptors) : base(options)

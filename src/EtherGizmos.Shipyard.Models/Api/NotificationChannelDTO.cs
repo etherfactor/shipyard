@@ -1,4 +1,7 @@
-﻿using Swashbuckle.AspNetCore.Filters;
+﻿using AutoMapper;
+using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Extensions;
+using Swashbuckle.AspNetCore.Filters;
 using System.Diagnostics.CodeAnalysis;
 
 namespace EtherGizmos.Shipyard.Api;
@@ -10,6 +13,21 @@ public class NotificationChannelDTO
     public string Name { get; set; } = null!;
 
     public DynamicBagDTO ConfigSchema { get; set; } = new();
+}
+
+public class NotificationChannelDTOProfile : Profile
+{
+    public NotificationChannelDTOProfile() : base(nameof(NotificationChannelDTOProfile), mapper =>
+    {
+        var toDto = mapper.CreateMap<NotificationChannel, NotificationChannelDTO>();
+        toDto.IgnoreAllMembers();
+        toDto.MapMember(dest => dest.Id, src => src.Id);
+        /* Begin Audit */
+        /*  End Audit  */
+        toDto.MapMember(dest => dest.Name, src => src.Name);
+        toDto.MapMember(dest => dest.ConfigSchema, src => new DynamicBagDTO() { Data = src.ConfigSchema });
+    })
+    { }
 }
 
 [ExcludeFromCodeCoverage]

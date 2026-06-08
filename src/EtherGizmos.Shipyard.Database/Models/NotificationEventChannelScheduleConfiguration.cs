@@ -9,7 +9,7 @@ public class NotificationEventChannelScheduleConfiguration : IEntityTypeConfigur
     public void Configure(
         EntityTypeBuilder<NotificationEventChannelSchedule> entity)
     {
-        entity.ToTable("notification_channels");
+        entity.ToTable("notification_event_channel_schedules");
 
         entity.HasKey(e => new { e.NotificationEventId, e.NotificationChannelId, e.NotificationScheduleId });
 

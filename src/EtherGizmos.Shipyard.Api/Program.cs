@@ -250,6 +250,7 @@ builder.Services.AddSingleton<ISourceLoggerFactory, SourceLoggerFactory>();
 
 builder.Services.AddHostedService<BootstrapSeeder>();
 builder.Services.AddSingleton<IBootstrapper, AppBootstrapper>();
+builder.Services.AddSingleton<IBootstrapper, NotificationBootstrapper>();
 builder.Services.AddSingleton<IBootstrapper, OAuth2Bootstrapper>();
 
 // Export & Import
@@ -279,13 +280,6 @@ builder.Services.AddNotifications(
                 evt.Supports<PackageDeliveredEvent, EmailChannel, PackageDeliveredEmailFormatter>();
                 evt.Supports<PackageDeliveredEvent, WebhookChannel, PackageDeliveredWebhookFormatter>();
             });
-    });
-
-builder.Services
-    .AddKeyedTransient(NotificationChannels.Email.Key, (provider, _) =>
-    {
-        var resolver = provider.GetRequiredService<IConnectionResolver>();
-        return resolver.CreateEmailSender(builder.Configuration["Email:ConnectionId"]!);
     });
 
 // Health

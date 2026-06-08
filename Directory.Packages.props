@@ -11,15 +11,15 @@
     <PackageVersion Include="AutoMapper" Version="16.1.1" />
     <PackageVersion Include="CommunityToolkit.Aspire.Hosting.MailPit" Version="13.3.0" />
     <PackageVersion Include="coverlet.collector" Version="10.0.0" />
-    <PackageVersion Include="EtherGizmos.Common.Composition.ChildContainers" Version="0.1.0-alpha.3" />
-    <PackageVersion Include="EtherGizmos.Common.Cryptography.Certificates" Version="0.1.0-alpha.3" />
-    <PackageVersion Include="EtherGizmos.Common.Data.Migrations" Version="0.1.0-alpha.3" />
-    <PackageVersion Include="EtherGizmos.Common.Data.PostgreSql" Version="0.1.0-alpha.3" />
-    <PackageVersion Include="EtherGizmos.Common.Data.UnitOfWork" Version="0.1.0-alpha.3" />
-    <PackageVersion Include="EtherGizmos.Common.Messaging.RabbitMQ" Version="0.1.0-alpha.3" />
-    <PackageVersion Include="EtherGizmos.Common.Notifications" Version="0.1.0-alpha.3" />
-    <PackageVersion Include="EtherGizmos.Common.Notifications.Email" Version="0.1.0-alpha.3" />
-    <PackageVersion Include="EtherGizmos.Common.Notifications.Webhook" Version="0.1.0-alpha.3" />
+    <PackageVersion Include="EtherGizmos.Common.Composition.ChildContainers" Version="0.1.0-alpha.5" />
+    <PackageVersion Include="EtherGizmos.Common.Cryptography.Certificates" Version="0.1.0-alpha.5" />
+    <PackageVersion Include="EtherGizmos.Common.Data.Migrations" Version="0.1.0-alpha.5" />
+    <PackageVersion Include="EtherGizmos.Common.Data.PostgreSql" Version="0.1.0-alpha.5" />
+    <PackageVersion Include="EtherGizmos.Common.Data.UnitOfWork" Version="0.1.0-alpha.5" />
+    <PackageVersion Include="EtherGizmos.Common.Messaging.RabbitMQ" Version="0.1.0-alpha.5" />
+    <PackageVersion Include="EtherGizmos.Common.Notifications" Version="0.1.0-alpha.5" />
+    <PackageVersion Include="EtherGizmos.Common.Notifications.Email" Version="0.1.0-alpha.5" />
+    <PackageVersion Include="EtherGizmos.Common.Notifications.Webhook" Version="0.1.0-alpha.5" />
     <PackageVersion Include="FluentMigrator.Runner.Postgres" Version="8.0.1" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.12.4" />
     <PackageVersion Include="HtmlAgilityPack.CssSelectors.NetCore" Version="1.2.1" />

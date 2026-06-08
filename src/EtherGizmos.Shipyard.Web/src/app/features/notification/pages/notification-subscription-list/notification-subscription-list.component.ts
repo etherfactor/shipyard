@@ -42,21 +42,21 @@ export class NotificationSubscriptionListComponent extends ListComponent<Notific
   readonly events$$ = signal<NotificationEvent[]>([]);
   readonly eventEnum$$ = computed<[string, FilterValue][]>(() => {
     return this.events$$().map(item =>
-      [this.formatStyleSpan(NotificationEventTheme, item.id, item.name), item.id]
+      [this.formatStyleSpan(NotificationEventTheme, item.id) + " " + this.lookupName(this.events$$(), item.id), item.id]
     );
   });
 
   readonly channels$$ = signal<NotificationChannel[]>([]);
   readonly channelEnum$$ = computed<[string, FilterValue][]>(() => {
     return this.channels$$().map(item =>
-      [this.formatStyleSpan(NotificationChannelTheme, item.id, item.name), item.id]
+      [this.formatStyleSpan(NotificationChannelTheme, item.id) + " " + this.lookupName(this.channels$$(), item.id), item.id]
     );
   });
 
   readonly schedules$$ = signal<NotificationSchedule[]>([]);
   readonly scheduleEnum$$ = computed<[string, FilterValue][]>(() => {
     return this.schedules$$().map(item =>
-      [this.formatStyleSpan(NotificationScheduleTheme, item.id, item.name), item.id]
+      [this.formatStyleSpan(NotificationScheduleTheme, item.id) + " " + this.lookupName(this.schedules$$(), item.id), item.id]
     );
   });
 
@@ -152,13 +152,17 @@ export class NotificationSubscriptionListComponent extends ListComponent<Notific
     this.$router.navigate(["/notifications/subscriptions", "new"]);
   }
 
-  formatStyleSpan(themes: Record<string, NotificationTheme>, id: string, name: string) {
+  formatStyleSpan(themes: Record<string, NotificationTheme>, id: string) {
     const theme = themes[id];
     if (theme) {
-      return `<span class="bi ${theme.iconClass} ${theme.colorClass}"></span> ${name}`;
+      return `<span class="bi ${theme.iconClass} ${theme.colorClass}"></span>`;
     } else {
-      return `<span class="bi bi-question-circle text-secondary"></span> ${name}`;
+      return `<span class="bi bi-question-circle text-secondary"></span>`;
     }
+  }
+
+  lookupName(names: { id: string, name: string }[], id: string) {
+    return names.find(e => e.id === id)?.name ?? id;
   }
 
   NotificationEventTheme = NotificationEventTheme;

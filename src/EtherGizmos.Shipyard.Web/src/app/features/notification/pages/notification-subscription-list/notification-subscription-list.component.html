@@ -58,46 +58,16 @@
 
           <ng-template #rows let-row>
             <td class="text-nowrap">
-              <div [innerHtml]="formatStyleSpan(NotificationEventTheme, row.eventType, row.name)"></div>
-              <!--@switch (row.eventType) {
-              @case ('package.delivered') {
-              <span class="bi bi-box-seam text-success"></span> Package Delivered
-              }
-              @default {
-              {{row.eventType}}
-              }
-              }-->
+              <span [innerHtml]="formatStyleSpan(NotificationEventTheme, row.eventType)"></span>
+              {{lookupName(events$$(), row.eventType)}}
             </td>
             <td class="text-nowrap">
-              <div [innerHtml]="formatStyleSpan(NotificationChannelTheme, row.channelKey, row.name)"></div>
-              <!--@switch (row.channelKey) {
-              @case ('email') {
-              <span class="bi bi-envelope text-success"></span> Email
-              }
-              @case ('webpush') {
-              <span class="bi bi-phone text-info"></span> Web Push
-              }
-              @case ('webhook') {
-              <span class="bi bi-globe text-warning"></span> Webhook
-              }
-              @default {
-              {{row.channelKey}}
-              }
-              }-->
+              <span [innerHtml]="formatStyleSpan(NotificationChannelTheme, row.channelKey)"></span>
+              {{lookupName(channels$$(), row.channelKey)}}
             </td>
             <td class="text-nowrap">
-              <div [innerHtml]="formatStyleSpan(NotificationScheduleTheme, row.scheduleType, row.name)"></div>
-              <!--@switch (row.scheduleType) {
-              @case ('immediate') {
-              <span class="bi bi-lightning text-warning"></span> Immediate
-              }
-              @case ('digest') {
-              <span class="bi bi-clock-history text-info"></span> Digest
-              }
-              @default {
-              {{row.scheduleType}}
-              }
-              }-->
+              <span [innerHtml]="formatStyleSpan(NotificationScheduleTheme, row.scheduleType)"></span>
+              {{lookupName(schedules$$(), row.scheduleType)}}
             </td>
             <td class="text-nowrap">
               @if (row.isActive) {
