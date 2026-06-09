@@ -19,7 +19,7 @@
                    [sort]="activeSort" (sortChange)="onSortChange($event)"
                    (filterChange)="onFilterChange($event)">
           <ng-template #headers>
-            <th app-table-header="eventType" class="text-nowrap"
+            <th app-table-header="notificationEventId" class="text-nowrap"
                 type="string"
                 [sortable]="true"
                 [filterable]="true"
@@ -27,7 +27,7 @@
                 [enumValues]="eventEnum$$()">
               Event
             </th>
-            <th app-table-header="channelKey" class="text-nowrap"
+            <th app-table-header="notificationChannelId" class="text-nowrap"
                 type="string"
                 [sortable]="true"
                 [filterable]="true"
@@ -35,7 +35,7 @@
                 [enumValues]="channelEnum$$()">
               Channel
             </th>
-            <th app-table-header="scheduleType" class="text-nowrap"
+            <th app-table-header="notificationScheduleId" class="text-nowrap"
                 type="number"
                 [sortable]="true"
                 [filterable]="true"
@@ -58,16 +58,16 @@
 
           <ng-template #rows let-row>
             <td class="text-nowrap">
-              <span [innerHtml]="formatStyleSpan(NotificationEventTheme, row.eventType)"></span>
-              {{lookupName(events$$(), row.eventType)}}
+              <span [innerHtml]="formatStyleSpan(NotificationEventTheme, row.notificationEventId)"></span>
+              {{lookupName(events$$(), row.notificationEventId)}}
             </td>
             <td class="text-nowrap">
-              <span [innerHtml]="formatStyleSpan(NotificationChannelTheme, row.channelKey)"></span>
-              {{lookupName(channels$$(), row.channelKey)}}
+              <span [innerHtml]="formatStyleSpan(NotificationChannelTheme, row.notificationChannelId)"></span>
+              {{lookupName(channels$$(), row.notificationChannelId)}}
             </td>
             <td class="text-nowrap">
-              <span [innerHtml]="formatStyleSpan(NotificationScheduleTheme, row.scheduleType)"></span>
-              {{lookupName(schedules$$(), row.scheduleType)}}
+              <span [innerHtml]="formatStyleSpan(NotificationScheduleTheme, row.notificationScheduleId)"></span>
+              {{lookupName(schedules$$(), row.notificationScheduleId)}}
             </td>
             <td class="text-nowrap">
               @if (row.isActive) {

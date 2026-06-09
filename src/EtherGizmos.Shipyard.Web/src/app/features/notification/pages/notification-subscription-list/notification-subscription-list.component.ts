@@ -111,7 +111,7 @@ export class NotificationSubscriptionListComponent extends ListComponent<Notific
   override readonly perPage: number = 10;
 
   override activeSort: SortColumn = {
-    column: "eventType",
+    column: "notificationEventId",
     direction: "asc",
   };
 

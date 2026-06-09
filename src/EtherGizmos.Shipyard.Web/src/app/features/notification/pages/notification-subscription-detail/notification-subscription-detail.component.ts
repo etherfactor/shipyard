@@ -17,7 +17,7 @@ import { Notification } from "../../models/notification";
 import { NotificationChannel } from "../../models/notification-channel";
 import { NotificationEvent } from "../../models/notification-event";
 import { NotificationSchedule } from "../../models/notification-schedule";
-import { NotificationSubscription, notificationSubscriptionForm } from "../../models/notification-subscription";
+import { NotificationSubscription, NotificationSubscriptionF, notificationSubscriptionForm } from "../../models/notification-subscription";
 import { NotificationChannelTheme, NotificationEventTheme, NotificationScheduleTheme, NotificationTheme } from "../../models/notification-theme";
 import { NotificationMetaService } from "../../services/notification-meta/notification-meta.service";
 import { NotificationSubscriptionService } from "../../services/notification-subscription/notification-subscription.service";
@@ -48,7 +48,7 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
 
   readonly id$$ = signal<number | undefined>(undefined);
   readonly subscription$$ = signal<NotificationSubscription>({} as NotificationSubscription);
-  readonly form$$ = signal<TypedFormGroup<NotificationSubscription> | undefined>(undefined);
+  readonly form$$ = signal<TypedFormGroup<NotificationSubscriptionF> | undefined>(undefined);
 
   readonly isEditing$$ = signal(false);
 
@@ -233,7 +233,7 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
 
   private init() {
     const form = notificationSubscriptionForm(this.$form, this.subscription$$());
-    form.controls.channelKey.valueChanges.subscribe(channelId => {
+    form.controls.notificationChannelId.valueChanges.subscribe(channelId => {
       const channelSchema = this.channels$$().find(channel => channel.id === channelId)?.configSchema;
       if (channelSchema) {
         this.channelSchema$$.set(JsonSchemaZ.parse(channelSchema));

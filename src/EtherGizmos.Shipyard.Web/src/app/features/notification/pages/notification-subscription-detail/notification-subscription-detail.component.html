@@ -7,7 +7,7 @@
   <div class="col-12 mt-3">
     @if (id$$()) {
     <detail-header text="Subscription Details"
-                   [subtext]="record?.eventType + ' (#' + record?.id + ')'" />
+                   [subtext]="record?.notificationEventId + ' (#' + record?.id + ')'" />
     } @else {
     <detail-header text="Subscription Details"
                    subtext="Creating new subscription." />
@@ -47,7 +47,7 @@
               <ng-select [clearable]="false"
                          [selectOnTab]="true"
                          [readonlyForm]="!isEditing$$()"
-                         formControlName="eventType">
+                         formControlName="notificationEventId">
                 @for (event of events$$(); track event.id) {
                 <ng-option [value]="event.id">
                   <span [innerHtml]="formatStyleSpan(NotificationEventTheme, event.id)"></span>
@@ -65,7 +65,7 @@
               <ng-select [clearable]="false"
                          [selectOnTab]="true"
                          [readonlyForm]="!isEditing$$()"
-                         formControlName="channelKey">
+                         formControlName="notificationChannelId">
                 @for (channel of channels$$(); track channel.id) {
                 <ng-option [value]="channel.id">
                   <span [innerHtml]="formatStyleSpan(NotificationChannelTheme, channel.id)"></span>
@@ -85,7 +85,7 @@
               <ng-select [clearable]="false"
                          [selectOnTab]="true"
                          [readonlyForm]="!isEditing$$()"
-                         formControlName="scheduleType">
+                         formControlName="notificationScheduleId">
                 @for (schedule of schedules$$(); track schedule.id) {
                 <ng-option [value]="schedule.id">
                   <span [innerHtml]="formatStyleSpan(NotificationScheduleTheme, schedule.id)"></span>
@@ -100,7 +100,7 @@
           <div class="row mt-3">
             <label for="cron" class="col-sm-4 col-form-label">Schedule cron</label>
             <div class="col-sm-8">
-              <input id="cron" type="text" [readonlyForm]="!isEditing$$() || form.value.scheduleType !== 'digest'" placeholder="Only required for digest" />
+              <input id="cron" type="text" [readonlyForm]="!isEditing$$() || form.value.notificationScheduleId !== 'digest'" placeholder="Only required for digest" />
             </div>
           </div>
         </div>
@@ -115,7 +115,7 @@
     <detail-box icon="bi-code"
                 text="Channel Configuration">
       @if (channelSchema) {
-      <json-schema-auto-form [schema]="channelSchema" [form]="form.controls.channelConfig" [readonly]="!isEditing$$()" />
+      <json-schema-auto-form [schema]="channelSchema" [form]="form.controls.notificationChannelConfig" [readonly]="!isEditing$$()" />
       } @else {
       <div class="mt-3">
         Select a channel to configure its properties

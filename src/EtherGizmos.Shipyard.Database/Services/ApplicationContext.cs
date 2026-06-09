@@ -51,6 +51,8 @@ public class ApplicationContext : DbContext
 
     public virtual DbSet<Database.NotificationSchedule> NotificationSchedules { get; set; }
 
+    public virtual DbSet<NotificationSubscriptionExt> NotificationSubscriptions { get; set; }
+
     public virtual DbSet<Package> Packages { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }

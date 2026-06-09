@@ -26,11 +26,14 @@ public class NotificationSubscriptionDTOConfiguration : IModelConfiguration
             /* Begin Audit */
             /*  End Audit  */
             entity.Property(e => e.UserId);
-            entity.Property(e => e.EventType);
-            entity.Property(e => e.ChannelKey);
-            entity.ComplexProperty(e => e.ChannelConfig);
-            entity.Property(e => e.ScheduleType);
-            entity.ComplexProperty(e => e.ScheduleConfig);
+            entity.Property(e => e.NotificationEventId);
+            entity.HasRequired(e => e.NotificationEvent);
+            entity.Property(e => e.NotificationChannelId);
+            entity.HasRequired(e => e.NotificationChannel);
+            entity.ComplexProperty(e => e.NotificationChannelConfig);
+            entity.Property(e => e.NotificationScheduleId);
+            entity.HasRequired(e => e.NotificationSchedule);
+            entity.ComplexProperty(e => e.NotificationScheduleConfig);
             entity.Property(e => e.IsActive);
             entity.Property(e => e.LastNotificationAt);
             entity.Property(e => e.NextNotificationAt);

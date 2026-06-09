@@ -1,7 +1,7 @@
 ﻿using Asp.Versioning;
 using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Common.Models;
 using EtherGizmos.Shipyard.Api;
+using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -86,15 +86,15 @@ public class NotificationSubscriptionsController : AutoODataController
         => ForItem(id)
             .DeleteAsync(cancellationToken);
 
-    private IKeylessRequestBuilder<NotificationSubscription, NotificationSubscriptionDTO> ForSet()
-        => ForSet<NotificationSubscription, NotificationSubscriptionDTO>()
+    private IKeylessRequestBuilder<NotificationSubscriptionExt, NotificationSubscriptionDTO> ForSet()
+        => ForSet<NotificationSubscriptionExt, NotificationSubscriptionDTO>()
             .OnCreating(async (db, dto) =>
             {
                 db.UserId = _userContext.UserId.ToString()!;
             });
 
-    private IKeyedRequestBuilder<NotificationSubscription, NotificationSubscriptionDTO> ForItem(
+    private IKeyedRequestBuilder<NotificationSubscriptionExt, NotificationSubscriptionDTO> ForItem(
         long id)
         => ForItem(
-            KeyMapping<NotificationSubscription, NotificationSubscriptionDTO, long>.Create(id, e => e.Id, e => e.Id));
+            KeyMapping<NotificationSubscriptionExt, NotificationSubscriptionDTO, long>.Create(id, e => e.Id, e => e.Id));
 }
