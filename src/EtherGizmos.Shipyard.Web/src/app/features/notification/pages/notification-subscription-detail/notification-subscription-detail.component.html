@@ -1,3 +1,5 @@
+@let form = form$$();
+
 <!-- Header -->
 <div class="row">
   <div class="col-12 mt-3">
@@ -8,8 +10,9 @@
   </div>
 </div>
 
+@if (form) {
 <!-- Summary -->
-<div class="row">
+<div class="row" [formGroup]="form">
   <div class="col-12 mt-3">
     <detail-box icon="bi-broadcast"
                 text="Subscription Summary">
@@ -24,7 +27,7 @@
         </div>
         <div class="col-md-6">
           <div class="form-check mt-4 mb-1">
-            <input id="isActive" class="form-check-input" type="checkbox" value="" />
+            <input id="isActive" class="form-check-input" type="checkbox" formControlName="isActive" />
             <label for="isActive" class="form-check-label">
               Is active?
             </label>
@@ -38,7 +41,8 @@
             <div class="col-sm-8">
               <ng-select [clearable]="false"
                          [selectOnTab]="true"
-                         [readonlyForm]="false">
+                         [readonlyForm]="false"
+                         formControlName="eventType">
                 @for (event of events$$(); track event.id) {
                 <ng-option [value]="event.id">
                   <span [innerHtml]="formatStyleSpan(NotificationEventTheme, event.id)"></span>
@@ -55,7 +59,8 @@
             <div class="col-sm-8">
               <ng-select [clearable]="false"
                          [selectOnTab]="true"
-                         [readonlyForm]="false">
+                         [readonlyForm]="false"
+                         formControlName="channelKey">
                 @for (channel of channels$$(); track channel.id) {
                 <ng-option [value]="channel.id">
                   <span [innerHtml]="formatStyleSpan(NotificationChannelTheme, channel.id)"></span>
@@ -74,7 +79,8 @@
             <div class="col-sm-8">
               <ng-select [clearable]="false"
                          [selectOnTab]="true"
-                         [readonlyForm]="false">
+                         [readonlyForm]="false"
+                         formControlName="scheduleType">
                 @for (schedule of schedules$$(); track schedule.id) {
                 <ng-option [value]="schedule.id">
                   <span [innerHtml]="formatStyleSpan(NotificationScheduleTheme, schedule.id)"></span>
@@ -89,7 +95,7 @@
           <div class="row mt-3">
             <label for="cron" class="col-sm-4 col-form-label">Schedule cron</label>
             <div class="col-sm-8">
-              <input id="cron" type="text" [readonlyForm]="false" placeholder="Only required for digest" />
+              <input id="cron" type="text" [readonlyForm]="form.value.scheduleType !== 'digest'" placeholder="Only required for digest" />
             </div>
           </div>
         </div>
@@ -100,10 +106,23 @@
 
 <!-- Configuration -->
 <div class="row">
-  <div class="col-12 mt-3">
+  <div class="col-md-6 mt-3">
     <detail-box icon="bi-code"
                 text="Channel Configuration">
-      <json-schema-auto-form [schema]="channelSchema$$()" />
+      @let channelSchema = channelSchema$$();
+      @if (channelSchema) {
+      <json-schema-auto-form [schema]="channelSchema" />
+      } @else {
+      <div class="mt-3">
+        Select a channel to configure its properties.
+      </div>
+      }
+    </detail-box>
+  </div>
+  <div class="col-md-6 mt-3">
+    <detail-box icon="bi-code-square"
+                text="JSON Schema">
+      <div class="schema-preview mt-3">{{JSON.stringify(channelSchema$$(), null, 2)}}</div>
     </detail-box>
   </div>
 </div>
@@ -182,3 +201,4 @@
     </detail-box>
   </div>
 </div>
+}

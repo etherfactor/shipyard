@@ -1,10 +1,12 @@
 import { Component, computed, inject, OnInit, signal } from "@angular/core";
+import { FormBuilder, ReactiveFormsModule } from "@angular/forms";
 import { Router } from "@angular/router";
 import { NgSelectModule } from "@ng-select/ng-select";
 import { DetailBoxButton, DetailBoxComponent } from "../../../../shared/components/detail-box/detail-box.component";
 import { DetailHeaderComponent } from "../../../../shared/components/detail-header/detail-header.component";
 import { JsonSchemaAutoFormComponent } from "../../../../shared/components/json-schema-auto-form/json-schema-auto-form.component";
 import { ReadonlyFormDirective } from "../../../../shared/directives/readonly-form/readonly-form.directive";
+import { JsonSchema, JsonSchemaZ } from "../../../../shared/types/json-schema/json-schema";
 import { Bound } from "../../../../shared/utilities/bound/bound.util";
 import { FilterValue } from "../../../../shared/utilities/filter/filter.util";
 import { TypedFormGroup } from "../../../../shared/utilities/form/form.util";
@@ -12,12 +14,9 @@ import { Notification } from "../../models/notification";
 import { NotificationChannel } from "../../models/notification-channel";
 import { NotificationEvent } from "../../models/notification-event";
 import { NotificationSchedule } from "../../models/notification-schedule";
-import { NotificationSubscription } from "../../models/notification-subscription";
+import { NotificationSubscription, notificationSubscriptionForm } from "../../models/notification-subscription";
 import { NotificationChannelTheme, NotificationEventTheme, NotificationScheduleTheme, NotificationTheme } from "../../models/notification-theme";
 import { NotificationMetaService } from "../../services/notification-meta/notification-meta.service";
-import { JsonSchemaZ } from "../../../../shared/types/json-schema/json-schema";
-
-console.log(JsonSchemaZ);
 
 @Component({
   selector: "app-notification-subscription-detail",
@@ -26,12 +25,14 @@ console.log(JsonSchemaZ);
     DetailHeaderComponent,
     JsonSchemaAutoFormComponent,
     NgSelectModule,
+    ReactiveFormsModule,
     ReadonlyFormDirective,
   ],
   templateUrl: "./notification-subscription-detail.component.html",
   styleUrl: "./notification-subscription-detail.component.scss",
 })
 export class NotificationSubscriptionDetailComponent implements OnInit {
+  private readonly $form = inject(FormBuilder);
   private readonly $notificationMeta = inject(NotificationMetaService);
   private readonly $router = inject(Router);
 
@@ -44,14 +45,7 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
   readonly subscription$$ = signal<NotificationSubscription | undefined>(undefined);
   readonly form$$ = signal<TypedFormGroup<NotificationSubscription> | undefined>(undefined);
 
-  readonly channelSchema$$ = computed(() => JsonSchemaZ.parse(this.subscription$$()?.channelConfig ?? {
-    type: "object",
-    properties: {
-      value: {
-        type: "boolean",
-      },
-    },
-  }));
+  readonly channelSchema$$ = signal<JsonSchema | undefined>(undefined);
 
   readonly events$$ = signal<NotificationEvent[]>([]);
   readonly eventEnum$$ = computed<[string, FilterValue][]>(() => {
@@ -94,6 +88,8 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
     this.loadEvents();
     this.loadChannels();
     this.loadSchedules();
+
+    this.initForm({} as NotificationSubscription);
   }
 
   async loadEvents() {
@@ -129,6 +125,16 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
     });
   }
 
+  initForm(subscription: NotificationSubscription) {
+    const form = notificationSubscriptionForm(this.$form, subscription);
+    form.controls.channelKey.valueChanges.subscribe(channelId => {
+      this.channelSchema$$.set(JsonSchemaZ.parse(this.channels$$().find(channel => channel.id === channelId)!.configSchema));
+      console.log(this.channelSchema$$());
+    });
+
+    this.form$$.set(form);
+  }
+
   @Bound viewDeliveries() {
     this.$router.navigate(["/notifications", "subscriptions", 0, "deliveries"]);
   }
@@ -161,4 +167,5 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
   NotificationEventTheme = NotificationEventTheme;
   NotificationChannelTheme = NotificationChannelTheme;
   NotificationScheduleTheme = NotificationScheduleTheme;
+  JSON = JSON;
 }

@@ -1,0 +1,11 @@
+.schema-preview {
+  min-height: 120px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: .86rem;
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color-translucent);
+  border-radius: 6px;
+  padding: 12px;
+  white-space: pre-wrap;
+  color: #cfd8e3;
+}
