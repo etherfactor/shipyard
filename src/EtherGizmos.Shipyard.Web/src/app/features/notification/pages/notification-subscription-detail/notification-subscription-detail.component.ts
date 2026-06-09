@@ -1,15 +1,18 @@
-import { Component, computed, inject, OnInit, signal } from "@angular/core";
+import { Component, computed, effect, inject, OnInit, signal } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule } from "@angular/forms";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
+import { EntitySingle } from "@ethergizmos/odata-fluent-client";
 import { NgSelectModule } from "@ng-select/ng-select";
 import { DetailBoxButton, DetailBoxComponent } from "../../../../shared/components/detail-box/detail-box.component";
 import { DetailHeaderComponent } from "../../../../shared/components/detail-header/detail-header.component";
 import { JsonSchemaAutoFormComponent } from "../../../../shared/components/json-schema-auto-form/json-schema-auto-form.component";
 import { ReadonlyFormDirective } from "../../../../shared/directives/readonly-form/readonly-form.directive";
+import { NavbarActionService } from "../../../../shared/services/navbar-action/navbar-action.service";
 import { JsonSchema, JsonSchemaZ } from "../../../../shared/types/json-schema/json-schema";
 import { Bound } from "../../../../shared/utilities/bound/bound.util";
 import { FilterValue } from "../../../../shared/utilities/filter/filter.util";
-import { TypedFormGroup } from "../../../../shared/utilities/form/form.util";
+import { getDirtyFormValues, TypedFormGroup } from "../../../../shared/utilities/form/form.util";
+import { NavbarAction } from "../../../app/components/navbar-action/navbar-action.component";
 import { Notification } from "../../models/notification";
 import { NotificationChannel } from "../../models/notification-channel";
 import { NotificationEvent } from "../../models/notification-event";
@@ -17,6 +20,7 @@ import { NotificationSchedule } from "../../models/notification-schedule";
 import { NotificationSubscription, notificationSubscriptionForm } from "../../models/notification-subscription";
 import { NotificationChannelTheme, NotificationEventTheme, NotificationScheduleTheme, NotificationTheme } from "../../models/notification-theme";
 import { NotificationMetaService } from "../../services/notification-meta/notification-meta.service";
+import { NotificationSubscriptionService } from "../../services/notification-subscription/notification-subscription.service";
 
 @Component({
   selector: "app-notification-subscription-detail",
@@ -33,19 +37,56 @@ import { NotificationMetaService } from "../../services/notification-meta/notifi
 })
 export class NotificationSubscriptionDetailComponent implements OnInit {
   private readonly $form = inject(FormBuilder);
+  private readonly $navbarAction = inject(NavbarActionService);
   private readonly $notificationMeta = inject(NotificationMetaService);
+  private readonly $notificationSubscription = inject(NotificationSubscriptionService);
+  private readonly $route = inject(ActivatedRoute);
   private readonly $router = inject(Router);
 
   readonly isLoading$$ = computed(() => this.isLoadingStack$$() > 0);
   private readonly isLoadingStack$$ = signal(0);
 
-  readonly isEditing$$ = signal(false);
-
   readonly id$$ = signal<number | undefined>(undefined);
-  readonly subscription$$ = signal<NotificationSubscription | undefined>(undefined);
+  readonly subscription$$ = signal<NotificationSubscription>({} as NotificationSubscription);
   readonly form$$ = signal<TypedFormGroup<NotificationSubscription> | undefined>(undefined);
 
+  readonly isEditing$$ = signal(false);
+
+  readonly actions$$ = computed(() => {
+    const actions: NavbarAction[] = [];
+
+    if (!this.isLoading$$()) {
+      if (!this.isEditing$$()) {
+        actions.push({
+          icon: "bi-pencil",
+          label: "Edit",
+          callback: this.onEdit,
+        });
+        actions.push({
+          icon: "bi-trash",
+          label: "Delete",
+          callback: this.onDelete,
+        });
+      } else {
+        actions.push({
+          icon: "bi-save",
+          label: "Save",
+          callback: this.onSave,
+        });
+        actions.push({
+          icon: "bi-x-square",
+          label: "Cancel",
+          callback: this.onCancel,
+        });
+      }
+    }
+
+    return actions;
+  });
+
   readonly channelSchema$$ = signal<JsonSchema | undefined>(undefined);
+
+  initPromise!: Promise<unknown>;
 
   readonly events$$ = signal<NotificationEvent[]>([]);
   readonly eventEnum$$ = computed<[string, FilterValue][]>(() => {
@@ -84,12 +125,29 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
     return buttons;
   });
 
-  ngOnInit() {
-    this.loadEvents();
-    this.loadChannels();
-    this.loadSchedules();
+  constructor() {
+    effect(() => this.$navbarAction.setActions(this.actions$$()));
+  }
 
-    this.initForm({} as NotificationSubscription);
+  ngOnInit() {
+    const e = this.loadEvents();
+    const c = this.loadChannels();
+    const s = this.loadSchedules();
+    this.initPromise = Promise.all([e, c, s]);
+
+    const subscriptionId = this.$route.snapshot.paramMap.get("subscriptionId");
+    if (subscriptionId) {
+      const id = parseInt(subscriptionId);
+      this.id$$.set(id);
+
+      this.load();
+    } else {
+      this.subscription$$.set({ isActive: true } as NotificationSubscription);
+
+      this.onEdit();
+    }
+
+    this.init();
   }
 
   async loadEvents() {
@@ -125,14 +183,72 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
     });
   }
 
-  initForm(subscription: NotificationSubscription) {
-    const form = notificationSubscriptionForm(this.$form, subscription);
+  private async load(single?: EntitySingle<NotificationSubscription>) {
+    const id = this.id$$();
+    if (!id)
+      return;
+
+    this.isLoadingStack$$.set(this.isLoadingStack$$() + 1);
+
+    single ??= this.$notificationSubscription
+      .get(id);
+
+    try {
+      const exec = single
+        .execute();
+      const data = await exec.data;
+      await this.initPromise;
+
+      this.subscription$$.set(data);
+      this.init();
+
+      // try {
+      //   this.isLoadingExecStack$$.set(this.isLoadingExecStack$$() + 1);
+
+      //   const exec = await this.$carrierExecution.search()
+      //     .filter(e =>
+      //       o.and(
+      //         o.eq(
+      //           e.prop("carrierId"),
+      //           o.int(id)
+      //         ),
+      //         o.ne(
+      //           e.prop("startedAt"),
+      //           o.null()
+      //         )
+      //       )
+      //     )
+      //     .orderBy("startedAt", "desc")
+      //     .execute()
+      //     .data;
+
+      //   this.exec$$.set(exec[0]);
+      // } finally {
+      //   this.isLoadingExecStack$$.set(this.isLoadingExecStack$$() - 1);
+      // }
+    } finally {
+      this.isLoadingStack$$.set(this.isLoadingStack$$() - 1);
+    }
+  }
+
+  private init() {
+    const form = notificationSubscriptionForm(this.$form, this.subscription$$());
     form.controls.channelKey.valueChanges.subscribe(channelId => {
-      this.channelSchema$$.set(JsonSchemaZ.parse(this.channels$$().find(channel => channel.id === channelId)!.configSchema));
-      console.log(this.channelSchema$$());
+      const channelSchema = this.channels$$().find(channel => channel.id === channelId)?.configSchema;
+      if (channelSchema) {
+        this.channelSchema$$.set(JsonSchemaZ.parse(channelSchema));
+      } else {
+        this.channelSchema$$.set(undefined);
+      }
     });
 
     this.form$$.set(form);
+    form.controls.isActive.markAsDirty();
+    if (this.isEditing$$()) {
+      form.enable();
+    } else {
+      form.disable();
+    }
   }
 
   @Bound viewDeliveries() {
@@ -162,6 +278,55 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
 
   lookupName(names: { id: string, name: string }[], id: string) {
     return names.find(e => e.id === id)?.name ?? id;
+  }
+
+  @Bound async onEdit() {
+    this.isEditing$$.set(true);
+    this.form$$()?.enable();
+  }
+
+  @Bound onDelete() {
+
+  }
+
+  @Bound async onSave() {
+    const record = this.subscription$$();
+    const form = this.form$$();
+
+    if (!record || !form)
+      return;
+
+    if (form.invalid) {
+      form.markAsUntouched();
+      form.markAllAsTouched();
+      return;
+    }
+
+    this.isLoadingStack$$.set(this.isLoadingStack$$() + 1);
+    try {
+      const data = getDirtyFormValues(form);
+
+      if (this.id$$()) {
+        const single = this.$notificationSubscription.update(record.id, data);
+        await this.load(single);
+        this.onCancel();
+      } else {
+        const create = this.$notificationSubscription.create(data).execute();
+        const created = await create.data;
+        this.$router.navigate(["/notifications", "subscriptions", created.id]);
+      }
+    } finally {
+      this.isLoadingStack$$.set(this.isLoadingStack$$() - 1);
+    }
+  }
+
+  @Bound onCancel() {
+    if (this.id$$()) {
+      this.isEditing$$.set(false);
+      this.init();
+    } else {
+      this.$router.navigate(["/notifications", "subscriptions"]);
+    }
   }
 
   NotificationEventTheme = NotificationEventTheme;

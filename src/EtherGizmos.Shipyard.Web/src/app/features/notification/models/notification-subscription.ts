@@ -2,6 +2,7 @@ import z from "zod";
 import { DateTimeZ } from "../../../shared/types/datetime/datetime";
 import { GuidZ } from "../../../shared/types/guid/guid";
 import { AppValidators, formFactoryForModel } from "../../../shared/utilities/form/form.util";
+import { FormControl, FormGroup } from "@angular/forms";
 
 export const NotificationSubscriptionZ = z.object({
   id: z.number().int(),
@@ -25,10 +26,22 @@ export const notificationSubscriptionForm = formFactoryForModel<NotificationSubs
   userId: [model.userId],
   eventType: [model.eventType, AppValidators.required],
   channelKey: [model.channelKey, AppValidators.required],
-  channelConfig: $form.nonNullable.group({}),
+  channelConfig: convertToFormGroup(model.channelConfig ?? {}),
   scheduleType: [model.scheduleType, AppValidators.required],
-  scheduleConfig: $form.nonNullable.group({}),
+  scheduleConfig: convertToFormGroup(model.scheduleConfig ?? {}),
   isActive: [model.isActive, AppValidators.required],
   lastNotificationAt: [model.lastNotificationAt],
   nextNotificationAt: [model.nextNotificationAt],
 }));
+
+function convertToFormGroup(data: any): FormGroup {
+  const group: any = {};
+  Object.keys(data).forEach(key => {
+    if (typeof data[key] === "object" && data[key] !== null && !Array.isArray(data[key])) {
+      group[key] = convertToFormGroup(data[key]);
+    } else {
+      group[key] = new FormControl(data[key]);
+    }
+  });
+  return new FormGroup(group);
+}
