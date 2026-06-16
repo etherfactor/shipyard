@@ -86,15 +86,15 @@ public class NotificationSubscriptionsController : AutoODataController
         => ForItem(id)
             .DeleteAsync(cancellationToken);
 
-    private IKeylessRequestBuilder<NotificationSubscriptionExt, NotificationSubscriptionDTO> ForSet()
-        => ForSet<NotificationSubscriptionExt, NotificationSubscriptionDTO>()
+    private IKeylessRequestBuilder<AppNotificationSubscription, NotificationSubscriptionDTO> ForSet()
+        => ForSet<AppNotificationSubscription, NotificationSubscriptionDTO>()
             .OnCreating(async (db, dto) =>
             {
                 db.UserId = _userContext.UserId.ToString()!;
             });
 
-    private IKeyedRequestBuilder<NotificationSubscriptionExt, NotificationSubscriptionDTO> ForItem(
+    private IKeyedRequestBuilder<AppNotificationSubscription, NotificationSubscriptionDTO> ForItem(
         long id)
         => ForItem(
-            KeyMapping<NotificationSubscriptionExt, NotificationSubscriptionDTO, long>.Create(id, e => e.Id, e => e.Id));
+            KeyMapping<AppNotificationSubscription, NotificationSubscriptionDTO, long>.Create(id, e => e.Id, e => e.Id));
 }

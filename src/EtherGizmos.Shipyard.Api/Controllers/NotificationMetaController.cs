@@ -78,27 +78,27 @@ public class NotificationMetaController : AutoODataController
         => ForEventItem(id)
             .GetAsync(queryOptions, cancellationToken);
 
-    private IKeylessRequestBuilder<NotificationChannel, NotificationChannelDTO> ForChannelSet()
-        => ForSet<NotificationChannel, NotificationChannelDTO>();
+    private IKeylessRequestBuilder<AppNotificationChannel, NotificationChannelDTO> ForChannelSet()
+        => ForSet<AppNotificationChannel, NotificationChannelDTO>();
 
-    private IKeyedRequestBuilder<NotificationChannel, NotificationChannelDTO> ForChannelItem(
+    private IKeyedRequestBuilder<AppNotificationChannel, NotificationChannelDTO> ForChannelItem(
         string id)
         => ForItem(
-            KeyMapping<NotificationChannel, NotificationChannelDTO, string>.Create(id, e => e.Id, e => e.Id));
+            KeyMapping<AppNotificationChannel, NotificationChannelDTO, string>.Create(id, e => e.Id, e => e.Id));
 
-    private IKeylessRequestBuilder<NotificationSchedule, NotificationScheduleDTO> ForScheduleSet()
-        => ForSet<NotificationSchedule, NotificationScheduleDTO>();
+    private IKeylessRequestBuilder<AppNotificationSchedule, NotificationScheduleDTO> ForScheduleSet()
+        => ForSet<AppNotificationSchedule, NotificationScheduleDTO>();
 
-    private IKeyedRequestBuilder<NotificationSchedule, NotificationScheduleDTO> ForScheduleItem(
+    private IKeyedRequestBuilder<AppNotificationSchedule, NotificationScheduleDTO> ForScheduleItem(
         string id)
         => ForItem(
-            KeyMapping<NotificationSchedule, NotificationScheduleDTO, string>.Create(id, e => e.Id, e => e.Id));
+            KeyMapping<AppNotificationSchedule, NotificationScheduleDTO, string>.Create(id, e => e.Id, e => e.Id));
 
-    private IKeylessRequestBuilder<NotificationEvent, NotificationEventDTO> ForEventSet()
-        => ForSet<NotificationEvent, NotificationEventDTO>();
+    private IKeylessRequestBuilder<AppNotificationEvent, NotificationEventDTO> ForEventSet()
+        => ForSet<AppNotificationEvent, NotificationEventDTO>();
 
-    private IKeyedRequestBuilder<NotificationEvent, NotificationEventDTO> ForEventItem(
+    private IKeyedRequestBuilder<AppNotificationEvent, NotificationEventDTO> ForEventItem(
         string id)
         => ForItem(
-            KeyMapping<NotificationEvent, NotificationEventDTO, string>.Create(id, e => e.Id, e => e.Id));
+            KeyMapping<AppNotificationEvent, NotificationEventDTO, string>.Create(id, e => e.Id, e => e.Id));
 }

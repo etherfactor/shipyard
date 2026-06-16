@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using EtherGizmos.Common.Models;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Extensions;
 using Swashbuckle.AspNetCore.Filters;
@@ -46,7 +45,7 @@ public class NotificationSubscriptionDTOProfile : Profile
 {
     public NotificationSubscriptionDTOProfile() : base(nameof(NotificationSubscriptionDTOProfile), mapper =>
     {
-        var toDto = mapper.CreateMap<NotificationSubscriptionExt, NotificationSubscriptionDTO>();
+        var toDto = mapper.CreateMap<AppNotificationSubscription, NotificationSubscriptionDTO>();
         toDto.IgnoreAllMembers();
         toDto.MapMember(dest => dest.Id, src => src.Id);
         toDto.MapMember(dest => dest.UserId, src => Guid.Parse(src.UserId));
@@ -61,8 +60,8 @@ public class NotificationSubscriptionDTOProfile : Profile
         toDto.MapMember(dest => dest.IsActive, src => src.IsEnabled);
         toDto.MapMember(dest => dest.LastNotificationAt, src => src.LastNotificationAt);
         toDto.MapMember(dest => dest.NextNotificationAt, src => src.NextNotificationAt);
-        
-        var fromDto = mapper.CreateMap<NotificationSubscriptionDTO, NotificationSubscriptionExt>();
+
+        var fromDto = mapper.CreateMap<NotificationSubscriptionDTO, AppNotificationSubscription>();
         fromDto.IgnoreAllMembers();
         fromDto.MapMember(dest => dest.UserId, src => src.UserId.ToString());
         fromDto.MapMember(dest => dest.EventType, src => src.NotificationEventId);

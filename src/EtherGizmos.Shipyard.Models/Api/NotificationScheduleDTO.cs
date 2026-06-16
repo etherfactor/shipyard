@@ -19,7 +19,7 @@ public class NotificationScheduleDTOProfile : Profile
 {
     public NotificationScheduleDTOProfile() : base(nameof(NotificationScheduleDTOProfile), mapper =>
     {
-        var toDto = mapper.CreateMap<NotificationSchedule, NotificationScheduleDTO>();
+        var toDto = mapper.CreateMap<AppNotificationSchedule, NotificationScheduleDTO>();
         toDto.IgnoreAllMembers();
         toDto.MapMember(dest => dest.Id, src => src.Id);
         /* Begin Audit */

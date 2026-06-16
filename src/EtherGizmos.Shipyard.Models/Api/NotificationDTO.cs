@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using EtherGizmos.Common.Models;
+using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Extensions;
 using Swashbuckle.AspNetCore.Filters;
 using System.Diagnostics.CodeAnalysis;
@@ -25,7 +25,7 @@ public class NotificationDTOProfile : Profile
 {
     public NotificationDTOProfile() : base(nameof(NotificationDTOProfile), mapper =>
     {
-        var toDto = mapper.CreateMap<Notification, NotificationDTO>();
+        var toDto = mapper.CreateMap<AppNotification, NotificationDTO>();
         toDto.IgnoreAllMembers();
         toDto.MapMember(dest => dest.Id, src => src.Id);
         toDto.MapMember(dest => dest.CreatedAt, src => src.CreatedAt);

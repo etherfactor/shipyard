@@ -19,7 +19,7 @@ public class NotificationEventDTOProfile : Profile
 {
     public NotificationEventDTOProfile() : base(nameof(NotificationEventDTOProfile), mapper =>
     {
-        var toDto = mapper.CreateMap<NotificationEvent, NotificationEventDTO>();
+        var toDto = mapper.CreateMap<AppNotificationEvent, NotificationEventDTO>();
         toDto.IgnoreAllMembers();
         toDto.MapMember(dest => dest.Id, src => src.Id);
         /* Begin Audit */

@@ -110,9 +110,11 @@
         }
       </td>
       <td>
+        @if (!readonly) {
         <button class="btn btn-danger btn-sm" (click)="removeSelfRow(i)">
           <span class="bi bi-x-lg"></span>
         </button>
+        }
       </td>
     </tr>
     }

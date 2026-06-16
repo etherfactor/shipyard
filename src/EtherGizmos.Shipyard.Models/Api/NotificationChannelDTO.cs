@@ -19,7 +19,7 @@ public class NotificationChannelDTOProfile : Profile
 {
     public NotificationChannelDTOProfile() : base(nameof(NotificationChannelDTOProfile), mapper =>
     {
-        var toDto = mapper.CreateMap<NotificationChannel, NotificationChannelDTO>();
+        var toDto = mapper.CreateMap<AppNotificationChannel, NotificationChannelDTO>();
         toDto.IgnoreAllMembers();
         toDto.MapMember(dest => dest.Id, src => src.Id);
         /* Begin Audit */

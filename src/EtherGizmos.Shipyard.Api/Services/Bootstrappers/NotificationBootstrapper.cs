@@ -3,10 +3,10 @@ using EtherGizmos.Common.Converters;
 using EtherGizmos.Shipyard.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
-using DatabaseNotificationChannel = EtherGizmos.Shipyard.Database.NotificationChannel;
-using DatabaseNotificationEvent = EtherGizmos.Shipyard.Database.NotificationEvent;
-using DatabaseNotificationEventChannelSchedule = EtherGizmos.Shipyard.Database.NotificationEventChannelSchedule;
-using DatabaseNotificationSchedule = EtherGizmos.Shipyard.Database.NotificationSchedule;
+using DatabaseNotificationChannel = EtherGizmos.Shipyard.Database.AppNotificationChannel;
+using DatabaseNotificationEvent = EtherGizmos.Shipyard.Database.AppNotificationEvent;
+using DatabaseNotificationEventChannelSchedule = EtherGizmos.Shipyard.Database.AppNotificationEventChannelSchedule;
+using DatabaseNotificationSchedule = EtherGizmos.Shipyard.Database.AppNotificationSchedule;
 
 namespace EtherGizmos.Shipyard.Services.Bootstrappers;
 

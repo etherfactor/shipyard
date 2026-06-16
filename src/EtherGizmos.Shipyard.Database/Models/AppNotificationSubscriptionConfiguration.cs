@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EtherGizmos.Shipyard.Models;
 
-public class NotificationSubscriptionExtConfiguration : IEntityTypeConfiguration<NotificationSubscriptionExt>
+public class AppNotificationSubscriptionConfiguration : IEntityTypeConfiguration<AppNotificationSubscription>
 {
     public void Configure(
-        EntityTypeBuilder<NotificationSubscriptionExt> entity)
+        EntityTypeBuilder<AppNotificationSubscription> entity)
     {
         entity.ToTable("notification_subscriptions");
 

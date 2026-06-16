@@ -4,12 +4,32 @@
   }
 }
 
+.text-primary {
+  --notification-bg-rgb: 115, 29, 216;
+}
+
+.text-info {
+  --notification-bg-rgb: 13, 202, 240;
+}
+
+.text-success {
+  --notification-bg-rgb: 25, 135, 84;
+}
+
+.text-warning {
+  --notification-bg-rgb: 255, 193, 7;
+}
+
+.text-danger {
+  --notification-bg-rgb: 220, 53, 69;
+}
+
 .notification-icon {
   width: 2.25rem;
   height: 2.25rem;
   display: inline-grid;
   place-items: center;
   border-radius: 50%;
-  background: rgba(var(--bs-primary-rgb), 0.25);
+  background: rgba(var(--notification-bg-rgb), 0.25);
   color: var(--bs-primary);
 }

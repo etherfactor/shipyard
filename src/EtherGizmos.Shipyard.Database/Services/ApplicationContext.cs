@@ -43,15 +43,17 @@ public class ApplicationContext : DbContext
 
     public virtual DbSet<Group> Groups { get; set; }
 
-    public virtual DbSet<Database.NotificationChannel> NotificationChannels { get; set; }
+    public virtual DbSet<AppNotificationChannel> NotificationChannels { get; set; }
 
-    public virtual DbSet<NotificationEvent> NotificationEvents { get; set; }
+    public virtual DbSet<AppNotificationEvent> NotificationEvents { get; set; }
 
-    public virtual DbSet<NotificationEventChannelSchedule> NotificationEventChannelSchedules { get; set; }
+    public virtual DbSet<AppNotification> Notifications { get; set; }
 
-    public virtual DbSet<Database.NotificationSchedule> NotificationSchedules { get; set; }
+    public virtual DbSet<AppNotificationEventChannelSchedule> NotificationEventChannelSchedules { get; set; }
 
-    public virtual DbSet<NotificationSubscriptionExt> NotificationSubscriptions { get; set; }
+    public virtual DbSet<AppNotificationSchedule> NotificationSchedules { get; set; }
+
+    public virtual DbSet<AppNotificationSubscription> NotificationSubscriptions { get; set; }
 
     public virtual DbSet<Package> Packages { get; set; }
 
@@ -121,6 +123,14 @@ public class ApplicationContext : DbContext
                 (a, b) => JsonSerializer.Serialize(a, jsonOptions) == JsonSerializer.Serialize(b, jsonOptions),
                 c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                 c => new Dictionary<string, object?>(c)));
+
+        modelBuilder.AddGlobalValueConverter(new ValueConverter<IDictionary<string, string?>, string>(
+            app => JsonSerializer.Serialize(app, jsonOptions),
+            db => JsonSerializer.Deserialize<IDictionary<string, string?>>(db, jsonOptions)!),
+            new ValueComparer<IDictionary<string, string?>>(
+                (a, b) => JsonSerializer.Serialize(a, jsonOptions) == JsonSerializer.Serialize(b, jsonOptions),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                c => new Dictionary<string, string?>(c)));
 
         //**********************************************************
         // Add Query Filters

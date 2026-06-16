@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 
 namespace EtherGizmos.Shipyard.Swagger;
 

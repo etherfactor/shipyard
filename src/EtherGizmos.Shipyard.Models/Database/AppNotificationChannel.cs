@@ -2,7 +2,7 @@
 
 namespace EtherGizmos.Shipyard.Database;
 
-public class NotificationSchedule : IEntity
+public class AppNotificationChannel : IEntity
 {
     public virtual string Id { get; set; } = null!;
 

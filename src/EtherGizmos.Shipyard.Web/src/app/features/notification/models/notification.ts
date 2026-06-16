@@ -9,7 +9,7 @@ export const NotificationZ = z.object({
   notificationSubscriptionId: z.number().int(),
   notificationSubscription: z.lazy(() => NotificationSubscriptionZ).nullish(),
   //isRead: z.boolean(),
-  payload: z.object({}).passthrough(),
+  payload: z.object({}).loose(),
 });
 
 export interface Notification extends z.infer<typeof NotificationZ> { }

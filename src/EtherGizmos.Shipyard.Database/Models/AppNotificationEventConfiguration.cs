@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EtherGizmos.Shipyard.Models;
 
-public class NotificationEventConfiguration : IEntityTypeConfiguration<NotificationEvent>
+public class AppNotificationEventConfiguration : IEntityTypeConfiguration<AppNotificationEvent>
 {
     public void Configure(
-        EntityTypeBuilder<NotificationEvent> entity)
+        EntityTypeBuilder<AppNotificationEvent> entity)
     {
         entity.ToTable("notification_events");
 

@@ -1,6 +1,6 @@
 ﻿using Asp.Versioning;
-using EtherGizmos.Common.Models;
 using EtherGizmos.Shipyard.Api;
+using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -39,11 +39,11 @@ public class NotificationsController : AutoODataController
         => ForItem(id)
             .GetAsync(queryOptions, cancellationToken);
 
-    private IKeylessRequestBuilder<Notification, NotificationDTO> ForSet()
-        => ForSet<Notification, NotificationDTO>();
+    private IKeylessRequestBuilder<AppNotification, NotificationDTO> ForSet()
+        => ForSet<AppNotification, NotificationDTO>();
 
-    private IKeyedRequestBuilder<Notification, NotificationDTO> ForItem(
+    private IKeyedRequestBuilder<AppNotification, NotificationDTO> ForItem(
         long id)
         => ForItem(
-            KeyMapping<Notification, NotificationDTO, long>.Create(id, e => e.Id, e => e.Id));
+            KeyMapping<AppNotification, NotificationDTO, long>.Create(id, e => e.Id, e => e.Id));
 }

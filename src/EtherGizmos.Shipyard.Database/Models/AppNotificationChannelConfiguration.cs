@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EtherGizmos.Shipyard.Models;
 
-public class NotificationChannelConfiguration : IEntityTypeConfiguration<NotificationChannel>
+public class AppNotificationChannelConfiguration : IEntityTypeConfiguration<AppNotificationChannel>
 {
     public void Configure(
-        EntityTypeBuilder<NotificationChannel> entity)
+        EntityTypeBuilder<AppNotificationChannel> entity)
     {
         entity.ToTable("notification_channels");
 

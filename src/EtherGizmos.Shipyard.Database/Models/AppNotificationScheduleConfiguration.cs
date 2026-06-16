@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EtherGizmos.Shipyard.Models;
 
-public class NotificationScheduleConfiguration : IEntityTypeConfiguration<NotificationSchedule>
+public class AppNotificationScheduleConfiguration : IEntityTypeConfiguration<AppNotificationSchedule>
 {
-    public void Configure(EntityTypeBuilder<NotificationSchedule> entity)
+    public void Configure(EntityTypeBuilder<AppNotificationSchedule> entity)
     {
         entity.ToTable("notification_schedules");
 

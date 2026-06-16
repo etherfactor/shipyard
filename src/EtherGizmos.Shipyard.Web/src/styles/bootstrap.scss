@@ -1,15 +1,5 @@
 @import './_base.scss';
 
-$theme-colors: map-merge(
-  $theme-colors,
-  (
-    "primary": #731dd8,
-    // "primary2": #a31621,
-    // "primary3": #af1b3f,
-    // "primary6": #00e5e5,
-  )
-);
-
 @import "../../node_modules/bootstrap/scss/bootstrap.scss";
 
 .form-control-plaintext {

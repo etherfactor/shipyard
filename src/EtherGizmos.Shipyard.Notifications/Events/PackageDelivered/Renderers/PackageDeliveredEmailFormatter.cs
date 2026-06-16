@@ -31,7 +31,7 @@ public class PackageDeliveredEmailFormatter
 
         var updates = model.Updates.OrderBy(e => e.OccurredAt);
 
-        var subject = "Package Delivered";
+        var subject = model.Title;
 
         var html = LiquidMjmlRenderer.Render(
             "PackageDelivered.Templates.PackageDelivered",

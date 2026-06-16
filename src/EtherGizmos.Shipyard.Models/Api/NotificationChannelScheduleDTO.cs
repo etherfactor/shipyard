@@ -21,7 +21,7 @@ public class NotificationChannelScheduleDTOProfile : Profile
 {
     public NotificationChannelScheduleDTOProfile() : base(nameof(NotificationChannelScheduleDTOProfile), mapper =>
     {
-        var toDto = mapper.CreateMap<NotificationEventChannelSchedule, NotificationChannelScheduleDTO>();
+        var toDto = mapper.CreateMap<AppNotificationEventChannelSchedule, NotificationChannelScheduleDTO>();
         toDto.IgnoreAllMembers();
         /* Begin Audit */
         /*  End Audit  */
