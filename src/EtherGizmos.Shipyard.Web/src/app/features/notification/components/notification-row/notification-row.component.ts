@@ -1,9 +1,9 @@
 import { CommonModule } from "@angular/common";
-import { Component, HostBinding, Input } from "@angular/core";
+import { Component, Input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { DateTime } from "luxon";
 import { Notification } from "../../models/notification";
-import { NotificationChannelTheme, NotificationEventTheme, NotificationScheduleTheme, NotificationTheme } from "../../models/notification-theme";
+import { NotificationChannelTheme, NotificationEventTheme, NotificationScheduleTheme, NotificationStatusTheme, NotificationTheme } from "../../models/notification-theme";
 
 @Component({
   selector: "notification-row",
@@ -70,4 +70,5 @@ export class NotificationRowComponent {
   NotificationEventTheme = NotificationEventTheme;
   NotificationChannelTheme = NotificationChannelTheme;
   NotificationScheduleTheme = NotificationScheduleTheme;
+  NotificationStatusTheme = NotificationStatusTheme;
 }

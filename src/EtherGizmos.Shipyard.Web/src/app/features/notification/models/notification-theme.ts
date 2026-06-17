@@ -1,3 +1,5 @@
+import { NotificationStatusType } from "./notification-status-type";
+
 export interface NotificationTheme {
   iconClass: string;
   colorClass: string;
@@ -33,5 +35,24 @@ export const NotificationEventTheme: Record<string, NotificationTheme> = {
   "package.delivered": {
     iconClass: "bi-box-seam",
     colorClass: "text-success",
+  },
+};
+
+export const NotificationStatusTheme: Record<string, NotificationTheme> = {
+  [NotificationStatusType.Pending]: {
+    iconClass: "bi-hourglass-split",
+    colorClass: "text-warning",
+  },
+  [NotificationStatusType.InFlight]: {
+    iconClass: "bi-three-dots",
+    colorClass: "text-info",
+  },
+  [NotificationStatusType.Sent]: {
+    iconClass: "bi-check-circle",
+    colorClass: "text-success",
+  },
+  [NotificationStatusType.Failed]: {
+    iconClass: "bi-x-circle",
+    colorClass: "text-danger",
   },
 };

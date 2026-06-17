@@ -1,38 +1,83 @@
 <div class="d-flex gap-3">
-  <span class="notification-icon" [ngClass]="colorClass"><i class="bi" [ngClass]="iconClass"></i></span>
+  <span class="notification-icon" [ngClass]="colorClass">
+    <i class="bi" [ngClass]="iconClass"></i>
+  </span>
+
   <div class="flex-grow-1">
-    <div class="d-flex justify-content-between gap-3">
-      <div>
-        @if ("title" in notification.payload) {
-        {{notification.payload['title']}}
-        } @else {
-        <div class="fw-semibold">An Event Occurred</div>
-        }
-        <div class="text-muted small">Tracking #{{notification.payload['trackingNumber']}} · {{notification.payload['carrierName']}} · {{humanizeTimestamp(notification.createdAt)}}</div>
+    <div class="d-flex justify-content-between align-items-start gap-3">
+      <div class="min-w-0">
+        <div class="fw-semibold">
+          @if ("title" in notification.payload) {
+          {{ notification.payload['title'] }}
+          } @else if (notification.notificationSubscription?.notificationEvent?.name) {
+          {{ notification.notificationSubscription?.notificationEvent?.name }}
+          } @else {
+          An Event Occurred
+          }
+        </div>
+
+        <div class="text-muted small">
+          @if ("trackingNumber" in notification.payload) {
+          Tracking #{{ notification.payload['trackingNumber'] }} ·
+          }
+
+          @if ("carrierName" in notification.payload) {
+          {{ notification.payload['carrierName'] }} ·
+          }
+
+          {{ humanizeTimestamp(notification.createdAt) }}
+        </div>
       </div>
-      @if (notification.notificationSubscription?.notificationScheduleId !== 'digest') {
-      <span [innerHtml]="formatStyleSpan(NotificationChannelTheme, notification.notificationSubscription?.notificationChannelId ?? 'unknown', notification.notificationSubscription?.notificationChannel?.name ?? 'Unknown')"></span>
-      } @else {
-      <span [innerHtml]="formatStyleSpan(NotificationScheduleTheme, notification.notificationSubscription?.notificationScheduleId ?? 'unknown', notification.notificationSubscription?.notificationSchedule?.name ?? 'Unknown')"></span>
-      }
+
+      <div class="d-flex flex-wrap justify-content-end gap-1">
+        @if (notification.notificationSubscription?.notificationScheduleId === 'digest') {
+        <span [innerHtml]="formatStyleSpan(
+              NotificationScheduleTheme,
+              notification.notificationSubscription?.notificationScheduleId ?? 'unknown',
+              notification.notificationSubscription?.notificationSchedule?.name ?? 'Digest'
+              )">
+        </span>
+        } @else {
+        <span [innerHtml]="formatStyleSpan(
+              NotificationChannelTheme,
+              notification.notificationSubscription?.notificationChannelId ?? 'unknown',
+              notification.notificationSubscription?.notificationChannel?.name ?? 'Unknown'
+              )">
+        </span>
+        }
+
+        <span [innerHtml]="formatStyleSpan(
+              NotificationStatusTheme,
+              notification.statusType ?? 'unknown',
+              notification.statusType ?? 'Unknown'
+              )">
+        </span>
+      </div>
     </div>
+
     <p class="mb-2 mt-2">
       @if ("message" in notification.payload) {
-      {{notification.payload['message']}}
+      {{ notification.payload['message'] }}
       } @else {
-      An event of type '{{notification.notificationSubscription?.notificationEvent?.name ?? 'Unknown'}}' has occurred.
+      An event of type '{{ notification.notificationSubscription?.notificationEvent?.name ?? 'Unknown' }}' has occurred.
       }
     </p>
-    <div class="d-flex gap-2">
-      <!-- class="btn-group btn-group-sm" -->
+
+    <div class="d-flex flex-wrap gap-2">
       @if ("packageId" in notification.payload) {
-      <a class="btn btn-sm btn-primary" [routerLink]="['/packages', notification.payload['packageId']]" [queryParams]="{ append: 1 }">
+      <a class="btn btn-sm btn-primary"
+         [routerLink]="['/packages', notification.payload['packageId']]"
+         [queryParams]="{ append: 1 }">
         <i class="bi bi-box-arrow-up-right me-1"></i>
         View package
       </a>
       }
+
       @if ("carrierId" in notification.payload) {
-      <a class="btn btn-sm btn-primary" [routerLink]="['/carriers', notification.payload['carrierId']]" [queryParams]="{ append: 1 }">
+      <a class="btn btn-sm"
+         [ngClass]="('packageId' in notification.payload) ? 'btn-outline-secondary' : 'btn-primary'"
+         [routerLink]="['/carriers', notification.payload['carrierId']]"
+         [queryParams]="{ append: 1 }">
         <i class="bi bi-box-arrow-up-right me-1"></i>
         View carrier
       </a>
