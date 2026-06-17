@@ -27,6 +27,7 @@ public class NotificationDTOConfiguration : IModelConfiguration
             /*  End Audit  */
             entity.Property(e => e.CreatedAt);
             entity.Property(e => e.SentAt);
+            entity.EnumProperty(e => e.StatusType);
             entity.Property(e => e.NotificationSubscriptionId);
             entity.HasRequired(e => e.NotificationSubscription);
             entity.ComplexProperty(e => e.Payload);

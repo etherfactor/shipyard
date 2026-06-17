@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EtherGizmos.Shipyard.Api.Enums;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Extensions;
 using Swashbuckle.AspNetCore.Filters;
@@ -13,6 +14,8 @@ public class NotificationDTO
     public DateTimeOffset CreatedAt { get; set; }
 
     public DateTimeOffset? SentAt { get; set; }
+
+    public NotificationStatusTypeDTO StatusType { get; set; }
 
     public long NotificationSubscriptionId { get; set; }
 
@@ -30,6 +33,7 @@ public class NotificationDTOProfile : Profile
         toDto.MapMember(dest => dest.Id, src => src.Id);
         toDto.MapMember(dest => dest.CreatedAt, src => src.CreatedAt);
         toDto.MapMember(dest => dest.SentAt, src => src.SentAt);
+        toDto.MapMember(dest => dest.StatusType, src => src.Status);
         toDto.MapMember(dest => dest.NotificationSubscriptionId, src => src.NotificationSubscriptionId);
         toDto.MapMember(dest => dest.NotificationSubscription, src => src.NotificationSubscription, opt => opt.ExplicitExpansion());
         toDto.MapMember(dest => dest.Payload, src => new DynamicBagDTO() { DataRaw = src.Payload });
@@ -45,6 +49,7 @@ public static class NotificationDTOExamples
         Id = 1,
         CreatedAt = DateTimeOffset.UtcNow,
         SentAt = DateTimeOffset.UtcNow,
+        StatusType = NotificationStatusTypeDTO.Sent,
         NotificationSubscriptionId = 1,
         NotificationSubscription = null!,
         Payload = new()

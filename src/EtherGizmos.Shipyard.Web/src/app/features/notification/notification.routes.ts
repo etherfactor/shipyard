@@ -4,10 +4,10 @@ export const NOTIFICATION_ROUTES: ExtendedRoute[] = [
   {
     path: "",
     pathMatch: "full",
-    loadComponent: () => import("./pages/notification-inbox/notification-inbox.component").then(m => m.NotificationInboxComponent),
+    loadComponent: () => import("./pages/notification-history/notification-history.component").then(m => m.NotificationHistoryComponent),
     data: {
       breadcrumb: {
-        label: "Notification Inbox",
+        label: "Notification History",
         link: "/notifications",
       },
       parentBreadcrumbs: [],
@@ -23,7 +23,7 @@ export const NOTIFICATION_ROUTES: ExtendedRoute[] = [
       },
       parentBreadcrumbs: [
         {
-          label: "Notification Inbox",
+          label: "Notification History",
           link: "/notifications",
         },
       ],
@@ -39,7 +39,7 @@ export const NOTIFICATION_ROUTES: ExtendedRoute[] = [
       },
       parentBreadcrumbs: [
         {
-          label: "Notification Inbox",
+          label: "Notification History",
           link: "/notifications",
         },
         {
@@ -59,7 +59,7 @@ export const NOTIFICATION_ROUTES: ExtendedRoute[] = [
       },
       parentBreadcrumbs: [
         {
-          label: "Notification Inbox",
+          label: "Notification History",
           link: "/notifications",
         },
         {

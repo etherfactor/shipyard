@@ -277,8 +277,11 @@ builder.Services.AddNotifications(
             evt =>
             {
                 evt.HasDisplayName("Package Delivered");
+
                 evt.Supports<PackageDeliveredEvent, EmailChannel, PackageDeliveredEmailFormatter>();
+
                 evt.Supports<PackageDeliveredEvent, WebhookChannel, PackageDeliveredWebhookFormatter>();
+                evt.SupportsDigest<PackageDeliveredEvent, WebhookChannel, PackageDeliveredDigestWebhookFormatter>();
             });
     });
 

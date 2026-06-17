@@ -3,7 +3,7 @@ import z from "zod";
 export const NotificationScheduleZ = z.object({
   id: z.string(),
   name: z.string(),
-  configSchema: z.object({}).passthrough(),
+  configSchema: z.object({}).loose(),
 });
 
 export interface NotificationSchedule extends z.infer<typeof NotificationScheduleZ> { }

@@ -1,5 +1,5 @@
 <div class="d-flex gap-3">
-  <span class="notification-icon" [ngClass]="colorClass"><i class="bi bi-truck"></i></span>
+  <span class="notification-icon" [ngClass]="colorClass"><i class="bi" [ngClass]="iconClass"></i></span>
   <div class="flex-grow-1">
     <div class="d-flex justify-content-between gap-3">
       <div>
@@ -10,19 +10,32 @@
         }
         <div class="text-muted small">Tracking #{{notification.payload['trackingNumber']}} · {{notification.payload['carrierName']}} · {{humanizeTimestamp(notification.createdAt)}}</div>
       </div>
-      <span class="badge text-bg-primary align-self-start">Unread</span>
+      @if (notification.notificationSubscription?.notificationScheduleId !== 'digest') {
+      <span [innerHtml]="formatStyleSpan(NotificationChannelTheme, notification.notificationSubscription?.notificationChannelId ?? 'unknown', notification.notificationSubscription?.notificationChannel?.name ?? 'Unknown')"></span>
+      } @else {
+      <span [innerHtml]="formatStyleSpan(NotificationScheduleTheme, notification.notificationSubscription?.notificationScheduleId ?? 'unknown', notification.notificationSubscription?.notificationSchedule?.name ?? 'Unknown')"></span>
+      }
     </div>
     <p class="mb-2 mt-2">
       @if ("message" in notification.payload) {
       {{notification.payload['message']}}
       } @else {
-      An event of type {{notification.notificationSubscription?.notificationEventId ?? 'unknown'}} has occurred.
+      An event of type '{{notification.notificationSubscription?.notificationEvent?.name ?? 'Unknown'}}' has occurred.
       }
     </p>
-    <div class="btn-group btn-group-sm">
-      <button class="btn btn-secondary"><i class="bi bi-envelope-open me-1"></i> Mark read</button>
+    <div class="d-flex gap-2">
+      <!-- class="btn-group btn-group-sm" -->
       @if ("packageId" in notification.payload) {
-      <a class="btn btn-primary" [routerLink]="['/packages', notification.payload['packageId']]" [queryParams]="{ append: 1 }"><i class="bi bi-box-arrow-up-right me-1"></i> View package</a>
+      <a class="btn btn-sm btn-primary" [routerLink]="['/packages', notification.payload['packageId']]" [queryParams]="{ append: 1 }">
+        <i class="bi bi-box-arrow-up-right me-1"></i>
+        View package
+      </a>
+      }
+      @if ("carrierId" in notification.payload) {
+      <a class="btn btn-sm btn-primary" [routerLink]="['/carriers', notification.payload['carrierId']]" [queryParams]="{ append: 1 }">
+        <i class="bi bi-box-arrow-up-right me-1"></i>
+        View carrier
+      </a>
       }
     </div>
   </div>

@@ -19,7 +19,7 @@ import { NotificationMetaService } from "../../services/notification-meta/notifi
 import { NotificationService } from "../../services/notification/notification.service";
 
 @Component({
-  selector: "app-notification-inbox",
+  selector: "app-notification-history",
   imports: [
     DetailBoxComponent,
     DetailHeaderComponent,
@@ -29,10 +29,10 @@ import { NotificationService } from "../../services/notification/notification.se
     NotificationRowComponent,
     RouterModule,
   ],
-  templateUrl: "./notification-inbox.component.html",
-  styleUrl: "./notification-inbox.component.scss",
+  templateUrl: "./notification-history.component.html",
+  styleUrl: "./notification-history.component.scss",
 })
-export class NotificationInboxComponent extends ListComponent<Notification> implements OnInit {
+export class NotificationHistoryComponent extends ListComponent<Notification> implements OnInit {
   private readonly $notification = inject(NotificationService);
   private readonly $notificationMeta = inject(NotificationMetaService);
   private readonly $router = inject(Router);
@@ -122,7 +122,11 @@ export class NotificationInboxComponent extends ListComponent<Notification> impl
 
   protected override getEntitySet(): EntitySet<Notification> {
     let set = this.$notification.search()
-      .expand("notificationSubscription");
+      .expand("notificationSubscription", e => e
+        .expand("notificationEvent")
+        .expand("notificationChannel")
+        .expand("notificationSchedule")
+      );
 
     const eventId = this.searchEventId;
     if (eventId && eventId !== "__all") {
