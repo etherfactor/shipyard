@@ -125,8 +125,10 @@
     }
   </tbody>
 </table>
+@if (!readonly) {
 <button class="btn btn-primary btn-sm mt-2" (click)="addSelfRow()">
   <span class="bi bi-plus-square"></span>
   Add property
 </button>
+}
 }

@@ -41,42 +41,61 @@ export class JsonSchemaAutoFormComponent implements OnInit, OnChanges {
   });
 
   ngOnInit(): void {
-    this.selfRecordForm.valueChanges.subscribe((properties: { name: string, value: string }[]) => {
-      const form = this.form;
-
+    this.selfRecordForm.valueChanges.subscribe((properties: { name: string; value: string }[]) => {
       if (this.dontEmit$$()) return;
 
-      for (const key of Object.keys(form.controls)) {
-        const property = properties.find(property => property.name === key);
-        if (!property) {
-          form.removeControl(key);
-        } else {
-          if (!(form.controls[property.name] instanceof FormControl)) {
-            form.removeControl(property.name);
+      this.dontEmit(() => {
+        const form = this.form;
+
+        for (const key of Object.keys(form.controls)) {
+          const property = properties.find(property => property.name === key);
+
+          if (!property) {
+            form.removeControl(key, { emitEvent: false });
+          } else if (!(form.controls[property.name] instanceof FormControl)) {
+            form.removeControl(property.name, { emitEvent: false });
           }
         }
-      }
 
-      const used: Record<string, boolean> = {};
-      for (let i = 0; i < properties.length; i++) {
-        const property = properties[i];
-        if (!used[property.name]) {
-          if (!form.controls[property.name]) {
-            form.addControl(property.name, new FormControl(undefined, { nonNullable: true, validators: [AppValidators.required] }));
+        const used: Record<string, boolean> = {};
+
+        for (let i = 0; i < properties.length; i++) {
+          const property = properties[i];
+
+          if (!property.name) continue;
+
+          if (!used[property.name]) {
+            if (!form.controls[property.name]) {
+              form.addControl(
+                property.name,
+                new FormControl(undefined, {
+                  nonNullable: true,
+                  validators: [AppValidators.required],
+                }),
+                { emitEvent: false },
+              );
+            }
+
+            form.controls[property.name].setValue(property.value ?? "", {
+              emitEvent: false,
+            });
+
+            form.controls[property.name].markAsDirty();
+          } else {
+            let useControl = this.selfRecordForm.controls[i];
+
+            if (useControl instanceof FormGroup) {
+              useControl = useControl.controls["name"];
+            }
+
+            useControl.setErrors({ name: "Name is a duplicate" });
           }
 
-          form.controls[property.name].setValue(property.value ?? "");
-          form.controls[property.name].markAsDirty();
-        } else {
-          let useControl = this.selfRecordForm.controls[i];
-          if (useControl instanceof FormGroup) {
-            useControl = useControl.controls["name"];
-          }
-          useControl.setErrors({ name: "Name is a duplicate" });
+          used[property.name] = true;
         }
 
-        used[property.name] = true;
-      }
+        form.updateValueAndValidity({ emitEvent: true });
+      });
     });
   }
 
@@ -102,7 +121,11 @@ export class JsonSchemaAutoFormComponent implements OnInit, OnChanges {
         const newForm = form.currentValue as FormGroup;
         this.setSelfRows(newForm.value);
         newForm.valueChanges.subscribe((value: object) => {
-          this.setSelfRows(value);
+          if (this.dontEmit$$()) return;
+
+          this.dontEmit(() => {
+            this.setSelfRows(value);
+          });
         });
         newForm.events.pipe(
           filter(event => event instanceof TouchedChangeEvent),
@@ -183,8 +206,8 @@ export class JsonSchemaAutoFormComponent implements OnInit, OnChanges {
   setSelfRows(value: object) {
     const entries = Object.entries(value).map(entry => ({ name: entry[0], value: entry[1] }));
 
-    const curVal = JSON.stringify(this.selfRecordForm.value);
-    const newVal = JSON.stringify(entries);
+    const curVal = JSON.stringify(this.selfRecordForm.value).replace(/""/, "null");
+    const newVal = JSON.stringify(entries).replace(/""/, "null");
 
     if (newVal !== curVal) {
       this.dontEmit(() => {

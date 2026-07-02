@@ -2,8 +2,8 @@
 <div class="row">
   <div class="col-12 mt-3">
 
-    <detail-header text="Notifications"
-                   subtext="View your received notifications." />
+    <detail-header text="Notification History"
+                   subtext="View your recently delivered notifications." />
 
   </div>
 </div>
@@ -12,21 +12,11 @@
 <div class="row">
   <div class="col-12 mt-3">
     <detail-box icon="bi-funnel"
-                text="Notification Search">
+                text="Notification Filters">
       <div class="row align-items-end">
-        <div class="col-md-4 mt-3">
-          <label>Contents</label>
-          <input type="text" class="form-control" [(ngModel)]="searchContents" placeholder="Search package, carrier, etc." />
-        </div>
-        <div class="col-md-3 mt-3">
-          <label>State</label>
-          <select class="form-select">
-            <option>Unread</option>
-            <option>All</option>
-          </select>
-        </div>
-        <div class="col-md-3 mt-3">
-          <label>Event type</label>
+
+        <div class="col-md mt-3">
+          <label>Event</label>
           <ng-select [clearable]="false"
                      [selectOnTab]="true"
                      [(ngModel)]="searchEventId">
@@ -42,6 +32,53 @@
             }
           </ng-select>
         </div>
+
+        <div class="col-md mt-3">
+          <label>Channel</label>
+          <ng-select [clearable]="false"
+                     [selectOnTab]="true"
+                     [(ngModel)]="searchChannelId">
+            <ng-option value="__all">
+              <span class="bi bi-check-all"></span>
+              All
+            </ng-option>
+            @for (channel of channels; track channel.id) {
+            <ng-option [value]="channel.id">
+              <span [innerHtml]="formatStyleSpan(NotificationChannelTheme, channel.id)"></span>
+              {{channel.name}}
+            </ng-option>
+            }
+          </ng-select>
+        </div>
+
+        <div class="col-md mt-3">
+          <label>Status</label>
+          <ng-select [clearable]="false"
+                     [selectOnTab]="true"
+                     [(ngModel)]="searchStatusType">
+            <ng-option value="__all">
+              <span class="bi bi-check-all"></span>
+              All
+            </ng-option>
+            <ng-option [value]="NotificationStatusType.Sent">
+              <span [innerHtml]="formatStyleSpan(NotificationStatusTheme, NotificationStatusType.Sent)"></span>
+              Sent
+            </ng-option>
+            <ng-option [value]="NotificationStatusType.Failed">
+              <span [innerHtml]="formatStyleSpan(NotificationStatusTheme, NotificationStatusType.Failed)"></span>
+              Failed
+            </ng-option>
+            <ng-option [value]="NotificationStatusType.InFlight">
+              <span [innerHtml]="formatStyleSpan(NotificationStatusTheme, NotificationStatusType.InFlight)"></span>
+              In-flight
+            </ng-option>
+            <ng-option [value]="NotificationStatusType.Pending">
+              <span [innerHtml]="formatStyleSpan(NotificationStatusTheme, NotificationStatusType.Pending)"></span>
+              Pending
+            </ng-option>
+          </ng-select>
+        </div>
+
         <div class="col-md-2 mt-3">
           @if (!isLoading()) {
           <button class="btn btn-primary w-100" (click)="search()">
@@ -54,6 +91,7 @@
           </button>
           }
         </div>
+
       </div>
     </detail-box>
   </div>
@@ -62,8 +100,8 @@
 <!-- List -->
 <div class="row">
   <div class="col-12 mt-3">
-    <detail-box icon="bi-mailbox"
-                text="Notification Inbox"
+    <detail-box icon="bi-clock-history"
+                text="Notification History"
                 [buttons]="notificationInboxButtons$$()">
 
       <div class="list-group mt-3">

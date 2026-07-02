@@ -115,7 +115,13 @@
     <detail-box icon="bi-code"
                 text="Channel Configuration">
       @if (channelSchema) {
+      @if (!isChannelSchemaEmpty$$()) {
       <json-schema-auto-form [schema]="channelSchema" [form]="form.controls.notificationChannelConfig" [readonly]="!isEditing$$()" />
+      } @else {
+      <div class="mt-3">
+        This channel cannot be configured
+      </div>
+      }
       } @else {
       <div class="mt-3">
         Select a channel to configure its properties

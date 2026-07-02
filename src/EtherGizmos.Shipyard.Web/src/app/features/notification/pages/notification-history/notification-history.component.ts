@@ -13,8 +13,10 @@ import { SortColumn } from "../../../../shared/utilities/sort/sort.util";
 import { NavbarAction } from "../../../app/components/navbar-action/navbar-action.component";
 import { NotificationRowComponent } from "../../components/notification-row/notification-row.component";
 import { Notification } from "../../models/notification";
+import { NotificationChannel } from "../../models/notification-channel";
 import { NotificationEvent } from "../../models/notification-event";
-import { NotificationChannelTheme, NotificationEventTheme, NotificationScheduleTheme, NotificationTheme } from "../../models/notification-theme";
+import { NotificationStatusType } from "../../models/notification-status-type";
+import { NotificationChannelTheme, NotificationEventTheme, NotificationScheduleTheme, NotificationStatusTheme, NotificationTheme } from "../../models/notification-theme";
 import { NotificationMetaService } from "../../services/notification-meta/notification-meta.service";
 import { NotificationService } from "../../services/notification/notification.service";
 
@@ -37,11 +39,12 @@ export class NotificationHistoryComponent extends ListComponent<Notification> im
   private readonly $notificationMeta = inject(NotificationMetaService);
   private readonly $router = inject(Router);
 
-  searchContents?: string;
-  searchState?: string;
   searchEventId = "__all";
+  searchChannelId = "__all";
+  searchStatusType = "__all";
 
   events: NotificationEvent[] = [];
+  channels: NotificationChannel[] = [];
 
   notificationInboxButtons$$ = computed<DetailBoxButton[]>(() => {
     const buttons: DetailBoxButton[] = [];
@@ -59,6 +62,7 @@ export class NotificationHistoryComponent extends ListComponent<Notification> im
     super.ngOnInit();
 
     this.loadEvents();
+    this.loadChannels();
   }
 
   async loadEvents() {
@@ -71,13 +75,14 @@ export class NotificationHistoryComponent extends ListComponent<Notification> im
     });
   }
 
-  override async search() {
-    await super.search();
-
-    const contents = this.searchContents;
-    if (contents && contents.trim() !== "") {
-      this.records = deepSearch(this.records, contents);
-    }
+  async loadChannels() {
+    await this.doWork(async () => {
+      this.channels = await this.$notificationMeta.channels
+        .search()
+        .orderBy("name")
+        .execute()
+        .data;
+    });
   }
 
   @Bound manageSubscriptions() {
@@ -138,6 +143,26 @@ export class NotificationHistoryComponent extends ListComponent<Notification> im
       );
     }
 
+    const channelId = this.searchChannelId;
+    if (channelId && channelId !== "__all") {
+      set = set.filter(e =>
+        o.eq(
+          e.prop("notificationSubscription/notificationChannelId" as any),
+          o.string(channelId),
+        ),
+      );
+    }
+
+    const statusType = this.searchStatusType;
+    if (statusType && statusType !== "__all") {
+      set = set.filter(e =>
+        o.eq(
+          e.prop("statusType"),
+          o.string(statusType),
+        ),
+      );
+    }
+
     return set;
   }
 
@@ -154,9 +179,12 @@ export class NotificationHistoryComponent extends ListComponent<Notification> im
     }
   }
 
+  NotificationStatusType = NotificationStatusType;
+
   NotificationEventTheme = NotificationEventTheme;
   NotificationChannelTheme = NotificationChannelTheme;
   NotificationScheduleTheme = NotificationScheduleTheme;
+  NotificationStatusTheme = NotificationStatusTheme;
 }
 
 function deepSearch<T extends object>(data: T[], find: string) {

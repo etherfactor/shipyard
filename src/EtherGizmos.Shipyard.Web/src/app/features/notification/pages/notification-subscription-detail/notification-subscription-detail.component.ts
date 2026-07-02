@@ -11,7 +11,7 @@ import { NavbarActionService } from "../../../../shared/services/navbar-action/n
 import { JsonSchema, JsonSchemaZ } from "../../../../shared/types/json-schema/json-schema";
 import { Bound } from "../../../../shared/utilities/bound/bound.util";
 import { FilterValue } from "../../../../shared/utilities/filter/filter.util";
-import { getDirtyFormValues, TypedFormGroup } from "../../../../shared/utilities/form/form.util";
+import { getAllFormValues, getDirtyFormValues, TypedFormGroup } from "../../../../shared/utilities/form/form.util";
 import { NavbarAction } from "../../../app/components/navbar-action/navbar-action.component";
 import { Notification } from "../../models/notification";
 import { NotificationChannel } from "../../models/notification-channel";
@@ -85,6 +85,14 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
   });
 
   readonly channelSchema$$ = signal<JsonSchema | undefined>(undefined);
+  readonly isChannelSchemaEmpty$$ = computed(() => {
+    const schema = this.channelSchema$$();
+    if (!schema || Object.keys(schema).length === 1) {
+      return true;
+    }
+
+    return false;
+  });
 
   initPromise!: Promise<unknown>;
 
@@ -305,6 +313,20 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
     this.isLoadingStack$$.set(this.isLoadingStack$$() + 1);
     try {
       const data = getDirtyFormValues(form);
+
+      const value = getAllFormValues(form);
+
+      const curChannelVal = JSON.stringify(this.subscription$$().notificationChannelConfig).replace(/""/, "null");
+      const newChannelVal = JSON.stringify(value.notificationChannelConfig).replace(/""/, "null");
+      if (newChannelVal !== curChannelVal) {
+        data.notificationChannelConfig = value.notificationChannelConfig;
+      }
+
+      const curScheduleVal = JSON.stringify(this.subscription$$().notificationScheduleConfig).replace(/""/, "null");
+      const newScheduleVal = JSON.stringify(value.notificationScheduleConfig).replace(/""/, "null");
+      if (newScheduleVal !== curScheduleVal) {
+        data.notificationScheduleConfig = value.notificationScheduleConfig;
+      }
 
       if (this.id$$()) {
         const single = this.$notificationSubscription.update(record.id, data);
