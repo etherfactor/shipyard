@@ -33,8 +33,12 @@ export const NotificationScheduleTheme: Record<string, NotificationTheme> = {
 
 export const NotificationEventTheme: Record<string, NotificationTheme> = {
   "package.delivered": {
-    iconClass: "bi-box-seam",
+    iconClass: "bi-check-circle",
     colorClass: "text-success",
+  },
+  "package.outForDelivery": {
+    iconClass: "bi-box-seam",
+    colorClass: "text-warning",
   },
 };
 

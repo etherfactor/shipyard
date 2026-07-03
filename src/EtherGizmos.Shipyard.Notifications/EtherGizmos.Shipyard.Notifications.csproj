@@ -7,11 +7,17 @@
   <ItemGroup>
     <None Remove="Events\Base\_layout.mjml.html" />
     <None Remove="Events\PackageDelivered\Templates\PackageDelivered.mjml.html" />
+    <None Remove="Events\PackageDelivered\Templates\PackageDeliveredDigest.mjml.html" />
+    <None Remove="Events\PackageOutForDelivery\Templates\PackageOutForDelivery.mjml.html" />
+    <None Remove="Events\PackageOutForDelivery\Templates\PackageOutForDeliveryDigest.mjml.html" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Events\Base\Templates\_layout.mjml.html" />
     <EmbeddedResource Include="Events\PackageDelivered\Templates\PackageDelivered.mjml.html" />
+    <EmbeddedResource Include="Events\PackageDelivered\Templates\PackageDeliveredDigest.mjml.html" />
+    <EmbeddedResource Include="Events\PackageOutForDelivery\Templates\PackageOutForDelivery.mjml.html" />
+    <EmbeddedResource Include="Events\PackageOutForDelivery\Templates\PackageOutForDeliveryDigest.mjml.html" />
   </ItemGroup>
 
   <ItemGroup>

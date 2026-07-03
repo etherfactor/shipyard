@@ -279,9 +279,23 @@ builder.Services.AddNotifications(
                 evt.HasDisplayName("Package Delivered");
 
                 evt.Supports<PackageDeliveredEvent, EmailChannel, PackageDeliveredEmailFormatter>();
+                evt.SupportsDigest<PackageDeliveredEvent, EmailChannel, PackageDeliveredDigestEmailFormatter>();
 
                 evt.Supports<PackageDeliveredEvent, WebhookChannel, PackageDeliveredWebhookFormatter>();
                 evt.SupportsDigest<PackageDeliveredEvent, WebhookChannel, PackageDeliveredDigestWebhookFormatter>();
+            });
+
+        opt.AddNotification<PackageOutForDeliveryEvent, PackageOutForDeliveryRouter>(
+            "package.outForDelivery",
+            evt =>
+            {
+                evt.HasDisplayName("Package Out For Delivery");
+
+                evt.Supports<PackageOutForDeliveryEvent, EmailChannel, PackageOutForDeliveryEmailFormatter>();
+                evt.SupportsDigest<PackageOutForDeliveryEvent, EmailChannel, PackageOutForDeliveryDigestEmailFormatter>();
+
+                evt.Supports<PackageOutForDeliveryEvent, WebhookChannel, PackageOutForDeliveryWebhookFormatter>();
+                evt.SupportsDigest<PackageOutForDeliveryEvent, WebhookChannel, PackageOutForDeliveryDigestWebhookFormatter>();
             });
     });
 

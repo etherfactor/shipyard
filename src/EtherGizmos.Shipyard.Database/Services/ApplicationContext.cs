@@ -88,6 +88,15 @@ public class ApplicationContext : DbContext
     {
         optionsBuilder.ReplaceService<IModelCacheKeyFactory, UserContextModelCacheKeyFactory>();
         optionsBuilder.AddInterceptors(_interceptors);
+
+        //if (_interceptors.First() is SaveChangesInterceptor interceptor)
+        //{
+        //    try
+        //    {
+        //        interceptor.SavingChanges(null!, InterceptionResult<int>.SuppressWithResult(0));
+        //    }
+        //    catch { }
+        //}
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

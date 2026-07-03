@@ -1,5 +1,6 @@
 ﻿using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Events;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace EtherGizmos.Shipyard;
@@ -10,7 +11,8 @@ public static class NotificationBuilderExtensions
     {
         public void AddShipyardExtractors()
         {
-            @this.Services.TryAddSingleton<IDomainEventExtractor, PackageDeliveredExtractor>();
+            @this.Services.TryAddEnumerable(new ServiceDescriptor(typeof(IDomainEventExtractor), typeof(PackageDeliveredExtractor), ServiceLifetime.Singleton));
+            @this.Services.TryAddEnumerable(new ServiceDescriptor(typeof(IDomainEventExtractor), typeof(PackageOutForDeliveryExtractor), ServiceLifetime.Singleton));
         }
     }
 }

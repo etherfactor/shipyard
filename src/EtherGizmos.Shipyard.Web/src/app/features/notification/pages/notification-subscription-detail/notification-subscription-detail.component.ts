@@ -316,14 +316,14 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
 
       const value = getAllFormValues(form);
 
-      const curChannelVal = JSON.stringify(this.subscription$$().notificationChannelConfig).replace(/""/, "null");
-      const newChannelVal = JSON.stringify(value.notificationChannelConfig).replace(/""/, "null");
+      const curChannelVal = (JSON.stringify(this.subscription$$().notificationChannelConfig) ?? "{}").replace(/""/, "null");
+      const newChannelVal = (JSON.stringify(value.notificationChannelConfig) ?? "{}").replace(/""/, "null");
       if (newChannelVal !== curChannelVal) {
         data.notificationChannelConfig = value.notificationChannelConfig;
       }
 
-      const curScheduleVal = JSON.stringify(this.subscription$$().notificationScheduleConfig).replace(/""/, "null");
-      const newScheduleVal = JSON.stringify(value.notificationScheduleConfig).replace(/""/, "null");
+      const curScheduleVal = (JSON.stringify(this.subscription$$().notificationScheduleConfig) ?? "{}").replace(/""/, "null");
+      const newScheduleVal = (JSON.stringify(value.notificationScheduleConfig) ?? "{}").replace(/""/, "null");
       if (newScheduleVal !== curScheduleVal) {
         data.notificationScheduleConfig = value.notificationScheduleConfig;
       }
