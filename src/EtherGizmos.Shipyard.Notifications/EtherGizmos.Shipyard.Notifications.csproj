@@ -8,16 +8,24 @@
     <None Remove="Events\Base\_layout.mjml.html" />
     <None Remove="Events\PackageDelivered\Templates\PackageDelivered.mjml.html" />
     <None Remove="Events\PackageDelivered\Templates\PackageDeliveredDigest.mjml.html" />
+    <None Remove="Events\PackageFailedAttempt\Templates\PackageFailedAttempt.mjml.html" />
+    <None Remove="Events\PackageFailedAttempt\Templates\PackageFailedAttemptDigest.mjml.html" />
     <None Remove="Events\PackageOutForDelivery\Templates\PackageOutForDelivery.mjml.html" />
     <None Remove="Events\PackageOutForDelivery\Templates\PackageOutForDeliveryDigest.mjml.html" />
+    <None Remove="Events\PackageReturned\Templates\PackageReturned.mjml.html" />
+    <None Remove="Events\PackageReturned\Templates\PackageReturnedDigest.mjml.html" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Events\Base\Templates\_layout.mjml.html" />
     <EmbeddedResource Include="Events\PackageDelivered\Templates\PackageDelivered.mjml.html" />
     <EmbeddedResource Include="Events\PackageDelivered\Templates\PackageDeliveredDigest.mjml.html" />
+    <EmbeddedResource Include="Events\PackageFailedAttempt\Templates\PackageFailedAttempt.mjml.html" />
+    <EmbeddedResource Include="Events\PackageFailedAttempt\Templates\PackageFailedAttemptDigest.mjml.html" />
     <EmbeddedResource Include="Events\PackageOutForDelivery\Templates\PackageOutForDelivery.mjml.html" />
     <EmbeddedResource Include="Events\PackageOutForDelivery\Templates\PackageOutForDeliveryDigest.mjml.html" />
+    <EmbeddedResource Include="Events\PackageReturned\Templates\PackageReturned.mjml.html" />
+    <EmbeddedResource Include="Events\PackageReturned\Templates\PackageReturnedDigest.mjml.html" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,57 @@
+{{capture title}}
+{{subject}}
+{{end}}
+
+{{capture content}}
+<mj-text>
+  <h1>Your carrier rule maintenance digest</h1>
+</mj-text>
+<mj-text font-size="16px" line-height="25px" padding-bottom="20px">
+  Hi {{name}}, Shipyard found {{notification_count}} carrier update{{if notification_count != 1}}s{{end}} that could not be classified between <b>{{start_at}}</b> and <b>{{end_at}}</b>.
+</mj-text>
+{{for notification in notifications}}
+<mj-table css-class="detail-table" container-background-color="#faf8ff" border="1px solid #e6ddf7;" padding="0 0 18px 0">
+  <tr>
+    <td colspan="2" style="padding: 20px;">
+      <div style="text-transform: uppercase; letter-spacing: 0.05em; color: #777777; font-size: 12px; font-weight: 700;">
+        Unknown status
+      </div>
+      <div style="font-size: 18px;">
+        <b>{{notification.carrier_name}}</b>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 0 20px 20px 20px;">
+      <div style="text-transform: uppercase; letter-spacing: 0.05em; color: #777777; font-size: 12px; font-weight: 700;">
+        Observed at
+      </div>
+      <div style="font-size: 16px;">
+        <b>{{notification.observed_at}}</b>
+      </div>
+    </td>
+    <td style="padding: 0 20px 20px 20px;">
+      <div style="text-transform: uppercase; letter-spacing: 0.05em; color: #777777; font-size: 12px; font-weight: 700;">
+        Unmatched status text
+      </div>
+      <div style="font-size: 16px;">
+        {{notification.status_text}}
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" style="padding: 0 20px 20px 20px;">
+      <a href="{{shipyard_url}}/carriers/{{notification.carrier_id}}" style="color: #731dd8; text-decoration: none;">
+        Review carrier definition
+      </a>
+    </td>
+  </tr>
+</mj-table>
+{{end}}
+<mj-divider border-width="1px" padding="5px 5px 25px 5px" border-color="#cccccc"></mj-divider>
+<mj-text line-height="18px" color="#777777">
+  These notifications omit package details so carrier maintainers can update rules without receiving package-level access.
+</mj-text>
+{{end}}
+
+{{include "_layout"}}

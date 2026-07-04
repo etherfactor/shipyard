@@ -11,8 +11,13 @@ public static class NotificationBuilderExtensions
     {
         public void AddShipyardExtractors()
         {
+            @this.Services.TryAddEnumerable(new ServiceDescriptor(typeof(IDomainEventExtractor), typeof(CarrierUnknownStatusExtractor), ServiceLifetime.Singleton));
+
             @this.Services.TryAddEnumerable(new ServiceDescriptor(typeof(IDomainEventExtractor), typeof(PackageDeliveredExtractor), ServiceLifetime.Singleton));
+            @this.Services.TryAddEnumerable(new ServiceDescriptor(typeof(IDomainEventExtractor), typeof(PackageFailedAttemptExtractor), ServiceLifetime.Singleton));
             @this.Services.TryAddEnumerable(new ServiceDescriptor(typeof(IDomainEventExtractor), typeof(PackageOutForDeliveryExtractor), ServiceLifetime.Singleton));
+            @this.Services.TryAddEnumerable(new ServiceDescriptor(typeof(IDomainEventExtractor), typeof(PackageReturnedExtractor), ServiceLifetime.Singleton));
+            @this.Services.TryAddEnumerable(new ServiceDescriptor(typeof(IDomainEventExtractor), typeof(PackageUnknownStatusExtractor), ServiceLifetime.Singleton));
         }
     }
 }

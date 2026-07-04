@@ -272,6 +272,19 @@ builder.Services.AddNotifications(
 
         opt.AddShipyardExtractors();
 
+        opt.AddNotification<CarrierUnknownStatusEvent, CarrierUnknownStatusRouter>(
+            "carrier.unknownStatus",
+            evt =>
+            {
+                evt.HasDisplayName("Carrier Unknown Status");
+
+                evt.Supports<CarrierUnknownStatusEvent, EmailChannel, CarrierUnknownStatusEmailFormatter>();
+                evt.SupportsDigest<CarrierUnknownStatusEvent, EmailChannel, CarrierUnknownStatusDigestEmailFormatter>();
+
+                evt.Supports<CarrierUnknownStatusEvent, WebhookChannel, CarrierUnknownStatusWebhookFormatter>();
+                evt.SupportsDigest<CarrierUnknownStatusEvent, WebhookChannel, CarrierUnknownStatusDigestWebhookFormatter>();
+            });
+
         opt.AddNotification<PackageDeliveredEvent, PackageDeliveredRouter>(
             "package.delivered",
             evt =>
@@ -285,6 +298,19 @@ builder.Services.AddNotifications(
                 evt.SupportsDigest<PackageDeliveredEvent, WebhookChannel, PackageDeliveredDigestWebhookFormatter>();
             });
 
+        opt.AddNotification<PackageFailedAttemptEvent, PackageFailedAttemptRouter>(
+            "package.failedAttempt",
+            evt =>
+            {
+                evt.HasDisplayName("Package Failed Attempt");
+
+                evt.Supports<PackageFailedAttemptEvent, EmailChannel, PackageFailedAttemptEmailFormatter>();
+                evt.SupportsDigest<PackageFailedAttemptEvent, EmailChannel, PackageFailedAttemptDigestEmailFormatter>();
+
+                evt.Supports<PackageFailedAttemptEvent, WebhookChannel, PackageFailedAttemptWebhookFormatter>();
+                evt.SupportsDigest<PackageFailedAttemptEvent, WebhookChannel, PackageFailedAttemptDigestWebhookFormatter>();
+            });
+
         opt.AddNotification<PackageOutForDeliveryEvent, PackageOutForDeliveryRouter>(
             "package.outForDelivery",
             evt =>
@@ -296,6 +322,32 @@ builder.Services.AddNotifications(
 
                 evt.Supports<PackageOutForDeliveryEvent, WebhookChannel, PackageOutForDeliveryWebhookFormatter>();
                 evt.SupportsDigest<PackageOutForDeliveryEvent, WebhookChannel, PackageOutForDeliveryDigestWebhookFormatter>();
+            });
+
+        opt.AddNotification<PackageReturnedEvent, PackageReturnedRouter>(
+            "package.returned",
+            evt =>
+            {
+                evt.HasDisplayName("Package Returned");
+
+                evt.Supports<PackageReturnedEvent, EmailChannel, PackageReturnedEmailFormatter>();
+                evt.SupportsDigest<PackageReturnedEvent, EmailChannel, PackageReturnedDigestEmailFormatter>();
+
+                evt.Supports<PackageReturnedEvent, WebhookChannel, PackageReturnedWebhookFormatter>();
+                evt.SupportsDigest<PackageReturnedEvent, WebhookChannel, PackageReturnedDigestWebhookFormatter>();
+            });
+
+        opt.AddNotification<PackageUnknownStatusEvent, PackageUnknownStatusRouter>(
+            "package.unknownStatus",
+            evt =>
+            {
+                evt.HasDisplayName("Package Unknown Status");
+
+                evt.Supports<PackageUnknownStatusEvent, EmailChannel, PackageUnknownStatusEmailFormatter>();
+                evt.SupportsDigest<PackageUnknownStatusEvent, EmailChannel, PackageUnknownStatusDigestEmailFormatter>();
+
+                evt.Supports<PackageUnknownStatusEvent, WebhookChannel, PackageUnknownStatusWebhookFormatter>();
+                evt.SupportsDigest<PackageUnknownStatusEvent, WebhookChannel, PackageUnknownStatusDigestWebhookFormatter>();
             });
     });
 

@@ -32,6 +32,10 @@ export const NotificationScheduleTheme: Record<string, NotificationTheme> = {
 };
 
 export const NotificationEventTheme: Record<string, NotificationTheme> = {
+  "carrier.unknownStatus": {
+    iconClass: "bi-question-circle",
+    colorClass: "text-info",
+  },
   "package.delivered": {
     iconClass: "bi-check-circle",
     colorClass: "text-success",
@@ -39,6 +43,18 @@ export const NotificationEventTheme: Record<string, NotificationTheme> = {
   "package.outForDelivery": {
     iconClass: "bi-box-seam",
     colorClass: "text-warning",
+  },
+  "package.failedAttempt": {
+    iconClass: "bi-exclamation-triangle",
+    colorClass: "text-warning",
+  },
+  "package.returned": {
+    iconClass: "bi-arrow-return-left",
+    colorClass: "text-danger",
+  },
+  "package.unknownStatus": {
+    iconClass: "bi-question-circle",
+    colorClass: "text-secondary",
   },
 };
 
