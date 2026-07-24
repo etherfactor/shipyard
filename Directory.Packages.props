@@ -16,9 +16,11 @@
     <PackageVersion Include="EtherGizmos.Common.Data.Migrations" Version="0.1.0-alpha.5" />
     <PackageVersion Include="EtherGizmos.Common.Data.PostgreSql" Version="0.1.0-alpha.5" />
     <PackageVersion Include="EtherGizmos.Common.Data.UnitOfWork" Version="0.1.0-alpha.5" />
+    <PackageVersion Include="EtherGizmos.Common.Messaging.OpenTelemetry" Version="0.1.0-alpha.5" />
     <PackageVersion Include="EtherGizmos.Common.Messaging.RabbitMQ" Version="0.1.0-alpha.5" />
     <PackageVersion Include="EtherGizmos.Common.Notifications" Version="0.1.0-alpha.5" />
     <PackageVersion Include="EtherGizmos.Common.Notifications.Email" Version="0.1.0-alpha.5" />
+    <PackageVersion Include="EtherGizmos.Common.Notifications.OpenTelemetry" Version="0.1.0-alpha.5" />
     <PackageVersion Include="EtherGizmos.Common.Notifications.Webhook" Version="0.1.0-alpha.5" />
     <PackageVersion Include="FluentMigrator.Runner.Postgres" Version="8.0.1" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.12.4" />
@@ -55,6 +57,7 @@
     <PackageVersion Include="Mjml.Net" Version="4.11.0" />
     <PackageVersion Include="NCrontab.Signed" Version="3.4.0" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
+    <PackageVersion Include="Npgsql.OpenTelemetry" Version="10.0.3" />
     <PackageVersion Include="NUnit3TestAdapter" Version="6.2.0" />
     <PackageVersion Include="NUnit" Version="4.6.0" />
     <PackageVersion Include="NUnit.Analyzers" Version="4.13.0" />
@@ -67,8 +70,10 @@
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.3" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.15.3" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.2" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.17.0-beta.1" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.15.1" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.17.0" />
     <PackageVersion Include="Scriban" Version="7.2.0" />
     <PackageVersion Include="Selenium.Support" Version="4.43.0" />
     <PackageVersion Include="Selenium.WebDriver" Version="4.43.0" />

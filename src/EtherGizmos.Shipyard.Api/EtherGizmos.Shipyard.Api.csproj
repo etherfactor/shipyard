@@ -27,6 +27,9 @@
     <PackageReference Include="Microsoft.ClearScript.V8.Native.win-arm64" />
     <PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" />
     <PackageReference Include="Microsoft.ClearScript.V8.Native.win-x86" />
+    <PackageReference Include="Npgsql.OpenTelemetry" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" />
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="Serilog.Enrichers.Environment" />
     <PackageReference Include="Serilog.Settings.Configuration" />

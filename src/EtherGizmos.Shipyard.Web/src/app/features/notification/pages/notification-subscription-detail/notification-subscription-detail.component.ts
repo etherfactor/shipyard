@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, OnInit, signal } from "@angular/core";
-import { FormBuilder, ReactiveFormsModule } from "@angular/forms";
+import { FormBuilder, FormControl, ReactiveFormsModule } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { EntitySingle } from "@ethergizmos/odata-fluent-client";
 import { NgSelectModule } from "@ng-select/ng-select";
@@ -11,7 +11,7 @@ import { NavbarActionService } from "../../../../shared/services/navbar-action/n
 import { JsonSchema, JsonSchemaZ } from "../../../../shared/types/json-schema/json-schema";
 import { Bound } from "../../../../shared/utilities/bound/bound.util";
 import { FilterValue } from "../../../../shared/utilities/filter/filter.util";
-import { getAllFormValues, getDirtyFormValues, TypedFormGroup } from "../../../../shared/utilities/form/form.util";
+import { AppValidators, getAllFormValues, getDirtyFormValues, TypedFormGroup } from "../../../../shared/utilities/form/form.util";
 import { NavbarAction } from "../../../app/components/navbar-action/navbar-action.component";
 import { Notification } from "../../models/notification";
 import { NotificationChannel } from "../../models/notification-channel";
@@ -49,6 +49,10 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
   readonly id$$ = signal<number | undefined>(undefined);
   readonly subscription$$ = signal<NotificationSubscription>({} as NotificationSubscription);
   readonly form$$ = signal<TypedFormGroup<NotificationSubscriptionF> | undefined>(undefined);
+
+  get cronFormControl() {
+    return this.form$$()?.controls.notificationScheduleConfig.controls["cronExpression"] as unknown as FormControl<string>
+  }
 
   readonly isEditing$$ = signal(false);
 
@@ -250,6 +254,14 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
       }
     });
 
+    form.controls.notificationScheduleId.valueChanges.subscribe(value => {
+      if (value === "digest") {
+        form.controls.notificationScheduleConfig.controls["cronExpression"] ??= new FormControl("", { nonNullable: true, validators: [AppValidators.required] }) as any;
+      } else {
+        delete form.controls.notificationScheduleConfig.controls["cronExpression"];
+      }
+    });
+
     this.form$$.set(form);
     form.controls.isActive.markAsDirty();
     if (this.isEditing$$()) {
@@ -307,6 +319,11 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
     if (form.invalid) {
       form.markAsUntouched();
       form.markAllAsTouched();
+      return;
+    }
+
+    if (form.value.notificationScheduleId === "digest" && !this.cronFormControl?.value) {
+      this.cronFormControl?.markAsTouched();
       return;
     }
 

@@ -6,6 +6,8 @@
 
   <ItemGroup>
     <None Remove="Events\Base\_layout.mjml.html" />
+    <None Remove="Events\CarrierUnknownStatus\Templates\CarrierUnknownStatus.mjml.html" />
+    <None Remove="Events\CarrierUnknownStatus\Templates\CarrierUnknownStatusDigest.mjml.html" />
     <None Remove="Events\PackageDelivered\Templates\PackageDelivered.mjml.html" />
     <None Remove="Events\PackageDelivered\Templates\PackageDeliveredDigest.mjml.html" />
     <None Remove="Events\PackageFailedAttempt\Templates\PackageFailedAttempt.mjml.html" />
@@ -14,10 +16,14 @@
     <None Remove="Events\PackageOutForDelivery\Templates\PackageOutForDeliveryDigest.mjml.html" />
     <None Remove="Events\PackageReturned\Templates\PackageReturned.mjml.html" />
     <None Remove="Events\PackageReturned\Templates\PackageReturnedDigest.mjml.html" />
+    <None Remove="Events\PackageUnknownStatus\Templates\PackageUnknownStatus.mjml.html" />
+    <None Remove="Events\PackageUnknownStatus\Templates\PackageUnknownStatusDigest.mjml.html" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Events\Base\Templates\_layout.mjml.html" />
+    <EmbeddedResource Include="Events\CarrierUnknownStatus\Templates\CarrierUnknownStatus.mjml.html" />
+    <EmbeddedResource Include="Events\CarrierUnknownStatus\Templates\CarrierUnknownStatusDigest.mjml.html" />
     <EmbeddedResource Include="Events\PackageDelivered\Templates\PackageDelivered.mjml.html" />
     <EmbeddedResource Include="Events\PackageDelivered\Templates\PackageDeliveredDigest.mjml.html" />
     <EmbeddedResource Include="Events\PackageFailedAttempt\Templates\PackageFailedAttempt.mjml.html" />
@@ -26,10 +32,13 @@
     <EmbeddedResource Include="Events\PackageOutForDelivery\Templates\PackageOutForDeliveryDigest.mjml.html" />
     <EmbeddedResource Include="Events\PackageReturned\Templates\PackageReturned.mjml.html" />
     <EmbeddedResource Include="Events\PackageReturned\Templates\PackageReturnedDigest.mjml.html" />
+    <EmbeddedResource Include="Events\PackageUnknownStatus\Templates\PackageUnknownStatus.mjml.html" />
+    <EmbeddedResource Include="Events\PackageUnknownStatus\Templates\PackageUnknownStatusDigest.mjml.html" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="EtherGizmos.Common.Notifications.Email" />
+    <PackageReference Include="EtherGizmos.Common.Notifications.OpenTelemetry" />
     <PackageReference Include="EtherGizmos.Common.Notifications.Webhook" />
     <PackageReference Include="Mjml.Net" />
     <PackageReference Include="Scriban" />

@@ -31,6 +31,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
+using Npgsql;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 using Serilog;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -85,6 +88,27 @@ builder.Services.AddConnectionResolver()
     .WithPostgreSql()
     .WithRabbitMQ()
     .WithSmtp();
+
+// Observability
+builder.Services
+    .AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation()
+        .AddEntityFrameworkCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddMessagingInstrumentation()
+        .AddNpgsql()
+        .AddSqlClientInstrumentation()
+        .AddNotificationsInstrumentation()
+        .AddOtlpExporter())
+    .WithMetrics(metrics => metrics
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddMessagingInstrumentation()
+        .AddNpgsqlInstrumentation()
+        .AddSqlClientInstrumentation()
+        .AddNotificationsInstrumentation()
+        .AddOtlpExporter());
 
 // Security
 builder.UseOAuth2()
