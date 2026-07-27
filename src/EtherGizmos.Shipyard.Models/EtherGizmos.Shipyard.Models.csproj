@@ -11,6 +11,7 @@
     <PackageReference Include="EtherGizmos.Common.Notifications" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" />
+    <PackageReference Include="Microsoft.OpenApi" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" />
   </ItemGroup>
 
