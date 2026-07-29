@@ -53,7 +53,7 @@ public class NotificationBootstrapper : IBootstrapper
             e => new NotificationChannelMeta(e.Id, e.Name, JsonSerializer.Serialize(e.ConfigSchema, _jsonOptions)));
 
         var compareChannels = catalog.Channels.Select(
-            e => new NotificationChannelMeta(e.ChannelKey, e.DisplayName, JsonSerializer.Serialize(e.ConfigSchema, _jsonOptions)))
+            e => new NotificationChannelMeta(e.Id, e.Name, JsonSerializer.Serialize(e.ConfigSchema, _jsonOptions)))
             .ToList();
 
         var addChannels = compareChannels.Except(currentChannels);
@@ -91,7 +91,7 @@ public class NotificationBootstrapper : IBootstrapper
             e => new NotificationScheduleMeta(e.Id, e.Name, JsonSerializer.Serialize(e.ConfigSchema, _jsonOptions)));
 
         var compareSchedules = catalog.Schedules.Select(
-            e => new NotificationScheduleMeta(e.ScheduleKey, e.DisplayName, JsonSerializer.Serialize(e.ConfigSchema, _jsonOptions)))
+            e => new NotificationScheduleMeta(e.Id, e.Name, JsonSerializer.Serialize(e.ConfigSchema, _jsonOptions)))
             .ToList();
 
         var addSchedules = compareSchedules.Except(currentSchedules);
@@ -129,7 +129,7 @@ public class NotificationBootstrapper : IBootstrapper
             e => new NotificationEventMeta(e.Id, e.Name));
 
         var compareEvents = catalog.Events.Select(
-            e => new NotificationEventMeta(e.EventKey, e.DisplayName))
+            e => new NotificationEventMeta(e.Id, e.Name))
             .ToList();
 
         var addEvents = compareEvents.Except(currentEvents);
@@ -165,7 +165,7 @@ public class NotificationBootstrapper : IBootstrapper
             e => new NotificationEventChannelScheduleMeta(e.NotificationEventId, e.NotificationChannelId, e.NotificationScheduleId));
 
         var compareEventChannelSchedules = catalog.Events.Select(
-            e => e.Supports.Select(s => new NotificationEventChannelScheduleMeta(e.EventKey, s.ChannelKey, s.ScheduleKey)))
+            e => e.Supports.Select(s => new NotificationEventChannelScheduleMeta(e.Id, s.ChannelId, s.ScheduleId)))
             .SelectMany(e => e)
             .ToList();
 

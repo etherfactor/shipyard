@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Common.Models;
 using EtherGizmos.Shipyard.Extensions;
 using Swashbuckle.AspNetCore.Filters;
 using System.Diagnostics.CodeAnalysis;
@@ -19,7 +19,7 @@ public class NotificationChannelDTOProfile : Profile
 {
     public NotificationChannelDTOProfile() : base(nameof(NotificationChannelDTOProfile), mapper =>
     {
-        var toDto = mapper.CreateMap<AppNotificationChannel, NotificationChannelDTO>();
+        var toDto = mapper.CreateMap<NotificationChannel, NotificationChannelDTO>();
         toDto.IgnoreAllMembers();
         toDto.MapMember(dest => dest.Id, src => src.Id);
         /* Begin Audit */

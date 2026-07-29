@@ -3,6 +3,7 @@ import { Component, Input } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { DateTime } from "luxon";
 import { Notification } from "../../models/notification";
+import { NotificationStatusType } from "../../models/notification-status-type";
 import { NotificationChannelTheme, NotificationEventTheme, NotificationScheduleTheme, NotificationStatusTheme, NotificationTheme } from "../../models/notification-theme";
 
 @Component({
@@ -67,8 +68,23 @@ export class NotificationRowComponent {
     return date.toLocaleString(DateTime.DATETIME_MED);
   };
 
+  array(data: unknown) {
+    if (!Array.isArray(data)) {
+      throw new Error("Not an array");
+    }
+    return data;
+  }
+
+  NotificationStatusType = NotificationStatusType;
+
   NotificationEventTheme = NotificationEventTheme;
   NotificationChannelTheme = NotificationChannelTheme;
   NotificationScheduleTheme = NotificationScheduleTheme;
-  NotificationStatusTheme = NotificationStatusTheme;
+  NotificationStatusTheme: Record<string, NotificationTheme> = {
+    ...NotificationStatusTheme,
+    ["Included"]: {
+      iconClass: "bi-check-circle",
+      colorClass: "text-success",
+    },
+  };
 }

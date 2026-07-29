@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EtherGizmos.Common.Models;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Extensions;
 using Swashbuckle.AspNetCore.Filters;
@@ -19,7 +20,7 @@ public class NotificationScheduleDTOProfile : Profile
 {
     public NotificationScheduleDTOProfile() : base(nameof(NotificationScheduleDTOProfile), mapper =>
     {
-        var toDto = mapper.CreateMap<AppNotificationSchedule, NotificationScheduleDTO>();
+        var toDto = mapper.CreateMap<NotificationSchedule, NotificationScheduleDTO>();
         toDto.IgnoreAllMembers();
         toDto.MapMember(dest => dest.Id, src => src.Id);
         /* Begin Audit */

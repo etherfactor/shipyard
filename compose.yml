@@ -1,3 +1,22 @@
+x-otel-environment: &otel-environment
+  OTEL_EXPORTER_OTLP_ENDPOINT:
+  OTEL_EXPORTER_OTLP_PROTOCOL:
+  OTEL_EXPORTER_OTLP_HEADERS:
+  OTEL_EXPORTER_OTLP_TIMEOUT:
+  OTEL_EXPORTER_OTLP_LOGS_ENDPOINT:
+  OTEL_EXPORTER_OTLP_LOGS_PROTOCOL:
+  OTEL_EXPORTER_OTLP_LOGS_HEADERS:
+  OTEL_EXPORTER_OTLP_LOGS_TIMEOUT:
+  OTEL_EXPORTER_OTLP_TRACES_ENDPOINT:
+  OTEL_EXPORTER_OTLP_TRACES_PROTOCOL:
+  OTEL_EXPORTER_OTLP_TRACES_HEADERS:
+  OTEL_EXPORTER_OTLP_TRACES_TIMEOUT:
+  OTEL_EXPORTER_OTLP_METRICS_ENDPOINT:
+  OTEL_EXPORTER_OTLP_METRICS_PROTOCOL:
+  OTEL_EXPORTER_OTLP_METRICS_HEADERS:
+  OTEL_EXPORTER_OTLP_METRICS_TIMEOUT:
+  OTEL_RESOURCE_ATTRIBUTES:
+
 services:
   db:
     image: postgres:16-alpine
@@ -47,6 +66,8 @@ services:
   api:
     image: etherfactor/shipyard-api:latest
     environment:
+      <<: *otel-environment
+      OTEL_SERVICE_NAME: shipyard-api
       ASPNETCORE_URLS: http://+:8080
       ASPNETCORE_FORWARDEDHEADERS_ENABLED: ${SHIPYARD_USE_PROXY:-false}
       SHIPYARD_BOOTSTRAP_USER: "${SHIPYARD_BOOTSTRAP_USER:-admin}"
@@ -94,12 +115,14 @@ services:
   worker:
     image: etherfactor/shipyard-worker:latest
     environment:
+      <<: *otel-environment
+      OTEL_SERVICE_NAME: shipyard-worker
       Worker__DefaultTimeZone: ${SHIPYARD_DEFAULT_TZ:-America/Chicago}
       MessageBroker__ConnectionId: ComposeAmqp
       Connections__ComposeAmqp__Type: MessageBroker
       Connections__ComposeAmqp__RabbitMQ__ConnectionString: amqp://${RABBITMQ_USER:-shipyard}:${RABBITMQ_PASSWORD:-mySecure(!)Password}@rmq:5672
       Selenium__ConnectionString: http://selenium:4444/wd/hub
-      Api__BaseUrl: ${SHIPYARD_API_HOST:-http://localhost:7448}
+      Api__BaseUrl: http://api:8080
       Api__OAuth2__ClientId: ${SHIPYARD_WORKER_CLIENT_ID:-608b511a-737b-4e9a-90f5-64fb86b8469f}
       Api__OAuth2__ClientSecret: ${SHIPYARD_WORKER_CLIENT_SECRET}
     healthcheck:

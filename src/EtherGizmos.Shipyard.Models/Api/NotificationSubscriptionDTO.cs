@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Common.Models;
 using EtherGizmos.Shipyard.Extensions;
 using Swashbuckle.AspNetCore.Filters;
 using System.ComponentModel.DataAnnotations;
@@ -45,30 +45,30 @@ public class NotificationSubscriptionDTOProfile : Profile
 {
     public NotificationSubscriptionDTOProfile() : base(nameof(NotificationSubscriptionDTOProfile), mapper =>
     {
-        var toDto = mapper.CreateMap<AppNotificationSubscription, NotificationSubscriptionDTO>();
+        var toDto = mapper.CreateMap<NotificationSubscription, NotificationSubscriptionDTO>();
         toDto.IgnoreAllMembers();
         toDto.MapMember(dest => dest.Id, src => src.Id);
         toDto.MapMember(dest => dest.UserId, src => Guid.Parse(src.UserId));
-        toDto.MapMember(dest => dest.NotificationEventId, src => src.EventType);
+        toDto.MapMember(dest => dest.NotificationEventId, src => src.EventId);
         toDto.MapMember(dest => dest.NotificationEvent, src => src.Event, opt => opt.ExplicitExpansion());
-        toDto.MapMember(dest => dest.NotificationChannelId, src => src.ChannelKey);
+        toDto.MapMember(dest => dest.NotificationChannelId, src => src.ChannelId);
         toDto.MapMember(dest => dest.NotificationChannel, src => src.Channel, opt => opt.ExplicitExpansion());
-        toDto.MapMember(dest => dest.NotificationChannelConfig, src => new DynamicBagDTO() { DataRaw = src.ChannelConfigRaw });
-        toDto.MapMember(dest => dest.NotificationScheduleId, src => src.ScheduleType);
+        toDto.MapMember(dest => dest.NotificationChannelConfig, src => new DynamicBagDTO() { Data = src.ChannelConfig });
+        toDto.MapMember(dest => dest.NotificationScheduleId, src => src.ScheduleId);
         toDto.MapMember(dest => dest.NotificationSchedule, src => src.Schedule, opt => opt.ExplicitExpansion());
-        toDto.MapMember(dest => dest.NotificationScheduleConfig, src => new DynamicBagDTO() { DataRaw = src.ScheduleConfigRaw });
+        toDto.MapMember(dest => dest.NotificationScheduleConfig, src => new DynamicBagDTO() { Data = src.ScheduleConfig });
         toDto.MapMember(dest => dest.IsActive, src => src.IsEnabled);
         toDto.MapMember(dest => dest.LastNotificationAt, src => src.LastNotificationAt);
         toDto.MapMember(dest => dest.NextNotificationAt, src => src.NextNotificationAt);
 
-        var fromDto = mapper.CreateMap<NotificationSubscriptionDTO, AppNotificationSubscription>();
+        var fromDto = mapper.CreateMap<NotificationSubscriptionDTO, NotificationSubscription>();
         fromDto.IgnoreAllMembers();
         fromDto.MapMember(dest => dest.UserId, src => src.UserId.ToString());
-        fromDto.MapMember(dest => dest.EventType, src => src.NotificationEventId);
-        fromDto.MapMember(dest => dest.ChannelKey, src => src.NotificationChannelId);
-        fromDto.MapMember(dest => dest.ChannelConfigRaw, src => src.NotificationChannelConfig.DataRaw);
-        fromDto.MapMember(dest => dest.ScheduleType, src => src.NotificationScheduleId);
-        fromDto.MapMember(dest => dest.ScheduleConfigRaw, src => src.NotificationScheduleConfig.DataRaw);
+        fromDto.MapMember(dest => dest.EventId, src => src.NotificationEventId);
+        fromDto.MapMember(dest => dest.ChannelId, src => src.NotificationChannelId);
+        fromDto.MapMember(dest => dest.ChannelConfig, src => src.NotificationChannelConfig.Data);
+        fromDto.MapMember(dest => dest.ScheduleId, src => src.NotificationScheduleId);
+        fromDto.MapMember(dest => dest.ScheduleConfig, src => src.NotificationScheduleConfig.Data);
         fromDto.MapMember(dest => dest.IsEnabled, src => src.IsActive);
     })
     { }

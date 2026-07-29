@@ -64,6 +64,7 @@ internal static class Setup
             ["Security:OAuth2:SigningCertificate:KeyId"] = "AuthSigning",
             ["Security:OAuth2:EncryptionCertificate:KeyId"] = "AuthEncryption",
             ["Security:OAuth2:WorkerClientSecret"] = "cGFyYWdyYXBoYmVzdHJhaXNlY29weW1lZGljaW5lc2lja3BlcmhhcHNhZnRlcm5vb24=",
+            ["WebUI:BaseUrl"] = "https://localhost",
         };
 
         _waf = new ConfiguredWebApplicationFactory<Program>(preSettings)

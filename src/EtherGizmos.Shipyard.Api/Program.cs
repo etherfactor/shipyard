@@ -8,6 +8,7 @@ using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Events;
+using EtherGizmos.Shipyard.Events.Base;
 using EtherGizmos.Shipyard.Services;
 using EtherGizmos.Shipyard.Services.Bootstrappers;
 using EtherGizmos.Shipyard.Services.Export;
@@ -40,8 +41,17 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSerilog((services, logger) =>
-    logger.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>()));
+var otelEnabled = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT"))
+    || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"))
+    || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"))
+    || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT")); 
+
+builder.Services
+    .AddSerilog((services, logger) =>
+    {
+        logger.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>());
+        if (otelEnabled) logger.WriteTo.OpenTelemetry();
+    });
 
 //**********************************************************
 // Configuration
@@ -90,25 +100,30 @@ builder.Services.AddConnectionResolver()
     .WithSmtp();
 
 // Observability
-builder.Services
-    .AddOpenTelemetry()
-    .WithTracing(tracing => tracing
-        .AddAspNetCoreInstrumentation()
-        .AddEntityFrameworkCoreInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddMessagingInstrumentation()
-        .AddNpgsql()
-        .AddSqlClientInstrumentation()
-        .AddNotificationsInstrumentation()
-        .AddOtlpExporter())
-    .WithMetrics(metrics => metrics
-        .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddMessagingInstrumentation()
-        .AddNpgsqlInstrumentation()
-        .AddSqlClientInstrumentation()
-        .AddNotificationsInstrumentation()
-        .AddOtlpExporter());
+if (otelEnabled)
+{
+    builder.Services
+        .AddOpenTelemetry()
+        .WithTracing(tracing => tracing
+            .AddAspNetCoreInstrumentation()
+            .AddEntityFrameworkCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddMessagingInstrumentation()
+            .AddNpgsql()
+            .AddSqlClientInstrumentation()
+            .AddNotificationsInstrumentation()
+            .AddUnitOfWorkInstrumentation()
+            .AddOtlpExporter())
+        .WithMetrics(metrics => metrics
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddMessagingInstrumentation()
+            .AddNpgsqlInstrumentation()
+            .AddSqlClientInstrumentation()
+            .AddNotificationsInstrumentation()
+            .AddUnitOfWorkInstrumentation()
+            .AddOtlpExporter());
+}
 
 // Security
 builder.UseOAuth2()
@@ -298,6 +313,7 @@ builder.Services.AddNotifications(
 
         opt.AddNotification<CarrierUnknownStatusEvent, CarrierUnknownStatusRouter>(
             "carrier.unknownStatus",
+            typeof(NoConfiguration),
             evt =>
             {
                 evt.HasDisplayName("Carrier Unknown Status");
@@ -311,6 +327,7 @@ builder.Services.AddNotifications(
 
         opt.AddNotification<PackageDeliveredEvent, PackageDeliveredRouter>(
             "package.delivered",
+            typeof(NoConfiguration),
             evt =>
             {
                 evt.HasDisplayName("Package Delivered");
@@ -324,6 +341,7 @@ builder.Services.AddNotifications(
 
         opt.AddNotification<PackageFailedAttemptEvent, PackageFailedAttemptRouter>(
             "package.failedAttempt",
+            typeof(NoConfiguration),
             evt =>
             {
                 evt.HasDisplayName("Package Failed Attempt");
@@ -337,6 +355,7 @@ builder.Services.AddNotifications(
 
         opt.AddNotification<PackageOutForDeliveryEvent, PackageOutForDeliveryRouter>(
             "package.outForDelivery",
+            typeof(NoConfiguration),
             evt =>
             {
                 evt.HasDisplayName("Package Out For Delivery");
@@ -350,6 +369,7 @@ builder.Services.AddNotifications(
 
         opt.AddNotification<PackageReturnedEvent, PackageReturnedRouter>(
             "package.returned",
+            typeof(NoConfiguration),
             evt =>
             {
                 evt.HasDisplayName("Package Returned");
@@ -363,6 +383,7 @@ builder.Services.AddNotifications(
 
         opt.AddNotification<PackageUnknownStatusEvent, PackageUnknownStatusRouter>(
             "package.unknownStatus",
+            typeof(NoConfiguration),
             evt =>
             {
                 evt.HasDisplayName("Package Unknown Status");

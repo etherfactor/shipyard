@@ -13,15 +13,26 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 using Serilog;
 using System.Text.Json;
 
 var builder = Host.CreateApplicationBuilder(args);
 
+var otelEnabled = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT"))
+    || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"))
+    || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"))
+    || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT"));
+
 builder.Logging.ClearProviders();
 
-builder.Services.AddSerilog((services, logger) =>
-    logger.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>()),
+builder.Services
+    .AddSerilog((services, logger) =>
+    {
+        logger.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>());
+        if (otelEnabled) logger.WriteTo.OpenTelemetry();
+    },
     writeToProviders: true);
 
 builder.Services.AddTeeStreamLogger();
@@ -76,6 +87,25 @@ builder.AddServiceDefaults();
 
 builder.Services.AddConnectionResolver()
     .WithRabbitMQ();
+
+// Observability
+if (otelEnabled)
+{
+    builder.Services
+        .AddOpenTelemetry()
+        .WithTracing(tracing => tracing
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddMessagingInstrumentation()
+            .AddUnitOfWorkInstrumentation()
+            .AddOtlpExporter())
+        .WithMetrics(metrics => metrics
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddMessagingInstrumentation()
+            .AddUnitOfWorkInstrumentation()
+            .AddOtlpExporter());
+}
 
 // Http
 builder.Services.AddHttpClient("API")

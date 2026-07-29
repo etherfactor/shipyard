@@ -26,7 +26,7 @@ public class PackageFailedAttemptDigestEmailFormatter
         using var uow = _uowFactory.Create();
         var userRepo = uow.Repository<User>();
 
-        var userId = new Guid(notification.NotificationSubscription.UserId);
+        var userId = new Guid(notification.Subscription.UserId);
         var user = userRepo.Data.Single(e => e.Id == userId);
 
         var orderedNotifications = model.Notifications

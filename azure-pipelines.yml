@@ -8,7 +8,7 @@ resources:
   - repository: sharedTemplates
     type: git
     name: 'Projects/PipelineTemplates'
-    ref: 'refs/tags/1.2.0'
+    ref: 'refs/heads/feature/compose-tests'
 
 stages:
 
@@ -140,3 +140,40 @@ stages:
       - from: 'containers/docker-entrypoint.web.sh'
         to: 'files'
       repository: 'shipyard-web'
+
+- stage: verify
+  displayName: 'Verify'
+
+  jobs:
+
+  # Verify default compose file works
+  - template: shared/container/test-compose.yml@sharedTemplates
+    parameters:
+      name: 'test_container'
+      composeFile: 'compose.yml'
+      environmentExampleFile: '.env.example'
+      environmentFile: '.env'
+      images:
+      - name: 'api'
+        artifactName: 'api-docker'
+        repository: 'etherfactor/shipyard-api'
+      - name: 'worker'
+        artifactName: 'worker-docker'
+        repository: 'etherfactor/shipyard-worker'
+      - name: 'web'
+        artifactName: 'web-docker'
+        repository: 'etherfactor/shipyard-web'
+      pullServices:
+      - 'db'
+      - 'rmq'
+      - 'selenium'
+      waitTimeout: 180
+      verificationSteps:
+      - bash: |
+          curl --fail --silent --show-error http://localhost:7448/health
+        displayName: 'Verify Shipyard API'
+      - bash: |
+          curl --fail --silent --show-error \
+            http://localhost:7447/assets/config.json > /dev/null
+        displayName: 'Verify Shipyard Web'
+      artifactName: 'compose-logs'

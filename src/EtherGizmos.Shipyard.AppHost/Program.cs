@@ -4,14 +4,17 @@ var postgresUsername = builder.AddParameter("postgres-username", "postgres", sec
 var postgresPassword = builder.AddParameter("postgres-password", "nQW~xg-Z2Tzr5pkj*edJ5f", secret: true);
 
 var postgres = builder.AddPostgres("postgres", port: 57691, userName: postgresUsername, password: postgresPassword)
+    .WithImageTag("17.10")
     .WithDataVolume(isReadOnly: false);
 
 var database = postgres.AddDatabase("postgres-db", databaseName: "shipyard");
 
-var rabbitmq = builder.AddRabbitMQ("rabbitmq");
+var rabbitmq = builder.AddRabbitMQ("rabbitmq")
+    .WithImageTag("4.3");
+
 rabbitmq.WithManagementPlugin();
 
-var selenium = builder.AddContainer("selenium", "selenium/standalone-chromium:137.0");
+var selenium = builder.AddContainer("selenium", "selenium/standalone-chromium:150.0");
 selenium.WithHttpEndpoint(targetPort: 4444, name: "endpoint");
 
 var mailpit = builder.AddMailPit("mailpit");

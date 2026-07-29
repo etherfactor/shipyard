@@ -9,10 +9,16 @@
         <div class="fw-semibold">
           @if ("title" in notification.payload) {
           {{ notification.payload['title'] }}
+
           } @else if (notification.notificationSubscription?.notificationEvent?.name) {
+          @if ("notifications" in notification.payload) {
+          Digest:
+          }
           {{ notification.notificationSubscription?.notificationEvent?.name }}
+
           } @else {
           An Event Occurred
+
           }
         </div>
 
@@ -46,10 +52,15 @@
         </span>
         }
 
+        @let statusType = notification.notificationSubscription?.notificationScheduleId === 'digest'
+          && !("notifications" in notification.payload)
+          && notification.statusType === NotificationStatusType.Sent
+          ? "Included"
+          : notification.statusType;
         <span [innerHtml]="formatStyleSpan(
               NotificationStatusTheme,
-              notification.statusType ?? 'unknown',
-              notification.statusType ?? 'Unknown'
+              statusType ?? 'unknown',
+              statusType ?? 'Unknown'
               )">
         </span>
       </div>
@@ -58,6 +69,10 @@
     <p class="mb-2 mt-2">
       @if ("message" in notification.payload) {
       {{ notification.payload['message'] }}
+      } @else if ("notifications" in notification.payload) {
+      @let length = array(notification.payload['notifications']).length;
+      A digest of type '{{ notification.notificationSubscription?.notificationEvent?.name ?? 'Unknown' }}' was created.
+      This digest included {{ length }} {{ length == 1 ? 'event' : 'events' }}.
       } @else {
       An event of type '{{ notification.notificationSubscription?.notificationEvent?.name ?? 'Unknown' }}' has occurred.
       }
@@ -75,7 +90,7 @@
 
       @if ("carrierId" in notification.payload) {
       <a class="btn btn-sm"
-         [ngClass]="('packageId' in notification.payload) ? 'btn-outline-secondary' : 'btn-primary'"
+         [ngClass]="('packageId' in notification.payload) ? 'btn-secondary' : 'btn-primary'"
          [routerLink]="['/carriers', notification.payload['carrierId']]"
          [queryParams]="{ append: 1 }">
         <i class="bi bi-box-arrow-up-right me-1"></i>

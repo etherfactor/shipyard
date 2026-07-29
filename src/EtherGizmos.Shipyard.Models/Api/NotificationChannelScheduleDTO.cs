@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EtherGizmos.Common.Models;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Extensions;
 using Swashbuckle.AspNetCore.Filters;
@@ -21,14 +22,14 @@ public class NotificationChannelScheduleDTOProfile : Profile
 {
     public NotificationChannelScheduleDTOProfile() : base(nameof(NotificationChannelScheduleDTOProfile), mapper =>
     {
-        var toDto = mapper.CreateMap<AppNotificationEventChannelSchedule, NotificationChannelScheduleDTO>();
+        var toDto = mapper.CreateMap<NotificationChannelSchedule, NotificationChannelScheduleDTO>();
         toDto.IgnoreAllMembers();
         /* Begin Audit */
         /*  End Audit  */
-        toDto.MapMember(dest => dest.NotificationChannelId, src => src.NotificationChannelId);
-        toDto.MapMember(dest => dest.NotificationChannel, src => src.NotificationChannel, opt => opt.ExplicitExpansion());
-        toDto.MapMember(dest => dest.NotificationScheduleId, src => src.NotificationScheduleId);
-        toDto.MapMember(dest => dest.NotificationSchedule, src => src.NotificationSchedule, opt => opt.ExplicitExpansion());
+        toDto.MapMember(dest => dest.NotificationChannelId, src => src.ChannelId);
+        toDto.MapMember(dest => dest.NotificationChannel, src => src.Channel, opt => opt.ExplicitExpansion());
+        toDto.MapMember(dest => dest.NotificationScheduleId, src => src.ScheduleId);
+        toDto.MapMember(dest => dest.NotificationSchedule, src => src.Schedule, opt => opt.ExplicitExpansion());
     })
     { }
 }
