@@ -318,8 +318,11 @@ builder.Services.AddNotifications(
             {
                 evt.HasDisplayName("Carrier Unknown Status");
 
-                evt.Supports<CarrierUnknownStatusEvent, EmailChannel, CarrierUnknownStatusEmailFormatter>();
-                evt.SupportsDigest<CarrierUnknownStatusEvent, EmailChannel, CarrierUnknownStatusDigestEmailFormatter>();
+                if (emailConnectionId is not null)
+                {
+                    evt.Supports<CarrierUnknownStatusEvent, EmailChannel, CarrierUnknownStatusEmailFormatter>();
+                    evt.SupportsDigest<CarrierUnknownStatusEvent, EmailChannel, CarrierUnknownStatusDigestEmailFormatter>();
+                }
 
                 evt.Supports<CarrierUnknownStatusEvent, WebhookChannel, CarrierUnknownStatusWebhookFormatter>();
                 evt.SupportsDigest<CarrierUnknownStatusEvent, WebhookChannel, CarrierUnknownStatusDigestWebhookFormatter>();
@@ -332,8 +335,11 @@ builder.Services.AddNotifications(
             {
                 evt.HasDisplayName("Package Delivered");
 
-                evt.Supports<PackageDeliveredEvent, EmailChannel, PackageDeliveredEmailFormatter>();
-                evt.SupportsDigest<PackageDeliveredEvent, EmailChannel, PackageDeliveredDigestEmailFormatter>();
+                if (emailConnectionId is not null)
+                {
+                    evt.Supports<PackageDeliveredEvent, EmailChannel, PackageDeliveredEmailFormatter>();
+                    evt.SupportsDigest<PackageDeliveredEvent, EmailChannel, PackageDeliveredDigestEmailFormatter>();
+                }
 
                 evt.Supports<PackageDeliveredEvent, WebhookChannel, PackageDeliveredWebhookFormatter>();
                 evt.SupportsDigest<PackageDeliveredEvent, WebhookChannel, PackageDeliveredDigestWebhookFormatter>();
@@ -346,8 +352,11 @@ builder.Services.AddNotifications(
             {
                 evt.HasDisplayName("Package Failed Attempt");
 
-                evt.Supports<PackageFailedAttemptEvent, EmailChannel, PackageFailedAttemptEmailFormatter>();
-                evt.SupportsDigest<PackageFailedAttemptEvent, EmailChannel, PackageFailedAttemptDigestEmailFormatter>();
+                if (emailConnectionId is not null)
+                {
+                    evt.Supports<PackageFailedAttemptEvent, EmailChannel, PackageFailedAttemptEmailFormatter>();
+                    evt.SupportsDigest<PackageFailedAttemptEvent, EmailChannel, PackageFailedAttemptDigestEmailFormatter>();
+                }
 
                 evt.Supports<PackageFailedAttemptEvent, WebhookChannel, PackageFailedAttemptWebhookFormatter>();
                 evt.SupportsDigest<PackageFailedAttemptEvent, WebhookChannel, PackageFailedAttemptDigestWebhookFormatter>();
@@ -360,8 +369,11 @@ builder.Services.AddNotifications(
             {
                 evt.HasDisplayName("Package Out For Delivery");
 
-                evt.Supports<PackageOutForDeliveryEvent, EmailChannel, PackageOutForDeliveryEmailFormatter>();
-                evt.SupportsDigest<PackageOutForDeliveryEvent, EmailChannel, PackageOutForDeliveryDigestEmailFormatter>();
+                if (emailConnectionId is not null)
+                {
+                    evt.Supports<PackageOutForDeliveryEvent, EmailChannel, PackageOutForDeliveryEmailFormatter>();
+                    evt.SupportsDigest<PackageOutForDeliveryEvent, EmailChannel, PackageOutForDeliveryDigestEmailFormatter>();
+                }
 
                 evt.Supports<PackageOutForDeliveryEvent, WebhookChannel, PackageOutForDeliveryWebhookFormatter>();
                 evt.SupportsDigest<PackageOutForDeliveryEvent, WebhookChannel, PackageOutForDeliveryDigestWebhookFormatter>();
@@ -374,8 +386,11 @@ builder.Services.AddNotifications(
             {
                 evt.HasDisplayName("Package Returned");
 
-                evt.Supports<PackageReturnedEvent, EmailChannel, PackageReturnedEmailFormatter>();
-                evt.SupportsDigest<PackageReturnedEvent, EmailChannel, PackageReturnedDigestEmailFormatter>();
+                if (emailConnectionId is not null)
+                {
+                    evt.Supports<PackageReturnedEvent, EmailChannel, PackageReturnedEmailFormatter>();
+                    evt.SupportsDigest<PackageReturnedEvent, EmailChannel, PackageReturnedDigestEmailFormatter>();
+                }
 
                 evt.Supports<PackageReturnedEvent, WebhookChannel, PackageReturnedWebhookFormatter>();
                 evt.SupportsDigest<PackageReturnedEvent, WebhookChannel, PackageReturnedDigestWebhookFormatter>();
@@ -388,8 +403,11 @@ builder.Services.AddNotifications(
             {
                 evt.HasDisplayName("Package Unknown Status");
 
-                evt.Supports<PackageUnknownStatusEvent, EmailChannel, PackageUnknownStatusEmailFormatter>();
-                evt.SupportsDigest<PackageUnknownStatusEvent, EmailChannel, PackageUnknownStatusDigestEmailFormatter>();
+                if (emailConnectionId is not null)
+                {
+                    evt.Supports<PackageUnknownStatusEvent, EmailChannel, PackageUnknownStatusEmailFormatter>();
+                    evt.SupportsDigest<PackageUnknownStatusEvent, EmailChannel, PackageUnknownStatusDigestEmailFormatter>();
+                }
 
                 evt.Supports<PackageUnknownStatusEvent, WebhookChannel, PackageUnknownStatusWebhookFormatter>();
                 evt.SupportsDigest<PackageUnknownStatusEvent, WebhookChannel, PackageUnknownStatusDigestWebhookFormatter>();
