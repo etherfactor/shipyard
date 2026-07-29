@@ -56,12 +56,6 @@ builder.Services
     .ValidateDataAnnotations();
 
 builder.Services
-    .AddOptions<ConnectionReferenceOptions>("Database")
-    .Bind(builder.Configuration.GetSection("Database"))
-    .ValidateOnStart()
-    .ValidateDataAnnotations();
-
-builder.Services
     .AddOptions<ConnectionReferenceOptions>("MessageBroker")
     .Bind(builder.Configuration.GetSection("MessageBroker"))
     .ValidateOnStart()
