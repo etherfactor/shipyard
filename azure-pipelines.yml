@@ -177,3 +177,6 @@ stages:
             http://localhost:7447/assets/config.json > /dev/null
         displayName: 'Verify Shipyard Web'
       artifactName: 'compose-logs'
+      env:
+        SHIPYARD_WORKER_CLIENT_SECRET: 3HwNJcDqQmRomHNYAgFgCNMjH2Nq73a6
+        SHIPYARD_WEB_LOG_APIKEY: tOMXIp94zMgMiGML2KJaeexUm04gh1sF
