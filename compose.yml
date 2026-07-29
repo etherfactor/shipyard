@@ -85,14 +85,14 @@ services:
       Security__OAuth2__WebUIRedirectUrls__0: ${SHIPYARD_WEB_HOST:-http://localhost:7447}/login/callback
       Security__OAuth2__WorkerClientSecret: ${SHIPYARD_WORKER_CLIENT_SECRET}
       Security__OAuth2__DisableTransportSecurityRequirement: true
-      Security__OAuth2__EncryptionCertificate__CertificateId: AuthEncryption
-      Security__Certificates__AuthEncryption__Type: ${SHIPYARD_ENC_TYPE:-PfxFile}
-      Security__Certificates__AuthEncryption__File__Path: ${SHIPYARD_ENC_PATH:-/opt/certificates/auth-encryption.pfx}
-      Security__Certificates__AuthEncryption__File__AutoGenerate: true
-      Security__OAuth2__SigningCertificate__CertificateId: AuthSigning
-      Security__Certificates__AuthSigning__Type: ${SHIPYARD_SIGN_TYPE:-PfxFile}
-      Security__Certificates__AuthSigning__File__Path: ${SHIPYARD_SIGN_PATH:-/opt/certificates/auth-signing.pfx}
-      Security__Certificates__AuthSigning__File__AutoGenerate: true
+      Security__OAuth2__EncryptionCertificate__KeyId: AuthEncryption
+      Keys__AuthEncryption__Type: ${SHIPYARD_ENC_TYPE:-Asymmetric}
+      Keys__AuthEncryption__PfxFile__Path: ${SHIPYARD_ENC_PATH:-/opt/certificates/auth-encryption.pfx}
+      Keys__AuthEncryption__PfxFile__AutoGenerate: true
+      Security__OAuth2__SigningCertificate__KeyId: AuthSigning
+      Keys__AuthSigning__Type: ${SHIPYARD_SIGN_TYPE:-Asymmetric}
+      Keys__AuthSigning__PfxFile__Path: ${SHIPYARD_SIGN_PATH:-/opt/certificates/auth-signing.pfx}
+      Keys__AuthSigning__PfxFile__AutoGenerate: true
       LogIngestion__Sources__WebUI__ApiKey: ${SHIPYARD_WEB_LOG_APIKEY}
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
