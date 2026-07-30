@@ -92,7 +92,7 @@ stages:
       inputArtifactName: 'api'
       outputArtifactName: 'api-docker'
       dockerfilePath: 'containers/api.dockerfile'
-      repository: 'shipyard-api'
+      repository: 'etherfactor/shipyard-api'
 
   # Publish dotnet worker
   - template: dotnet/publish/application.yml@sharedTemplates
@@ -111,7 +111,7 @@ stages:
       inputArtifactName: 'worker'
       outputArtifactName: 'worker-docker'
       dockerfilePath: 'containers/worker.dockerfile'
-      repository: 'shipyard-worker'
+      repository: 'etherfactor/shipyard-worker'
 
   # Publish angular web ui
   - template: node/publish/application.yml@sharedTemplates
@@ -139,7 +139,7 @@ stages:
         to: 'files'
       - from: 'containers/docker-entrypoint.web.sh'
         to: 'files'
-      repository: 'shipyard-web'
+      repository: 'etherfactor/shipyard-web'
 
 - stage: verify
   displayName: 'Verify'
