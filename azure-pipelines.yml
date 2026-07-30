@@ -156,17 +156,14 @@ stages:
       images:
       - name: 'api'
         artifactName: 'api-docker'
-        repository: 'etherfactor/shipyard-api'
         addTags:
         - 'latest'
       - name: 'worker'
         artifactName: 'worker-docker'
-        repository: 'etherfactor/shipyard-worker'
         addTags:
         - 'latest'
       - name: 'web'
         artifactName: 'web-docker'
-        repository: 'etherfactor/shipyard-web'
         addTags:
         - 'latest'
       pullServices:
