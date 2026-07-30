@@ -179,8 +179,7 @@ stages:
           curl --fail --silent --show-error http://localhost:7448/health
         displayName: 'Verify Shipyard API'
       - bash: |
-          curl --fail --silent --show-error \
-            http://localhost:7447/assets/config.json > /dev/null
+          curl --fail --silent --show-error http://localhost:7447/assets/config.json > /dev/null
         displayName: 'Verify Shipyard Web'
       artifactName: 'compose-logs'
       env:
