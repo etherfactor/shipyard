@@ -25,14 +25,17 @@ internal class SearchAuthAspect<TEntity, TId>
             Assert.That(response.StatusCode, Is.Not.EqualTo(HttpStatusCode.Forbidden));
         });
 
-        yield return new AspectCase($"search:nocap:403", async context =>
+        if (specification.Capabilities.Contains(ResourceFunctionality.CapabilityRequired))
         {
-            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString(), capabilities: "");
+            yield return new AspectCase($"search:nocap:403", async context =>
+            {
+                var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString(), capabilities: "");
 
-            var response = await client.GetAsync(specification.BaseRoute);
+                var response = await client.GetAsync(specification.BaseRoute);
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
-        });
+                Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
+            });
+        }
 
         yield return new AspectCase($"search:anon:401", async context =>
         {
@@ -68,15 +71,18 @@ internal class GetAuthAspect<TEntity, TId>
             Assert.That(response.StatusCode, Is.Not.EqualTo(HttpStatusCode.Forbidden));
         });
 
-        yield return new AspectCase($"get:nocap:403", async context =>
+        if (specification.Capabilities.Contains(ResourceFunctionality.CapabilityRequired))
         {
-            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString(), capabilities: "");
+            yield return new AspectCase($"get:nocap:403", async context =>
+            {
+                var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString(), capabilities: "");
 
-            var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForRead);
-            var response = await client.GetAsync(specification.BaseRoute + specification.Path(id));
+                var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForRead);
+                var response = await client.GetAsync(specification.BaseRoute + specification.Path(id));
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
-        });
+                Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
+            });
+        }
 
         yield return new AspectCase($"get:anon:401", async context =>
         {
@@ -113,15 +119,18 @@ internal class CreateAuthAspect<TEntity, TId>
             Assert.That(response.StatusCode, Is.Not.EqualTo(HttpStatusCode.Forbidden));
         });
 
-        yield return new AspectCase($"create:nocap:403", async context =>
+        if (specification.Capabilities.Contains(ResourceFunctionality.CapabilityRequired))
         {
-            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString(), capabilities: "");
+            yield return new AspectCase($"create:nocap:403", async context =>
+            {
+                var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString(), capabilities: "");
 
-            var body = specification.Create();
-            var response = await client.PostAsync(specification.BaseRoute, body);
+                var body = specification.Create();
+                var response = await client.PostAsync(specification.BaseRoute, body);
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
-        });
+                Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
+            });
+        }
 
         yield return new AspectCase($"create:anon:401", async context =>
         {
@@ -159,16 +168,19 @@ internal class PatchAuthAspect<TEntity, TId>
             Assert.That(response.StatusCode, Is.Not.EqualTo(HttpStatusCode.Forbidden));
         });
 
-        yield return new AspectCase($"patch:nocap:403", async context =>
+        if (specification.Capabilities.Contains(ResourceFunctionality.CapabilityRequired))
         {
-            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString(), capabilities: "");
+            yield return new AspectCase($"patch:nocap:403", async context =>
+            {
+                var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString(), capabilities: "");
 
-            var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForUpdate);
-            var body = specification.Update(entity);
-            var response = await client.PatchAsync(specification.BaseRoute + specification.Path(id), body);
+                var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForUpdate);
+                var body = specification.Update(entity);
+                var response = await client.PatchAsync(specification.BaseRoute + specification.Path(id), body);
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
-        });
+                Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
+            });
+        }
 
         yield return new AspectCase($"patch:anon:401", async context =>
         {
@@ -206,15 +218,18 @@ internal class DeleteAuthAspect<TEntity, TId>
             Assert.That(response.StatusCode, Is.Not.EqualTo(HttpStatusCode.Forbidden));
         });
 
-        yield return new AspectCase($"delete:nocap:403", async context =>
+        if (specification.Capabilities.Contains(ResourceFunctionality.CapabilityRequired))
         {
-            var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString(), capabilities: "");
+            yield return new AspectCase($"delete:nocap:403", async context =>
+            {
+                var client = context.GetClientWithCapabilities(Setup.OwnerUserId.ToString(), capabilities: "");
 
-            var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForUpdate);
-            var response = await client.DeleteAsync(specification.BaseRoute + specification.Path(id));
+                var (entity, id) = await specification.Records.AcquireAsync(context, AcquirePurpose.ForUpdate);
+                var response = await client.DeleteAsync(specification.BaseRoute + specification.Path(id));
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
-        });
+                Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
+            });
+        }
 
         yield return new AspectCase($"delete:anon:401", async context =>
         {

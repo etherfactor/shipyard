@@ -36,6 +36,7 @@ public class PackagesControllerV1Spec : IODataResourceSpec<PackageDTO, int>
 
             //Miscellaneous
             ResourceFunctionality.GroupFiltering,
+            ResourceFunctionality.CapabilityRequired,
         };
 
     public Func<PackageDTO, int> Identity => carrier => carrier.Id;

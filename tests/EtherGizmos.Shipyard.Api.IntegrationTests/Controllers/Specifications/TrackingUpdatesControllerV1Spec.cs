@@ -37,6 +37,7 @@ public class TrackingUpdatesControllerV1Spec : IODataResourceSpec<TrackingUpdate
 
             //Miscellaneous
             ResourceFunctionality.GroupFiltering,
+            ResourceFunctionality.CapabilityRequired,
         };
 
     public Func<TrackingUpdateDTO, int> Identity => carrier => carrier.Id;

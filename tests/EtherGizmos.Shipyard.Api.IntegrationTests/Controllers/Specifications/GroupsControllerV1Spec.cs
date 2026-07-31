@@ -33,6 +33,9 @@ public class GroupsControllerV1Spec : IODataResourceSpec<GroupDTO, int>
             ResourceFunctionality.QuerySelect,
             ResourceFunctionality.QuerySkip,
             ResourceFunctionality.QueryTop,
+
+            //Miscellaneous
+            ResourceFunctionality.CapabilityRequired,
         };
 
     public Func<GroupDTO, int> Identity => carrier => carrier.Id;

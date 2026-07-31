@@ -33,6 +33,9 @@ public class CarriersControllerV1Spec : IODataResourceSpec<CarrierDTO, int>
             ResourceFunctionality.QuerySelect,
             ResourceFunctionality.QuerySkip,
             ResourceFunctionality.QueryTop,
+
+            //Miscellaneous
+            ResourceFunctionality.CapabilityRequired,
         };
 
     public Func<CarrierDTO, int> Identity => carrier => carrier.Id;

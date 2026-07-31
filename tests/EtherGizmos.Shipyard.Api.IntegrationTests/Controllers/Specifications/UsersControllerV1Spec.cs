@@ -36,6 +36,7 @@ public class UsersControllerV1Spec : IODataResourceSpec<UserDTO, Guid>
 
             //Miscellaneous
             ResourceFunctionality.GroupFiltering,
+            ResourceFunctionality.CapabilityRequired,
         };
 
     public Func<UserDTO, Guid> Identity => user => user.Id;

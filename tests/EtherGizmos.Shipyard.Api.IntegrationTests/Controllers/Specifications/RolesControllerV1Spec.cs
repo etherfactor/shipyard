@@ -29,6 +29,9 @@ public class RolesControllerV1Spec : IODataResourceSpec<RoleDTO, int>
             ResourceFunctionality.QuerySelect,
             ResourceFunctionality.QuerySkip,
             ResourceFunctionality.QueryTop,
+
+            //Miscellaneous
+            ResourceFunctionality.CapabilityRequired,
         };
 
     public Func<RoleDTO, int> Identity => carrier => carrier.Id;
