@@ -24,6 +24,10 @@ public abstract class AutoODataController : ODataController
         _serviceProvider = serviceProvider;
     }
 
+    protected virtual IQueryable<TEntity> Filter<TEntity>(IQueryable<TEntity> queryable)
+        where TEntity : class, IEntity
+        => queryable;
+
     protected async Task<TEntity> LoadRecordAsync<TEntity, TDto, TKey>(
         IUnitOfWork uow,
         IEnumerable<KeyMapping<TEntity, TDto, TKey>> keys,
@@ -53,7 +57,10 @@ public abstract class AutoODataController : ODataController
                 return Expression.Lambda<Func<TEntity, bool>>(Expression.AndAlso(leftExp.Body, rightExp.Body), [.. parameters]);
             });
 
-        var record = await repository.Data.SingleOrDefaultAsync(condition, cancellationToken: cancellationToken);
+        var data = repository.Data;
+        data = Filter(data);
+
+        var record = await data.SingleOrDefaultAsync(condition, cancellationToken: cancellationToken);
 
         //Record was not found, so return 404 Not Found
         if (record is null)
@@ -353,8 +360,11 @@ public abstract class AutoODataController : ODataController
             using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
             var repository = uow.Repository<TEntity>();
 
+            var data = repository.Data;
+            data = _controller.Filter(data);
+
             var finished = await _mapper
-                .MapExplicitly(repository.Data)
+                .MapExplicitly(data)
                 .To<TDto>()
                 .ApplyQueryOptions(queryOptions)
                 .ExecuteAsync(cancellationToken);

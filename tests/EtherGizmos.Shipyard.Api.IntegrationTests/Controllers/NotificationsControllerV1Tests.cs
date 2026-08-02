@@ -4,17 +4,14 @@ using EtherGizmos.Shipyard.Controllers.Specifications;
 
 namespace EtherGizmos.Shipyard.Controllers;
 
-internal class TrackingUpdatesControllerV1Tests : IntegrationTestBase
+internal class NotificationsControllerV1Tests : IntegrationTestBase
 {
     public static IEnumerable<AspectCase> All
-        => EntityAspects.BuildAll(TrackingUpdatesControllerV1Spec.Instance);
+        => EntityAspects.BuildAll(NotificationsControllerV1Spec.Instance);
 
     [OneTimeSetUp]
     public async Task OneTimeSetUp()
-    {
-        await CarriersControllerV1Spec.Instance.Records.AcquireAsync(FixtureContext.Instance, AcquirePurpose.ForRead);
-        await PackagesControllerV1Spec.Instance.Records.AcquireAsync(FixtureContext.Instance, AcquirePurpose.ForRead);
-    }
+        => await NotificationsControllerV1Spec.Instance.Records.AcquireAsync(FixtureContext.Instance, AcquirePurpose.ForRead);
 
     [TestCaseSource(nameof(All))]
     public async Task Aspect(AspectCase c)

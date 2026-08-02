@@ -1,10 +1,6 @@
-﻿using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Shipyard.Abstractions;
+﻿using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api;
-using EtherGizmos.Shipyard.Api.Enums;
-using EtherGizmos.Shipyard.Database;
-using EtherGizmos.Shipyard.Database.Enums;
-using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http.Json;
 
 namespace EtherGizmos.Shipyard.Controllers.Specifications;
 
@@ -25,6 +21,9 @@ public class TrackingUpdatesControllerV1Spec : IODataResourceSpec<TrackingUpdate
             //Actions
             ResourceFunctionality.Search,
             ResourceFunctionality.Get,
+            ResourceFunctionality.Create,
+            ResourceFunctionality.Update,
+            ResourceFunctionality.Delete,
 
             //Query options
             ResourceFunctionality.QueryCount,
@@ -46,9 +45,23 @@ public class TrackingUpdatesControllerV1Spec : IODataResourceSpec<TrackingUpdate
 
     public IRecordSource<TrackingUpdateDTO, int> Records => new TrackingUpdatesControllerV1Source(this);
 
-    public HttpContent Create() => throw new NotImplementedException();
+    public HttpContent Create() => Create(packageId: 1);
 
-    public HttpContent Update(TrackingUpdateDTO entity) => throw new NotImplementedException();
+    private HttpContent Create(int packageId) =>
+        JsonContent.Create(new
+        {
+            occurredAt = DateTimeOffset.UtcNow.ToString("O"),
+            statusType = "OutForDelivery",
+            location = "Somewhere",
+            description = "Your package was delivered",
+            packageId = packageId,
+        });
+
+    public HttpContent Update(TrackingUpdateDTO entity) =>
+        JsonContent.Create(new
+        {
+            statusType = "Delivered",
+        });
 
     private class TrackingUpdatesControllerV1Source : IRecordSource<TrackingUpdateDTO, int>
     {
@@ -67,25 +80,12 @@ public class TrackingUpdatesControllerV1Spec : IODataResourceSpec<TrackingUpdate
         {
             var (_, id) = await PackagesControllerV1Spec.Instance.Records.AcquireAsync(context, purpose, createdByUserId);
 
-            var uowFactory = Setup.Services.GetRequiredService<IUnitOfWorkFactory>();
-            using var uow = uowFactory.Create();
+            var body = ((TrackingUpdatesControllerV1Spec)_specification).Create(packageId: id);
+            var client = context.GetClientWithCapabilities((createdByUserId ?? Setup.OwnerUserId).ToString());
+            var response = await client.PostAsync(_specification.BaseRoute, body);
 
-            var updateRepo = uow.Repository<TrackingUpdate>();
-
-            var update = new TrackingUpdate()
-            {
-                PackageId = id,
-                StatusTypeId = StatusTypeId.Delivered,
-            };
-
-            updateRepo.Add(update);
-
-            await uow.SaveChangesAsync();
-
-            return (new()
-            {
-                StatusType = StatusTypeDTO.Delivered,
-            }, update.Id);
+            var entity = await response.Content.ReadFromJsonAsync<TrackingUpdateDTO>(JsonOptions.Default);
+            return (entity!, entity!.Id);
         }
     }
 }

@@ -5,6 +5,7 @@ using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace EtherGizmos.Shipyard.Controllers;
@@ -18,6 +19,15 @@ public class NotificationMetaController : AutoODataController
         IServiceProvider serviceProvider)
         : base(serviceProvider)
     {
+    }
+
+    protected override IQueryable<TEntity> Filter<TEntity>(
+        IQueryable<TEntity> queryable)
+    {
+        if (queryable is IQueryable<NotificationEvent> eventQueryable)
+            return (IQueryable<TEntity>)eventQueryable.Include(e => e.Supports);
+
+        return queryable;
     }
 
     [ApiVersion(1.0)]

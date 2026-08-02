@@ -28,6 +28,7 @@ public class NotificationSubscriptionDTOConfiguration : IModelConfiguration
             entity.Property(e => e.UserId);
             entity.Property(e => e.NotificationEventId);
             entity.HasRequired(e => e.NotificationEvent);
+            entity.ComplexProperty(e => e.NotificationEventConfig);
             entity.Property(e => e.NotificationChannelId);
             entity.HasRequired(e => e.NotificationChannel);
             entity.ComplexProperty(e => e.NotificationChannelConfig);

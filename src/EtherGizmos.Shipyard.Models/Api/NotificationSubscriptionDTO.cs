@@ -18,6 +18,8 @@ public class NotificationSubscriptionDTO
 
     public NotificationEventDTO? NotificationEvent { get; set; }
 
+    public DynamicBagDTO NotificationEventConfig { get; set; } = new();
+
     [Required]
     public string NotificationChannelId { get; set; } = null!;
 
@@ -51,6 +53,7 @@ public class NotificationSubscriptionDTOProfile : Profile
         toDto.MapMember(dest => dest.UserId, src => Guid.Parse(src.UserId));
         toDto.MapMember(dest => dest.NotificationEventId, src => src.EventId);
         toDto.MapMember(dest => dest.NotificationEvent, src => src.Event, opt => opt.ExplicitExpansion());
+        toDto.MapMember(dest => dest.NotificationEventConfig, src => new DynamicBagDTO() { Data = src.EventConfig });
         toDto.MapMember(dest => dest.NotificationChannelId, src => src.ChannelId);
         toDto.MapMember(dest => dest.NotificationChannel, src => src.Channel, opt => opt.ExplicitExpansion());
         toDto.MapMember(dest => dest.NotificationChannelConfig, src => new DynamicBagDTO() { Data = src.ChannelConfig });
@@ -65,6 +68,7 @@ public class NotificationSubscriptionDTOProfile : Profile
         fromDto.IgnoreAllMembers();
         fromDto.MapMember(dest => dest.UserId, src => src.UserId.ToString());
         fromDto.MapMember(dest => dest.EventId, src => src.NotificationEventId);
+        fromDto.MapMember(dest => dest.EventConfig, src => src.NotificationEventConfig.Data);
         fromDto.MapMember(dest => dest.ChannelId, src => src.NotificationChannelId);
         fromDto.MapMember(dest => dest.ChannelConfig, src => src.NotificationChannelConfig.Data);
         fromDto.MapMember(dest => dest.ScheduleId, src => src.NotificationScheduleId);

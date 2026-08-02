@@ -70,13 +70,13 @@ public class CarrierExecutionsController : AutoODataController
             .PatchAsync(patch, queryOptions, cancellationToken);
 
     private IKeylessRequestBuilder<CarrierExecution, CarrierExecutionDTO> ForSet()
-        => ForSet<CarrierExecution, CarrierExecutionDTO>()
-            .OnCreating((db, dto) =>
-            {
-                db.StartedAt ??= db.CompletedAt;
-                db.StepCount = (short)db.Carrier.Steps.Count;
-                return Task.CompletedTask;
-            });
+        => ForSet<CarrierExecution, CarrierExecutionDTO>();
+    //        .OnCreating((db, dto) =>
+    //        {
+    //            db.StartedAt ??= db.CompletedAt;
+    //            db.StepCount = (short)db.Carrier.Steps.Count;
+    //            return Task.CompletedTask;
+    //        });
 
     private IKeyedRequestBuilder<CarrierExecution, CarrierExecutionDTO> ForItem(
         int id)
