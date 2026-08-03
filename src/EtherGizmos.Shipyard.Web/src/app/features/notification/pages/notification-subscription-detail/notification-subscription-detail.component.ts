@@ -5,6 +5,7 @@ import { EntitySingle } from "@ethergizmos/odata-fluent-client";
 import { NgSelectModule } from "@ng-select/ng-select";
 import { DetailBoxButton, DetailBoxComponent } from "../../../../shared/components/detail-box/detail-box.component";
 import { DetailHeaderComponent } from "../../../../shared/components/detail-header/detail-header.component";
+import { InputLuxonDatetimeComponent } from "../../../../shared/components/input-luxon-datetime/input-luxon-datetime.component";
 import { JsonSchemaAutoFormComponent } from "../../../../shared/components/json-schema-auto-form/json-schema-auto-form.component";
 import { ReadonlyFormDirective } from "../../../../shared/directives/readonly-form/readonly-form.directive";
 import { NavbarActionService } from "../../../../shared/services/navbar-action/navbar-action.service";
@@ -28,6 +29,7 @@ import { NotificationSubscriptionService } from "../../services/notification-sub
     DetailBoxComponent,
     DetailHeaderComponent,
     JsonSchemaAutoFormComponent,
+    InputLuxonDatetimeComponent,
     NgSelectModule,
     ReactiveFormsModule,
     ReadonlyFormDirective,
