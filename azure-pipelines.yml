@@ -8,7 +8,7 @@ resources:
   - repository: sharedTemplates
     type: git
     name: 'Projects/PipelineTemplates'
-    ref: 'refs/heads/feature/compose-tests'
+    ref: 'refs/tags/2.0.0'
 
 stages:
 
