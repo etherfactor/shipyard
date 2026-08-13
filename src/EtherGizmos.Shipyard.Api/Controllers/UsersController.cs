@@ -43,10 +43,10 @@ public class UsersController : AutoODataController
     [ProducesResponseSet]
     [ProducesResponseType(200, Type = typeof(UserDTO)), SwaggerResponseExample(200, typeof(UserDTOExampleGet))]
     public Task<IActionResult> Search(
-    ODataQueryOptions<UserDTO> queryOptions,
-    CancellationToken cancellationToken = default)
-    => ForSet()
-        .SearchAsync(queryOptions, cancellationToken);
+        ODataQueryOptions<UserDTO> queryOptions,
+        CancellationToken cancellationToken = default)
+        => ForSet()
+            .SearchAsync(queryOptions, cancellationToken);
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute + "({id})")]
