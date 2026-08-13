@@ -29,6 +29,9 @@ public class CarrierUnknownStatusEmailFormatter
         var userId = new Guid(notification.Subscription.UserId);
         var user = userRepo.Data.Single(e => e.Id == userId);
 
+        if (user.EmailAddress is null)
+            throw new InvalidOperationException(EmailConstants.UserLacksEmailExceptionMessage);
+
         var subject = model.Title;
 
         var html = LiquidMjmlRenderer.Render(
@@ -48,8 +51,7 @@ public class CarrierUnknownStatusEmailFormatter
         var message = new EmailMessage()
         {
             Subject = subject,
-            From = new("shipyard@localhost"),
-            To = [new(user.EmailAddress ?? "test@domain.com")],
+            To = [new(user.EmailAddress)],
             HtmlBody = html,
         };
 

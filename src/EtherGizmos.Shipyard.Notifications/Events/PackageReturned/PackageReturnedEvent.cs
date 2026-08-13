@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+
 #pragma warning disable IDE0130
 namespace EtherGizmos.Shipyard.Events;
 
@@ -15,7 +17,7 @@ public record PackageReturnedEvent : ShipyardEvent
 
     public required string? Contents { get; init; }
 
-    public required List<PackageReturnedEventUpdate> Updates { get; init; }
+    public required ImmutableList<PackageReturnedEventUpdate> Updates { get; init; }
 }
 
 public record PackageReturnedEventUpdate

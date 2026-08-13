@@ -36,7 +36,8 @@ api.WithEnvironment("Email:ConnectionId", "AspireEmail");
 api.WithEnvironment("Connections:AspireEmail:Type", "Email");
 api.WaitFor(mailpit).WithEnvironment("Connections:AspireEmail:Smtp:Host", () => mailpit.GetEndpoint("smtp").Host)
     .WithEnvironment("Connections:AspireEmail:Smtp:Port", () => mailpit.GetEndpoint("smtp").Port.ToString())
-    .WithEnvironment("Connections:AspireEmail:Smtp:UseSsl", "false");
+    .WithEnvironment("Connections:AspireEmail:Smtp:UseSsl", "false")
+    .WithEnvironment("Connections:AspireEmail:Smtp:From:Address", "test@domain.com");
 
 var worker = builder.AddProject<Projects.EtherGizmos_Shipyard_Worker>("worker");
 worker.WithEnvironment("DOTNET_ENVIRONMENT", "Development");

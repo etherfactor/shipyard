@@ -29,6 +29,9 @@ public class PackageReturnedEmailFormatter
         var userId = new Guid(notification.Subscription.UserId);
         var user = userRepo.Data.Single(e => e.Id == userId);
 
+        if (user.EmailAddress is null)
+            throw new InvalidOperationException(EmailConstants.UserLacksEmailExceptionMessage);
+
         var updates = model.Updates.OrderBy(e => e.OccurredAt);
         var subject = model.Title;
 
@@ -45,6 +48,11 @@ public class PackageReturnedEmailFormatter
                 details = updates.LastOrDefault()?.Description,
                 contents = model.Contents,
                 packageId = model.PackageId,
+                updates = updates.Reverse().Take(5).Select(e => new
+                {
+                    occurredAt = e.OccurredAt,
+                    details = e.Description,
+                }),
                 shipyardUrl = model.ShipyardUrl,
                 unsubscribeKey = "invalid",
             });

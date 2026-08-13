@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+
 #pragma warning disable IDE0130
 namespace EtherGizmos.Shipyard.Events;
 
@@ -15,7 +17,7 @@ public record PackageFailedAttemptEvent : ShipyardEvent
 
     public required string? Contents { get; init; }
 
-    public required List<PackageFailedAttemptEventUpdate> Updates { get; init; }
+    public required ImmutableList<PackageFailedAttemptEventUpdate> Updates { get; init; }
 }
 
 public record PackageFailedAttemptEventUpdate

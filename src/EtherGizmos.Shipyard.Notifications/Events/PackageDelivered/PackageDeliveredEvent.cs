@@ -1,4 +1,6 @@
-﻿#pragma warning disable IDE0130
+﻿using System.Collections.Immutable;
+
+#pragma warning disable IDE0130
 namespace EtherGizmos.Shipyard.Events;
 
 public record PackageDeliveredEvent : ShipyardEvent
@@ -15,7 +17,7 @@ public record PackageDeliveredEvent : ShipyardEvent
 
     public required string? Contents { get; init; }
 
-    public required List<PackageDeliveredEventUpdate> Updates { get; init; }
+    public required ImmutableList<PackageDeliveredEventUpdate> Updates { get; init; }
 }
 
 public record PackageDeliveredEventUpdate
