@@ -290,7 +290,7 @@ builder.Services.AddSingleton<ISourceLoggerFactory, SourceLoggerFactory>();
 
 builder.Services.AddHostedService<BootstrapSeeder>();
 builder.Services.AddSingleton<IBootstrapper, AppBootstrapper>();
-builder.Services.AddSingleton<IBootstrapper, NotificationBootstrapper>();
+//builder.Services.AddSingleton<IBootstrapper, NotificationBootstrapper>();
 builder.Services.AddSingleton<IBootstrapper, OAuth2Bootstrapper>();
 
 // Export & Import
