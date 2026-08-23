@@ -12,11 +12,14 @@ public class PackageOutForDeliveryEmailFormatter
     : EmailNotificationChannelFormatter<ImmediateSchedule, PackageOutForDeliveryEvent>
 {
     private readonly IUnitOfWorkFactory _uowFactory;
+    private readonly INotificationUnsubscribeService _unsubscribeService;
 
     public PackageOutForDeliveryEmailFormatter(
-        IUnitOfWorkFactory uowFactory)
+        IUnitOfWorkFactory uowFactory,
+        INotificationUnsubscribeService unsubscribeService)
     {
         _uowFactory = uowFactory.AsUnfiltered();
+        _unsubscribeService = unsubscribeService;
     }
 
     public override EmailEnvelope Format(
@@ -36,6 +39,15 @@ public class PackageOutForDeliveryEmailFormatter
 
         var subject = model.Title;
 
+        var shipyardUrl = model.ShipyardUrl;
+
+        var unsubscribeKey = _unsubscribeService
+            .GetUnsubscribeKeyAsync(notification.SubscriptionId)
+            .GetAwaiter()
+            .GetResult();
+
+        var unsubscribeUrl = $"{shipyardUrl}/notifications/unsubscribe?key={Uri.EscapeDataString(unsubscribeKey)}";
+
         var html = LiquidMjmlRenderer.Render(
             "PackageOutForDelivery.Templates.PackageOutForDelivery",
             new
@@ -54,8 +66,8 @@ public class PackageOutForDeliveryEmailFormatter
                     occurredAt = e.OccurredAt,
                     details = e.Description,
                 }),
-                shipyardUrl = model.ShipyardUrl,
-                unsubscribeKey = "invalid",
+                shipyardUrl = shipyardUrl,
+                unsubscribeUrl = unsubscribeUrl,
             });
 
         var message = new EmailMessage()

@@ -31,12 +31,14 @@ internal class ApiAuthenticationHandler : DelegatingHandler
         if (request.RequestUri?.AbsoluteUri.StartsWith(_apiOptions.CurrentValue.BaseUrl, StringComparison.OrdinalIgnoreCase) == true
             && request.RequestUri?.AbsoluteUri.Contains("oauth/v2.0", StringComparison.OrdinalIgnoreCase) == false)
         {
-            if (_accessToken is null || _accessToken.Expires < DateTimeOffset.UtcNow)
+            //Add a few minutes so we don't try to use a token right as it expires
+            var now = DateTimeOffset.UtcNow.AddMinutes(5);
+            if (_accessToken is null || _accessToken.Expires < now)
             {
                 await _semaphore.WaitAsync(cancellationToken);
                 try
                 {
-                    if (_accessToken is null || _accessToken.Expires < DateTimeOffset.UtcNow)
+                    if (_accessToken is null || _accessToken.Expires < now)
                     {
                         var apiOptions = _apiOptions.CurrentValue;
                         _accessToken = await GenerateAccessTokenAsync(cancellationToken);

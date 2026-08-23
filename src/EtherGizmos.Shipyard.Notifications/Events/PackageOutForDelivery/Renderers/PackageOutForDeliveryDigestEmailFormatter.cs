@@ -12,11 +12,14 @@ public class PackageOutForDeliveryDigestEmailFormatter
     : EmailNotificationChannelFormatter<DigestSchedule, Digest<PackageOutForDeliveryEvent>>
 {
     private readonly IUnitOfWorkFactory _uowFactory;
+    private readonly INotificationUnsubscribeService _unsubscribeService;
 
     public PackageOutForDeliveryDigestEmailFormatter(
-        IUnitOfWorkFactory uowFactory)
+        IUnitOfWorkFactory uowFactory,
+        INotificationUnsubscribeService unsubscribeService)
     {
         _uowFactory = uowFactory.AsUnfiltered();
+        _unsubscribeService = unsubscribeService;
     }
 
     public override EmailEnvelope Format(
@@ -39,6 +42,15 @@ public class PackageOutForDeliveryDigestEmailFormatter
         var subject = orderedNotifications.Count == 1
             ? "1 Package Out For Delivery"
             : $"{orderedNotifications.Count} Packages Out For Delivery";
+
+        var shipyardUrl = orderedNotifications.FirstOrDefault()?.ShipyardUrl;
+
+        var unsubscribeKey = _unsubscribeService
+            .GetUnsubscribeKeyAsync(notification.SubscriptionId)
+            .GetAwaiter()
+            .GetResult();
+
+        var unsubscribeUrl = $"{shipyardUrl}/notifications/unsubscribe?key={Uri.EscapeDataString(unsubscribeKey)}";
 
         var html = LiquidMjmlRenderer.Render(
             "PackageOutForDelivery.Templates.PackageOutForDeliveryDigest",
@@ -65,8 +77,8 @@ public class PackageOutForDeliveryDigestEmailFormatter
                         details = lastUpdate?.Description,
                     };
                 }),
-                shipyardUrl = orderedNotifications.FirstOrDefault()?.ShipyardUrl,
-                unsubscribeKey = "invalid",
+                shipyardUrl = shipyardUrl,
+                unsubscribeUrl = unsubscribeUrl,
             });
 
         var message = new EmailMessage()

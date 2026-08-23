@@ -17,6 +17,7 @@ using EtherGizmos.Shipyard.Services.Health;
 using EtherGizmos.Shipyard.Services.HostedServices;
 using EtherGizmos.Shipyard.Services.Logging;
 using EtherGizmos.Shipyard.Services.Middleware;
+using EtherGizmos.Shipyard.Services.Notifications;
 using EtherGizmos.Shipyard.Services.Pipeline.OAuth2;
 using EtherGizmos.Shipyard.Services.Security;
 using EtherGizmos.Shipyard.Services.Validators;
@@ -413,6 +414,8 @@ builder.Services.AddNotifications(
                 evt.SupportsDigest<PackageUnknownStatusEvent, WebhookChannel, PackageUnknownStatusDigestWebhookFormatter>();
             });
     });
+
+builder.Services.AddSingleton<INotificationUnsubscribeService, NotificationUnsubscribeService>();
 
 // Health
 builder.Services

@@ -10,6 +10,4 @@ public record ShipyardEvent : IDomainEvent
     public required string Message { get; init; }
 
     public required string ShipyardUrl { get; init; }
-
-    public required string UnsubscribeKey { get; init; }
 }

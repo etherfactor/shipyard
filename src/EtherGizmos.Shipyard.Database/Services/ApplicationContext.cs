@@ -43,17 +43,7 @@ public class ApplicationContext : DbContext
 
     public virtual DbSet<Group> Groups { get; set; }
 
-    public virtual DbSet<AppNotificationChannel> NotificationChannels { get; set; }
-
-    public virtual DbSet<AppNotificationEvent> NotificationEvents { get; set; }
-
-    public virtual DbSet<AppNotification> Notifications { get; set; }
-
-    public virtual DbSet<AppNotificationEventChannelSchedule> NotificationEventChannelSchedules { get; set; }
-
-    public virtual DbSet<AppNotificationSchedule> NotificationSchedules { get; set; }
-
-    public virtual DbSet<AppNotificationSubscription> NotificationSubscriptions { get; set; }
+    public virtual DbSet<NotificationUnsubscribeKey> NotificationUnsubscribeKeys { get; set; }
 
     public virtual DbSet<Package> Packages { get; set; }
 

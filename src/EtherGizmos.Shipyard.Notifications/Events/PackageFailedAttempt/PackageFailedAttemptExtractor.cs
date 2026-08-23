@@ -45,7 +45,6 @@ internal class PackageFailedAttemptExtractor : IDomainEventExtractor
                 Title = "Package Delivery Attempt Failed",
                 Message = message,
                 ShipyardUrl = $"{uri.Scheme}://{uri.Authority}",
-                UnsubscribeKey = "invalid",
 
                 PackageId = package.Id,
                 CarrierId = package.CarrierId,

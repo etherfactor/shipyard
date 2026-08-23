@@ -45,7 +45,6 @@ internal class PackageDeliveredExtractor : IDomainEventExtractor
                 Title = "Package Delivered",
                 Message = message,
                 ShipyardUrl = $"{uri.Scheme}://{uri.Authority}",
-                UnsubscribeKey = "invalid",
 
                 PackageId = package.Id,
                 CarrierId = package.CarrierId,
