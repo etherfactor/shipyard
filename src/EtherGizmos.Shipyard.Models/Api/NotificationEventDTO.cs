@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using EtherGizmos.Common.Models;
-using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Extensions;
 using Swashbuckle.AspNetCore.Filters;
 using System.Diagnostics.CodeAnalysis;

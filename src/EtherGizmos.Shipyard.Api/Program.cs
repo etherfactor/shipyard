@@ -45,7 +45,7 @@ var builder = WebApplication.CreateBuilder(args);
 var otelEnabled = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT"))
     || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"))
     || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"))
-    || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT")); 
+    || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT"));
 
 builder.Services
     .AddSerilog((services, logger) =>
@@ -344,6 +344,20 @@ builder.Services.AddNotifications(
 
                 evt.Supports<PackageDeliveredEvent, WebhookChannel, PackageDeliveredWebhookFormatter>();
                 evt.SupportsDigest<PackageDeliveredEvent, WebhookChannel, PackageDeliveredDigestWebhookFormatter>();
+            });
+
+        opt.AddNotification<PackageEtaChangedEvent, PackageEtaChangedRouter>(
+            "package.etaChanged",
+            typeof(NoConfiguration),
+            evt =>
+            {
+                evt.HasDisplayName("Package ETA Changed");
+
+                if (emailConnectionId is not null)
+                {
+                    evt.Supports<PackageEtaChangedEvent, EmailChannel, PackageEtaChangedEmailFormatter>();
+                    evt.SupportsDigest<PackageEtaChangedEvent, EmailChannel, PackageEtaChangedDigestEmailFormatter>();
+                }
             });
 
         opt.AddNotification<PackageFailedAttemptEvent, PackageFailedAttemptRouter>(

@@ -40,6 +40,10 @@ export const NotificationEventTheme: Record<string, NotificationTheme> = {
     iconClass: "bi-check-circle",
     colorClass: "text-success",
   },
+  "package.etaChanged": {
+    iconClass: "bi-alarm",
+    colorClass: "text-warning",
+  },
   "package.outForDelivery": {
     iconClass: "bi-box-seam",
     colorClass: "text-warning",
