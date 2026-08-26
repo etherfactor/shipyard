@@ -59,8 +59,8 @@ public class ApplicationContext : DbContext
 
     public ApplicationContext(
         DbContextOptions<ApplicationContext> options,
-        [FromKeyedServices("Application")] IMigrationManager migrationManager,
-        [FromKeyedServices("Notification")] IMigrationManager migrationManager1,
+        [FromKeyedServices("Application")] IMigrationManager appMigrationManager,
+        [FromKeyedServices("Notification")] IMigrationManager notifMigrationManager,
         IFilterContext filterContext,
         IUserContext userContext,
         IEnumerable<IInterceptor> interceptors) : base(options)
@@ -69,7 +69,13 @@ public class ApplicationContext : DbContext
         _userContext = userContext;
         _interceptors = interceptors;
 
-        migrationManager.EnsureMigratedAsync()
+        notifMigrationManager
+            .EnsureMigratedAsync()
+            .GetAwaiter()
+            .GetResult();
+
+        appMigrationManager
+            .EnsureMigratedAsync()
             .GetAwaiter()
             .GetResult();
     }
