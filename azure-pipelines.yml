@@ -8,7 +8,7 @@ resources:
   - repository: sharedTemplates
     type: git
     name: 'Projects/PipelineTemplates'
-    ref: 'refs/heads/feature/pre-post-tasks'
+    ref: 'refs/tags/2.1.0'
 
 stages:
 
