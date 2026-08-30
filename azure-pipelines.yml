@@ -8,7 +8,7 @@ resources:
   - repository: sharedTemplates
     type: git
     name: 'Projects/PipelineTemplates'
-    ref: 'refs/tags/1.2.0'
+    ref: 'refs/tags/2.1.0'
 
 stages:
 
@@ -68,7 +68,7 @@ stages:
       vmImage: 'ubuntu-22.04'
       projectName: 'EtherGizmos.Shipyard.Api'
       artifactName: 'api'
-      prepTasks:
+      preTasks:
 
       # Install a specific node version
       - task: NodeTool@0
@@ -92,7 +92,7 @@ stages:
       inputArtifactName: 'api'
       outputArtifactName: 'api-docker'
       dockerfilePath: 'containers/api.dockerfile'
-      repository: 'shipyard-api'
+      repository: 'etherfactor/shipyard-api'
 
   # Publish dotnet worker
   - template: dotnet/publish/application.yml@sharedTemplates
@@ -111,7 +111,7 @@ stages:
       inputArtifactName: 'worker'
       outputArtifactName: 'worker-docker'
       dockerfilePath: 'containers/worker.dockerfile'
-      repository: 'shipyard-worker'
+      repository: 'etherfactor/shipyard-worker'
 
   # Publish angular web ui
   - template: node/publish/application.yml@sharedTemplates
@@ -139,4 +139,46 @@ stages:
         to: 'files'
       - from: 'containers/docker-entrypoint.web.sh'
         to: 'files'
-      repository: 'shipyard-web'
+      repository: 'etherfactor/shipyard-web'
+
+- stage: verify
+  displayName: 'Verify'
+
+  jobs:
+
+  # Verify default compose file works
+  - template: shared/container/test-compose.yml@sharedTemplates
+    parameters:
+      name: 'test_container'
+      composeFile: 'compose.yml'
+      environmentExampleFile: '.env.example'
+      environmentFile: '.env'
+      images:
+      - name: 'api'
+        artifactName: 'api-docker'
+        addTags:
+        - 'latest'
+      - name: 'worker'
+        artifactName: 'worker-docker'
+        addTags:
+        - 'latest'
+      - name: 'web'
+        artifactName: 'web-docker'
+        addTags:
+        - 'latest'
+      pullServices:
+      - 'db'
+      - 'rmq'
+      - 'selenium'
+      waitTimeout: 180
+      verificationSteps:
+      - bash: |
+          curl --fail --silent --show-error http://localhost:7448/health
+        displayName: 'Verify Shipyard API'
+      - bash: |
+          curl --fail --silent --show-error http://localhost:7447/assets/config.json > /dev/null
+        displayName: 'Verify Shipyard Web'
+      artifactName: 'compose-logs'
+      env:
+        SHIPYARD_WORKER_CLIENT_SECRET: 3HwNJcDqQmRomHNYAgFgCNMjH2Nq73a6
+        SHIPYARD_WEB_LOG_APIKEY: tOMXIp94zMgMiGML2KJaeexUm04gh1sF

@@ -28,16 +28,19 @@ public static class IOAuth2BuilderExtensions
         tempOptions.OAuth2.DbContextType = typeof(TContext);
 
         var tempServices = new ServiceCollection()
-            .AddSingleton<IConfiguration>(@this.Builder.Configuration)
-            .AddCertificates();
+            .AddSingleton<IConfiguration>(@this.Builder.Configuration);
+
+        tempServices
+            .AddKeyResolver()
+            .WithCertificates();
 
         using var provider = tempServices.BuildServiceProvider();
-        var resolver = provider.GetRequiredService<ICertificateResolver>();
+        var resolver = provider.GetRequiredService<IKeyResolver>();
 
-        var encryptionId = tempOptions.OAuth2.EncryptionCertificate.CertificateId;
+        var encryptionId = tempOptions.OAuth2.EncryptionCertificate.KeyId;
         var encryption = resolver.LoadCertificate(encryptionId);
 
-        var signingId = tempOptions.OAuth2.SigningCertificate.CertificateId;
+        var signingId = tempOptions.OAuth2.SigningCertificate.KeyId;
         var signing = resolver.LoadCertificate(signingId);
 
         @this.Builder.Services.AddOpenIddict()
@@ -51,6 +54,8 @@ public static class IOAuth2BuilderExtensions
             {
                 opt.AllowAuthorizationCodeFlow()
                     .RequireProofKeyForCodeExchange();
+
+                opt.AllowClientCredentialsFlow();
 
                 opt.AllowRefreshTokenFlow();
 

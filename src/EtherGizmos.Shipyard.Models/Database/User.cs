@@ -13,6 +13,8 @@ public class User : InternalUser<Guid>, IEntity, IAuditable
 
     public virtual Guid? ModifiedByUserId { get; set; }
 
+    public virtual Guid? SystemId { get; set; }
+
     public virtual string Password
     {
         get => throw new NotSupportedException();
@@ -20,6 +22,10 @@ public class User : InternalUser<Guid>, IEntity, IAuditable
     }
 
     private static readonly IPasswordHasher<User> _hasher = new PasswordHasher<User>();
+
+    public virtual bool IsSystemManaged { get; set; } = false;
+
+    public virtual bool IsInteractiveLoginEnabled { get; set; } = true;
 
     public virtual int? GroupId { get; set; }
 

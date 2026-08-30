@@ -1,7 +1,8 @@
 ﻿using Asp.Versioning;
-using EtherGizmos.Shipyard.Api.Services.Security;
+using EtherGizmos.Shipyard.Api;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
+using EtherGizmos.Shipyard.Services.Security;
 using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
 using Swashbuckle.AspNetCore.Filters;
 
-namespace EtherGizmos.Shipyard.Api.Controllers;
+namespace EtherGizmos.Shipyard.Controllers;
 
 [Authorize]
 public class GroupsController : AutoODataController

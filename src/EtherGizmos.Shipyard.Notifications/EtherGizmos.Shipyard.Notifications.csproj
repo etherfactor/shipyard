@@ -1,25 +1,56 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Notifications", ""))</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MailKit" Version="4.13.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.6" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.6" />
+    <None Remove="Events\Base\_layout.mjml.html" />
+    <None Remove="Events\CarrierUnknownStatus\Templates\CarrierUnknownStatus.mjml.html" />
+    <None Remove="Events\CarrierUnknownStatus\Templates\CarrierUnknownStatusDigest.mjml.html" />
+    <None Remove="Events\PackageDelivered\Templates\PackageDelivered.mjml.html" />
+    <None Remove="Events\PackageDelivered\Templates\PackageDeliveredDigest.mjml.html" />
+    <None Remove="Events\PackageEtaChanged\Templates\PackageEtaChanged.mjml.html" />
+    <None Remove="Events\PackageEtaChanged\Templates\PackageEtaChangedDigest.mjml.html" />
+    <None Remove="Events\PackageFailedAttempt\Templates\PackageFailedAttempt.mjml.html" />
+    <None Remove="Events\PackageFailedAttempt\Templates\PackageFailedAttemptDigest.mjml.html" />
+    <None Remove="Events\PackageOutForDelivery\Templates\PackageOutForDelivery.mjml.html" />
+    <None Remove="Events\PackageOutForDelivery\Templates\PackageOutForDeliveryDigest.mjml.html" />
+    <None Remove="Events\PackageReturned\Templates\PackageReturned.mjml.html" />
+    <None Remove="Events\PackageReturned\Templates\PackageReturnedDigest.mjml.html" />
+    <None Remove="Events\PackageUnknownStatus\Templates\PackageUnknownStatus.mjml.html" />
+    <None Remove="Events\PackageUnknownStatus\Templates\PackageUnknownStatusDigest.mjml.html" />
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="$(MSBuildProjectName).UnitTests" />
-    <InternalsVisibleTo Include="$(MSBuildProjectName).IntegrationTests" />
+    <EmbeddedResource Include="Events\Base\Templates\_layout.mjml.html" />
+    <EmbeddedResource Include="Events\CarrierUnknownStatus\Templates\CarrierUnknownStatus.mjml.html" />
+    <EmbeddedResource Include="Events\CarrierUnknownStatus\Templates\CarrierUnknownStatusDigest.mjml.html" />
+    <EmbeddedResource Include="Events\PackageDelivered\Templates\PackageDelivered.mjml.html" />
+    <EmbeddedResource Include="Events\PackageDelivered\Templates\PackageDeliveredDigest.mjml.html" />
+    <EmbeddedResource Include="Events\PackageEtaChanged\Templates\PackageEtaChanged.mjml.html" />
+    <EmbeddedResource Include="Events\PackageEtaChanged\Templates\PackageEtaChangedDigest.mjml.html" />
+    <EmbeddedResource Include="Events\PackageFailedAttempt\Templates\PackageFailedAttempt.mjml.html" />
+    <EmbeddedResource Include="Events\PackageFailedAttempt\Templates\PackageFailedAttemptDigest.mjml.html" />
+    <EmbeddedResource Include="Events\PackageOutForDelivery\Templates\PackageOutForDelivery.mjml.html" />
+    <EmbeddedResource Include="Events\PackageOutForDelivery\Templates\PackageOutForDeliveryDigest.mjml.html" />
+    <EmbeddedResource Include="Events\PackageReturned\Templates\PackageReturned.mjml.html" />
+    <EmbeddedResource Include="Events\PackageReturned\Templates\PackageReturnedDigest.mjml.html" />
+    <EmbeddedResource Include="Events\PackageUnknownStatus\Templates\PackageUnknownStatus.mjml.html" />
+    <EmbeddedResource Include="Events\PackageUnknownStatus\Templates\PackageUnknownStatusDigest.mjml.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EtherGizmos.Common.Notifications.Email" />
+    <PackageReference Include="EtherGizmos.Common.Notifications.OpenTelemetry" />
+    <PackageReference Include="EtherGizmos.Common.Notifications.Webhook" />
+    <PackageReference Include="Mjml.Net" />
+    <PackageReference Include="Scriban" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\EtherGizmos.Common.Utilities\EtherGizmos.Common.Utilities.csproj" />
+    <ProjectReference Include="..\EtherGizmos.Shipyard.Models\EtherGizmos.Shipyard.Models.csproj" />
   </ItemGroup>
 
 </Project>

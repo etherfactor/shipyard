@@ -1,22 +1,22 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
+using EtherGizmos.Common;
+using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Abstractions;
-using EtherGizmos.Shipyard.Api.Abstractions;
+using EtherGizmos.Shipyard.Api;
 using EtherGizmos.Shipyard.Api.Errors;
-using EtherGizmos.Shipyard.Api.Exceptions;
 using EtherGizmos.Shipyard.Api.Models;
-using EtherGizmos.Shipyard.Api.Services.Security;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
-using EtherGizmos.Shipyard.Extensions;
+using EtherGizmos.Shipyard.Exceptions;
+using EtherGizmos.Shipyard.Models;
+using EtherGizmos.Shipyard.Services.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using OpenIddict.Abstractions;
 using Swashbuckle.AspNetCore.Filters;
-using System.Reflection;
 using System.Text.Json;
-using static OpenIddict.Abstractions.OpenIddictConstants;
+using System.Text.Json.Nodes;
 
-namespace EtherGizmos.Shipyard.Api.Controllers;
+namespace EtherGizmos.Shipyard.Controllers;
 
 [ApiController]
 public class ImportExportController : ControllerBase
@@ -68,7 +68,7 @@ public class ImportExportController : ControllerBase
         var export = new ExportDocument(
             "carrier",
             1,
-            GetMetadata(),
+            JsonSerializer.Deserialize<IDictionary<string, object?>>(JsonNode.Parse($"{{\"exportedAt\":\"{DateTimeOffset.UtcNow}\"}}")!.AsObject(), JsonSerializerOptions.Export),
             JsonSerializer.Deserialize<IDictionary<string, object?>>(node, JsonSerializerOptions.Export)!);
 
         return Ok(export);
@@ -183,22 +183,6 @@ public class ImportExportController : ControllerBase
             ImporterResultStatusType.Updated => Ok(resultDto),
             ImporterResultStatusType.Error => BadRequest(resultDto),
             _ => BadRequest(resultDto),
-        };
-    }
-
-    private IDictionary<string, object?>? GetMetadata()
-    {
-        return new Dictionary<string, object?>()
-        {
-            ["exportedAt"] = DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
-            ["exportedBy"] = User.GetClaim(Claims.Username),
-            ["source"] = new Dictionary<string, object?>()
-            {
-                ["application"] = "Shipyard",
-                ["version"] = Assembly.GetExecutingAssembly()?
-                        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
-                        .InformationalVersion,
-            },
         };
     }
 }

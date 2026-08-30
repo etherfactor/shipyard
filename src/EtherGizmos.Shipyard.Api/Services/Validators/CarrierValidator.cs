@@ -1,5 +1,6 @@
-﻿using AutoMapper;
+using AutoMapper;
 using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Api;
 using EtherGizmos.Shipyard.Api.Enums;
 using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Database;
@@ -8,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-namespace EtherGizmos.Shipyard.Api.Services.Validators;
+namespace EtherGizmos.Shipyard.Services.Validators;
 
 internal class CarrierValidator : IModelValidator<Carrier>
 {

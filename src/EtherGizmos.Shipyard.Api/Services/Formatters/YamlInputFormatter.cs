@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using System.Reflection;
 using System.Text;
 using VYaml.Annotations;
 using VYaml.Serialization;
 
-namespace EtherGizmos.Shipyard.Api.Services.Formatters;
+namespace EtherGizmos.Shipyard.Services.Formatters;
 
 public class YamlInputFormatter : TextInputFormatter
 {

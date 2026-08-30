@@ -72,6 +72,6 @@ public class AuthorizationServerOptions
     public class CertificateOptions
     {
         [Required]
-        public string CertificateId { get; set; } = null!;
+        public string KeyId { get; set; } = null!;
     }
 }

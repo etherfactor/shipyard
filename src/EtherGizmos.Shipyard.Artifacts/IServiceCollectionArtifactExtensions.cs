@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common.Configuration;
+﻿using EtherGizmos.Common;
 using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Services;
@@ -22,8 +22,7 @@ public static class IServiceCollectionArtifactExtensions
             .ValidateOnStart()
             .ValidateDataAnnotations();
 
-        @this.AddDatabase()
-            .AddDbContext<ArtifactContext>((services, opt) =>
+        @this.AddDbContext<ArtifactContext>((services, opt) =>
             {
                 opt.UseLazyLoadingProxies();
                 opt.EnableSensitiveDataLogging();
@@ -33,18 +32,7 @@ public static class IServiceCollectionArtifactExtensions
 
                 var connectionId = dbOptions.Database.ConnectionId;
 
-                var resolver = services.GetRequiredService<IConnectionResolver>();
-                var connection = resolver.GetDatabaseConnection(connectionId);
-
-                connection.Match(
-                    _ => throw new InvalidOperationException($"The connection {connectionId} is not a valid database connection."),
-                    postgreSql =>
-                    {
-                        return opt.UseNpgsql(
-                            postgreSql.ConnectionString,
-                            o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
-                    }
-                );
+                opt.UseConnection(services, connectionId);
             });
 
         return @this;
@@ -61,8 +49,7 @@ public static class IServiceCollectionArtifactExtensions
             .ValidateOnStart()
             .ValidateDataAnnotations();
 
-        @this.AddDatabase()
-            .AddDbContext<ArtifactContext>((services, opt) =>
+        @this.AddDbContext<ArtifactContext>((services, opt) =>
             {
                 opt.UseLazyLoadingProxies();
                 opt.EnableSensitiveDataLogging();
@@ -72,18 +59,7 @@ public static class IServiceCollectionArtifactExtensions
 
                 var connectionId = dbOptions.Database.ConnectionId;
 
-                var resolver = services.GetRequiredService<IConnectionResolver>();
-                var connection = resolver.GetDatabaseConnection(connectionId);
-
-                connection.Match(
-                    _ => throw new InvalidOperationException($"The connection {connectionId} is not a valid database connection."),
-                    postgreSql =>
-                    {
-                        return opt.UseNpgsql(
-                            postgreSql.ConnectionString,
-                            o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
-                    }
-                );
+                opt.UseConnection(services, connectionId);
             });
 
         return @this;

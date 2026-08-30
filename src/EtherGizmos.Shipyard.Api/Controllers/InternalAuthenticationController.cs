@@ -1,8 +1,8 @@
 ﻿using EtherGizmos.Common;
+using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Controllers;
-using EtherGizmos.Shipyard.Abstractions;
-using EtherGizmos.Shipyard.Api.ViewModels;
 using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace EtherGizmos.Shipyard.Api.Controllers;
+namespace EtherGizmos.Shipyard.Controllers;
 
 public class InternalAuthenticationController : InternalAuthenticationControllerBase<User>
 {
@@ -49,7 +49,7 @@ public class InternalAuthenticationController : InternalAuthenticationController
             return View(nameof(ChangePassword), model);
         }
 
-        using var uow = _uowFactory.Create(useRequestScope: true);
+        using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
         var userRepo = uow.Repository<User>();
 
         var subject = Guid.Parse(User.GetClaim(Claims.Subject)!);

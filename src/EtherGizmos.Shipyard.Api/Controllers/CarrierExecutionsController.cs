@@ -1,34 +1,26 @@
 ﻿using Asp.Versioning;
-using EtherGizmos.Shipyard.Abstractions;
-using EtherGizmos.Shipyard.Api.Errors;
-using EtherGizmos.Shipyard.Api.Services.Security;
+using EtherGizmos.Shipyard.Api;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
+using EtherGizmos.Shipyard.Services.Security;
 using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
 using Swashbuckle.AspNetCore.Filters;
 
-namespace EtherGizmos.Shipyard.Api.Controllers;
+namespace EtherGizmos.Shipyard.Controllers;
 
 [Authorize]
 public class CarrierExecutionsController : AutoODataController
 {
     private const string BaseRoute = "api/v{version:apiVersion}/carrierExecutions";
 
-    private readonly IUnitOfWorkFactory _uowFactory;
-    private readonly IArtifactReader _artifactReader;
-
     public CarrierExecutionsController(
-        IServiceProvider serviceProvider,
-        IUnitOfWorkFactory uowFactory,
-        IArtifactReader artifactReader)
+        IServiceProvider serviceProvider)
         : base(serviceProvider)
-    {
-        _uowFactory = uowFactory;
-        _artifactReader = artifactReader;
-    }
+    { }
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute)]
@@ -52,39 +44,48 @@ public class CarrierExecutionsController : AutoODataController
         => ForItem(id)
             .GetAsync(queryOptions, cancellationToken);
 
+    //[ApiVersion(1.0)]
+    //[HttpPost(BaseRoute)]
+    //[HasCapability(SecurableType.Carrier, PermissionId.Write)]
+    //[Consumes(typeof(CarrierExecutionDTO), "application/json"), SwaggerRequestExample(typeof(CarrierExecutionDTO), typeof(CarrierExecutionDTOExamplePost))]
+    //[ProducesResponseType(200, Type = typeof(CarrierExecutionDTO)), SwaggerResponseExample(200, typeof(CarrierExecutionDTOExamplePost))]
+    //public Task<IActionResult> Create(
+    //    [FromBody] CarrierExecutionDTO create,
+    //    ODataQueryOptions<CarrierExecutionDTO> queryOptions,
+    //    CancellationToken cancellationToken = default)
+    //    => ForSet()
+    //        .CreateAsync(create, queryOptions, cancellationToken);
+
     [ApiVersion(1.0)]
-    [HttpGet(BaseRoute + "({id})" + "/readArtifact")]
-    [HasCapability(SecurableType.Carrier, PermissionId.Read)]
-    [ProducesResponseType(200, Type = typeof(Stream))]
-    public async Task<IActionResult> ReadArtifact(
+    [HttpPatch(BaseRoute + "({id})")]
+    [HasCapability(SecurableType.Carrier, PermissionId.Write)]
+    [Consumes(typeof(CarrierExecutionDTO), "application/json"), SwaggerRequestExample(typeof(CarrierExecutionDTO), typeof(CarrierExecutionDTOExamplePatch))]
+    [ProducesResponseType(200, Type = typeof(CarrierExecutionDTO)), SwaggerResponseExample(200, typeof(CarrierExecutionDTOExampleGet))]
+    public Task<IActionResult> Patch(
         int id,
-        string uri,
+        [FromBody] Delta<CarrierExecutionDTO> patch,
+        ODataQueryOptions<CarrierExecutionDTO> queryOptions,
         CancellationToken cancellationToken = default)
-    {
-        using var uow = _uowFactory.Create();
-        var record = await LoadRecordAsync(
-            uow,
-            [KeyMapping<CarrierExecution, CarrierExecutionDTO, int>.Create(id, e => e.Id, e => e.Id)],
-            cancellationToken: cancellationToken);
-
-        var artifact = record.Artifacts.FirstOrDefault(e => e.ArtifactUri.ToString().Equals(uri, StringComparison.OrdinalIgnoreCase));
-        if (artifact is null)
-        {
-            new Error.Reference.EntityNotFoundReferenceError<CarrierExecutionDTO>()
-                .AddDetail((e => e.Artifacts[0].ArtifactUri, uri))
-                .Return();
-        }
-
-        var meta = await _artifactReader.ReadAsync(artifact.ArtifactUri, cancellationToken);
-
-        return File(meta.Stream, meta.ContentType, meta.FileName);
-    }
+        => ForItem(id)
+            .PatchAsync(patch, queryOptions, cancellationToken);
 
     private IKeylessRequestBuilder<CarrierExecution, CarrierExecutionDTO> ForSet()
         => ForSet<CarrierExecution, CarrierExecutionDTO>();
+    //        .OnCreating((db, dto) =>
+    //        {
+    //            db.StartedAt ??= db.CompletedAt;
+    //            db.StepCount = (short)db.Carrier.Steps.Count;
+    //            return Task.CompletedTask;
+    //        });
 
     private IKeyedRequestBuilder<CarrierExecution, CarrierExecutionDTO> ForItem(
         int id)
         => ForItem(
-            KeyMapping<CarrierExecution, CarrierExecutionDTO, int>.Create(id, e => e.Id, e => e.Id));
+            KeyMapping<CarrierExecution, CarrierExecutionDTO, int>.Create(id, e => e.Id, e => e.Id))
+            .OnUpdating((db, dto) =>
+            {
+                db.StartedAt ??= db.CompletedAt;
+                db.StepCount = (short)db.Carrier.Steps.Count;
+                return Task.CompletedTask;
+            });
 }

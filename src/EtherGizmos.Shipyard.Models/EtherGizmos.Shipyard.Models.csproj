@@ -1,23 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Models", ""))</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Asp.Versioning.Abstractions" Version="8.1.0" />
-    <PackageReference Include="AutoMapper" Version="14.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="8.0.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <InternalsVisibleTo Include="$(MSBuildProjectName).UnitTests" />
-    <InternalsVisibleTo Include="$(MSBuildProjectName).IntegrationTests" />
+    <PackageReference Include="Asp.Versioning.Abstractions" />
+    <PackageReference Include="AutoMapper" />
+    <PackageReference Include="EtherGizmos.Common.Data.UnitOfWork" />
+    <PackageReference Include="EtherGizmos.Common.Notifications" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" />
+    <PackageReference Include="Microsoft.OpenApi" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Filters" />
   </ItemGroup>
 
   <ItemGroup>

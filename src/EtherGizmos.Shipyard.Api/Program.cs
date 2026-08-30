@@ -3,41 +3,56 @@ using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Configuration;
 using EtherGizmos.Common.Services;
 using EtherGizmos.Shipyard;
-using EtherGizmos.Shipyard.Api.Abstractions;
-using EtherGizmos.Shipyard.Api.Configuration;
+using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
-using EtherGizmos.Shipyard.Api.Services.Export;
-using EtherGizmos.Shipyard.Api.Services.Formatters;
-using EtherGizmos.Shipyard.Api.Services.Health;
-using EtherGizmos.Shipyard.Api.Services.HostedServices;
-using EtherGizmos.Shipyard.Api.Services.Logging;
-using EtherGizmos.Shipyard.Api.Services.Middleware;
-using EtherGizmos.Shipyard.Api.Services.Pipeline.OAuth2;
-using EtherGizmos.Shipyard.Api.Services.Security;
-using EtherGizmos.Shipyard.Api.Services.Validators;
 using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Events;
+using EtherGizmos.Shipyard.Events.Base;
 using EtherGizmos.Shipyard.Services;
+using EtherGizmos.Shipyard.Services.Bootstrappers;
+using EtherGizmos.Shipyard.Services.Export;
+using EtherGizmos.Shipyard.Services.Formatters;
+using EtherGizmos.Shipyard.Services.Health;
+using EtherGizmos.Shipyard.Services.HostedServices;
+using EtherGizmos.Shipyard.Services.Logging;
+using EtherGizmos.Shipyard.Services.Middleware;
+using EtherGizmos.Shipyard.Services.Notifications;
+using EtherGizmos.Shipyard.Services.Pipeline.OAuth2;
+using EtherGizmos.Shipyard.Services.Security;
+using EtherGizmos.Shipyard.Services.Validators;
 using JavaScriptEngineSwitcher.Extensions.MsDependencyInjection;
 using JavaScriptEngineSwitcher.V8;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
+using Npgsql;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 using Serilog;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSerilog((services, logger) =>
-    logger.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>()));
+var otelEnabled = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT"))
+    || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"))
+    || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"))
+    || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT"));
+
+builder.Services
+    .AddSerilog((services, logger) =>
+    {
+        logger.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>());
+        if (otelEnabled) logger.WriteTo.OpenTelemetry();
+    });
 
 //**********************************************************
 // Configuration
@@ -45,30 +60,34 @@ builder.Services.AddSerilog((services, logger) =>
 builder.Configuration
     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
     .AddRemappedEnvironmentVariables(
-        (new(@"(?<=[^:_])_(?=[^_])"), "."),
-        (new(@"(?<=[^_]):_(?=[^_])"), " "),
-        (new(@"^ConnectionStrings:(?=[^_:])"), ""))
-    .AddExpandedConnections(builder.Configuration);
+        new(new(@"(?<=[^:_])_(?=[^_])"), "."),
+        new(new(@"(?<=[^_]):_(?=[^_])"), " "),
+        new(new(@"^ConnectionStrings:(?=[^_:])"), ""))
+    .AddModularConfigurations(builder.Configuration);
 
 builder.Services
-    .AddOptions<DatabaseReferenceOptions>()
-    .Configure<IConfiguration>((opt, conf) =>
-    {
-        conf.GetSection("Database")
-            .Bind(opt);
-    })
+    .AddOptions<WebUIOptions>()
+    .Bind(builder.Configuration.GetSection("WebUI"))
+    .ValidateOnStart()
+    .ValidateDataAnnotations();
+
+builder.Services
+    .AddOptions<ConnectionReferenceOptions>("Database")
+    .Bind(builder.Configuration.GetSection("Database"))
+    .ValidateOnStart()
+    .ValidateDataAnnotations();
+
+builder.Services
+    .AddOptions<ConnectionReferenceOptions>("MessageBroker")
+    .Bind(builder.Configuration.GetSection("MessageBroker"))
     .ValidateOnStart()
     .ValidateDataAnnotations();
 
 builder.Services
     .AddOptions<LogIngestionOptions>()
-    .Configure<IConfiguration>((opt, config) =>
-    {
-        config.GetSection("LogIngestion")
-            .Bind(opt);
-    })
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+    .Bind(builder.Configuration.GetSection("LogIngestion"))
+    .ValidateOnStart()
+    .ValidateDataAnnotations();
 
 //**********************************************************
 // Services
@@ -76,7 +95,36 @@ builder.Services
 // General
 builder.AddServiceDefaults();
 
-builder.Services.AddServiceConnections();
+builder.Services.AddConnectionResolver()
+    .WithPostgreSql()
+    .WithRabbitMQ()
+    .WithSmtp();
+
+// Observability
+if (otelEnabled)
+{
+    builder.Services
+        .AddOpenTelemetry()
+        .WithTracing(tracing => tracing
+            .AddAspNetCoreInstrumentation()
+            .AddEntityFrameworkCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddMessagingInstrumentation()
+            .AddNpgsql()
+            .AddSqlClientInstrumentation()
+            .AddNotificationsInstrumentation()
+            .AddUnitOfWorkInstrumentation()
+            .AddOtlpExporter())
+        .WithMetrics(metrics => metrics
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddMessagingInstrumentation()
+            .AddNpgsqlInstrumentation()
+            .AddSqlClientInstrumentation()
+            .AddNotificationsInstrumentation()
+            .AddUnitOfWorkInstrumentation()
+            .AddOtlpExporter());
+}
 
 // Security
 builder.UseOAuth2()
@@ -104,29 +152,36 @@ builder.Services.AddSingleton<ICapabilityAuthorizer, CapabilityAuthorizer>();
 
 // Database
 builder.Services
-    .AddDatabase()
+    .AddDbContext<ApplicationContext>((services, opt) =>
+    {
+        opt.UseLazyLoadingProxies();
+        opt.EnableSensitiveDataLogging();
+
+        var dbOptions = services
+            .GetRequiredService<IOptionsMonitor<ConnectionReferenceOptions>>()
+            .Get("Database");
+
+        var connectionId = dbOptions.ConnectionId;
+
+        var resolver = services.GetRequiredService<IConnectionResolver>();
+
+        opt.UseConnection(services, connectionId);
+    })
     .AddDbContext<AuthorizationContext>((services, opt) =>
     {
         opt.UseLazyLoadingProxies();
         opt.EnableSensitiveDataLogging();
 
-        var dbOptions = services.GetRequiredService<IOptions<DatabaseReferenceOptions>>()
-            .Value;
+        var dbOptions = services
+            .GetRequiredService<IOptionsMonitor<ConnectionReferenceOptions>>()
+            .Get("Database");
 
         var connectionId = dbOptions.ConnectionId;
 
         var resolver = services.GetRequiredService<IConnectionResolver>();
         var connection = resolver.GetDatabaseConnection(connectionId);
 
-        connection.Match(
-            _ => throw new InvalidOperationException($"The connection {connectionId} is not a valid database connection."),
-            postgreSql =>
-            {
-                return opt.UseNpgsql(
-                    postgreSql.ConnectionString,
-                    o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
-            }
-        );
+        opt.UseConnection(services, connectionId);
     })
     .AddUnitOfWork(opt =>
     {
@@ -134,17 +189,22 @@ builder.Services
         opt.BindDbContext<ArtifactContext>();
     });
 
+builder.Services.AddScoped<IFilterContext, FilterContext>();
+
+builder.Services
+    .AddMigrations("Application", typeof(ApplicationContext).Assembly)
+    .UseConnection(builder.Configuration["Database:ConnectionId"] ?? "!Unknown");
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.TryAddSingleton<IUserContext, UserContext>();
+
 // Messaging
 builder.Services
     .AddMessaging((opt, conf) =>
     {
         opt.Publishers.AddQueue("tracking-poll-request", "tracking.poll.request");
     })
-    .UseRabbitMQ((opt, conf) =>
-    {
-        conf.GetSection("RabbitMq")
-            .Bind(opt);
-    })
+    .UseConnection(builder.Configuration["MessageBroker:ConnectionId"] ?? "!Unknown")
     .AddConsumersFromAssemblies(typeof(Program).Assembly);
 
 builder.Services
@@ -157,6 +217,11 @@ builder.Services
 // Storage
 builder.Services
     .AddArtifactReader((opt, conf) =>
+    {
+        conf.GetSection("Artifacts")
+            .Bind(opt);
+    })
+    .AddArtifactWriter((opt, conf) =>
     {
         conf.GetSection("Artifacts")
             .Bind(opt);
@@ -221,16 +286,150 @@ builder.Services
         opt.ResponseBodyLogLimit = 1024;
     });
 
-builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 builder.Services.AddSingleton<ISourceLoggerFactory, SourceLoggerFactory>();
 
-builder.Services.AddHostedService<InitialConfigSeeder>();
-builder.Services.AddHostedService<OAuth2Seeder>();
+builder.Services.AddHostedService<BootstrapSeeder>();
+builder.Services.AddSingleton<IBootstrapper, AppBootstrapper>();
+//builder.Services.AddSingleton<IBootstrapper, NotificationBootstrapper>();
+builder.Services.AddSingleton<IBootstrapper, OAuth2Bootstrapper>();
 
 // Export & Import
 builder.Services.AddSingleton<IExportDocumentMigrator, ExportDocumentMigrator>();
 builder.Services.AddScoped<IExportDocumentImporterRegistry, ExportDocumentImporterRegistry>();
 builder.Services.AddScoped<IExportDocumentImporter, CarrierImporter>();
+
+// Notifications
+builder.Services.AddNotifications(
+    builder.Configuration["Database:ConnectionId"]!,
+    builder.Configuration["MessageBroker:ConnectionId"]!,
+    opt =>
+    {
+        opt.AddWebhookChannel();
+
+        var emailConnectionId = builder.Configuration["Email:ConnectionId"];
+        if (emailConnectionId is not null)
+            opt.AddEmailChannel(emailConnectionId);
+
+        opt.AddShipyardExtractors();
+
+        opt.AddNotification<CarrierUnknownStatusEvent, CarrierUnknownStatusRouter>(
+            "carrier.unknownStatus",
+            typeof(NoConfiguration),
+            evt =>
+            {
+                evt.HasDisplayName("Carrier Unknown Status");
+
+                if (emailConnectionId is not null)
+                {
+                    evt.Supports<CarrierUnknownStatusEvent, EmailChannel, CarrierUnknownStatusEmailFormatter>();
+                    evt.SupportsDigest<CarrierUnknownStatusEvent, EmailChannel, CarrierUnknownStatusDigestEmailFormatter>();
+                }
+
+                evt.Supports<CarrierUnknownStatusEvent, WebhookChannel, CarrierUnknownStatusWebhookFormatter>();
+                evt.SupportsDigest<CarrierUnknownStatusEvent, WebhookChannel, CarrierUnknownStatusDigestWebhookFormatter>();
+            });
+
+        opt.AddNotification<PackageDeliveredEvent, PackageDeliveredRouter>(
+            "package.delivered",
+            typeof(NoConfiguration),
+            evt =>
+            {
+                evt.HasDisplayName("Package Delivered");
+
+                if (emailConnectionId is not null)
+                {
+                    evt.Supports<PackageDeliveredEvent, EmailChannel, PackageDeliveredEmailFormatter>();
+                    evt.SupportsDigest<PackageDeliveredEvent, EmailChannel, PackageDeliveredDigestEmailFormatter>();
+                }
+
+                evt.Supports<PackageDeliveredEvent, WebhookChannel, PackageDeliveredWebhookFormatter>();
+                evt.SupportsDigest<PackageDeliveredEvent, WebhookChannel, PackageDeliveredDigestWebhookFormatter>();
+            });
+
+        opt.AddNotification<PackageEtaChangedEvent, PackageEtaChangedRouter>(
+            "package.etaChanged",
+            typeof(NoConfiguration),
+            evt =>
+            {
+                evt.HasDisplayName("Package ETA Changed");
+
+                if (emailConnectionId is not null)
+                {
+                    evt.Supports<PackageEtaChangedEvent, EmailChannel, PackageEtaChangedEmailFormatter>();
+                    evt.SupportsDigest<PackageEtaChangedEvent, EmailChannel, PackageEtaChangedDigestEmailFormatter>();
+                }
+            });
+
+        opt.AddNotification<PackageFailedAttemptEvent, PackageFailedAttemptRouter>(
+            "package.failedAttempt",
+            typeof(NoConfiguration),
+            evt =>
+            {
+                evt.HasDisplayName("Package Failed Attempt");
+
+                if (emailConnectionId is not null)
+                {
+                    evt.Supports<PackageFailedAttemptEvent, EmailChannel, PackageFailedAttemptEmailFormatter>();
+                    evt.SupportsDigest<PackageFailedAttemptEvent, EmailChannel, PackageFailedAttemptDigestEmailFormatter>();
+                }
+
+                evt.Supports<PackageFailedAttemptEvent, WebhookChannel, PackageFailedAttemptWebhookFormatter>();
+                evt.SupportsDigest<PackageFailedAttemptEvent, WebhookChannel, PackageFailedAttemptDigestWebhookFormatter>();
+            });
+
+        opt.AddNotification<PackageOutForDeliveryEvent, PackageOutForDeliveryRouter>(
+            "package.outForDelivery",
+            typeof(NoConfiguration),
+            evt =>
+            {
+                evt.HasDisplayName("Package Out For Delivery");
+
+                if (emailConnectionId is not null)
+                {
+                    evt.Supports<PackageOutForDeliveryEvent, EmailChannel, PackageOutForDeliveryEmailFormatter>();
+                    evt.SupportsDigest<PackageOutForDeliveryEvent, EmailChannel, PackageOutForDeliveryDigestEmailFormatter>();
+                }
+
+                evt.Supports<PackageOutForDeliveryEvent, WebhookChannel, PackageOutForDeliveryWebhookFormatter>();
+                evt.SupportsDigest<PackageOutForDeliveryEvent, WebhookChannel, PackageOutForDeliveryDigestWebhookFormatter>();
+            });
+
+        opt.AddNotification<PackageReturnedEvent, PackageReturnedRouter>(
+            "package.returned",
+            typeof(NoConfiguration),
+            evt =>
+            {
+                evt.HasDisplayName("Package Returned");
+
+                if (emailConnectionId is not null)
+                {
+                    evt.Supports<PackageReturnedEvent, EmailChannel, PackageReturnedEmailFormatter>();
+                    evt.SupportsDigest<PackageReturnedEvent, EmailChannel, PackageReturnedDigestEmailFormatter>();
+                }
+
+                evt.Supports<PackageReturnedEvent, WebhookChannel, PackageReturnedWebhookFormatter>();
+                evt.SupportsDigest<PackageReturnedEvent, WebhookChannel, PackageReturnedDigestWebhookFormatter>();
+            });
+
+        opt.AddNotification<PackageUnknownStatusEvent, PackageUnknownStatusRouter>(
+            "package.unknownStatus",
+            typeof(NoConfiguration),
+            evt =>
+            {
+                evt.HasDisplayName("Package Unknown Status");
+
+                if (emailConnectionId is not null)
+                {
+                    evt.Supports<PackageUnknownStatusEvent, EmailChannel, PackageUnknownStatusEmailFormatter>();
+                    evt.SupportsDigest<PackageUnknownStatusEvent, EmailChannel, PackageUnknownStatusDigestEmailFormatter>();
+                }
+
+                evt.Supports<PackageUnknownStatusEvent, WebhookChannel, PackageUnknownStatusWebhookFormatter>();
+                evt.SupportsDigest<PackageUnknownStatusEvent, WebhookChannel, PackageUnknownStatusDigestWebhookFormatter>();
+            });
+    });
+
+builder.Services.AddSingleton<INotificationUnsubscribeService, NotificationUnsubscribeService>();
 
 // Health
 builder.Services
@@ -254,19 +453,9 @@ builder.Services
             Description = "Enter your JWT token",
         });
 
-        opt.AddSecurityRequirement(new OpenApiSecurityRequirement()
+        opt.AddSecurityRequirement(document => new OpenApiSecurityRequirement()
         {
-            {
-                new OpenApiSecurityScheme()
-                {
-                    Reference = new OpenApiReference()
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer",
-                    },
-                },
-                Array.Empty<string>()
-            },
+            [new OpenApiSecuritySchemeReference("Bearer", document)] = [],
         });
     });
 

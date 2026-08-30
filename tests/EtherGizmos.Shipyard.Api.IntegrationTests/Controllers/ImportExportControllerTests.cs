@@ -1,8 +1,8 @@
-﻿using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
-using EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Specifications;
+﻿using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Controllers.Specifications;
 using System.Text;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers;
+namespace EtherGizmos.Shipyard.Controllers;
 
 internal class ImportExportControllerTests : IntegrationTestBase
 {

@@ -1,6 +1,6 @@
 using EtherGizmos.Shipyard.Api.Errors;
 
-namespace EtherGizmos.Shipyard.Api.Services.Middleware;
+namespace EtherGizmos.Shipyard.Services.Middleware;
 
 public class ReturnErrorExceptionMiddleware
 {

@@ -42,7 +42,7 @@ export class TableHeaderComponent<TData extends object> implements OnInit, OnDes
   @Input() type?: FilterTypeLabel;
   @Input() operators: FilterOperatorLabel[] = [];
   @Input() flags: FilterFlag[] = [];
-  @Input() enumValues: FilterValue[] = [];
+  @Input() enumValues: FilterValue[] | [string, FilterValue][] = [];
 
   @Input() sortable: boolean = false;
 
@@ -208,5 +208,9 @@ export class TableHeaderComponent<TData extends object> implements OnInit, OnDes
   setFilterCondition(value: FilterCondition) {
     const condition = this.filterForm;
     condition.setValue(value);
+  }
+
+  isNamedFilter(value: unknown): value is [string, FilterValue] {
+    return Array.isArray(value);
   }
 }

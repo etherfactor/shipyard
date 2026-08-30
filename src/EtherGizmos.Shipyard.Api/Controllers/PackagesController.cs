@@ -1,13 +1,14 @@
 using Asp.Versioning;
 using AutoMapper;
+using EtherGizmos.Common;
 using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Api;
 using EtherGizmos.Shipyard.Api.Errors;
-using EtherGizmos.Shipyard.Api.Services.Security;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Extensions;
 using EtherGizmos.Shipyard.Messages;
+using EtherGizmos.Shipyard.Services.Security;
 using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,12 +19,13 @@ using OpenIddict.Abstractions;
 using Swashbuckle.AspNetCore.Filters;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace EtherGizmos.Shipyard.Api.Controllers;
+namespace EtherGizmos.Shipyard.Controllers;
 
 [Authorize]
 public class PackagesController : AutoODataController
 {
     private const string BaseRoute = "api/v{version:apiVersion}/packages";
+    private readonly TimeSpan BaseDelay = TimeSpan.FromHours(6); //TODO: Make this adjustable
 
     private readonly IUnitOfWorkFactory _uowFactory;
     private readonly IMapper _mapper;
@@ -107,7 +109,7 @@ public class PackagesController : AutoODataController
         ODataQueryOptions<PackageDTO> queryOptions,
         CancellationToken cancellationToken = default)
     {
-        using var uow = _uowFactory.Create(useRequestScope: true);
+        using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
         var packageRepo = uow.Repository<Package>();
 
         var dbData = await packageRepo.Data
@@ -132,7 +134,7 @@ public class PackagesController : AutoODataController
         int id,
         CancellationToken cancellationToken = default)
     {
-        using var uow = _uowFactory.Create(useRequestScope: true);
+        using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
         var packageRepo = uow.Repository<Package>();
 
         var package = await packageRepo.Data
@@ -155,7 +157,7 @@ public class PackagesController : AutoODataController
             StepCount = (short)package.Carrier.Steps.Count,
         };
 
-        executionRepo.Create(execution);
+        executionRepo.Add(execution);
 
         await uow.SaveChangesAsync(cancellationToken);
 
@@ -169,7 +171,7 @@ public class PackagesController : AutoODataController
 
         package.LastPollAt = DateTimeOffset.UtcNow;
         package.NextPollAt = package.LastPollAt
-            + TimeSpan.FromHours(6) * (double)package.LastStatusType.PollingFactor;
+            + BaseDelay * (double)package.LastStatusType.PollingFactor;
 
         await uow.SaveChangesAsync(cancellationToken);
 
@@ -195,5 +197,27 @@ public class PackagesController : AutoODataController
     private IKeyedRequestBuilder<Package, PackageDTO> ForItem(
         int id)
         => ForItem(
-            KeyMapping<Package, PackageDTO, int>.Create(id, e => e.Id, e => e.Id));
+            KeyMapping<Package, PackageDTO, int>.Create(id, e => e.Id, e => e.Id))
+            .OnUpdating(async (db, dto) =>
+            {
+                var prevStatusTypeId = db.LastStatusTypeId;
+                db.LastStatusTypeId = db.TrackingUpdates
+                    .OrderByDescending(e => e.OccurredAt)
+                    .Select(e => e.StatusTypeId)
+                    .FirstOrDefault();
+
+                using var uow = _uowFactory.Create();
+                var statusRepo = uow.Repository<StatusType>();
+
+                var status = await statusRepo.Data
+                    .SingleAsync(e => e.Id == db.LastStatusTypeId);
+
+                var nextTime = status.IsFinal
+                    ? DateTimeOffset.MaxValue
+                    : db.LastPollAt + BaseDelay * (double)status.PollingFactor;
+
+                db.NextPollAt = nextTime;
+
+                db.IsDelivered = db.LastStatusTypeId == StatusTypeId.Delivered;
+            });
 }

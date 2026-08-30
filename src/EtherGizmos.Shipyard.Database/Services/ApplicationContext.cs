@@ -1,20 +1,23 @@
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Converters;
-using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 
 namespace EtherGizmos.Shipyard.Services;
 
 public class ApplicationContext : DbContext
 {
+    private readonly IFilterContext _filterContext;
     private readonly IUserContext _userContext;
+    private readonly IEnumerable<IInterceptor> _interceptors;
 
     public IUserContext UserContext => _userContext;
 
@@ -40,6 +43,8 @@ public class ApplicationContext : DbContext
 
     public virtual DbSet<Group> Groups { get; set; }
 
+    public virtual DbSet<NotificationUnsubscribeKey> NotificationUnsubscribeKeys { get; set; }
+
     public virtual DbSet<Package> Packages { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
@@ -54,12 +59,23 @@ public class ApplicationContext : DbContext
 
     public ApplicationContext(
         DbContextOptions<ApplicationContext> options,
-        IMigrationManager migrationManager,
-        IUserContext userContext) : base(options)
+        [FromKeyedServices("Application")] IMigrationManager appMigrationManager,
+        [FromKeyedServices("Notification")] IMigrationManager notifMigrationManager,
+        IFilterContext filterContext,
+        IUserContext userContext,
+        IEnumerable<IInterceptor> interceptors) : base(options)
     {
+        _filterContext = filterContext;
         _userContext = userContext;
+        _interceptors = interceptors;
 
-        migrationManager.EnsureMigratedAsync()
+        notifMigrationManager
+            .EnsureMigratedAsync()
+            .GetAwaiter()
+            .GetResult();
+
+        appMigrationManager
+            .EnsureMigratedAsync()
             .GetAwaiter()
             .GetResult();
     }
@@ -67,6 +83,16 @@ public class ApplicationContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.ReplaceService<IModelCacheKeyFactory, UserContextModelCacheKeyFactory>();
+        optionsBuilder.AddInterceptors(_interceptors);
+
+        //if (_interceptors.First() is SaveChangesInterceptor interceptor)
+        //{
+        //    try
+        //    {
+        //        interceptor.SavingChanges(null!, InterceptionResult<int>.SuppressWithResult(0));
+        //    }
+        //    catch { }
+        //}
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -103,11 +129,19 @@ public class ApplicationContext : DbContext
                 c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                 c => new Dictionary<string, object?>(c)));
 
+        modelBuilder.AddGlobalValueConverter(new ValueConverter<IDictionary<string, string?>, string>(
+            app => JsonSerializer.Serialize(app, jsonOptions),
+            db => JsonSerializer.Deserialize<IDictionary<string, string?>>(db, jsonOptions)!),
+            new ValueComparer<IDictionary<string, string?>>(
+                (a, b) => JsonSerializer.Serialize(a, jsonOptions) == JsonSerializer.Serialize(b, jsonOptions),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                c => new Dictionary<string, string?>(c)));
+
         //**********************************************************
         // Add Query Filters
 
         modelBuilder.Entity<CarrierExecution>()
-            .HasQueryFilter(record => AclPackages.Any(acl =>
+            .HasQueryFilter(record => _filterContext.Disabled || AclPackages.Any(acl =>
                 _userContext.UserId != null
                 && acl.PrincipalUserId == _userContext.UserId
                 && acl.PermissionId == PermissionId.Read
@@ -115,7 +149,7 @@ public class ApplicationContext : DbContext
                 && acl.PackageId == record.PackageId));
 
         modelBuilder.Entity<Group>()
-            .HasQueryFilter(record => AclGroups.Any(acl =>
+            .HasQueryFilter(record => _filterContext.Disabled || AclGroups.Any(acl =>
                 _userContext.UserId != null
                 && acl.PrincipalUserId == _userContext.UserId
                 && acl.PermissionId == PermissionId.Read
@@ -123,7 +157,7 @@ public class ApplicationContext : DbContext
                 && acl.GroupId == record.Id));
 
         modelBuilder.Entity<Package>()
-            .HasQueryFilter(record => AclPackages.Any(acl =>
+            .HasQueryFilter(record => _filterContext.Disabled || AclPackages.Any(acl =>
                 _userContext.UserId != null
                 && acl.PrincipalUserId == _userContext.UserId
                 && acl.PermissionId == PermissionId.Read
@@ -131,7 +165,7 @@ public class ApplicationContext : DbContext
                 && acl.PackageId == record.Id));
 
         modelBuilder.Entity<TrackingUpdate>()
-            .HasQueryFilter(record => AclPackages.Any(acl =>
+            .HasQueryFilter(record => _filterContext.Disabled || AclPackages.Any(acl =>
                 _userContext.UserId != null
                 && acl.PrincipalUserId == _userContext.UserId
                 && acl.PermissionId == PermissionId.Read
@@ -139,7 +173,7 @@ public class ApplicationContext : DbContext
                 && acl.PackageId == record.PackageId));
 
         modelBuilder.Entity<User>()
-            .HasQueryFilter(record => AclUsers.Any(acl =>
+            .HasQueryFilter(record => _filterContext.Disabled || AclUsers.Any(acl =>
                 _userContext.UserId != null
                 && acl.PrincipalUserId == _userContext.UserId
                 && acl.PermissionId == PermissionId.Read

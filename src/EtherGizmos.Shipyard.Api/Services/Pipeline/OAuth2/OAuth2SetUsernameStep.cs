@@ -3,7 +3,7 @@ using EtherGizmos.Shipyard.Database;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace EtherGizmos.Shipyard.Api.Services.Pipeline.OAuth2;
+namespace EtherGizmos.Shipyard.Services.Pipeline.OAuth2;
 
 public class OAuth2SetUsernameStep : IClaimsPipelineStep<OAuth2PrincipalContext>
 {

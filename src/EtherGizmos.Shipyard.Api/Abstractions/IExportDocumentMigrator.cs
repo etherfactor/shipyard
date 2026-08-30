@@ -1,6 +1,6 @@
-﻿using EtherGizmos.Shipyard.Api.Models;
+using EtherGizmos.Shipyard.Api.Models;
 
-namespace EtherGizmos.Shipyard.Api.Abstractions;
+namespace EtherGizmos.Shipyard.Abstractions;
 
 public interface IExportDocumentMigrator
 {

@@ -1,7 +1,7 @@
-﻿using EtherGizmos.Shipyard.Api.IntegrationTests.Controllers;
+using EtherGizmos.Shipyard.Controllers;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
+namespace EtherGizmos.Shipyard.Abstractions;
 
 public record FixtureContext(Func<HttpClient> AnonymousClientFactory, ITokenMinter Minter)
 {

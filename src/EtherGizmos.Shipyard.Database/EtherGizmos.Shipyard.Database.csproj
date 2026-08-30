@@ -1,24 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Database", ""))</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EtherGizmos.Extensions.DependencyInjection.ChildContainers" Version="0.1.0-ci.2" />
-    <PackageReference Include="FluentMigrator.Runner.Postgres" Version="7.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="9.0.6" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-    <PackageReference Include="Scrutor" Version="7.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <InternalsVisibleTo Include="$(MSBuildProjectName).UnitTests" />
-    <InternalsVisibleTo Include="$(MSBuildProjectName).IntegrationTests" />
+    <PackageReference Include="EtherGizmos.Common.Composition.ChildContainers" />
+    <PackageReference Include="EtherGizmos.Common.Data.Migrations" />
+    <PackageReference Include="EtherGizmos.Common.Data.UnitOfWork" />
+    <PackageReference Include="EtherGizmos.Common.Data.UnitOfWork.OpenTelemetry" />
+    <PackageReference Include="FluentMigrator.Runner.Postgres" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
   </ItemGroup>
 
   <ItemGroup>

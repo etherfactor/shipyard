@@ -31,6 +31,8 @@ public class TrackingUpdateDTOConfiguration : IModelConfiguration
             entity.EnumProperty(e => e.StatusType);
             entity.Property(e => e.Location);
             entity.Property(e => e.Description);
+            entity.Property(e => e.PackageId);
+            entity.HasRequired(e => e.Package);
         }
     }
 }

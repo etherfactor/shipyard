@@ -18,6 +18,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         entity.AuditProperties();
 
+        entity.Property(e => e.SystemId)
+            .HasColumnName("system_id");
+
         entity.Property(e => e.Username)
             .HasColumnName("username");
 
@@ -37,6 +40,12 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasColumnName("full_name");
 
         entity.Ignore(e => e.Password);
+
+        entity.Property(e => e.IsSystemManaged)
+            .HasColumnName("is_system_managed");
+
+        entity.Property(e => e.IsInteractiveLoginEnabled)
+            .HasColumnName("is_interactive_login_enabled");
 
         entity.Property(e => e.GroupId)
             .HasColumnName("group_id");

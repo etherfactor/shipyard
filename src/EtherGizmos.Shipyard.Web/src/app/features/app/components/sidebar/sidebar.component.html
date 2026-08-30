@@ -37,7 +37,36 @@
 
   </div>
 
+  <!-- Notifications -->
+  <div class="px-3 pt-3 pb-1 text-uppercase text-muted small fw-semibold">
+    Notifications
+  </div>
+
+  <div class="list-group list-group-flush">
+
+    <!-- Notifications -->
+    <a [routerLink]="['/notifications']"
+       routerLinkActive #rlNotifications="routerLinkActive"
+       class="list-group-item list-group-item-action d-flex align-items-center"
+       [class.active]="rlNotifications.isActive && !rlSubscriptions.isActive"
+       (click)="dismiss(0)">
+      <i class="bi bi-clock-history me-2"></i>
+      History
+    </a>
+
+    <!-- Subscriptions -->
+    <a [routerLink]="['/notifications/subscriptions']"
+       routerLinkActive="active" #rlSubscriptions="routerLinkActive"
+       class="list-group-item list-group-item-action d-flex align-items-center"
+       (click)="dismiss(0)">
+      <i class="bi bi-bell me-2"></i>
+      Subscriptions
+    </a>
+
+  </div>
+
   <!-- Configuration -->
+  @if (hasCapability(SecurableType.Carrier, PermissionId.Read) || hasCapability(SecurableType.Carrier, PermissionId.Write)) {
   <div class="px-3 pt-3 pb-1 text-uppercase text-muted small fw-semibold">
     Configuration
   </div>
@@ -67,8 +96,10 @@
     }
 
   </div>
+  }
 
   <!-- Administration -->
+  @if (hasCapability(SecurableType.User, PermissionId.Read) || hasCapability(SecurableType.Group, PermissionId.Read) || hasCapability(SecurableType.Role, PermissionId.Read)) {
   <div class="px-3 pt-3 pb-1 text-uppercase text-muted small fw-semibold">
     Administration
   </div>
@@ -108,23 +139,8 @@
     </a>
     }
 
-    <!-- Notification Logs -->
-    <!--<a [routerLink]="['/notifications']" class="list-group-item list-group-item-action d-flex align-items-center" (click)="dismiss(0)">
-      <i class="bi bi-bell me-2"></i>
-      Notifications
-    </a>-->
-    <!-- Settings -->
-    <!--<a [routerLink]="['/settings']" class="list-group-item list-group-item-action d-flex align-items-center" (click)="dismiss(0)">
-      <i class="bi bi-gear me-2"></i>
-      Settings
-    </a>-->
-    <!-- System/Debug Info -->
-    <!--<a [routerLink]="['/system']" class="list-group-item list-group-item-action d-flex align-items-center" (click)="dismiss(0)">
-      <i class="bi bi-hdd-network me-2"></i>
-      System Info
-    </a>-->
-
   </div>
+  }
 
   <hr class="my-3" />
 

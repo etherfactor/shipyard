@@ -1,0 +1,67 @@
+{{capture title}}
+{{subject}}
+{{end}}
+
+{{capture content}}
+<mj-text>
+  <h1>Your returned package digest</h1>
+</mj-text>
+<mj-text font-size="16px" line-height="25px" padding-bottom="20px">
+  Hi {{name}}, Shipyard found {{notification_count}} returned package update{{if notification_count != 1}}s{{end}} between <b>{{start_at}}</b> and <b>{{end_at}}</b>.
+</mj-text>
+{{for notification in notifications}}
+<mj-table css-class="detail-table" container-background-color="#faf8ff" border="1px solid #e6ddf7;" padding="0 0 18px 0">
+  <tr>
+    <td colspan="2" style="padding: 20px;">
+      <div style="text-transform: uppercase; letter-spacing: 0.05em; color: #777777; font-size: 12px; font-weight: 700;">
+        Returned
+      </div>
+      <div style="font-size: 18px;">
+        <b>{{notification.carrier_name}} tracking #{{notification.tracking_number}}</b>
+      </div>
+      {{if notification.contents}}
+      <div style="font-size: 14px; color: #555555; padding-top: 4px;">
+        {{notification.contents}}
+      </div>
+      {{end}}
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 0 20px 20px 20px;">
+      <div style="text-transform: uppercase; letter-spacing: 0.05em; color: #777777; font-size: 12px; font-weight: 700;">
+        Updated at
+      </div>
+      <div style="font-size: 16px;">
+        <b>{{notification.returned_at}}</b>
+      </div>
+    </td>
+    <td style="padding: 0 20px 20px 20px;">
+      <div style="text-transform: uppercase; letter-spacing: 0.05em; color: #777777; font-size: 12px; font-weight: 700;">
+        Last update
+      </div>
+      <div style="font-size: 16px;">
+        {{notification.details}}
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" style="padding: 0 20px 20px 20px;">
+      {{if notification.tracking_url}}
+      <a href="{{notification.tracking_url}}" style="color: #731dd8; text-decoration: none;">
+        Open carrier tracking
+      </a>
+      <span style="color: #cccccc;"> | </span>
+      {{end}}
+      <a href="{{shipyard_url}}/packages/{{notification.package_id}}" style="color: #731dd8; text-decoration: none;">
+        View in Shipyard
+      </a>
+    </td>
+  </tr>
+</mj-table>
+{{end}}
+<mj-button href="{{shipyard_url}}/packages" background-color="#731dd8" border-radius="10px" font-size="16px" padding-bottom="20px">
+  View packages
+</mj-button>
+{{end}}
+
+{{include "_layout"}}

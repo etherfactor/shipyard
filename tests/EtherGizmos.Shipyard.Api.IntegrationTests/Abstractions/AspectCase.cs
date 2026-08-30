@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
+﻿namespace EtherGizmos.Shipyard.Abstractions;
 
 public record AspectCase(string Name, Func<FixtureContext, Task> Test)
 {

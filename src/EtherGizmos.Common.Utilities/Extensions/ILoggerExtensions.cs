@@ -1,6 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace EtherGizmos.Common.Extensions;
+﻿#pragma warning disable IDE0130
+namespace Microsoft.Extensions.Logging;
 
 public static class ILoggerExtensions
 {

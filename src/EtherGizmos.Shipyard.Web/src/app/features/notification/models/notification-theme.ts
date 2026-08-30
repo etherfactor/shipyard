@@ -1,0 +1,82 @@
+import { NotificationStatusType } from "./notification-status-type";
+
+export interface NotificationTheme {
+  iconClass: string;
+  colorClass: string;
+}
+
+export const NotificationChannelTheme: Record<string, NotificationTheme> = {
+  "email": {
+    iconClass: "bi-envelope",
+    colorClass: "text-success",
+  },
+  "webpush": {
+    iconClass: "bi-phone",
+    colorClass: "text-info",
+  },
+  "webhook": {
+    iconClass: "bi-globe",
+    colorClass: "text-warning",
+  },
+};
+
+export const NotificationScheduleTheme: Record<string, NotificationTheme> = {
+  "immediate": {
+    iconClass: "bi-lightning",
+    colorClass: "text-warning",
+  },
+  "digest": {
+    iconClass: "bi-clock-history",
+    colorClass: "text-info",
+  },
+};
+
+export const NotificationEventTheme: Record<string, NotificationTheme> = {
+  "carrier.unknownStatus": {
+    iconClass: "bi-question-circle",
+    colorClass: "text-info",
+  },
+  "package.delivered": {
+    iconClass: "bi-check-circle",
+    colorClass: "text-success",
+  },
+  "package.etaChanged": {
+    iconClass: "bi-alarm",
+    colorClass: "text-warning",
+  },
+  "package.outForDelivery": {
+    iconClass: "bi-box-seam",
+    colorClass: "text-warning",
+  },
+  "package.failedAttempt": {
+    iconClass: "bi-exclamation-triangle",
+    colorClass: "text-warning",
+  },
+  "package.returned": {
+    iconClass: "bi-arrow-return-left",
+    colorClass: "text-danger",
+  },
+  "package.unknownStatus": {
+    iconClass: "bi-question-circle",
+    colorClass: "text-secondary",
+  },
+};
+
+export const NotificationStatusTheme: Record<string, NotificationTheme> = {
+  [NotificationStatusType.Pending]: {
+    iconClass: "bi-hourglass-split",
+    colorClass: "text-warning",
+  },
+  [NotificationStatusType.InFlight]: {
+    iconClass: "bi-three-dots",
+    colorClass: "text-info",
+  },
+  [NotificationStatusType.Sent]: {
+    iconClass: "bi-check-circle",
+    colorClass: "text-success",
+  },
+  [NotificationStatusType.Failed]: {
+    iconClass: "bi-x-circle",
+    colorClass: "text-danger",
+  },
+};

@@ -3,7 +3,7 @@ using OpenIddict.Abstractions;
 using System.Security.Claims;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace EtherGizmos.Shipyard.Api.Services.Pipeline.OAuth2;
+namespace EtherGizmos.Shipyard.Services.Pipeline.OAuth2;
 
 public class OAuth2ApplyDestinationsStep : IClaimsPipelineStep<OAuth2PrincipalContext>
 {

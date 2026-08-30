@@ -1,0 +1,233 @@
+@let record = subscription$$();
+@let form = form$$();
+@let channelSchema = channelSchema$$();
+
+<!-- Header -->
+<div class="row">
+  <div class="col-12 mt-3">
+    @if (id$$()) {
+    <detail-header text="Subscription Details"
+                   [subtext]="record?.notificationEventId + ' (#' + record?.id + ')'" />
+    } @else {
+    <detail-header text="Subscription Details"
+                   subtext="Creating new subscription." />
+    }
+  </div>
+</div>
+
+@if (record && form) {
+<!-- Summary -->
+<div class="row" [formGroup]="form">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-broadcast"
+                text="Subscription Summary">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="notificationEventId" class="col-sm-4 col-form-label">Event</label>
+            <div class="col-sm-8">
+              <ng-select [clearable]="false"
+                         [selectOnTab]="true"
+                         [readonlyForm]="!isEditing$$()"
+                         formControlName="notificationEventId">
+                @for (event of events$$(); track event.id) {
+                <ng-option [value]="event.id">
+                  <span [innerHtml]="formatStyleSpan(NotificationEventTheme, event.id)"></span>
+                  {{event.name}}
+                </ng-option>
+                }
+              </ng-select>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="notificationChannelId" class="col-sm-4 col-form-label">Channel</label>
+            <div class="col-sm-8">
+              <ng-select [clearable]="false"
+                         [selectOnTab]="true"
+                         [readonlyForm]="!isEditing$$()"
+                         formControlName="notificationChannelId">
+                @for (channel of channels$$(); track channel.id) {
+                <ng-option [value]="channel.id">
+                  <span [innerHtml]="formatStyleSpan(NotificationChannelTheme, channel.id)"></span>
+                  {{channel.name}}
+                </ng-option>
+                }
+              </ng-select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="notificationScheduleId" class="col-sm-4 col-form-label">Schedule</label>
+            <div class="col-sm-8">
+              <ng-select [clearable]="false"
+                         [selectOnTab]="true"
+                         [readonlyForm]="!isEditing$$()"
+                         formControlName="notificationScheduleId">
+                @for (schedule of schedules$$(); track schedule.id) {
+                <ng-option [value]="schedule.id">
+                  <span [innerHtml]="formatStyleSpan(NotificationScheduleTheme, schedule.id)"></span>
+                  {{schedule.name}}
+                </ng-option>
+                }
+              </ng-select>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="cron" class="col-sm-4 col-form-label">Schedule cron</label>
+            <div class="col-sm-8">
+              @if (!cronFormControl) {
+              <input id="cron" type="text" [readonlyForm]="true" placeholder="Only required for digest" />
+              } @else {
+              <input id="cron" type="text" [formControl]="cronFormControl" [readonlyForm]="!isEditing$$()" placeholder="0 0 * * * (daily)" />
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="nextNotificationAt" class="col-sm-4 col-form-label">Next notification at</label>
+            <div class="col-sm-8">
+              <input-luxon-datetime id="nextNotificationAt" formControlName="nextNotificationAt" [readonly]="true" />
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-check mt-4 mb-1">
+            <input id="isActive" class="form-check-input" type="checkbox" formControlName="isActive" />
+            <label for="isActive" class="form-check-label">
+              Is active?
+            </label>
+          </div>
+        </div>
+      </div>
+    </detail-box>
+  </div>
+</div>
+
+<!-- Configuration -->
+<div class="row">
+  <div class="col-md-6 mt-3">
+    <detail-box icon="bi-code"
+                text="Channel Configuration">
+      @if (channelSchema) {
+      @if (!isChannelSchemaEmpty$$()) {
+      <json-schema-auto-form [schema]="channelSchema" [form]="form.controls.notificationChannelConfig" [readonly]="!isEditing$$()" />
+      } @else {
+      <div class="mt-3">
+        This channel cannot be configured
+      </div>
+      }
+      } @else {
+      <div class="mt-3">
+        Select a channel to configure its properties
+      </div>
+      }
+    </detail-box>
+  </div>
+  <div class="col-md-6 mt-3">
+    <detail-box icon="bi-code-square"
+                text="JSON Schema">
+      @if (channelSchema) {
+      <div class="schema-preview mt-3">{{JSON.stringify(channelSchema, null, 2)}}</div>
+      } @else {
+      <div class="schema-preview mt-3">No channel selected</div>
+      }
+    </detail-box>
+  </div>
+</div>
+
+<!-- Last delivery -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-envelope"
+                text="Last Delivery"
+                [buttons]="deliveryButtons$$()">
+      @let delivery = delivery$$();
+      @if (delivery) {
+      <!--<div class="row">
+        @let statusMeta = getExecutionStatusMetadata(exec.executionStatusType);
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="status" class="col-sm-4 col-form-label">
+              Status
+            </label>
+            <div class="col-sm-8">
+              <ng-select id="execStatus" [ngModel]="1" [ngModelOptions]="{ standalone: true }" [readonly]="true" [readonlyForm]="true">
+                <ng-option [value]="1">
+                  <span class="bi me-1" [class]="[statusMeta.icon, statusMeta.color]"></span>
+                  {{statusMeta.label}}
+                </ng-option>
+              </ng-select>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="execStartedAt" class="col-sm-4 col-form-label">
+              Started at
+            </label>
+            <div class="col-sm-8">
+              <input id="execStartedAt" type="text" [value]="exec.startedAt?.toLocaleString({ month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) ?? '—'" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row">
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="execDuration" class="col-sm-4 col-form-label">
+              Duration
+            </label>
+            <div class="col-sm-8">
+              <input id="execDuration" type="text" [value]="getDiffTime(exec.startedAt, exec.completedAt)" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="execArtifacts" class="col-sm-4 col-form-label">
+              Artifacts
+            </label>
+            <div class="col-sm-8">
+              <input id="execArtifacts" type="text" [value]="exec.artifacts.length" [readonlyForm]="true" />
+            </div>
+          </div>
+        </div>
+
+      </div>-->
+      } @else {
+      <div class="row">
+        <div class="col-12 mt-3">
+          No recent deliveries
+        </div>
+      </div>
+      }
+    </detail-box>
+  </div>
+</div>
+}
+
+<!-- Loading Overlay -->
+@if (isLoading$$()) {
+<div style="position: fixed; top: 0; left: 0; height: 100%; width: 100%; background-color: color-mix(in srgb, var(--bs-body-bg) 50%, transparent); z-index: 100;">
+</div>
+<div style="position: fixed; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%); z-index: 100;">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+}

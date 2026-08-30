@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.13.35806.99
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11723.231
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.Api", "src\EtherGizmos.Shipyard.Api\EtherGizmos.Shipyard.Api.csproj", "{2375BE4B-3676-D814-610F-E6593B940DD7}"
 EndProject
@@ -11,22 +11,19 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.env.example = .env.example
 		.gitignore = .gitignore
 		azure-pipelines-audit.yml = azure-pipelines-audit.yml
 		azure-pipelines.yml = azure-pipelines.yml
-		gitversion.yml = gitversion.yml
 		compose.yml = compose.yml
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		gitversion.yml = gitversion.yml
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Common.Messaging", "src\EtherGizmos.Common.Messaging\EtherGizmos.Common.Messaging.csproj", "{9E77EE3D-DC6E-4CCA-9736-E670AED1ECCC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Common.RabbitMQ", "src\EtherGizmos.Common.Messaging.RabbitMQ\EtherGizmos.Common.RabbitMQ.csproj", "{E787D37F-7A83-4BD7-9ECA-E524FCC6C6D4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Common.Configuration", "src\EtherGizmos.Common.Configuration\EtherGizmos.Common.Configuration.csproj", "{EA3592A3-7951-4ABC-96B6-64893980FF55}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EtherGizmos.Shipyard.Worker", "src\EtherGizmos.Shipyard.Worker\EtherGizmos.Shipyard.Worker.csproj", "{41BB7B80-31D9-4F7E-AFAA-D8F61BFB98B6}"
 EndProject
@@ -77,18 +74,6 @@ Global
 		{C73EAD76-D6E0-0A12-9796-A2127568B5B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C73EAD76-D6E0-0A12-9796-A2127568B5B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C73EAD76-D6E0-0A12-9796-A2127568B5B2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9E77EE3D-DC6E-4CCA-9736-E670AED1ECCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9E77EE3D-DC6E-4CCA-9736-E670AED1ECCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9E77EE3D-DC6E-4CCA-9736-E670AED1ECCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9E77EE3D-DC6E-4CCA-9736-E670AED1ECCC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E787D37F-7A83-4BD7-9ECA-E524FCC6C6D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E787D37F-7A83-4BD7-9ECA-E524FCC6C6D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E787D37F-7A83-4BD7-9ECA-E524FCC6C6D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E787D37F-7A83-4BD7-9ECA-E524FCC6C6D4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EA3592A3-7951-4ABC-96B6-64893980FF55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EA3592A3-7951-4ABC-96B6-64893980FF55}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EA3592A3-7951-4ABC-96B6-64893980FF55}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EA3592A3-7951-4ABC-96B6-64893980FF55}.Release|Any CPU.Build.0 = Release|Any CPU
 		{41BB7B80-31D9-4F7E-AFAA-D8F61BFB98B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{41BB7B80-31D9-4F7E-AFAA-D8F61BFB98B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{41BB7B80-31D9-4F7E-AFAA-D8F61BFB98B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -143,9 +128,6 @@ Global
 		{2375BE4B-3676-D814-610F-E6593B940DD7} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 		{B5BBD912-F928-411A-A528-E8A84C048C43} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 		{C73EAD76-D6E0-0A12-9796-A2127568B5B2} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
-		{9E77EE3D-DC6E-4CCA-9736-E670AED1ECCC} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
-		{E787D37F-7A83-4BD7-9ECA-E524FCC6C6D4} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
-		{EA3592A3-7951-4ABC-96B6-64893980FF55} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 		{41BB7B80-31D9-4F7E-AFAA-D8F61BFB98B6} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 		{29515E1D-C186-4FD7-B2E9-C427972E4A43} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}
 		{7044DA17-A7D2-4C0A-90A4-A18DC9CFC80F} = {4A974C85-9F75-4D3C-9A02-6E9BF13A11A2}

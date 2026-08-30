@@ -1,75 +1,54 @@
-using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Shipyard.Abstractions;
-using EtherGizmos.Shipyard.Database;
-using EtherGizmos.Shipyard.Database.Enums;
+using EtherGizmos.Shipyard.Api;
 using EtherGizmos.Shipyard.Extensions;
-using EtherGizmos.Shipyard.Messages;
-using Microsoft.EntityFrameworkCore;
+using EtherGizmos.Shipyard.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Net.Http.Json;
+using System.Text.Json;
 
-namespace EtherGizmos.Shipyard.Worker.Services.HostedServices;
+namespace EtherGizmos.Shipyard.Services.HostedServices;
 
 public class QueueTrackingRequestBackgroundService : PeriodicBackgroundService
 {
     private const string CRON_EXPRESSION = "*/60 * * * * *";
 
-    private readonly IMessageSender _sender;
-
     public QueueTrackingRequestBackgroundService(
         IServiceProvider serviceProvider,
-        ILogger<QueueTrackingRequestBackgroundService> logger,
-        IMessageSender sender)
+        ILogger<QueueTrackingRequestBackgroundService> logger)
         : base(CRON_EXPRESSION, serviceProvider, logger)
     {
-        _sender = sender;
     }
 
     protected override async Task ExecuteIterationAsync(
         IServiceProvider provider,
         CancellationToken stoppingToken)
     {
-        var uowFactory = provider.GetRequiredService<IUnitOfWorkFactory>().AsUnfiltered();
-        using var uow = uowFactory.Create();
+        var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
+        using var client = httpClientFactory.CreateClient("API");
 
-        var packageRepo = uow.Repository<Package>();
+        var now = DateTimeOffset.UtcNow;
 
-        var ready = packageRepo.Data
-            .Where(e => e.NextPollAt < DateTimeOffset.UtcNow)
-            .Include(e => e.Carrier)
-            .Include(e => e.LastStatusType)
-            .AsAsyncEnumerable();
+        using var response = await client.GetAsync(
+            $"/api/v1/packages" +
+            $"?$filter=nextPollAt lt {now:yyyy-MM-ddTHH:mm:ss.fffffffZ}" +
+            $"&$expand=carrier",
+            cancellationToken: stoppingToken);
 
-        await Parallel.ForEachAsync(ready, async (package, ct) =>
+        var set = (await response.Content.ReadFromJsonAsync<ODataResultSet<PackageDTO>>(
+            JsonSerializerOptions.App,
+            cancellationToken: stoppingToken))!;
+
+        var ready = set.Value;
+
+        var parallelOptions = new ParallelOptions() { CancellationToken = stoppingToken };
+        await Parallel.ForEachAsync(ready, parallelOptions, async (package, ct) =>
         {
-            using var subUow = uowFactory.Create();
-            var executionRepo = subUow.Repository<CarrierExecution>();
+            using var createResponse = await client.PostAsync(
+                $"/api/v1/packages({package.Id})/schedulePoll",
+                null,
+                cancellationToken: ct);
 
-            var execution = new CarrierExecution()
-            {
-                CarrierId = package.CarrierId,
-                PackageId = package.Id,
-                ExecutionStatus = ExecutionStatusType.Queued,
-                StepCount = (short)package.Carrier.Steps.Count,
-            };
-
-            executionRepo.Create(execution);
-
-            await subUow.SaveChangesAsync(ct);
-
-            await _sender.SendAsync("tracking-poll-request", new TrackingRequest()
-            {
-                ExecutionId = execution.Id,
-                PackageId = package.Id,
-                CarrierId = package.CarrierId,
-                TrackingNumber = package.TrackingNumber,
-            }, cancellationToken: stoppingToken);
-
-            package.LastPollAt = DateTimeOffset.UtcNow;
-            package.NextPollAt = package.LastPollAt
-                + TimeSpan.FromHours(6) * (double)package.LastStatusType.PollingFactor;
+            createResponse.EnsureSuccessStatusCode();
         });
-
-        await uow.SaveChangesAsync(stoppingToken);
     }
 }

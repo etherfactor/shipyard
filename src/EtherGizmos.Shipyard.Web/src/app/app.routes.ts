@@ -33,6 +33,15 @@ export const APP_ROUTES: ExtendedRoute[] = [
     canActivate: [authenticationGuard],
   },
   {
+    path: "notifications",
+    loadChildren: () => import("./features/notification/notification.routes").then(m => m.NOTIFICATION_ROUTES),
+    canActivate: [authenticationGuard],
+  },
+  {
+    path: "notifications",
+    loadChildren: () => import("./features/notification/unsubscribe.routes").then(m => m.UNSUBSCRIBE_ROUTES),
+  },
+  {
     path: "packages",
     loadChildren: () => import("./features/package/package.routes").then(m => m.PACKAGE_ROUTES),
     canActivate: [authenticationGuard],

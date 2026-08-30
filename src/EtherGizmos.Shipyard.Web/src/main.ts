@@ -51,10 +51,7 @@ import { provideODataClient } from './app/shared/utilities/odata/odata.util';
               .createLogger()
         ),
         provideSimpleConfig(HTTP_BATCH_LOG_SINK_OPTIONS, {
-          endpoint: "https://localhost:7265/api/v1/logs?apiKey=d142d01e-9f50-4704-ac67-fe09c157922a",
-          headers: {
-            "X-Api-Key": "d142d01e-9f50-4704-ac67-fe09c157922a",
-          },
+          endpoint: `${config.logging.endpoint}?apiKey=${encodeURIComponent(config.logging.apiKey)}`,
         }),
         provideOAuth2Service(),
         provideAuth({

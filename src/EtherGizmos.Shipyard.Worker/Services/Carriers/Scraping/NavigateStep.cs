@@ -1,10 +1,10 @@
-﻿using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
+﻿using EtherGizmos.Shipyard.Services.WebDrivers;
 using HtmlAgilityPack;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
+namespace EtherGizmos.Shipyard.Services.Carriers.Scraping;
 
 internal class NavigateStep : ScrapingStep
 {

@@ -1,6 +1,6 @@
-﻿using EtherGizmos.Shipyard.Api.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
 
-namespace EtherGizmos.Shipyard.Api.Services.Export;
+namespace EtherGizmos.Shipyard.Services.Export;
 
 internal class ExportDocumentImporterRegistry : IExportDocumentImporterRegistry
 {

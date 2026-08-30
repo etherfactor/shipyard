@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
+namespace EtherGizmos.Shipyard.Services.Carriers.Scraping;
 
 public class ScrapingStepConverter : JsonConverter<ScrapingStep>
 {

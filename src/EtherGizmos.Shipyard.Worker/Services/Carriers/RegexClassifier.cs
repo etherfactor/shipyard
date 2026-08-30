@@ -1,22 +1,20 @@
-using EtherGizmos.Shipyard.Abstractions;
-using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Api;
 using EtherGizmos.Shipyard.Database.Enums;
 using EtherGizmos.Shipyard.Extensions;
-using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Json;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace EtherGizmos.Shipyard.Worker.Services.Carriers;
+namespace EtherGizmos.Shipyard.Services.Carriers;
 
 internal class RegexClassifier : IRegexClassifier
 {
-    private readonly IUnitOfWorkFactory _uowFactory;
-
-    private Carrier? _carrier;
+    private readonly IHttpClientFactory _httpClientFactory;
 
     public RegexClassifier(
-        IUnitOfWorkFactory uowFactory)
+        IHttpClientFactory httpClientFactory)
     {
-        _uowFactory = uowFactory.AsUnfiltered();
+        _httpClientFactory = httpClientFactory;
     }
 
     public async Task<int> ClassifyStatusAsync(
@@ -24,19 +22,24 @@ internal class RegexClassifier : IRegexClassifier
         string description,
         CancellationToken cancellationToken = default)
     {
-        using var uow = _uowFactory.Create();
+        using var client = _httpClientFactory.CreateClient("API");
 
-        var carrierRepo = uow.Repository<Carrier>();
+        var response = await client.GetAsync(
+            $"/api/v1/carriers({carrierId})",
+            cancellationToken: cancellationToken);
 
-        _carrier ??= await carrierRepo.Data
-            .SingleAsync(e => e.Id == carrierId, cancellationToken: cancellationToken);
+        response.EnsureSuccessStatusCode();
 
-        foreach (var rule in _carrier.Rules.OrderBy(e => e.Priority))
+        var carrier = (await response.Content.ReadFromJsonAsync<CarrierDTO>(
+            JsonSerializerOptions.App,
+            cancellationToken: cancellationToken))!;
+
+        foreach (var rule in carrier.Rules.OrderBy(e => e.Priority))
         {
             var regex = new Regex(rule.Pattern);
             if (regex.IsMatch(description))
             {
-                return rule.StatusTypeId;
+                return (int)rule.StatusType;
             }
         }
 

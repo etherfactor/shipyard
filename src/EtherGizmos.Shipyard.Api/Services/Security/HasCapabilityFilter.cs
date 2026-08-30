@@ -1,9 +1,9 @@
-﻿using EtherGizmos.Shipyard.Api.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace EtherGizmos.Shipyard.Api.Services.Security;
+namespace EtherGizmos.Shipyard.Services.Security;
 
 public class HasCapabilityFilter : IAuthorizationFilter
 {

@@ -1,10 +1,10 @@
-﻿using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
+﻿using EtherGizmos.Shipyard.Services.WebDrivers;
 using HtmlAgilityPack;
 using HtmlAgilityPack.CssSelectors.NetCore;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 
-namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
+namespace EtherGizmos.Shipyard.Services.Carriers.Scraping;
 
 internal class ExtractListStep : ScrapingStep
 {

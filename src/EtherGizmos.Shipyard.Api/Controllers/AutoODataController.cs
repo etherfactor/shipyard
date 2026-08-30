@@ -1,6 +1,5 @@
 using AutoMapper;
 using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +12,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using System.Linq.Expressions;
 
-namespace EtherGizmos.Shipyard.Api.Controllers;
+namespace EtherGizmos.Shipyard.Controllers;
 
 public abstract class AutoODataController : ODataController
 {
@@ -24,6 +23,10 @@ public abstract class AutoODataController : ODataController
     {
         _serviceProvider = serviceProvider;
     }
+
+    protected virtual IQueryable<TEntity> Filter<TEntity>(IQueryable<TEntity> queryable)
+        where TEntity : class, IEntity
+        => queryable;
 
     protected async Task<TEntity> LoadRecordAsync<TEntity, TDto, TKey>(
         IUnitOfWork uow,
@@ -54,7 +57,10 @@ public abstract class AutoODataController : ODataController
                 return Expression.Lambda<Func<TEntity, bool>>(Expression.AndAlso(leftExp.Body, rightExp.Body), [.. parameters]);
             });
 
-        var record = await repository.Data.SingleOrDefaultAsync(condition, cancellationToken: cancellationToken);
+        var data = repository.Data;
+        data = Filter(data);
+
+        var record = await data.SingleOrDefaultAsync(condition, cancellationToken: cancellationToken);
 
         //Record was not found, so return 404 Not Found
         if (record is null)
@@ -211,7 +217,7 @@ public abstract class AutoODataController : ODataController
         {
             queryOptions.EnsureValidForSingle();
 
-            using var uow = _uowFactory.Create(useRequestScope: true);
+            using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
             var repository = uow.Repository<TEntity>();
 
             var validator = _modelValidatorFactory.GetValidator<TDto>();
@@ -226,7 +232,7 @@ public abstract class AutoODataController : ODataController
             var dbValidator = _modelValidatorFactory.GetValidator<TEntity>();
             await dbValidator.ValidateAsync(record, cancellationToken);
 
-            repository.Create(record);
+            repository.Add(record);
 
             await uow.SaveChangesAsync(cancellationToken: cancellationToken);
 
@@ -244,12 +250,12 @@ public abstract class AutoODataController : ODataController
         public async Task<IActionResult> DeleteAsync(
             CancellationToken cancellationToken = default)
         {
-            using var uow = _uowFactory.Create(useRequestScope: true);
+            using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
             var repository = uow.Repository<TEntity>();
 
             var record = await _controller.LoadRecordAsync(uow, Keys, cancellationToken: cancellationToken);
 
-            repository.Delete(record);
+            repository.Remove(record);
 
             await uow.SaveChangesAsync(cancellationToken: cancellationToken);
 
@@ -272,7 +278,7 @@ public abstract class AutoODataController : ODataController
         {
             queryOptions.EnsureValidForSingle();
 
-            using var uow = _uowFactory.Create(useRequestScope: true);
+            using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
             var repository = uow.Repository<TEntity>();
 
             var record = await _controller.LoadRecordAsync(uow, Keys, cancellationToken: cancellationToken);
@@ -307,7 +313,7 @@ public abstract class AutoODataController : ODataController
         {
             queryOptions.EnsureValidForSingle();
 
-            using var uow = _uowFactory.Create(useRequestScope: true);
+            using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
             var repository = uow.Repository<TEntity>();
 
             var testRecord = new TDto();
@@ -351,11 +357,14 @@ public abstract class AutoODataController : ODataController
             ODataQueryOptions<TDto> queryOptions,
             CancellationToken cancellationToken = default)
         {
-            using var uow = _uowFactory.Create(useRequestScope: true);
+            using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
             var repository = uow.Repository<TEntity>();
 
+            var data = repository.Data;
+            data = _controller.Filter(data);
+
             var finished = await _mapper
-                .MapExplicitly(repository.Data)
+                .MapExplicitly(data)
                 .To<TDto>()
                 .ApplyQueryOptions(queryOptions)
                 .ExecuteAsync(cancellationToken);
@@ -417,7 +426,7 @@ public abstract class AutoODataController : ODataController
         public async Task<IActionResult> CreateAsync(
             CancellationToken cancellationToken = default)
         {
-            using var uow = _uowFactory.Create(useRequestScope: true);
+            using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
             var repository = uow.Repository<TEntity>();
 
             var record = await _controller.LoadRecordAsync(uow, Keys, cancellationToken: cancellationToken);
@@ -447,7 +456,7 @@ public abstract class AutoODataController : ODataController
         public async Task<IActionResult> DeleteAsync(
             CancellationToken cancellationToken = default)
         {
-            using var uow = _uowFactory.Create(useRequestScope: true);
+            using var uow = _uowFactory.Create(new() { SccopeMode = UnitOfWorkScopeMode.RequestScope });
             var repository = uow.Repository<TEntity>();
 
             var record = await _controller.LoadRecordAsync(uow, Keys, cancellationToken: cancellationToken);
