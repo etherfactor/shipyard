@@ -12,11 +12,14 @@ public class CarrierUnknownStatusDigestEmailFormatter
     : EmailNotificationChannelFormatter<DigestSchedule, Digest<CarrierUnknownStatusEvent>>
 {
     private readonly IUnitOfWorkFactory _uowFactory;
+    private readonly INotificationUnsubscribeService _unsubscribeService;
 
     public CarrierUnknownStatusDigestEmailFormatter(
-        IUnitOfWorkFactory uowFactory)
+        IUnitOfWorkFactory uowFactory,
+        INotificationUnsubscribeService unsubscribeService)
     {
         _uowFactory = uowFactory.AsUnfiltered();
+        _unsubscribeService = unsubscribeService;
     }
 
     public override EmailEnvelope Format(
@@ -40,6 +43,15 @@ public class CarrierUnknownStatusDigestEmailFormatter
             ? "1 Unknown Carrier Status"
             : $"{orderedNotifications.Count} Unknown Carrier Statuses";
 
+        var shipyardUrl = orderedNotifications.FirstOrDefault()?.ShipyardUrl;
+
+        var unsubscribeKey = _unsubscribeService
+            .GetUnsubscribeKeyAsync(notification.SubscriptionId)
+            .GetAwaiter()
+            .GetResult();
+
+        var unsubscribeUrl = $"{shipyardUrl}/notifications/unsubscribe?id={notification.SubscriptionId}&key={Uri.EscapeDataString(unsubscribeKey)}";
+
         var html = LiquidMjmlRenderer.Render(
             "CarrierUnknownStatus.Templates.CarrierUnknownStatusDigest",
             new
@@ -56,8 +68,8 @@ public class CarrierUnknownStatusDigestEmailFormatter
                     observedAt = e.ObservedAt,
                     statusText = e.StatusText,
                 }),
-                shipyardUrl = orderedNotifications.FirstOrDefault()?.ShipyardUrl,
-                unsubscribeKey = "invalid",
+                shipyardUrl = shipyardUrl,
+                unsubscribeUrl = unsubscribeUrl,
             });
 
         var message = new EmailMessage()

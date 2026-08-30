@@ -45,7 +45,6 @@ internal class PackageUnknownStatusExtractor : IDomainEventExtractor
                 Title = "Unknown Package Status",
                 Message = message,
                 ShipyardUrl = $"{uri.Scheme}://{uri.Authority}",
-                UnsubscribeKey = "invalid",
 
                 PackageId = package.Id,
                 CarrierId = package.CarrierId,

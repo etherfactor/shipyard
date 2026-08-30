@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common;
+using EtherGizmos.Common;
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Models;
 using EtherGizmos.Shipyard.Abstractions;
@@ -12,11 +12,14 @@ public class PackageDeliveredEmailFormatter
     : EmailNotificationChannelFormatter<ImmediateSchedule, PackageDeliveredEvent>
 {
     private readonly IUnitOfWorkFactory _uowFactory;
+    private readonly INotificationUnsubscribeService _unsubscribeService;
 
     public PackageDeliveredEmailFormatter(
-        IUnitOfWorkFactory uowFactory)
+        IUnitOfWorkFactory uowFactory,
+        INotificationUnsubscribeService unsubscribeService)
     {
         _uowFactory = uowFactory.AsUnfiltered();
+        _unsubscribeService = unsubscribeService;
     }
 
     public override EmailEnvelope Format(
@@ -36,6 +39,15 @@ public class PackageDeliveredEmailFormatter
 
         var subject = model.Title;
 
+        var shipyardUrl = model.ShipyardUrl;
+
+        var unsubscribeKey = _unsubscribeService
+            .GetUnsubscribeKeyAsync(notification.SubscriptionId)
+            .GetAwaiter()
+            .GetResult();
+
+        var unsubscribeUrl = $"{shipyardUrl}/notifications/unsubscribe?id={notification.SubscriptionId}&key={Uri.EscapeDataString(unsubscribeKey)}";
+
         var html = LiquidMjmlRenderer.Render(
             "PackageDelivered.Templates.PackageDelivered",
             new
@@ -54,8 +66,8 @@ public class PackageDeliveredEmailFormatter
                     occurredAt = e.OccurredAt,
                     details = e.Description,
                 }),
-                shipyardUrl = model.ShipyardUrl,
-                unsubscribeKey = "invalid",
+                shipyardUrl = shipyardUrl,
+                unsubscribeUrl = unsubscribeUrl,
             });
 
         var message = new EmailMessage()

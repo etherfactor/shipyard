@@ -8,7 +8,7 @@ resources:
   - repository: sharedTemplates
     type: git
     name: 'Projects/PipelineTemplates'
-    ref: 'refs/tags/2.0.0'
+    ref: 'refs/tags/2.1.0'
 
 stages:
 
@@ -68,7 +68,7 @@ stages:
       vmImage: 'ubuntu-22.04'
       projectName: 'EtherGizmos.Shipyard.Api'
       artifactName: 'api'
-      prepTasks:
+      preTasks:
 
       # Install a specific node version
       - task: NodeTool@0

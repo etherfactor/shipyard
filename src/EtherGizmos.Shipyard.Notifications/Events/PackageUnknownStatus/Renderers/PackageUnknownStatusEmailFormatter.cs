@@ -12,11 +12,14 @@ public class PackageUnknownStatusEmailFormatter
     : EmailNotificationChannelFormatter<ImmediateSchedule, PackageUnknownStatusEvent>
 {
     private readonly IUnitOfWorkFactory _uowFactory;
+    private readonly INotificationUnsubscribeService _unsubscribeService;
 
     public PackageUnknownStatusEmailFormatter(
-        IUnitOfWorkFactory uowFactory)
+        IUnitOfWorkFactory uowFactory,
+        INotificationUnsubscribeService unsubscribeService)
     {
         _uowFactory = uowFactory.AsUnfiltered();
+        _unsubscribeService = unsubscribeService;
     }
 
     public override EmailEnvelope Format(
@@ -34,6 +37,15 @@ public class PackageUnknownStatusEmailFormatter
 
         var updates = model.Updates.OrderBy(e => e.OccurredAt);
         var subject = model.Title;
+
+        var shipyardUrl = model.ShipyardUrl;
+
+        var unsubscribeKey = _unsubscribeService
+            .GetUnsubscribeKeyAsync(notification.SubscriptionId)
+            .GetAwaiter()
+            .GetResult();
+
+        var unsubscribeUrl = $"{shipyardUrl}/notifications/unsubscribe?id={notification.SubscriptionId}&key={Uri.EscapeDataString(unsubscribeKey)}";
 
         var html = LiquidMjmlRenderer.Render(
             "PackageUnknownStatus.Templates.PackageUnknownStatus",
@@ -54,8 +66,8 @@ public class PackageUnknownStatusEmailFormatter
                     occurredAt = e.OccurredAt,
                     details = e.Description,
                 }),
-                shipyardUrl = model.ShipyardUrl,
-                unsubscribeKey = "invalid",
+                shipyardUrl = shipyardUrl,
+                unsubscribeUrl = unsubscribeUrl,
             });
 
         var message = new EmailMessage()

@@ -65,6 +65,7 @@ public class PackageDTOProfile : Profile
         fromDto.IgnoreAllMembers();
         fromDto.MapMember(dest => dest.CarrierId, src => src.CarrierId);
         fromDto.MapMember(dest => dest.TrackingNumber, src => src.TrackingNumber);
+        fromDto.MapMember(dest => dest.EstimatedDeliveryAt, src => src.EstimatedDeliveryAt);
         fromDto.MapMember(dest => dest.Contents, src => src.Contents);
     })
     { }

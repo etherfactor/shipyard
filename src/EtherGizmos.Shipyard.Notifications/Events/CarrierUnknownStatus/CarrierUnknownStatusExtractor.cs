@@ -42,7 +42,6 @@ internal class CarrierUnknownStatusExtractor : IDomainEventExtractor
                 Title = "Unknown Carrier Status",
                 Message = $"{package.Carrier.Name} emitted an unknown tracking status: {lastUpdate?.Description}.".Replace("..", "."),
                 ShipyardUrl = $"{uri.Scheme}://{uri.Authority}",
-                UnsubscribeKey = "invalid",
 
                 CarrierId = package.CarrierId,
                 CarrierName = package.Carrier.Name,

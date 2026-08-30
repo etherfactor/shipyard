@@ -133,7 +133,10 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
 
             var regenResponse = await client.PatchAsJsonAsync(
                 $"/api/v1/packages({message.PackageId})",
-                new { }, //Intentional no-op; updating the package causes it to recalculate the last status
+                new
+                {
+                    estimatedDeliveryAt = result.EstimatedDeliveryAt,
+                },
                 cancellationToken: context.CancellationToken);
 
             regenResponse.EnsureSuccessStatusCode();

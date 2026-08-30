@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Notifications", ""))</RootNamespace>
@@ -10,6 +10,8 @@
     <None Remove="Events\CarrierUnknownStatus\Templates\CarrierUnknownStatusDigest.mjml.html" />
     <None Remove="Events\PackageDelivered\Templates\PackageDelivered.mjml.html" />
     <None Remove="Events\PackageDelivered\Templates\PackageDeliveredDigest.mjml.html" />
+    <None Remove="Events\PackageEtaChanged\Templates\PackageEtaChanged.mjml.html" />
+    <None Remove="Events\PackageEtaChanged\Templates\PackageEtaChangedDigest.mjml.html" />
     <None Remove="Events\PackageFailedAttempt\Templates\PackageFailedAttempt.mjml.html" />
     <None Remove="Events\PackageFailedAttempt\Templates\PackageFailedAttemptDigest.mjml.html" />
     <None Remove="Events\PackageOutForDelivery\Templates\PackageOutForDelivery.mjml.html" />
@@ -26,6 +28,8 @@
     <EmbeddedResource Include="Events\CarrierUnknownStatus\Templates\CarrierUnknownStatusDigest.mjml.html" />
     <EmbeddedResource Include="Events\PackageDelivered\Templates\PackageDelivered.mjml.html" />
     <EmbeddedResource Include="Events\PackageDelivered\Templates\PackageDeliveredDigest.mjml.html" />
+    <EmbeddedResource Include="Events\PackageEtaChanged\Templates\PackageEtaChanged.mjml.html" />
+    <EmbeddedResource Include="Events\PackageEtaChanged\Templates\PackageEtaChangedDigest.mjml.html" />
     <EmbeddedResource Include="Events\PackageFailedAttempt\Templates\PackageFailedAttempt.mjml.html" />
     <EmbeddedResource Include="Events\PackageFailedAttempt\Templates\PackageFailedAttemptDigest.mjml.html" />
     <EmbeddedResource Include="Events\PackageOutForDelivery\Templates\PackageOutForDelivery.mjml.html" />

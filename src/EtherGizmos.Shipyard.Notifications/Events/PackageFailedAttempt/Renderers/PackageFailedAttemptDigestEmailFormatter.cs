@@ -12,11 +12,14 @@ public class PackageFailedAttemptDigestEmailFormatter
     : EmailNotificationChannelFormatter<DigestSchedule, Digest<PackageFailedAttemptEvent>>
 {
     private readonly IUnitOfWorkFactory _uowFactory;
+    private readonly INotificationUnsubscribeService _unsubscribeService;
 
     public PackageFailedAttemptDigestEmailFormatter(
-        IUnitOfWorkFactory uowFactory)
+        IUnitOfWorkFactory uowFactory,
+        INotificationUnsubscribeService unsubscribeService)
     {
         _uowFactory = uowFactory.AsUnfiltered();
+        _unsubscribeService = unsubscribeService;
     }
 
     public override EmailEnvelope Format(
@@ -39,6 +42,15 @@ public class PackageFailedAttemptDigestEmailFormatter
         var subject = orderedNotifications.Count == 1
             ? "1 Failed Delivery Attempt"
             : $"{orderedNotifications.Count} Failed Delivery Attempts";
+
+        var shipyardUrl = orderedNotifications.FirstOrDefault()?.ShipyardUrl;
+
+        var unsubscribeKey = _unsubscribeService
+            .GetUnsubscribeKeyAsync(notification.SubscriptionId)
+            .GetAwaiter()
+            .GetResult();
+
+        var unsubscribeUrl = $"{shipyardUrl}/notifications/unsubscribe?id={notification.SubscriptionId}&key={Uri.EscapeDataString(unsubscribeKey)}";
 
         var html = LiquidMjmlRenderer.Render(
             "PackageFailedAttempt.Templates.PackageFailedAttemptDigest",
@@ -65,8 +77,8 @@ public class PackageFailedAttemptDigestEmailFormatter
                         details = lastUpdate?.Description,
                     };
                 }),
-                shipyardUrl = orderedNotifications.FirstOrDefault()?.ShipyardUrl,
-                unsubscribeKey = "invalid",
+                shipyardUrl = shipyardUrl,
+                unsubscribeUrl = unsubscribeUrl,
             });
 
         var message = new EmailMessage()

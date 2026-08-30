@@ -1,7 +1,8 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Models;
 using EtherGizmos.Shipyard.Api;
+using EtherGizmos.Shipyard.Api.Errors;
 using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,16 +17,16 @@ public class NotificationSubscriptionsController : AutoODataController
 {
     private const string BaseRoute = "api/v{version:apiVersion}/notificationSubscriptions";
 
-    private readonly INotificationCatalogProvider _catalogProvider;
+    private readonly INotificationUnsubscribeService _unsubscribeService;
     private readonly IUserContext _userContext;
 
     public NotificationSubscriptionsController(
         IServiceProvider serviceProvider,
-        INotificationCatalogProvider catalogProvider,
+        INotificationUnsubscribeService unsubscribeService,
         IUserContext userContext)
         : base(serviceProvider)
     {
-        _catalogProvider = catalogProvider;
+        _unsubscribeService = unsubscribeService;
         _userContext = userContext;
     }
 
@@ -85,6 +86,26 @@ public class NotificationSubscriptionsController : AutoODataController
         CancellationToken cancellationToken = default)
         => ForItem(id)
             .DeleteAsync(cancellationToken);
+
+    [AllowAnonymous]
+    [ApiVersion(1.0)]
+    [HttpPost(BaseRoute + "({id})/unsubscribe")]
+    [ProducesResponseType(204)]
+    public async Task<IActionResult> Unsubscribe(
+        int id,
+        string key,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _unsubscribeService.UnsubscribeAsync(id, key, cancellationToken);
+        if (!result)
+        {
+            new Error.Reference.EntityNotFoundReferenceError<NotificationSubscriptionDTO>()
+                .AddDetail((e => e.Id, id))
+                .Return();
+        }
+
+        return NoContent();
+    }
 
     private IKeylessRequestBuilder<NotificationSubscription, NotificationSubscriptionDTO> ForSet()
         => ForSet<NotificationSubscription, NotificationSubscriptionDTO>()

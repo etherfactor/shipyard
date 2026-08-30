@@ -17,6 +17,7 @@ using EtherGizmos.Shipyard.Services.Health;
 using EtherGizmos.Shipyard.Services.HostedServices;
 using EtherGizmos.Shipyard.Services.Logging;
 using EtherGizmos.Shipyard.Services.Middleware;
+using EtherGizmos.Shipyard.Services.Notifications;
 using EtherGizmos.Shipyard.Services.Pipeline.OAuth2;
 using EtherGizmos.Shipyard.Services.Security;
 using EtherGizmos.Shipyard.Services.Validators;
@@ -44,7 +45,7 @@ var builder = WebApplication.CreateBuilder(args);
 var otelEnabled = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT"))
     || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"))
     || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"))
-    || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT")); 
+    || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT"));
 
 builder.Services
     .AddSerilog((services, logger) =>
@@ -289,7 +290,7 @@ builder.Services.AddSingleton<ISourceLoggerFactory, SourceLoggerFactory>();
 
 builder.Services.AddHostedService<BootstrapSeeder>();
 builder.Services.AddSingleton<IBootstrapper, AppBootstrapper>();
-builder.Services.AddSingleton<IBootstrapper, NotificationBootstrapper>();
+//builder.Services.AddSingleton<IBootstrapper, NotificationBootstrapper>();
 builder.Services.AddSingleton<IBootstrapper, OAuth2Bootstrapper>();
 
 // Export & Import
@@ -343,6 +344,20 @@ builder.Services.AddNotifications(
 
                 evt.Supports<PackageDeliveredEvent, WebhookChannel, PackageDeliveredWebhookFormatter>();
                 evt.SupportsDigest<PackageDeliveredEvent, WebhookChannel, PackageDeliveredDigestWebhookFormatter>();
+            });
+
+        opt.AddNotification<PackageEtaChangedEvent, PackageEtaChangedRouter>(
+            "package.etaChanged",
+            typeof(NoConfiguration),
+            evt =>
+            {
+                evt.HasDisplayName("Package ETA Changed");
+
+                if (emailConnectionId is not null)
+                {
+                    evt.Supports<PackageEtaChangedEvent, EmailChannel, PackageEtaChangedEmailFormatter>();
+                    evt.SupportsDigest<PackageEtaChangedEvent, EmailChannel, PackageEtaChangedDigestEmailFormatter>();
+                }
             });
 
         opt.AddNotification<PackageFailedAttemptEvent, PackageFailedAttemptRouter>(
@@ -413,6 +428,8 @@ builder.Services.AddNotifications(
                 evt.SupportsDigest<PackageUnknownStatusEvent, WebhookChannel, PackageUnknownStatusDigestWebhookFormatter>();
             });
     });
+
+builder.Services.AddSingleton<INotificationUnsubscribeService, NotificationUnsubscribeService>();
 
 // Health
 builder.Services

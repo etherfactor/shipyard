@@ -12,11 +12,14 @@ public class PackageFailedAttemptEmailFormatter
     : EmailNotificationChannelFormatter<ImmediateSchedule, PackageFailedAttemptEvent>
 {
     private readonly IUnitOfWorkFactory _uowFactory;
+    private readonly INotificationUnsubscribeService _unsubscribeService;
 
     public PackageFailedAttemptEmailFormatter(
-        IUnitOfWorkFactory uowFactory)
+        IUnitOfWorkFactory uowFactory,
+        INotificationUnsubscribeService unsubscribeService)
     {
         _uowFactory = uowFactory.AsUnfiltered();
+        _unsubscribeService = unsubscribeService;
     }
 
     public override EmailEnvelope Format(
@@ -34,6 +37,15 @@ public class PackageFailedAttemptEmailFormatter
 
         var updates = model.Updates.OrderBy(e => e.OccurredAt);
         var subject = model.Title;
+
+        var shipyardUrl = model.ShipyardUrl;
+
+        var unsubscribeKey = _unsubscribeService
+            .GetUnsubscribeKeyAsync(notification.SubscriptionId)
+            .GetAwaiter()
+            .GetResult();
+
+        var unsubscribeUrl = $"{shipyardUrl}/notifications/unsubscribe?id={notification.SubscriptionId}&key={Uri.EscapeDataString(unsubscribeKey)}";
 
         var html = LiquidMjmlRenderer.Render(
             "PackageFailedAttempt.Templates.PackageFailedAttempt",
@@ -53,8 +65,8 @@ public class PackageFailedAttemptEmailFormatter
                     occurredAt = e.OccurredAt,
                     details = e.Description,
                 }),
-                shipyardUrl = model.ShipyardUrl,
-                unsubscribeKey = "invalid",
+                shipyardUrl = shipyardUrl,
+                unsubscribeUrl = unsubscribeUrl,
             });
 
         var message = new EmailMessage()

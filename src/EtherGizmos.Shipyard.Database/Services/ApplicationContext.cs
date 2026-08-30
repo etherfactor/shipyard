@@ -43,17 +43,7 @@ public class ApplicationContext : DbContext
 
     public virtual DbSet<Group> Groups { get; set; }
 
-    public virtual DbSet<AppNotificationChannel> NotificationChannels { get; set; }
-
-    public virtual DbSet<AppNotificationEvent> NotificationEvents { get; set; }
-
-    public virtual DbSet<AppNotification> Notifications { get; set; }
-
-    public virtual DbSet<AppNotificationEventChannelSchedule> NotificationEventChannelSchedules { get; set; }
-
-    public virtual DbSet<AppNotificationSchedule> NotificationSchedules { get; set; }
-
-    public virtual DbSet<AppNotificationSubscription> NotificationSubscriptions { get; set; }
+    public virtual DbSet<NotificationUnsubscribeKey> NotificationUnsubscribeKeys { get; set; }
 
     public virtual DbSet<Package> Packages { get; set; }
 
@@ -69,8 +59,8 @@ public class ApplicationContext : DbContext
 
     public ApplicationContext(
         DbContextOptions<ApplicationContext> options,
-        [FromKeyedServices("Application")] IMigrationManager migrationManager,
-        [FromKeyedServices("Notification")] IMigrationManager migrationManager1,
+        [FromKeyedServices("Application")] IMigrationManager appMigrationManager,
+        [FromKeyedServices("Notification")] IMigrationManager notifMigrationManager,
         IFilterContext filterContext,
         IUserContext userContext,
         IEnumerable<IInterceptor> interceptors) : base(options)
@@ -79,7 +69,13 @@ public class ApplicationContext : DbContext
         _userContext = userContext;
         _interceptors = interceptors;
 
-        migrationManager.EnsureMigratedAsync()
+        notifMigrationManager
+            .EnsureMigratedAsync()
+            .GetAwaiter()
+            .GetResult();
+
+        appMigrationManager
+            .EnsureMigratedAsync()
             .GetAwaiter()
             .GetResult();
     }

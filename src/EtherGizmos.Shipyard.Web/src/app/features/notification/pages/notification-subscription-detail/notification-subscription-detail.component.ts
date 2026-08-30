@@ -159,9 +159,8 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
       this.subscription$$.set({ isActive: true } as NotificationSubscription);
 
       this.onEdit();
+      this.init();
     }
-
-    this.init();
   }
 
   async loadEvents() {
