@@ -46,7 +46,7 @@ public class PackageEtaChangedEmailFormatter
             .GetAwaiter()
             .GetResult();
 
-        var unsubscribeUrl = $"{shipyardUrl}/notifications/unsubscribe?key={Uri.EscapeDataString(unsubscribeKey)}";
+        var unsubscribeUrl = $"{shipyardUrl}/notifications/unsubscribe?id={notification.SubscriptionId}&key={Uri.EscapeDataString(unsubscribeKey)}";
 
         var html = LiquidMjmlRenderer.Render(
             "PackageEtaChanged.Templates.PackageEtaChanged",

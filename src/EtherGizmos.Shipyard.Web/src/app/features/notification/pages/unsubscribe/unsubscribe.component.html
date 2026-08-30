@@ -1,0 +1,49 @@
+@if (!isFailed$$()) {
+<div style="position: fixed; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%); z-index: 100;" class="text-center w-100">
+  <div class="text-warning">
+    <div class="mb-2">
+      <i class="bi bi-bell-slash fs-1"></i>
+    </div>
+    <h1 class="display-4 fw-bold">
+      Unsubscribe from Notifications?
+    </h1>
+  </div>
+  <p class="lead mb-3">
+    You’ll stop receiving this notification subscription.
+  </p>
+  <p class="text-muted mb-4">
+    This only affects this subscription. Other Shipyard notifications will continue normally.
+  </p>
+  <button type="button"
+          class="btn btn-danger"
+          (click)="unsubscribe()"
+          [disabled]="isUnsubscribing$$()">
+    @if (isUnsubscribing$$()) {
+    <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+    Unsubscribing...
+    } @else {
+    Unsubscribe
+    }
+  </button>
+</div>
+} @else {
+<div style="position: fixed; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%); z-index: 100;" class="text-center w-100 px-3">
+  <div class="text-warning">
+    <div class="mb-2">
+      <i class="bi bi-exclamation-circle fs-1"></i>
+    </div>
+    <h1 class="display-4 fw-bold">
+      Subscription Not Found
+    </h1>
+  </div>
+  <p class="lead mb-3">
+    This unsubscribe link is no longer valid.
+  </p>
+  <p class="text-muted mb-4">
+    The subscription may already have been removed, or the link may have expired.
+  </p>
+  <a routerLink="/" class="btn btn-primary">
+    Go Home
+  </a>
+</div>
+}

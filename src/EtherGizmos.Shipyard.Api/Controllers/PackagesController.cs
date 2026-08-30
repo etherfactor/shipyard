@@ -217,5 +217,7 @@ public class PackagesController : AutoODataController
                     : db.LastPollAt + BaseDelay * (double)status.PollingFactor;
 
                 db.NextPollAt = nextTime;
+
+                db.IsDelivered = db.LastStatusTypeId == StatusTypeId.Delivered;
             });
 }

@@ -87,8 +87,10 @@ public class NotificationSubscriptionsController : AutoODataController
         => ForItem(id)
             .DeleteAsync(cancellationToken);
 
+    [AllowAnonymous]
     [ApiVersion(1.0)]
     [HttpPost(BaseRoute + "({id})/unsubscribe")]
+    [ProducesResponseType(204)]
     public async Task<IActionResult> Unsubscribe(
         int id,
         string key,

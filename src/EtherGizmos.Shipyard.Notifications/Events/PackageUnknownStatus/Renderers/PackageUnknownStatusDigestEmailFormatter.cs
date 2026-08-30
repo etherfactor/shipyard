@@ -46,7 +46,7 @@ public class PackageUnknownStatusDigestEmailFormatter
             .GetAwaiter()
             .GetResult();
 
-        var unsubscribeUrl = $"{shipyardUrl}/notifications/unsubscribe?key={Uri.EscapeDataString(unsubscribeKey)}";
+        var unsubscribeUrl = $"{shipyardUrl}/notifications/unsubscribe?id={notification.SubscriptionId}&key={Uri.EscapeDataString(unsubscribeKey)}";
 
         var subject = orderedNotifications.Count == 1
             ? "1 Unknown Package Status"

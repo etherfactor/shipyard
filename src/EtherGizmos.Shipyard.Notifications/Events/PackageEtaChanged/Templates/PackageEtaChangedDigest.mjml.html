@@ -32,8 +32,8 @@
         Current ETA
       </div>
       <div style="font-size: 16px;">
-        {{if notification.current_eta == "None"}}
-        <b style="color: #ff0000">{{notification.current_eta}}</b>
+        {{if notification.current_eta == nil}}
+        <b style="color: #ff0000">None</b>
         {{else}}
         <b>{{notification.current_eta}}</b>
         {{end}}
@@ -45,8 +45,8 @@
       </div>
       <div style="font-size: 16px;">
         <div style="font-size: 16px;">
-          {{if notification.previous_eta == "None"}}
-          <b style="color: #ff0000">{{notification.previous_eta}}</b>
+          {{if notification.previous_eta == nil}}
+          <b style="color: #ff0000">None</b>
           {{else}}
           <b>{{notification.previous_eta}}</b>
           {{end}}

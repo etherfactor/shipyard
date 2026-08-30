@@ -2,6 +2,7 @@
 using EtherGizmos.Common.Models;
 using EtherGizmos.Shipyard.Database;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace EtherGizmos.Shipyard.Services.Notifications;
 
@@ -37,7 +38,8 @@ internal class NotificationUnsubscribeService : INotificationUnsubscribeService
             await uow.SaveChangesAsync(cancellationToken);
         }
 
-        return record.Value;
+        return Convert.ToBase64String(
+            Encoding.UTF8.GetBytes(record.Value));
     }
 
     public async Task<bool> UnsubscribeAsync(
@@ -57,6 +59,12 @@ internal class NotificationUnsubscribeService : INotificationUnsubscribeService
         var subscription = await subscriptionRepo.Data.SingleAsync(e =>
             e.Id == subscriptionId,
             cancellationToken: cancellationToken);
+
+        //Delete this unsubscribe key, so if the subscription gets turned back on, it gets a new one
+        var unsubKeyRepo = uow.Repository<NotificationUnsubscribeKey>();
+        await unsubKeyRepo.Data
+            .Where(e => e.SubscriptionId == subscriptionId)
+            .ExecuteDeleteAsync(cancellationToken);
 
         subscription.IsEnabled = false;
 

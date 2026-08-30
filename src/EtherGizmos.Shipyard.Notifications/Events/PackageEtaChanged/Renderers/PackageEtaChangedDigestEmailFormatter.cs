@@ -40,8 +40,8 @@ public class PackageEtaChangedDigestEmailFormatter
             .ToList();
 
         var subject = orderedNotifications.Count == 1
-            ? "1 Package Delivered"
-            : $"{orderedNotifications.Count} Packages Delivered";
+            ? "1 Package ETA Changed"
+            : $"{orderedNotifications.Count} Package ETAs Changed";
 
         var shipyardUrl = orderedNotifications.FirstOrDefault()?.ShipyardUrl;
 
@@ -50,7 +50,7 @@ public class PackageEtaChangedDigestEmailFormatter
             .GetAwaiter()
             .GetResult();
 
-        var unsubscribeUrl = $"{shipyardUrl}/notifications/unsubscribe?key={Uri.EscapeDataString(unsubscribeKey)}";
+        var unsubscribeUrl = $"{shipyardUrl}/notifications/unsubscribe?id={notification.SubscriptionId}&key={Uri.EscapeDataString(unsubscribeKey)}";
 
         var html = LiquidMjmlRenderer.Render(
             "PackageEtaChanged.Templates.PackageEtaChangedDigest",

@@ -21,8 +21,8 @@
         Current ETA
       </div>
       <div style="font-size: 16px;">
-        {{if current_eta == "None"}}
-        <b style="color: #ff0000">{{current_eta}}</b>
+        {{if current_eta == nil}}
+        <b style="color: #ff0000">None</b>
         {{else}}
         <b>{{current_eta}}</b>
         {{end}}
@@ -33,8 +33,8 @@
         Previous ETA
       </div>
       <div style="font-size: 16px;">
-        {{if previous_eta == "None"}}
-        <b style="color: #ff0000">{{previous_eta}}</b>
+        {{if previous_eta == nil}}
+        <b style="color: #ff0000">None</b>
         {{else}}
         <b>{{previous_eta}}</b>
         {{end}}

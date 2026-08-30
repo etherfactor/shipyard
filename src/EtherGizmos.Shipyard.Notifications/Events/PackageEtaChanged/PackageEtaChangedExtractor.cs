@@ -27,10 +27,13 @@ internal class PackageEtaChangedExtractor : IDomainEventExtractor
         IUnitOfWork unitOfWork,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        var delivered = (bool)entry.Property(nameof(Package.IsDelivered)).CurrentValue!;
+
         var property = entry.Property(nameof(Package.EstimatedDeliveryAt));
         var current = property.CurrentValue as DateTimeOffset?;
         var original = property.OriginalValue as DateTimeOffset?;
-        if (current != original && (
+
+        if (!delivered && current != original && (
             //ETA was cleared out
             current is null
             //A new ETA was added
@@ -51,7 +54,7 @@ internal class PackageEtaChangedExtractor : IDomainEventExtractor
 
             var @event = new PackageEtaChangedEvent()
             {
-                Title = "Package Delivered",
+                Title = "Package ETA Changed",
                 Message = message,
                 ShipyardUrl = $"{uri.Scheme}://{uri.Authority}",
 
