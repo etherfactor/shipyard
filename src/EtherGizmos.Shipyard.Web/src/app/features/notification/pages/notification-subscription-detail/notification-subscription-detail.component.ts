@@ -325,7 +325,6 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
     if (form.invalid) {
       form.markAsUntouched();
       form.markAllAsTouched();
-      console.log(form);
       return;
     }
 
