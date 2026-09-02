@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Common;
+using EtherGizmos.Common;
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Models;
 using EtherGizmos.Shipyard.Abstractions;

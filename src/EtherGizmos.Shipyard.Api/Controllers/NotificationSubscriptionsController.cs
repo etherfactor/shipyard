@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Models;
 using EtherGizmos.Shipyard.Api;
