@@ -106,6 +106,7 @@ if (otelEnabled)
     builder.Services
         .AddOpenTelemetry()
         .WithTracing(tracing => tracing
+            .AddShipyardInstrumentation()
             .AddAspNetCoreInstrumentation()
             .AddEntityFrameworkCoreInstrumentation()
             .AddHttpClientInstrumentation()
@@ -116,6 +117,7 @@ if (otelEnabled)
             .AddUnitOfWorkInstrumentation()
             .AddOtlpExporter())
         .WithMetrics(metrics => metrics
+            .AddShipyardInstrumentation()
             .AddAspNetCoreInstrumentation()
             .AddHttpClientInstrumentation()
             .AddMessagingInstrumentation()

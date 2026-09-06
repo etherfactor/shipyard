@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Models;
 using EtherGizmos.Shipyard.Api;
 using EtherGizmos.Shipyard.Swagger;
@@ -14,10 +15,30 @@ public class NotificationsController : AutoODataController
 {
     private const string BaseRoute = "api/v{version:apiVersion}/notifications";
 
+    private readonly IFilterContext _filterContext;
+    private readonly IUserContext _userContext;
+
     public NotificationsController(
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        IFilterContext filterContext,
+        IUserContext userContext)
         : base(serviceProvider)
-    { }
+    {
+        _filterContext = filterContext;
+        _userContext = userContext;
+    }
+
+    protected override IQueryable<TEntity> Filter<TEntity>(
+        IQueryable<TEntity> queryable)
+    {
+        if (queryable is IQueryable<Notification> notificationQueryable)
+            return (IQueryable<TEntity>)notificationQueryable.Where(e =>
+                _filterContext.Disabled
+                || (e.Subscription.UserId != null
+                && e.Subscription.UserId == _userContext.UserId.ToString()));
+
+        return queryable;
+    }
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute)]

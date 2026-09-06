@@ -23,6 +23,7 @@
     <PackageVersion Include="EtherGizmos.Common.Notifications.Email" Version="0.1.0-alpha.13" />
     <PackageVersion Include="EtherGizmos.Common.Notifications.OpenTelemetry" Version="0.1.0-alpha.13" />
     <PackageVersion Include="EtherGizmos.Common.Notifications.Webhook" Version="0.1.0-alpha.13" />
+    <PackageVersion Include="EtherGizmos.Common.Observability" Version="0.1.0-alpha.13" />
     <PackageVersion Include="FluentMigrator.Runner.Postgres" Version="8.0.1" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.12.4" />
     <PackageVersion Include="HtmlAgilityPack.CssSelectors.NetCore" Version="1.2.1" />
@@ -69,6 +70,7 @@
     <PackageVersion Include="OpenIddict.Server.AspNetCore" Version="7.6.0" />
     <PackageVersion Include="OpenIddict.Validation.AspNetCore" Version="7.6.0" />
     <PackageVersion Include="OpenIddict.Validation.ServerIntegration" Version="7.6.0" />
+    <PackageVersion Include="OpenTelemetry.Api" Version="1.15.3" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.17.0" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.17.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.17.0" />
