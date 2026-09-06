@@ -4,6 +4,7 @@ using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace EtherGizmos.Shipyard.Services.Bootstrappers;
 
@@ -25,6 +26,10 @@ internal class AppBootstrapper : IBootstrapper
     public async Task ExecuteAsync(
         CancellationToken cancellationToken = default)
     {
+        using var activity = ActivitySources.Shipyard.StartActivity(
+            "Bootstrap application users and groups",
+            ActivityKind.Internal);
+
         using var uow = _uowFactory.Create();
 
         //Create the initial admin user
