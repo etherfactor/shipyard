@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Common.Models;
 using EtherGizmos.Shipyard.Api;
@@ -18,16 +18,31 @@ public class NotificationSubscriptionsController : AutoODataController
     private const string BaseRoute = "api/v{version:apiVersion}/notificationSubscriptions";
 
     private readonly INotificationUnsubscribeService _unsubscribeService;
+    private readonly IFilterContext _filterContext;
     private readonly IUserContext _userContext;
 
     public NotificationSubscriptionsController(
         IServiceProvider serviceProvider,
         INotificationUnsubscribeService unsubscribeService,
+        IFilterContext filterContext,
         IUserContext userContext)
         : base(serviceProvider)
     {
         _unsubscribeService = unsubscribeService;
+        _filterContext = filterContext;
         _userContext = userContext;
+    }
+
+    protected override IQueryable<TEntity> Filter<TEntity>(
+        IQueryable<TEntity> queryable)
+    {
+        if (queryable is IQueryable<NotificationSubscription> subscriptionQueryable)
+            return (IQueryable<TEntity>)subscriptionQueryable.Where(e =>
+                _filterContext.Disabled
+                || (e.UserId != null
+                && e.UserId == _userContext.UserId.ToString()));
+
+        return queryable;
     }
 
     [ApiVersion(1.0)]

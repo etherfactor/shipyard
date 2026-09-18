@@ -1,4 +1,4 @@
-﻿using EtherGizmos.Shipyard.Configuration;
+using EtherGizmos.Shipyard.Configuration;
 using EtherGizmos.Shipyard.Extensions;
 using Microsoft.Extensions.Options;
 using System.Net;

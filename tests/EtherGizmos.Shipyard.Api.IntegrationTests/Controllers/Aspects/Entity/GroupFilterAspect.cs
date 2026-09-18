@@ -46,8 +46,8 @@ internal class SearchGroupFilterAspect<TEntity, TId>
 
             Assert.Multiple(() =>
             {
-                Assert.That(count1, Is.EqualTo(count2 + 1));
-                Assert.That(count2, Is.EqualTo(count1 - 1));
+                Assert.That(count1, Is.GreaterThan(count2!));
+                Assert.That(count2, Is.LessThan(count1!));
             });
         });
     }

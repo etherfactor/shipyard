@@ -4,6 +4,7 @@ using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
+using System.Diagnostics;
 using System.Text.Json;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
@@ -30,6 +31,10 @@ internal class OAuth2Bootstrapper : IBootstrapper
     public async Task ExecuteAsync(
         CancellationToken cancellationToken = default)
     {
+        using var activity = ActivitySources.Shipyard.StartActivity(
+            "Bootstrap OAuth 2.0 metadata",
+            ActivityKind.Internal);
+
         using var scope = _serviceProvider.CreateScope();
         var provider = scope.ServiceProvider;
 

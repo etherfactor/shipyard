@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using EtherGizmos.Common.Models;
 using EtherGizmos.Shipyard.Extensions;
 using Swashbuckle.AspNetCore.Filters;

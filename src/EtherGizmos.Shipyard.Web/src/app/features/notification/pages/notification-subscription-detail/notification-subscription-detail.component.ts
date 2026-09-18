@@ -257,7 +257,12 @@ export class NotificationSubscriptionDetailComponent implements OnInit {
 
     form.controls.notificationScheduleId.valueChanges.subscribe(value => {
       if (value === "digest") {
-        form.controls.notificationScheduleConfig.controls["cronExpression"] ??= new FormControl("", { nonNullable: true, validators: [AppValidators.required] }) as any;
+        if (!form.controls.notificationScheduleConfig.controls["cronExpression"]) {
+          const control = new FormControl("", { nonNullable: true, validators: [AppValidators.required] });
+          form.controls.notificationScheduleConfig.controls["cronExpression"] ??= control as any;
+
+          control.setParent(form.controls.notificationScheduleConfig);
+        }
       } else {
         delete form.controls.notificationScheduleConfig.controls["cronExpression"];
       }

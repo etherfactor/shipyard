@@ -10,6 +10,7 @@ import { AbstractLoggerService, AbstractSecurityStorage, authInterceptor, Defaul
 import { provideMonacoEditor } from 'ngx-monaco-editor-v2';
 import { AppComponent } from './app/app.component';
 import { APP_ROUTES } from './app/app.routes';
+import { errorInterceptor } from './app/shared/interceptors/error/error.interceptor';
 import { loggingInterceptor } from './app/shared/interceptors/logging/logging.interceptor';
 import { provideOAuth2Service } from './app/shared/services/oauth2/oauth2.service.concrete';
 import { OidcLoggerService } from './app/shared/services/oidc-logger/oidc-logger.service';
@@ -36,6 +37,7 @@ import { provideODataClient } from './app/shared/utilities/odata/odata.util';
           withInterceptors([
             authInterceptor(),
             loggingInterceptor,
+            errorInterceptor,
           ])
         ),
         provideODataClient(),

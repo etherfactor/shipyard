@@ -32,6 +32,9 @@ internal class NotificationsControllerV1Spec : IODataResourceSpec<NotificationDT
             ResourceFunctionality.QuerySelect,
             ResourceFunctionality.QuerySkip,
             ResourceFunctionality.QueryTop,
+
+            //Miscellaneous
+            ResourceFunctionality.GroupFiltering,
         };
 
     public Func<NotificationDTO, long> Identity => Notification => Notification.Id;

@@ -36,6 +36,9 @@ internal class NotificationSubscriptionsControllerV1Spec : IODataResourceSpec<No
             ResourceFunctionality.QuerySelect,
             ResourceFunctionality.QuerySkip,
             ResourceFunctionality.QueryTop,
+
+            //Miscellaneous
+            ResourceFunctionality.GroupFiltering,
         };
 
     public Func<NotificationSubscriptionDTO, long> Identity => NotificationSubscription => NotificationSubscription.Id;
@@ -92,7 +95,7 @@ internal class NotificationSubscriptionsControllerV1Spec : IODataResourceSpec<No
 
             var subscription = new NotificationSubscription()
             {
-                UserId = Guid.NewGuid().ToString(),
+                UserId = (createdByUserId ?? Setup.OwnerUserId).ToString(),
                 EventId = eventId,
                 EventConfig = new Dictionary<string, object?>() { },
                 ChannelId = channelId,
