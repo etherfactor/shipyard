@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests;
+namespace EtherGizmos.Shipyard;
 
 public class ConfiguredWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram>
     where TProgram : class

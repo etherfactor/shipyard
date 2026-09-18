@@ -1,9 +1,9 @@
 using EtherGizmos.Common.Extensions;
-using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
 using System.Net;
 using System.Text.Json;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Aspects.Entity;
+namespace EtherGizmos.Shipyard.Controllers.Aspects.Entity;
 
 internal class SearchSelectOptionAspect<TEntity, TId>
     : IAspect<TEntity, TId>

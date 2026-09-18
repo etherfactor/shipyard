@@ -1,7 +1,8 @@
-﻿using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
+﻿using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Api;
 using System.Net.Http.Json;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Specifications;
+namespace EtherGizmos.Shipyard.Controllers.Specifications;
 
 public class PackagesControllerV1Spec : IODataResourceSpec<PackageDTO, int>
 {
@@ -35,6 +36,7 @@ public class PackagesControllerV1Spec : IODataResourceSpec<PackageDTO, int>
 
             //Miscellaneous
             ResourceFunctionality.GroupFiltering,
+            ResourceFunctionality.CapabilityRequired,
         };
 
     public Func<PackageDTO, int> Identity => carrier => carrier.Id;

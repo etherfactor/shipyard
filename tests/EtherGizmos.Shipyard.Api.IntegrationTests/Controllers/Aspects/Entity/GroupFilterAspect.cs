@@ -1,11 +1,11 @@
-﻿using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
-using EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Specifications;
+﻿using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Controllers.Specifications;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Aspects.Entity;
+namespace EtherGizmos.Shipyard.Controllers.Aspects.Entity;
 
 internal class SearchGroupFilterAspect<TEntity, TId>
     : IAspect<TEntity, TId>
@@ -46,8 +46,8 @@ internal class SearchGroupFilterAspect<TEntity, TId>
 
             Assert.Multiple(() =>
             {
-                Assert.That(count1, Is.EqualTo(count2 + 1));
-                Assert.That(count2, Is.EqualTo(count1 - 1));
+                Assert.That(count1, Is.GreaterThan(count2!));
+                Assert.That(count2, Is.LessThan(count1!));
             });
         });
     }

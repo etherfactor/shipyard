@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Worker.Services.Carriers;
+﻿namespace EtherGizmos.Shipyard.Services.Carriers;
 
 public record TrackingResult
 {
@@ -9,6 +9,4 @@ public record TrackingResult
     public required DateTimeOffset? EstimatedDeliveryAt { get; init; }
 
     public required IReadOnlyList<TrackingResultDetail> Details { get; init; }
-
-    public required IReadOnlyList<TrackingResultArtifact> Artifacts { get; init; }
 }

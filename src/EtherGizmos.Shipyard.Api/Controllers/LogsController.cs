@@ -1,5 +1,5 @@
 ﻿using Asp.Versioning;
-using EtherGizmos.Shipyard.Api.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Serilog.Events;
 using Serilog.Parsing;
@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.ExceptionServices;
 using System.Text.Json;
 
-namespace EtherGizmos.Shipyard.Api.Controllers;
+namespace EtherGizmos.Shipyard.Controllers;
 
 [ApiController]
 public class LogsController : ControllerBase

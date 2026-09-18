@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace EtherGizmos.Shipyard.Worker.Services.Carriers;
+namespace EtherGizmos.Shipyard.Services.Carriers;
 
 internal class ClassifierTrackingProvider : ITrackingProvider, IDisposable
 {

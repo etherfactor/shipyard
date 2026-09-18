@@ -1,6 +1,7 @@
-﻿using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
+﻿using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Api;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Specifications;
+namespace EtherGizmos.Shipyard.Controllers.Specifications;
 
 public class RolesControllerV1Spec : IODataResourceSpec<RoleDTO, int>
 {
@@ -28,6 +29,9 @@ public class RolesControllerV1Spec : IODataResourceSpec<RoleDTO, int>
             ResourceFunctionality.QuerySelect,
             ResourceFunctionality.QuerySkip,
             ResourceFunctionality.QueryTop,
+
+            //Miscellaneous
+            ResourceFunctionality.CapabilityRequired,
         };
 
     public Func<RoleDTO, int> Identity => carrier => carrier.Id;

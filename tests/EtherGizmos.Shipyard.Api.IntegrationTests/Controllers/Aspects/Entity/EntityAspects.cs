@@ -1,13 +1,13 @@
-﻿using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
+﻿using EtherGizmos.Shipyard.Abstractions;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Aspects.Entity;
+namespace EtherGizmos.Shipyard.Controllers.Aspects.Entity;
 
 public static class EntityAspects
 {
     private static class Generic<TEntity, TId>
         where TEntity : class, new()
     {
-        public static IEnumerable<IAspect<TEntity, TId>> All 
+        public static IEnumerable<IAspect<TEntity, TId>> All
             =>
             [
                 new SearchAuthAspect<TEntity, TId>(),

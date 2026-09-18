@@ -1,7 +1,5 @@
 using EtherGizmos.Common.Abstractions;
-using EtherGizmos.Common.Configuration;
 using EtherGizmos.Common.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -30,36 +28,6 @@ public static class IServiceCollectionExtensions
             var serviceType = typeof(IModelValidator<>).MakeGenericType(modelValidator.ModelType);
             @this.TryAddScoped(serviceType, modelValidator.ValidatorType);
         }
-
-        return @this;
-    }
-
-    public static IServiceCollection AddCertificates(
-        this IServiceCollection @this)
-    {
-        @this.TryAddSingleton<ICertificateResolver, CertificateResolver>();
-
-        @this.AddOptions<Dictionary<string, CertificateOptions>>()
-            .Configure<IConfiguration>((opt, conf) =>
-            {
-                conf.GetSection("Security:Certificates")
-                    .Bind(opt);
-            });
-
-        return @this;
-    }
-
-    public static IServiceCollection AddServiceConnections(
-        this IServiceCollection @this)
-    {
-        @this.TryAddSingleton<IConnectionResolver, ConnectionResolver>();
-
-        @this.AddOptions<Dictionary<string, ConnectionOptions>>()
-            .Configure<IConfiguration>((opt, conf) =>
-            {
-                conf.GetSection("Connections")
-                    .Bind(opt);
-            });
 
         return @this;
     }

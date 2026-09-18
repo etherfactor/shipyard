@@ -24,7 +24,7 @@ export function getStatusTypeMetadata(statusType: StatusType): StatusTypeMetadat
       return { label: "Expired", icon: "bi-slash-circle", color: "text-muted" };
 
     case StatusType.FailedAttempt:
-      return { label: "Failed attempt", icon: "bi-x-circle", color: "text-danger" };
+      return { label: "Failed attempt", icon: "bi-exclamation-triangle", color: "text-danger" };
 
     case StatusType.InTransit:
       return { label: "In transit", icon: "bi-truck", color: "text-info" };
@@ -33,7 +33,7 @@ export function getStatusTypeMetadata(statusType: StatusType): StatusTypeMetadat
       return { label: "Out for delivery", icon: "bi-box-seam", color: "text-warning" };
 
     case StatusType.Returned:
-      return { label: "Returned", icon: "bi-arrow-counterclockwise", color: "text-danger" };
+      return { label: "Returned", icon: "bi-arrow-return-left", color: "text-danger" };
 
     case StatusType.Unknown:
       return { label: "Unknown", icon: "bi-question-circle", color: "text-muted" };

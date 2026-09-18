@@ -1,0 +1,51 @@
+{{capture title}}
+{{subject}}
+{{end}}
+
+{{capture content}}
+<mj-text>
+  <h1>A carrier update could not be classified.</h1>
+</mj-text>
+<mj-text font-size="16px" line-height="25px" padding-bottom="25px">
+  Hi {{name}}, Shipyard received tracking text from <b>{{carrier_name}}</b>, but the carrier definition did not map it to a known package status.
+</mj-text>
+<mj-table css-class="detail-table" container-background-color="#faf8ff" border="1px solid #e6ddf7;" padding="0">
+  <tr>
+    <td style="padding: 20px;">
+      <div style="text-transform: uppercase; letter-spacing: 0.05em; color: #777777; font-size: 12px; font-weight: 700;">
+        Carrier
+      </div>
+      <div style="font-size: 16px;">
+        <b>{{carrier_name}}</b>
+      </div>
+    </td>
+    <td style="padding: 20px;">
+      <div style="text-transform: uppercase; letter-spacing: 0.05em; color: #777777; font-size: 12px; font-weight: 700;">
+        Observed at
+      </div>
+      <div style="font-size: 16px;">
+        <b>{{observed_at}}</b>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" style="padding: 20px; padding-top: 0px;">
+      <div style="text-transform: uppercase; letter-spacing: 0.05em; color: #777777; font-size: 12px; font-weight: 700;">
+        Unmatched status text
+      </div>
+      <div style="font-size: 16px;">
+        {{status_text}}
+      </div>
+    </td>
+  </tr>
+</mj-table>
+<mj-button href="{{shipyard_url}}/carriers/{{carrier_id}}" background-color="#731dd8" border-radius="10px" font-size="16px" padding="25px 0 20px 0">
+  Review carrier definition
+</mj-button>
+<mj-divider border-width="1px" padding="5px 5px 25px 5px" border-color="#cccccc"></mj-divider>
+<mj-text line-height="18px" color="#777777">
+  This notification omits package details so carrier maintainers can update rules without receiving package-level access.
+</mj-text>
+{{end}}
+
+{{include "_layout"}}

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace EtherGizmos.Shipyard.Worker.Configuration;
+namespace EtherGizmos.Shipyard.Configuration;
 
 public class SeleniumDriverOptions
 {

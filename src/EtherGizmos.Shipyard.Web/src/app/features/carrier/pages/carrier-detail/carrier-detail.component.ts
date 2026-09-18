@@ -2,14 +2,17 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EntitySingle } from '@ethergizmos/odata-fluent-client';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { DateTime, Duration } from 'luxon';
 import { DetailBoxButton, DetailBoxComponent } from '../../../../shared/components/detail-box/detail-box.component';
 import { DetailHeaderComponent } from '../../../../shared/components/detail-header/detail-header.component';
+import { ExportModalComponent } from '../../../../shared/components/export-modal/export-modal.component';
 import { ReadonlyFormDirective } from '../../../../shared/directives/readonly-form/readonly-form.directive';
 import { NavbarActionService } from '../../../../shared/services/navbar-action/navbar-action.service';
 import { Bound } from '../../../../shared/utilities/bound/bound.util';
 import { TypedFormGroup, getDirtyFormValues } from '../../../../shared/utilities/form/form.util';
+import { openModal } from '../../../../shared/utilities/modal/modal.util';
 import { o } from '../../../../shared/utilities/odata/odata.util';
 import { NavbarAction } from '../../../app/components/navbar-action/navbar-action.component';
 import { UserSessionService } from '../../../login/services/user-session/user-session.service';
@@ -44,6 +47,7 @@ export class CarrierDetailComponent {
   private readonly $carrier = inject(CarrierService);
   private readonly $carrierExecution = inject(CarrierExecutionService);
   private readonly $form = inject(FormBuilder);
+  private readonly $modal = inject(NgbModal);
   private readonly $navbarAction = inject(NavbarActionService);
   private readonly $route = inject(ActivatedRoute);
   private readonly $router = inject(Router);
@@ -73,6 +77,11 @@ export class CarrierDetailComponent {
       const hasWrite = this.$session.hasCapability(SecurableType.Carrier, PermissionId.Write);
       const hasDelete = this.$session.hasCapability(SecurableType.Carrier, PermissionId.Delete);
       if (!this.isEditing$$()) {
+        actions.push({
+          icon: "bi-download",
+          label: "Export",
+          callback: this.onExport,
+        });
         if (hasWrite) {
           actions.push({
             icon: "bi-pencil",
@@ -225,6 +234,15 @@ export class CarrierDetailComponent {
     } else {
       this.form$$()?.disable();
     }
+  }
+
+  @Bound async onExport() {
+    const id = this.id$$();
+    if (!id)
+      return;
+
+    const content = this.$carrier.export(id, "application/yaml");
+    openModal({ modal: this.$modal, options: { size: "xl" } }, ExportModalComponent, "Export Carrier", content, `carrier-${id}.yml`);
   }
 
   @Bound async onEdit() {

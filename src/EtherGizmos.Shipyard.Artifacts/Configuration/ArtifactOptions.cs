@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using EtherGizmos.Common.Configuration;
+using System.ComponentModel.DataAnnotations;
 
 namespace EtherGizmos.Shipyard.Configuration;
 
@@ -8,5 +9,5 @@ public class ArtifactOptions
     public string BasePath { get; set; } = null!;
 
     [Required]
-    public DatabaseReferenceOptions Database { get; set; } = null!;
+    public ConnectionReferenceOptions Database { get; set; } = null!;
 }

@@ -35,6 +35,16 @@ public abstract class TypedErrorBase
         Details.Add(detail);
     }
 
+    public void AddDetailFrom(
+        TypedErrorBase error)
+    {
+        Details.AddRange(error.Details.Select(e =>
+            new TypedErrorDetailBase(
+                Code,
+                e.Target,
+                e.Message)));
+    }
+
     public ErrorWrapper Build()
     {
         var error = new ErrorWrapper()
@@ -44,12 +54,12 @@ public abstract class TypedErrorBase
                 Code = Code,
                 Target = Target,
                 Message = Message,
-                Details = Details.Select(e => new ErrorDetail()
+                Details = [.. Details.Select(e => new ErrorDetail()
                 {
                     Code = e.Code,
                     Target = e.Target,
                     Message = e.Message,
-                }).ToList(),
+                })],
                 InnerError = Exception is not null
                     ? new(Exception)
                     : null,

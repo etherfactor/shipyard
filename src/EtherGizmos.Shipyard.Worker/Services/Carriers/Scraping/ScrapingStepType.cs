@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
+﻿namespace EtherGizmos.Shipyard.Services.Carriers.Scraping;
 
 public enum ScrapingStepType
 {

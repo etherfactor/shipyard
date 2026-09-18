@@ -1,5 +1,19 @@
 @import '../../node_modules/bootstrap/scss/_functions.scss';
 
+$primary: #731dd8;
+
+$link-color: $primary;
+
+$link-color-dark: tint-color($primary, 50%);
+$link-hover-color-dark: tint-color($primary, 60%);
+
 $grid-gutter-width: 1rem;
 
 @import "../../node_modules/bootstrap/scss/_variables.scss";
+
+$theme-colors: map-merge(
+  $theme-colors,
+  (
+    "primary": $primary,
+  )
+);

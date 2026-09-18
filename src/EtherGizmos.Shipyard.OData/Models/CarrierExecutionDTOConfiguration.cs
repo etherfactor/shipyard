@@ -20,6 +20,11 @@ public class CarrierExecutionDTOConfiguration : IModelConfiguration
         readArtifact.Parameter<string>("uri");
         readArtifact.Returns<Stream>();
 
+        var writeArtifact = entity.Action("writeArtifact");
+        writeArtifact.Parameter<string>("contentType");
+        writeArtifact.Parameter<Stream>("content");
+        writeArtifact.Parameter<string>("fileName").Optional();
+
         entity.IgnoreAll();
 
         if (apiVersion >= ApiVersions.V0_1)

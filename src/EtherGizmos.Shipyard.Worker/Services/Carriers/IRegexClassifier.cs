@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Worker.Services.Carriers;
+﻿namespace EtherGizmos.Shipyard.Services.Carriers;
 
 public interface IRegexClassifier
 {

@@ -7,6 +7,8 @@
     "scope": "openid offline_access app"
   },
   "logging": {
+    "endpoint": "https://localhost:7265/api/v1/logs",
+    "apiKey": "d142d01e-9f50-4704-ac67-fe09c157922a",
     "minimumLevel": "Information"
   },
   "version": "dev"

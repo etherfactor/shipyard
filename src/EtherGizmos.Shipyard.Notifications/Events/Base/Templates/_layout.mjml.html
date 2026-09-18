@@ -1,0 +1,63 @@
+<mjml>
+  <mj-head>
+    <mj-title>{{title}}</mj-title>
+    <mj-attributes>
+      <mj-all font-family="Arial, Helvetica, sans-serif"></mj-all>
+      <mj-text color="#000000" align="left" padding="0px"></mj-text>
+    </mj-attributes>
+    <mj-style>
+      h1 {
+        margin-top: 0px;
+      }
+
+      p {
+        margin: 0px;
+      }
+
+      a {
+        color: #5b15b8;
+        text-decoration: underline;
+      }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#f4f1fa">
+    <mj-section background-color="transparent" padding="30px 30px 15px 30px">
+      <mj-group>
+        <mj-column width="42px">
+          <mj-image padding="0" src="{{shipyard_url}}/icons/icon-128x128-tight.png"></mj-image>
+        </mj-column>
+        <mj-column>
+          <mj-text padding-left="10px" line-height="4px">
+            <h1 style="font-size: 18px; padding-top: 13px;">Shipyard</h1>
+            <p style="font-size: 12px; color: #777777;">Self-hosted package tracking</p>
+          </mj-text>
+        </mj-column>
+      </mj-group>
+    </mj-section>
+    <mj-section background-color="#ffffff" border-top="8px solid #731dd8;" border-radius="15px" padding="30px">
+      <mj-column width="100%">
+        {{content}}
+      </mj-column>
+    </mj-section>
+    <mj-section padding="20px 0 0 0">
+      <mj-column>
+        <mj-text align="center" font-size="12px" line-height="18px" color="#777777">
+          You received this because delivery notifications are enabled for this tracked package.
+          <br />
+          <a href="{{unsubscribe_url}}"><b>Unsubscribe from this notification</b></a>
+          &nbsp;&bull;&nbsp;
+          <a href="{{shipyard_url}}/notifications">Manage notification preferences</a>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section padding="15px 0 20px 0">
+      <mj-column>
+        <mj-text align="center" font-size="12px" line-height="18px" color="#777777">
+          Shipyard
+          &nbsp;&bull;&nbsp;
+          Self-hosted package tracking
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

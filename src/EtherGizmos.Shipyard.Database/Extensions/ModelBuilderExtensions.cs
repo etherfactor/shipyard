@@ -29,6 +29,10 @@ public static class ModelBuilderExtensions
             {
                 if (property.ClrType == typeof(TModel))
                 {
+                    //Don't overwrite existing value converters
+                    if (property.GetValueConverter() is not null)
+                        continue;
+
                     property.SetValueConverter(converter);
 
                     if (comparer is not null)

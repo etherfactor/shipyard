@@ -1,6 +1,5 @@
-﻿using EtherGizmos.Common.Extensions;
-using EtherGizmos.Shipyard.Worker.Configuration;
-using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
+﻿using EtherGizmos.Shipyard.Configuration;
+using EtherGizmos.Shipyard.Services.WebDrivers;
 using HtmlAgilityPack;
 using HtmlAgilityPack.CssSelectors.NetCore;
 using Jint;
@@ -14,7 +13,7 @@ using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-namespace EtherGizmos.Shipyard.Worker.Services.Carriers.Scraping;
+namespace EtherGizmos.Shipyard.Services.Carriers.Scraping;
 
 internal class ScriptStep : ScrapingStep
 {
@@ -378,7 +377,6 @@ internal class ScriptStep : ScrapingStep
                 TrackingNumber = "",
                 EstimatedDeliveryAt = eta,
                 Details = events,
-                Artifacts = [],
             };
         }
     }

@@ -57,6 +57,15 @@ public class CarrierExecutionDTOProfile : Profile
         toDto.MapMember(dest => dest.StepCount, src => src.StepCount);
         toDto.MapMember(dest => dest.FailureStepIndex, src => src.FailureStepIndex);
         toDto.MapMember(dest => dest.Artifacts, src => src.Artifacts);
+
+        var fromDto = mapper.CreateMap<CarrierExecutionDTO, CarrierExecution>();
+        fromDto.IgnoreAllMembers();
+        fromDto.MapMember(dest => dest.CarrierId, src => src.CarrierId);
+        fromDto.MapMember(dest => dest.PackageId, src => src.PackageId);
+        fromDto.MapMember(dest => dest.StartedAt, src => src.StartedAt);
+        fromDto.MapMember(dest => dest.CompletedAt, src => src.CompletedAt);
+        fromDto.MapMember(dest => dest.ExecutionStatus, src => src.ExecutionStatusType);
+        fromDto.MapMember(dest => dest.FailureStepIndex, src => src.FailureStepIndex);
     })
     { }
 }

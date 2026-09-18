@@ -11,6 +11,8 @@ const AppConfigZ = z.object({
     scope: z.string(),
   }),
   logging: z.object({
+    endpoint: z.string(),
+    apiKey: z.string(),
     minimumLevel: z.nativeEnum(LogLevel),
   }),
   version: z.string(),

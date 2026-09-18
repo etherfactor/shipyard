@@ -10,6 +10,7 @@ import { AbstractLoggerService, AbstractSecurityStorage, authInterceptor, Defaul
 import { provideMonacoEditor } from 'ngx-monaco-editor-v2';
 import { AppComponent } from './app/app.component';
 import { APP_ROUTES } from './app/app.routes';
+import { errorInterceptor } from './app/shared/interceptors/error/error.interceptor';
 import { loggingInterceptor } from './app/shared/interceptors/logging/logging.interceptor';
 import { provideOAuth2Service } from './app/shared/services/oauth2/oauth2.service.concrete';
 import { OidcLoggerService } from './app/shared/services/oidc-logger/oidc-logger.service';
@@ -36,6 +37,7 @@ import { provideODataClient } from './app/shared/utilities/odata/odata.util';
           withInterceptors([
             authInterceptor(),
             loggingInterceptor,
+            errorInterceptor,
           ])
         ),
         provideODataClient(),
@@ -51,10 +53,7 @@ import { provideODataClient } from './app/shared/utilities/odata/odata.util';
               .createLogger()
         ),
         provideSimpleConfig(HTTP_BATCH_LOG_SINK_OPTIONS, {
-          endpoint: "https://localhost:7265/api/v1/logs?apiKey=d142d01e-9f50-4704-ac67-fe09c157922a",
-          headers: {
-            "X-Api-Key": "d142d01e-9f50-4704-ac67-fe09c157922a",
-          },
+          endpoint: `${config.logging.endpoint}?apiKey=${encodeURIComponent(config.logging.apiKey)}`,
         }),
         provideOAuth2Service(),
         provideAuth({

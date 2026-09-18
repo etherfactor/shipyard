@@ -27,7 +27,7 @@ partial class Error
             public InvalidModelState AddDetail(
                 ModelStateDictionary modelState,
                 Type modelType,
-                HttpContext context)
+                HttpContext? context = null)
             {
                 //If the model contains an empty key, errors are listed under that node
                 if (modelState.ContainsKey(""))
@@ -48,7 +48,7 @@ partial class Error
 
                         switch (error.ErrorMessage)
                         {
-                            case var _ when regexExtraProperty.IsMatch(errorMessage):
+                            case var _ when regexExtraProperty.IsMatch(errorMessage) && context is not null:
                                 var match = regexExtraProperty.Match(errorMessage);
                                 propertyName = match.Groups["PROP"].Value;
 
@@ -86,6 +86,14 @@ partial class Error
                     }
                 }
 
+                return this;
+            }
+
+            public InvalidModelState AddDetail(
+                string target,
+                string message)
+            {
+                AddDetail(new TypedErrorDetailBase(Code, target, message));
                 return this;
             }
 

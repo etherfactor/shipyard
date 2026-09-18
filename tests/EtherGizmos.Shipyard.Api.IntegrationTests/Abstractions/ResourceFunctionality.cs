@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
+﻿namespace EtherGizmos.Shipyard.Abstractions;
 
 public enum ResourceFunctionality
 {
@@ -17,4 +17,5 @@ public enum ResourceFunctionality
     QueryCount = 1 << 11,
     QueryApply = 1 << 12,
     GroupFiltering = 1 << 16,
+    CapabilityRequired = 1 << 20,
 }

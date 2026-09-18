@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
+﻿namespace EtherGizmos.Shipyard.Abstractions;
 
 public record TokenRequest(string Subject)
 {

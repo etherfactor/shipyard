@@ -1,4 +1,4 @@
-using EtherGizmos.Shipyard.Worker.Configuration;
+using EtherGizmos.Shipyard.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenQA.Selenium;
@@ -8,7 +8,7 @@ using OpenQA.Selenium.Support.UI;
 using SixLabors.ImageSharp;
 using System.Collections.Concurrent;
 
-namespace EtherGizmos.Shipyard.Worker.Services.WebDrivers;
+namespace EtherGizmos.Shipyard.Services.WebDrivers;
 
 internal class SeleniumChromiumClient : IBrowserClient, IDisposable
 {

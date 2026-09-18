@@ -7,4 +7,5 @@ public enum SecurableType
     User = 100,
     Role = 110,
     Group = 120,
+    NotificationSubscription = 200,
 }

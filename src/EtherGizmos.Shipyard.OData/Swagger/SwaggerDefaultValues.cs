@@ -1,6 +1,7 @@
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace EtherGizmos.Shipyard.Swagger;
 
@@ -25,9 +26,14 @@ public class SwaggerDefaultValues : IOperationFilter
         // REF: https://github.com/domaindrivendev/Swashbuckle.AspNetCore/issues/1752#issue-663991077
         foreach (var responseType in context.ApiDescription.SupportedResponseTypes)
         {
+            operation.Responses ??= [];
+
             // REF: https://github.com/domaindrivendev/Swashbuckle.AspNetCore/blob/b7cf75e7905050305b115dd96640ddd6e74c7ac9/src/Swashbuckle.AspNetCore.SwaggerGen/SwaggerGenerator/SwaggerGenerator.cs#L383-L387
             var responseKey = responseType.IsDefaultResponse ? "default" : responseType.StatusCode.ToString();
             var response = operation.Responses[responseKey];
+
+            if (response.Content is null)
+                continue;
 
             foreach (var contentType in response.Content.Keys)
             {
@@ -39,9 +45,7 @@ public class SwaggerDefaultValues : IOperationFilter
         }
 
         if (operation.Parameters == null)
-        {
             return;
-        }
 
         // REF: https://github.com/domaindrivendev/Swashbuckle.AspNetCore/issues/412
         // REF: https://github.com/domaindrivendev/Swashbuckle.AspNetCore/pull/413
@@ -51,14 +55,17 @@ public class SwaggerDefaultValues : IOperationFilter
 
             parameter.Description ??= description.ModelMetadata?.Description;
 
-            if (parameter.Schema.Default == null && description.DefaultValue != null)
+            if (parameter.Schema is not OpenApiSchema schema)
+                continue;
+
+            if (schema.Default == null && description.DefaultValue != null)
             {
                 // REF: https://github.com/Microsoft/aspnet-api-versioning/issues/429#issuecomment-605402330
                 var json = JsonSerializer.Serialize(description.DefaultValue, description.ModelMetadata!.ModelType);
-                parameter.Schema.Default = OpenApiAnyFactory.CreateFromJson(json);
+                schema.Default = JsonNode.Parse(json);
             }
 
-            parameter.Required |= description.IsRequired;
+            (parameter as OpenApiParameter)?.Required |= description.IsRequired;
         }
     }
 }

@@ -1,8 +1,8 @@
 using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Api.Errors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,8 +30,8 @@ internal class ValidationModelValidator<TModel> : IModelValidator<TModel>
         var validator = _serviceProvider.GetRequiredService<IObjectModelValidator>();
         var metadataProvider = _serviceProvider.GetRequiredService<IModelMetadataProvider>();
 
-        var actionContext = _serviceProvider.GetRequiredService<IActionContextAccessor>()
-            .ActionContext;
+        var actionContext = _serviceProvider.GetRequiredService<IHttpContextAccessor>()
+            .HttpContext?.Features?.Get<ActionContext>();
 
         if (actionContext is not null)
         {

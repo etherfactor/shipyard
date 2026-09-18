@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Worker.Services.WebDrivers;
+﻿namespace EtherGizmos.Shipyard.Services.WebDrivers;
 
 public interface IBrowserClient : IDisposable
 {

@@ -21,6 +21,7 @@ public class UserDTO
     [Required]
     public string Password { get; set; } = null!;
 
+    [EmailAddress]
     public string? EmailAddress { get; set; }
 
     public string? GivenName { get; set; }

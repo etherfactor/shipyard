@@ -17,9 +17,12 @@ export class ToastService {
   }
 }
 
+type ToastTheme = "primary" | "secondary" | "success" | "warning" | "danger" | "info";
+
 export interface ToastInfo {
   header: string;
   body: string;
+  theme?: ToastTheme;
   delay?: number;
   actions?: ToastAction[];
 }

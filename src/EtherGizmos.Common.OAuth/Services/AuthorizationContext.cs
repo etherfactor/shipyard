@@ -19,9 +19,9 @@ public class AuthorizationContext : DbContext
 
     public AuthorizationContext(
         DbContextOptions<AuthorizationContext> options,
-        IServiceProvider serviceProvider) : base(options)
+        [FromKeyedServices("Application")] IMigrationManager migrationManager) : base(options)
     {
-        serviceProvider.GetRequiredService<IOAuth2MigrationManager>()
+        migrationManager
             .EnsureMigratedAsync()
             .GetAwaiter()
             .GetResult();

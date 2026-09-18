@@ -1,4 +1,4 @@
-﻿namespace EtherGizmos.Shipyard.Api.Abstractions;
+﻿namespace EtherGizmos.Shipyard.Abstractions;
 
 public interface ISourceLoggerFactory
 {

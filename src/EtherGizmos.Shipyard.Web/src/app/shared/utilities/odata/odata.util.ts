@@ -218,7 +218,7 @@ export function narrowValidator<TEntity>(
 ): ZodType<TEntity> {
   const [unwrapped, wrappers] = unwrapZod(schema);
   if (!(unwrapped instanceof ZodObject)) {
-    return unwrapped;
+    return unwrapped as any;
   }
 
   const narrowed = narrowSelect(unwrapped, selectExpand.select);
@@ -226,7 +226,7 @@ export function narrowValidator<TEntity>(
   const expandedShape: ZodRawShape = Object.entries(selectExpand.expand).reduce<ZodRawShape>((acc, data) => {
     const [key, expand] = data;
     const original = unwrapped.shape[key];
-    acc[key] = narrowValidator(original, expand);
+    (acc as any)[key] = narrowValidator(original, expand);
 
     return acc;
   }, {});
@@ -255,7 +255,7 @@ function narrowSelect(
 
   const newShape: ZodRawShape = select.reduce<ZodRawShape>((acc, key) => {
     if (key in schema.shape) {
-      acc[key] = schema.shape[key];
+      (acc as any)[key] = schema.shape[key];
     }
 
     return acc;
@@ -273,31 +273,31 @@ function unwrapZod(
   while (true) {
     if (current instanceof ZodOptional) {
       wrappers.push({ kind: "optional" });
-      current = current._def.innerType;
+      current = current.def.innerType as any;
       continue;
     }
 
     if (current instanceof ZodNullable) {
       wrappers.push({ kind: "nullable" });
-      current = current._def.innerType;
+      current = current.def.innerType as any;
       continue;
     }
 
     if (current instanceof ZodDefault) {
-      wrappers.push({ kind: "default", defaultValue: current._def.defaultValue });
-      current = current._def.innerType;
+      wrappers.push({ kind: "default", defaultValue: current.def.defaultValue });
+      current = current.def.innerType as any;
       continue;
     }
 
     if (current instanceof ZodArray) {
       wrappers.push({ kind: "array" });
-      current = current._def.type;
+      current = current.def.element as any;
       continue;
     }
 
     if (current instanceof ZodLazy) {
-      const result = current._def.getter();
-      current = result;
+      const result = current.def.getter();
+      current = result as any;
       continue;
     }
 

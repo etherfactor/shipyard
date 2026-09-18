@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests;
+namespace EtherGizmos.Shipyard;
 
 /// <summary>
 /// Assuming integration tests do not run in parallel, intercepts the console output and logs it on a synchronous thread,

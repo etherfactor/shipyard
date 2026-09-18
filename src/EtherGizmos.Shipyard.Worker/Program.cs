@@ -1,26 +1,38 @@
 using EtherGizmos.Common;
 using EtherGizmos.Common.Configuration;
-using EtherGizmos.Shipyard;
+using EtherGizmos.Shipyard.Abstractions;
 using EtherGizmos.Shipyard.Configuration;
-using EtherGizmos.Shipyard.Models;
 using EtherGizmos.Shipyard.Services;
-using EtherGizmos.Shipyard.Worker.Configuration;
-using EtherGizmos.Shipyard.Worker.Services.Carriers;
-using EtherGizmos.Shipyard.Worker.Services.HostedServices;
-using EtherGizmos.Shipyard.Worker.Services.WebDrivers;
+using EtherGizmos.Shipyard.Services.Api;
+using EtherGizmos.Shipyard.Services.Carriers;
+using EtherGizmos.Shipyard.Services.Handlers;
+using EtherGizmos.Shipyard.Services.HostedServices;
+using EtherGizmos.Shipyard.Services.WebDrivers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 using Serilog;
 using System.Text.Json;
 
 var builder = Host.CreateApplicationBuilder(args);
 
+var otelEnabled = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT"))
+    || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"))
+    || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"))
+    || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT"));
+
 builder.Logging.ClearProviders();
 
-builder.Services.AddSerilog((services, logger) =>
-    logger.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>()),
+builder.Services
+    .AddSerilog((services, logger) =>
+    {
+        logger.ReadFrom.Configuration(services.GetRequiredService<IConfiguration>());
+        if (otelEnabled) logger.WriteTo.OpenTelemetry();
+    },
     writeToProviders: true);
 
 builder.Services.AddTeeStreamLogger();
@@ -32,48 +44,32 @@ builder.Configuration
     .AddJsonFile($"appsettings.{builder.Environment}.json", optional: true, reloadOnChange: true)
     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
     .AddRemappedEnvironmentVariables(
-        (new(@"(?<=[^:_])_(?=[^_])"), "."),
-        (new(@"(?<=[^_]):_(?=[^_])"), " "),
-        (new(@"^ConnectionStrings:(?=[^_:])"), ""))
-    .AddExpandedConnections(builder.Configuration);
+        new(new(@"(?<=[^:_])_(?=[^_])"), "."),
+        new(new(@"(?<=[^_]):_(?=[^_])"), " "),
+        new(new(@"^ConnectionStrings:(?=[^_:])"), ""))
+    .AddModularConfigurations(builder.Configuration);
 
 builder.Services
-    .AddOptions<DatabaseReferenceOptions>()
-    .Configure<IConfiguration>((opt, conf) =>
-    {
-        conf.GetSection("Database")
-            .Bind(opt);
-    })
+    .AddOptions<ApiOptions>()
+    .Bind(builder.Configuration.GetSection("Api"))
     .ValidateOnStart()
     .ValidateDataAnnotations();
 
 builder.Services
-    .AddOptions<NotificationOptions>()
-    .Configure<IConfiguration>((opt, conf) =>
-    {
-        conf.GetSection("Notifications")
-            .Bind(opt);
-    })
+    .AddOptions<ConnectionReferenceOptions>("MessageBroker")
+    .Bind(builder.Configuration.GetSection("MessageBroker"))
     .ValidateOnStart()
     .ValidateDataAnnotations();
 
 builder.Services
     .AddOptions<SeleniumDriverOptions>()
-    .Configure<IConfiguration>((opt, conf) =>
-    {
-        conf.GetSection("Selenium")
-            .Bind(opt);
-    })
+    .Bind(builder.Configuration.GetSection("Selenium"))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
 builder.Services
     .AddOptions<WorkerOptions>()
-    .Configure<IConfiguration>((opt, conf) =>
-    {
-        conf.GetSection("Worker")
-            .Bind(opt);
-    })
+    .Bind(builder.Configuration.GetSection("Worker"))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
@@ -83,16 +79,42 @@ builder.Services
 // General
 builder.AddServiceDefaults();
 
-builder.Services.AddServiceConnections();
+builder.Services.AddConnectionResolver()
+    .WithRabbitMQ();
 
-// Database
-builder.Services
-    .AddDatabase()
-    .AddUnitOfWork(opt =>
+// Observability
+if (otelEnabled)
+{
+    builder.Services
+        .AddOpenTelemetry()
+        .WithTracing(tracing => tracing
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddMessagingInstrumentation()
+            .AddUnitOfWorkInstrumentation()
+            .AddOtlpExporter())
+        .WithMetrics(metrics => metrics
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddMessagingInstrumentation()
+            .AddUnitOfWorkInstrumentation()
+            .AddOtlpExporter());
+}
+
+// Http
+builder.Services.AddHttpClient("API")
+    .ConfigureHttpClient((provider, client) =>
     {
-        opt.BindDbContext<ApplicationContext>();
-        opt.BindDbContext<ArtifactContext>();
-    });
+        var apiOptions = provider.GetRequiredService<IOptionsMonitor<ApiOptions>>()
+            .CurrentValue;
+
+        client.BaseAddress = new(apiOptions.BaseUrl);
+    })
+    .AddHttpMessageHandler(provider => provider.GetRequiredService<ApiAuthenticationHandler>());
+
+builder.Services.AddTransient<ApiAuthenticationHandler>();
+
+builder.Services.AddSingleton<IArtifactSender, ArtifactSender>();
 
 // Messaging
 builder.Services
@@ -110,11 +132,7 @@ builder.Services
         opt.Listeners.AddTopic("notification-package-delivered", "notification.package.delivered", subscription: "email");
         opt.Publishers.AddTopic("notification-package-delivered", "notification.package.delivered");
     })
-    .UseRabbitMQ((opt, conf) =>
-    {
-        conf.GetSection("RabbitMq")
-            .Bind(opt);
-    })
+    .UseConnection(builder.Configuration["MessageBroker:ConnectionId"] ?? "!Unknown")
     .AddConsumersFromAssemblies(typeof(Program).Assembly);
 
 builder.Services
@@ -122,14 +140,6 @@ builder.Services
     .Configure(opt =>
     {
         opt.Converters.Add(new ArtifactUriConverter());
-    });
-
-// Storage
-builder.Services
-    .AddArtifactWriter((opt, conf) =>
-    {
-        conf.GetSection("Artifacts")
-            .Bind(opt);
     });
 
 // Tracking
@@ -146,9 +156,6 @@ builder.Services
 builder.Services
     .AddSingleton<ITrackingProviderFactory, TrackingProviderFactory>()
     .AddTransient<IRegexClassifier, RegexClassifier>();
-
-// Notifications
-builder.Services.AddNotifications(typeof(Program).Assembly, typeof(NotificationEvent).Assembly);
 
 // Hosted Services
 builder.Services.AddHostedService<QueueTrackingRequestBackgroundService>();

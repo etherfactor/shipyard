@@ -14,4 +14,24 @@ public record ArtifactFormat(
     public static readonly ArtifactFormat Png = new("image/png", "png", false);
 
     public static readonly ArtifactFormat Binary = new("application/octet-stream", "bin", false);
+
+    private static readonly IEnumerable<ArtifactFormat> All =
+    [
+        Text,
+        Json,
+        NdJson,
+        Html,
+        WebP,
+        Png,
+        Binary,
+    ];
+
+    public static ArtifactFormat FromContentType(
+        string contentType)
+    {
+        var format = All.First(e => e.ContentType.Equals(contentType, StringComparison.OrdinalIgnoreCase)
+            || e.ContentType.Split(';')[0].Equals(contentType, StringComparison.OrdinalIgnoreCase));
+
+        return format;
+    }
 }

@@ -4,6 +4,7 @@ using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Extensions;
 using Swashbuckle.AspNetCore.Filters;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace EtherGizmos.Shipyard.Api;
 
@@ -11,6 +12,7 @@ public class CarrierRunbookStepDTO
 {
     public StepTypeDTO StepType { get; set; }
 
+    [JsonExtensionData]
     public IDictionary<string, object> Payload { get; set; } = new Dictionary<string, object>();
 }
 

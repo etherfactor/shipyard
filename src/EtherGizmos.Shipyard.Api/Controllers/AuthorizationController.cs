@@ -1,6 +1,6 @@
 ﻿using EtherGizmos.Common.Controllers;
 
-namespace EtherGizmos.Shipyard.Api.Controllers;
+namespace EtherGizmos.Shipyard.Controllers;
 
 public class AuthorizationController : AuthorizationControllerBase
 {

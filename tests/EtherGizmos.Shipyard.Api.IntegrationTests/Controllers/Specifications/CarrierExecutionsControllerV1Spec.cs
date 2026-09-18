@@ -1,11 +1,13 @@
-﻿using EtherGizmos.Shipyard.Abstractions;
+﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Api;
 using EtherGizmos.Shipyard.Api.Enums;
-using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http.Json;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Specifications;
+namespace EtherGizmos.Shipyard.Controllers.Specifications;
 
 public class CarrierExecutionsControllerV1Spec : IODataResourceSpec<CarrierExecutionDTO, int>
 {
@@ -24,6 +26,7 @@ public class CarrierExecutionsControllerV1Spec : IODataResourceSpec<CarrierExecu
             //Actions
             ResourceFunctionality.Search,
             ResourceFunctionality.Get,
+            ResourceFunctionality.Update,
 
             //Query options
             ResourceFunctionality.QueryCount,
@@ -33,6 +36,9 @@ public class CarrierExecutionsControllerV1Spec : IODataResourceSpec<CarrierExecu
             ResourceFunctionality.QuerySelect,
             ResourceFunctionality.QuerySkip,
             ResourceFunctionality.QueryTop,
+
+            //Miscellaneous
+            ResourceFunctionality.CapabilityRequired,
         };
 
     public Func<CarrierExecutionDTO, int> Identity => carrier => carrier.Id;
@@ -41,9 +47,17 @@ public class CarrierExecutionsControllerV1Spec : IODataResourceSpec<CarrierExecu
 
     public IRecordSource<CarrierExecutionDTO, int> Records => new CarrierExecutionsControllerV1Source(this);
 
-    public HttpContent Create() => throw new NotImplementedException();
+    public HttpContent Create() =>
+        JsonContent.Create(new
+        {
+            executionStatusType = "Queued",
+        });
 
-    public HttpContent Update(CarrierExecutionDTO entity) => throw new NotImplementedException();
+    public HttpContent Update(CarrierExecutionDTO entity) =>
+        JsonContent.Create(new
+        {
+            executionStatusType = "Successful",
+        });
 
     private class CarrierExecutionsControllerV1Source : IRecordSource<CarrierExecutionDTO, int>
     {
@@ -73,10 +87,10 @@ public class CarrierExecutionsControllerV1Spec : IODataResourceSpec<CarrierExecu
                 CarrierId = id,
                 PackageId = packageId,
                 StepCount = 1,
-                ExecutionStatus = ExecutionStatusType.Successful,
+                ExecutionStatus = ExecutionStatusType.Queued,
             };
 
-            executionRepo.Create(execution);
+            executionRepo.Add(execution);
 
             await uow.SaveChangesAsync();
 
@@ -84,7 +98,7 @@ public class CarrierExecutionsControllerV1Spec : IODataResourceSpec<CarrierExecu
             {
                 Id = execution.Id,
                 StepCount = 1,
-                ExecutionStatusType = ExecutionStatusTypeDTO.Successful,
+                ExecutionStatusType = ExecutionStatusTypeDTO.Queued,
             }, execution.Id);
         }
     }

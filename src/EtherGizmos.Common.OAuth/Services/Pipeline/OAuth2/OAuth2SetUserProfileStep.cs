@@ -30,6 +30,7 @@ internal class OAuth2SetUserProfileStep<TUser> : IClaimsPipelineStep<OAuth2Princ
             context.Identity.SetClaim(Claims.FamilyName, user.FamilyName);
             context.Identity.SetClaim(Claims.Name, user.FullName);
 
+            context.Identity.SetClaim(Claims.Username, user.Username);
             context.Identity.SetClaim(Claims.Email, user.EmailAddress);
         }
 

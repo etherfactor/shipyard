@@ -1,0 +1,142 @@
+<!-- Header -->
+<div class="row">
+  <div class="col-12 mt-3">
+
+    <detail-header text="Notification History"
+                   subtext="View your recently delivered notifications." />
+
+  </div>
+</div>
+
+<!-- Search -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-funnel"
+                text="Notification Filters">
+      <div class="row align-items-end">
+
+        <div class="col-md mt-3">
+          <label>Event</label>
+          <ng-select [clearable]="false"
+                     [selectOnTab]="true"
+                     [(ngModel)]="searchEventId">
+            <ng-option value="__all">
+              <span class="bi bi-check-all"></span>
+              All
+            </ng-option>
+            @for (event of events; track event.id) {
+            <ng-option [value]="event.id">
+              <span [innerHtml]="formatStyleSpan(NotificationEventTheme, event.id)"></span>
+              {{event.name}}
+            </ng-option>
+            }
+          </ng-select>
+        </div>
+
+        <div class="col-md mt-3">
+          <label>Channel</label>
+          <ng-select [clearable]="false"
+                     [selectOnTab]="true"
+                     [(ngModel)]="searchChannelId">
+            <ng-option value="__all">
+              <span class="bi bi-check-all"></span>
+              All
+            </ng-option>
+            @for (channel of channels; track channel.id) {
+            <ng-option [value]="channel.id">
+              <span [innerHtml]="formatStyleSpan(NotificationChannelTheme, channel.id)"></span>
+              {{channel.name}}
+            </ng-option>
+            }
+          </ng-select>
+        </div>
+
+        <div class="col-md mt-3">
+          <label>Status</label>
+          <ng-select [clearable]="false"
+                     [selectOnTab]="true"
+                     [(ngModel)]="searchStatusType">
+            <ng-option value="__all">
+              <span class="bi bi-check-all"></span>
+              All
+            </ng-option>
+            <ng-option [value]="NotificationStatusType.Sent">
+              <span [innerHtml]="formatStyleSpan(NotificationStatusTheme, NotificationStatusType.Sent)"></span>
+              Sent
+            </ng-option>
+            <ng-option [value]="NotificationStatusType.Failed">
+              <span [innerHtml]="formatStyleSpan(NotificationStatusTheme, NotificationStatusType.Failed)"></span>
+              Failed
+            </ng-option>
+            <ng-option [value]="NotificationStatusType.InFlight">
+              <span [innerHtml]="formatStyleSpan(NotificationStatusTheme, NotificationStatusType.InFlight)"></span>
+              In-flight
+            </ng-option>
+            <ng-option [value]="NotificationStatusType.Pending">
+              <span [innerHtml]="formatStyleSpan(NotificationStatusTheme, NotificationStatusType.Pending)"></span>
+              Pending
+            </ng-option>
+          </ng-select>
+        </div>
+
+        <div class="col-md-2 mt-3">
+          @if (!isLoading()) {
+          <button class="btn btn-primary w-100" (click)="search()">
+            Search
+          </button>
+          } @else {
+          <button class="btn btn-primary w-100" type="button" disabled>
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            <span class="visually-hidden" role="status">Loading...</span>
+          </button>
+          }
+        </div>
+
+      </div>
+    </detail-box>
+  </div>
+</div>
+
+<!-- List -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-clock-history"
+                text="Notification History"
+                [buttons]="notificationInboxButtons$$()">
+
+      <div class="list-group mt-3">
+        @if (!isLoading()) {
+
+        @for (notification of records; track notification.id) {
+        <notification-row [notification]="notification" />
+        } @empty {
+        No recent notifications
+        }
+
+        } @else {
+        <div style="min-height: 100px;">
+          <div class="position-absolute" style="top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+            <div class="position-absolute" style="top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%);">
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+
+      <div class="mt-3 d-flex justify-content-center">
+        <ngb-pagination [collectionSize]="count"
+                        [pageSize]="perPage"
+                        [page]="page"
+                        (pageChange)="page = $event; search()"
+                        [maxSize]="5"
+                        [rotate]="true"
+                        [boundaryLinks]="true"
+                        [directionLinks]="true"></ngb-pagination>
+      </div>
+
+    </detail-box>
+  </div>
+</div>

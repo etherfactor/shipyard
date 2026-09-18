@@ -112,6 +112,18 @@ export abstract class ListComponent<TEntity> implements OnInit {
     this.activeFilters = filters;
     this.searchSubject.next();
   }
+
+  protected async doWork(action: () => void | Promise<void>) {
+    this.isLoadingStack.set(this.isLoadingStack() + 1);
+    try {
+      const result = action();
+      if (result instanceof Promise) {
+        await result;
+      }
+    } finally {
+      this.isLoadingStack.set(this.isLoadingStack() - 1);
+    }
+  }
 }
 
 export interface TableColumn {

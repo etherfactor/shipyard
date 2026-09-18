@@ -1,0 +1,7 @@
+@import './_base.scss';
+
+.toast {
+  &.danger .toast-header {
+    @extend .text-bg-danger;
+  }
+}

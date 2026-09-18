@@ -1,7 +1,8 @@
-﻿using EtherGizmos.Shipyard.Api.IntegrationTests.Abstractions;
+﻿using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Shipyard.Api;
 using System.Net.Http.Json;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests.Controllers.Specifications;
+namespace EtherGizmos.Shipyard.Controllers.Specifications;
 
 public class CarriersControllerV1Spec : IODataResourceSpec<CarrierDTO, int>
 {
@@ -32,6 +33,9 @@ public class CarriersControllerV1Spec : IODataResourceSpec<CarrierDTO, int>
             ResourceFunctionality.QuerySelect,
             ResourceFunctionality.QuerySkip,
             ResourceFunctionality.QueryTop,
+
+            //Miscellaneous
+            ResourceFunctionality.CapabilityRequired,
         };
 
     public Func<CarrierDTO, int> Identity => carrier => carrier.Id;

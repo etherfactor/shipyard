@@ -23,10 +23,19 @@ public abstract class MigrationExtension : Migration
         get
         {
             //Extract the IMigrationContext from the base type through reflection
-            var context = (IMigrationContext)GetType()
-                .GetField("_context", BindingFlags.NonPublic | BindingFlags.Instance)!
-                .GetValue(this)!;
+            var type = GetType();
+            var fieldInfo = type
+                .GetField("_context", BindingFlags.NonPublic | BindingFlags.Instance)!;
 
+            while (fieldInfo is null && type.BaseType is not null)
+            {
+                type = type.BaseType!;
+
+                fieldInfo = type
+                    .GetField("_context", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            }
+
+            var context = (IMigrationContext)fieldInfo?.GetValue(this)!;
             return new MergeExpressionRoot(context);
         }
     }

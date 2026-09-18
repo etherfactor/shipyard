@@ -1,19 +1,18 @@
-﻿using EtherGizmos.Common.Configuration;
-using EtherGizmos.Shipyard.Configuration;
+﻿using EtherGizmos.Common;
+using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Common.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
-using Npgsql;
-using System.Data.Common;
 
-namespace EtherGizmos.Shipyard.Api.Services.Health;
+namespace EtherGizmos.Shipyard.Services.Health;
 
 internal class DatabaseHealthCheck : IHealthCheck
 {
-    private readonly IOptions<DatabaseReferenceOptions> _dbOptions;
+    private readonly IOptionsMonitor<ConnectionReferenceOptions> _dbOptions;
     private readonly IConnectionResolver _connectionResolver;
 
     public DatabaseHealthCheck(
-        IOptions<DatabaseReferenceOptions> dbOptions,
+        IOptionsMonitor<ConnectionReferenceOptions> dbOptions,
         IConnectionResolver connectionResolver)
     {
         _dbOptions = dbOptions;
@@ -24,14 +23,11 @@ internal class DatabaseHealthCheck : IHealthCheck
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {
-        var dbOptions = _dbOptions.Value;
+        var dbOptions = _dbOptions.Get("Database");
 
         try
         {
-            var connection = _connectionResolver.GetDatabaseConnection(dbOptions.ConnectionId);
-            using var dbConnection = connection.Match(
-                _ => throw new InvalidOperationException(),
-                psql => (DbConnection)new NpgsqlConnection(psql.ConnectionString));
+            using var dbConnection = _connectionResolver.CreateDbConnection(dbOptions.ConnectionId);
 
             await dbConnection.OpenAsync(cancellationToken);
 

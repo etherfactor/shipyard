@@ -1,0 +1,66 @@
+{{capture title}}
+{{subject}}
+{{end}}
+
+{{capture content}}
+<mj-text>
+  <h1>Your unknown tracking status digest</h1>
+</mj-text>
+<mj-text font-size="16px" line-height="25px" padding-bottom="20px">
+  Hi {{name}}, Shipyard found {{notification_count}} tracking update{{if notification_count != 1}}s{{end}} that could not be classified between <b>{{start_at}}</b> and <b>{{end_at}}</b>.
+</mj-text>
+{{for notification in notifications}}
+<mj-table css-class="detail-table" container-background-color="#faf8ff" border="1px solid #e6ddf7;" padding="0 0 18px 0">
+  <tr>
+    <td colspan="2" style="padding: 20px;">
+      <div style="text-transform: uppercase; letter-spacing: 0.05em; color: #777777; font-size: 12px; font-weight: 700;">
+        Unknown status
+      </div>
+      <div style="font-size: 18px;">
+        <b>{{notification.carrier_name}} tracking #{{notification.tracking_number}}</b>
+      </div>
+      {{if notification.contents}}
+      <div style="font-size: 14px; color: #555555; padding-top: 4px;">
+        {{notification.contents}}
+      </div>
+      {{end}}
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 0 20px 20px 20px;">
+      <div style="text-transform: uppercase; letter-spacing: 0.05em; color: #777777; font-size: 12px; font-weight: 700;">
+        Updated at
+      </div>
+      <div style="font-size: 16px;">
+        <b>{{notification.unknown_status_at}}</b>
+      </div>
+    </td>
+    <td style="padding: 0 20px 20px 20px;">
+      <div style="text-transform: uppercase; letter-spacing: 0.05em; color: #777777; font-size: 12px; font-weight: 700;">
+        Unmatched update
+      </div>
+      <div style="font-size: 16px;">
+        {{notification.details}}
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" style="padding: 0 20px 20px 20px;">
+      <a href="{{shipyard_url}}/carriers/{{notification.carrier_id}}" style="color: #731dd8; text-decoration: none;">
+        Review carrier definition
+      </a>
+      <span style="color: #cccccc;"> | </span>
+      <a href="{{shipyard_url}}/packages/{{notification.package_id}}" style="color: #731dd8; text-decoration: none;">
+        View package
+      </a>
+    </td>
+  </tr>
+</mj-table>
+{{end}}
+<mj-divider border-width="1px" padding="5px 5px 25px 5px" border-color="#cccccc"></mj-divider>
+<mj-text line-height="18px" color="#777777">
+  These notifications usually mean carrier parsing rules need maintenance. They are most useful for Shipyard administrators.
+</mj-text>
+{{end}}
+
+{{include "_layout"}}

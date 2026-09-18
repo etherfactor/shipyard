@@ -1,11 +1,12 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
-using EtherGizmos.Shipyard.Abstractions;
+using EtherGizmos.Common;
+using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Api;
 using EtherGizmos.Shipyard.Api.Errors;
-using EtherGizmos.Shipyard.Api.Services.Security;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
-using EtherGizmos.Shipyard.Extensions;
+using EtherGizmos.Shipyard.Services.Security;
 using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,7 @@ using OpenIddict.Abstractions;
 using Swashbuckle.AspNetCore.Filters;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace EtherGizmos.Shipyard.Api.Controllers;
+namespace EtherGizmos.Shipyard.Controllers;
 
 [Authorize]
 public class UsersController : AutoODataController
@@ -42,10 +43,10 @@ public class UsersController : AutoODataController
     [ProducesResponseSet]
     [ProducesResponseType(200, Type = typeof(UserDTO)), SwaggerResponseExample(200, typeof(UserDTOExampleGet))]
     public Task<IActionResult> Search(
-    ODataQueryOptions<UserDTO> queryOptions,
-    CancellationToken cancellationToken = default)
-    => ForSet()
-        .SearchAsync(queryOptions, cancellationToken);
+        ODataQueryOptions<UserDTO> queryOptions,
+        CancellationToken cancellationToken = default)
+        => ForSet()
+            .SearchAsync(queryOptions, cancellationToken);
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute + "({id})")]

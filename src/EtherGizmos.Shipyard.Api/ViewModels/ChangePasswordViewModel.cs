@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace EtherGizmos.Shipyard.Api.ViewModels;
+namespace EtherGizmos.Shipyard.ViewModels;
 
 public record ChangePasswordViewModel
 {

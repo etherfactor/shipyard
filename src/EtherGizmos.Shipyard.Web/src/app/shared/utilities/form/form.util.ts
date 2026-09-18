@@ -110,8 +110,8 @@ export class AppValidators extends Validators {
         return { value: `Must contain at least ${length} elements` };
       }
 
-      if (control.value.some((value: unknown) => !value)) {
-        return { value: `All values must not be falsy` };
+      if (control.value.some((value: unknown) => value === undefined)) {
+        return { value: `All values must not be undefined` };
       }
 
       return null;

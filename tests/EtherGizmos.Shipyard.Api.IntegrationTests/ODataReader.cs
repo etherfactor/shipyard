@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace EtherGizmos.Shipyard.Api.IntegrationTests;
+namespace EtherGizmos.Shipyard;
 
 public static class ODataReader
 {

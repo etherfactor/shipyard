@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
 
-namespace EtherGizmos.Shipyard.Worker.Configuration;
+namespace EtherGizmos.Shipyard.Configuration;
 
 public class WorkerOptions : IValidateOptions<WorkerOptions>
 {
