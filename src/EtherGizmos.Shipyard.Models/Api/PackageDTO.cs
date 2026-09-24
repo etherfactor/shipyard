@@ -24,7 +24,13 @@ public class PackageDTO
     [Required]
     public string TrackingNumber { get; set; } = null!;
 
+    public bool IsItemized { get; set; }
+
     public string? Contents { get; set; }
+
+    public int? OrderFulfillmentId { get; set; }
+
+    public OrderFulfillmentDTO? OrderFulfillment { get; set; }
 
     public DateTimeOffset? EstimatedDeliveryAt { get; set; }
 
@@ -32,9 +38,25 @@ public class PackageDTO
 
     public DateTimeOffset NextPollAt { get; set; }
 
-    public StatusTypeDTO LastStatusType { get; set; }
+    public TrackingStatusTypeDTO LastTrackingStatusType { get; set; }
 
     public bool IsDelivered { get; set; }
+
+    public DateTimeOffset? ReceivedAt { get; set; }
+
+    public Guid? ReceivedByUserId { get; set; }
+
+    public UserDTO? ReceivedByUser { get; set; }
+
+    public DateTimeOffset? ResolvedAt { get; set; }
+
+    public Guid? ResolvedByUserId { get; set; }
+
+    public UserDTO? ResolvedByUser { get; set; }
+
+    public string? ResolvedReason { get; set; }
+
+    public List<PackageItemDTO> PackageItems { get; set; } = [];
 
     public List<TrackingUpdateDTO> TrackingUpdates { get; set; } = [];
 }
@@ -57,7 +79,7 @@ public class PackageDTOProfile : Profile
         toDto.MapMember(dest => dest.EstimatedDeliveryAt, src => src.EstimatedDeliveryAt);
         toDto.MapMember(dest => dest.LastPollAt, src => src.LastPollAt);
         toDto.MapMember(dest => dest.NextPollAt, src => src.NextPollAt);
-        toDto.MapMember(dest => dest.LastStatusType, src => src.LastStatusTypeId);
+        toDto.MapMember(dest => dest.LastTrackingStatusType, src => src.LastTrackingStatusTypeId);
         toDto.MapMember(dest => dest.IsDelivered, src => src.IsDelivered);
         toDto.MapMember(dest => dest.TrackingUpdates, src => src.TrackingUpdates, opt => opt.ExplicitExpansion());
 
@@ -84,7 +106,7 @@ public static class PackageDTOExamples
         Contents = "Some items",
         LastPollAt = DateTimeOffset.UtcNow,
         NextPollAt = DateTimeOffset.UtcNow,
-        LastStatusType = StatusTypeDTO.Delivered,
+        LastTrackingStatusType = TrackingStatusTypeDTO.Delivered,
         IsDelivered = true,
     };
 

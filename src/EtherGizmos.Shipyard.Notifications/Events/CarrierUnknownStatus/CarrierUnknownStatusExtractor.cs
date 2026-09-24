@@ -27,10 +27,10 @@ internal class CarrierUnknownStatusExtractor : IDomainEventExtractor
         IUnitOfWork unitOfWork,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var property = entry.Property(nameof(Package.LastStatusTypeId));
+        var property = entry.Property(nameof(Package.LastTrackingStatusTypeId));
         var current = property.CurrentValue as int?;
         var original = property.OriginalValue as int?;
-        if (current == StatusTypeId.Unknown
+        if (current == TrackingStatusTypeId.Unknown
             && current != original)
         {
             var uri = new Uri(_selfOptions.CurrentValue.BaseUrl);

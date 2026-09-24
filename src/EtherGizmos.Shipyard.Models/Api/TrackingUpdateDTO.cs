@@ -17,7 +17,7 @@ public class TrackingUpdateDTO
 
     public DateTimeOffset OccurredAt { get; set; }
 
-    public StatusTypeDTO StatusType { get; set; }
+    public TrackingStatusTypeDTO TrackingStatusType { get; set; }
 
     public string? Location { get; set; }
 
@@ -40,7 +40,7 @@ public class TrackingUpdateDTOProfile : Profile
         toDto.MapMember(dest => dest.ModifiedAt, src => src.ModifiedAt);
         /*  End Audit  */
         toDto.MapMember(dest => dest.OccurredAt, src => src.OccurredAt);
-        toDto.MapMember(dest => dest.StatusType, src => src.StatusTypeId);
+        toDto.MapMember(dest => dest.TrackingStatusType, src => src.TrackingStatusTypeId);
         toDto.MapMember(dest => dest.Location, src => src.Location);
         toDto.MapMember(dest => dest.Description, src => src.Description);
         toDto.MapMember(dest => dest.PackageId, src => src.PackageId);
@@ -49,7 +49,7 @@ public class TrackingUpdateDTOProfile : Profile
         var fromDto = mapper.CreateMap<TrackingUpdateDTO, TrackingUpdate>();
         fromDto.IgnoreAllMembers();
         fromDto.MapMember(dest => dest.OccurredAt, src => src.OccurredAt);
-        fromDto.MapMember(dest => dest.StatusTypeId, src => src.StatusType);
+        fromDto.MapMember(dest => dest.TrackingStatusTypeId, src => src.TrackingStatusType);
         fromDto.MapMember(dest => dest.Location, src => src.Location);
         fromDto.MapMember(dest => dest.Description, src => src.Description);
         fromDto.MapMember(dest => dest.PackageId, src => src.PackageId);
@@ -66,7 +66,7 @@ public static class TrackingUpdateDTOExamples
         CreatedAt = DateTimeOffset.UtcNow,
         ModifiedAt = DateTimeOffset.UtcNow,
         OccurredAt = DateTimeOffset.UtcNow,
-        StatusType = StatusTypeDTO.Delivered,
+        TrackingStatusType = TrackingStatusTypeDTO.Delivered,
         Location = "Chicago, IL 60007",
         Description = "Delivery completed; more comments",
     };

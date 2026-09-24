@@ -138,7 +138,7 @@ internal class RunbookBrowserTrackingProvider : ITrackingProvider, IDisposable
                 return new TrackingResultDetail()
                 {
                     OccurredAt = occurredAt,
-                    StatusTypeId = StatusTypeId.Unknown,
+                    StatusTypeId = TrackingStatusTypeId.Unknown,
                     Location = NullIfEmpty(location),
                     Description = NullIfEmpty(description),
                 };

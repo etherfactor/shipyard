@@ -171,7 +171,7 @@ public class PackagesController : AutoODataController
 
         package.LastPollAt = DateTimeOffset.UtcNow;
         package.NextPollAt = package.LastPollAt
-            + BaseDelay * (double)package.LastStatusType.PollingFactor;
+            + BaseDelay * (double)package.LastTrackingStatusType.PollingFactor;
 
         await uow.SaveChangesAsync(cancellationToken);
 
@@ -200,17 +200,17 @@ public class PackagesController : AutoODataController
             KeyMapping<Package, PackageDTO, int>.Create(id, e => e.Id, e => e.Id))
             .OnUpdating(async (db, dto) =>
             {
-                var prevStatusTypeId = db.LastStatusTypeId;
-                db.LastStatusTypeId = db.TrackingUpdates
+                var prevStatusTypeId = db.LastTrackingStatusTypeId;
+                db.LastTrackingStatusTypeId = db.TrackingUpdates
                     .OrderByDescending(e => e.OccurredAt)
-                    .Select(e => e.StatusTypeId)
+                    .Select(e => e.TrackingStatusTypeId)
                     .FirstOrDefault();
 
                 using var uow = _uowFactory.Create();
-                var statusRepo = uow.Repository<StatusType>();
+                var statusRepo = uow.Repository<TrackingStatusType>();
 
                 var status = await statusRepo.Data
-                    .SingleAsync(e => e.Id == db.LastStatusTypeId);
+                    .SingleAsync(e => e.Id == db.LastTrackingStatusTypeId);
 
                 var nextTime = status.IsFinal
                     ? DateTimeOffset.MaxValue
@@ -218,6 +218,6 @@ public class PackagesController : AutoODataController
 
                 db.NextPollAt = nextTime;
 
-                db.IsDelivered = db.LastStatusTypeId == StatusTypeId.Delivered;
+                db.IsDelivered = db.LastTrackingStatusTypeId == TrackingStatusTypeId.Delivered;
             });
 }

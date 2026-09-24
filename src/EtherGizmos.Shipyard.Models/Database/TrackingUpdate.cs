@@ -14,9 +14,9 @@ public class TrackingUpdate : Auditable, IEntity
 
     public virtual DateTimeOffset OccurredAt { get; set; }
 
-    public virtual int StatusTypeId { get; set; }
+    public virtual int TrackingStatusTypeId { get; set; }
 
-    public virtual StatusType StatusType { get; set; } = null!;
+    public virtual TrackingStatusType TrackingStatusType { get; set; } = null!;
 
     public virtual string? Location { get; set; }
 
@@ -33,7 +33,7 @@ public class TrackingUpdateComparer : IEqualityComparer<TrackingUpdate>
             return x == y;
 
         return x.OccurredAt.Round(ROUND_INTERVAL) == y.OccurredAt.Round(ROUND_INTERVAL)
-            && x.StatusTypeId == y.StatusTypeId
+            && x.TrackingStatusTypeId == y.TrackingStatusTypeId
             && x.Location == y.Location;
     }
 
@@ -41,7 +41,7 @@ public class TrackingUpdateComparer : IEqualityComparer<TrackingUpdate>
     {
         return HashCode.Combine(
             obj.OccurredAt,
-            obj.StatusTypeId,
+            obj.TrackingStatusTypeId,
             obj.Location ?? "");
     }
 }

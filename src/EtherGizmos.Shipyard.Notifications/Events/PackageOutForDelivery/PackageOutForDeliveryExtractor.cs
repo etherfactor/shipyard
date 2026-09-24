@@ -27,10 +27,10 @@ internal class PackageOutForDeliveryExtractor : IDomainEventExtractor
         IUnitOfWork unitOfWork,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var property = entry.Property(nameof(Package.LastStatusTypeId));
+        var property = entry.Property(nameof(Package.LastTrackingStatusTypeId));
         var current = property.CurrentValue as int?;
         var original = property.OriginalValue as int?;
-        if (current == StatusTypeId.OutForDelivery
+        if (current == TrackingStatusTypeId.OutForDelivery
             && current != original)
         {
             var uri = new Uri(_selfOptions.CurrentValue.BaseUrl);
@@ -54,7 +54,7 @@ internal class PackageOutForDeliveryExtractor : IDomainEventExtractor
                 Contents = package.Contents,
                 Updates = [.. package.TrackingUpdates.Select(e => new PackageOutForDeliveryEventUpdate()
                 {
-                    Status = e.StatusType.Name,
+                    Status = e.TrackingStatusType.Name,
                     OccurredAt = e.OccurredAt,
                     Location = e.Location,
                     Description = e.Description,

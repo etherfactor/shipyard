@@ -1,6 +1,6 @@
 namespace EtherGizmos.Shipyard.Database.Enums;
 
-public static class StatusTypeId
+public static class TrackingStatusTypeId
 {
     public const int Unknown = 0;
 

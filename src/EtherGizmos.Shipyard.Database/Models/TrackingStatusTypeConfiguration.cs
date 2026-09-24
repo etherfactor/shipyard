@@ -5,17 +5,17 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EtherGizmos.Shipyard.Models;
 
-public class StatusTypeConfiguration : IEntityTypeConfiguration<StatusType>
+public class TrackingStatusTypeConfiguration : IEntityTypeConfiguration<TrackingStatusType>
 {
     public void Configure(
-        EntityTypeBuilder<StatusType> entity)
+        EntityTypeBuilder<TrackingStatusType> entity)
     {
-        entity.ToTable("status_types", table => table.HasTrigger("TR"));
+        entity.ToTable("tracking_status_types", table => table.HasTrigger("TR"));
 
         entity.HasKey(e => e.Id);
 
         entity.Property(e => e.Id)
-            .HasColumnName("status_type_id");
+            .HasColumnName("tracking_status_type_id");
 
         entity.AuditProperties();
 

@@ -51,7 +51,7 @@ public class ApplicationContext : DbContext
 
     public virtual DbSet<RoleUser> RoleUsers { get; set; }
 
-    public virtual DbSet<StatusType> StatusTypes { get; set; }
+    public virtual DbSet<TrackingStatusType> StatusTypes { get; set; }
 
     public virtual DbSet<TrackingUpdate> TrackingUpdates { get; set; }
 

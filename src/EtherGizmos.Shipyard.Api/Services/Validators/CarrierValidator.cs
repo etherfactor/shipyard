@@ -130,7 +130,7 @@ internal class CarrierValidator : IModelValidator<Carrier>
             var rule = carrier.Rules[i];
 
             var pattern = rule.Pattern;
-            var statusType = rule.StatusType;
+            var statusType = rule.TrackingStatusType;
             var priority = rule.Priority;
 
             var path = $"rules[{i}].";

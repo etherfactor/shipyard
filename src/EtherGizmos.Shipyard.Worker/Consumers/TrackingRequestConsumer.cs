@@ -67,7 +67,7 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
                 .Select(e => new TrackingUpdateDTO()
                 {
                     OccurredAt = e.OccurredAt,
-                    StatusType = (StatusTypeDTO)e.StatusTypeId,
+                    TrackingStatusType = (TrackingStatusTypeDTO)e.StatusTypeId,
                     Location = e.Location,
                     Description = e.Description,
                     PackageId = message.PackageId,
@@ -93,7 +93,7 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
                 var current = updates[update.OccurredAt];
                 update.Id = current.Id;
 
-                if (current.StatusType != update.StatusType
+                if (current.TrackingStatusType != update.TrackingStatusType
                     || current.Location != update.Location
                     || current.Description != update.Description)
                 {
@@ -110,7 +110,7 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
                         new
                         {
                             occurredAt = update.OccurredAt,
-                            statusType = update.StatusType.ToString(),
+                            statusType = update.TrackingStatusType.ToString(),
                             location = update.Location,
                             description = update.Description,
                             packageId = update.PackageId,
@@ -123,7 +123,7 @@ public class TrackingRequestConsumer : IMessageConsumer<TrackingRequest>
                         new
                         {
                             occurredAt = update.OccurredAt,
-                            statusType = update.StatusType.ToString(),
+                            statusType = update.TrackingStatusType.ToString(),
                             location = update.Location,
                             description = update.Description,
                             packageId = update.PackageId,

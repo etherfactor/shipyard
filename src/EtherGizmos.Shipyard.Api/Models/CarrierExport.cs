@@ -165,16 +165,16 @@ public partial class CarrierRuleExportV1
         CarrierStatusRule rule)
     {
         Pattern = rule.Pattern;
-        StatusType = rule.StatusTypeId switch
+        StatusType = rule.TrackingStatusTypeId switch
         {
-            1 => StatusTypeDTO.Waiting,
-            10 => StatusTypeDTO.InTransit,
-            20 => StatusTypeDTO.OutForDelivery,
-            100 => StatusTypeDTO.Delivered,
-            -10 => StatusTypeDTO.FailedAttempt,
-            -100 => StatusTypeDTO.Returned,
-            -200 => StatusTypeDTO.Expired,
-            _ => StatusTypeDTO.Unknown
+            1 => TrackingStatusTypeDTO.Waiting,
+            10 => TrackingStatusTypeDTO.InTransit,
+            20 => TrackingStatusTypeDTO.OutForDelivery,
+            100 => TrackingStatusTypeDTO.Delivered,
+            -10 => TrackingStatusTypeDTO.FailedAttempt,
+            -100 => TrackingStatusTypeDTO.Returned,
+            -200 => TrackingStatusTypeDTO.Expired,
+            _ => TrackingStatusTypeDTO.Unknown
         };
         Priority = rule.Priority;
         IsActive = rule.IsActive;
@@ -184,7 +184,7 @@ public partial class CarrierRuleExportV1
     public string Pattern { get; set; } = null!;
 
     [Required]
-    public StatusTypeDTO StatusType { get; set; }
+    public TrackingStatusTypeDTO StatusType { get; set; }
 
     public int Priority { get; set; } = 999999;
 
@@ -194,7 +194,7 @@ public partial class CarrierRuleExportV1
         CarrierStatusRule rule)
     {
         rule.Pattern = Pattern;
-        rule.StatusTypeId = (int)StatusType;
+        rule.TrackingStatusTypeId = (int)StatusType;
         rule.Priority = Priority;
         rule.IsActive = IsActive;
 

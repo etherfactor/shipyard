@@ -8,7 +8,10 @@ namespace EtherGizmos.Shipyard.Models;
 
 public class PackageDTOConfiguration : IModelConfiguration
 {
-    public void Apply(ODataModelBuilder builder, ApiVersion apiVersion, string? routePrefix)
+    public void Apply(
+        ODataModelBuilder builder,
+        ApiVersion apiVersion,
+        string? routePrefix)
     {
         var entitySet = builder.EntitySet<PackageDTO>("packages");
         var entity = entitySet.EntityType;
@@ -30,12 +33,23 @@ public class PackageDTOConfiguration : IModelConfiguration
             entity.Property(e => e.CarrierId);
             entity.HasRequired(e => e.Carrier);
             entity.Property(e => e.TrackingNumber);
+            entity.Property(e => e.IsItemized);
             entity.Property(e => e.Contents);
+            entity.Property(e => e.OrderFulfillmentId);
+            entity.HasOptional(e => e.OrderFulfillment);
             entity.Property(e => e.EstimatedDeliveryAt);
             entity.Property(e => e.LastPollAt);
             entity.Property(e => e.NextPollAt);
-            entity.EnumProperty(e => e.LastStatusType);
+            entity.EnumProperty(e => e.LastTrackingStatusType);
             entity.Property(e => e.IsDelivered);
+            entity.Property(e => e.ReceivedAt);
+            entity.Property(e => e.ReceivedByUserId);
+            entity.HasOptional(e => e.ReceivedByUser);
+            entity.Property(e => e.ResolvedAt);
+            entity.Property(e => e.ResolvedByUserId);
+            entity.HasOptional(e => e.ResolvedByUser);
+            entity.Property(e => e.ResolvedReason);
+            entity.CollectionProperty(e => e.PackageItems);
             entity.HasMany(e => e.TrackingUpdates);
 
             builder.Function("findUpdatedPackages")

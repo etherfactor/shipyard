@@ -29,12 +29,12 @@ public class CarrierStatusRuleConfiguration : IEntityTypeConfiguration<CarrierSt
         entity.Property(e => e.Pattern)
             .HasColumnName("pattern");
 
-        entity.Property(e => e.StatusTypeId)
-            .HasColumnName("status_type_id");
+        entity.Property(e => e.TrackingStatusTypeId)
+            .HasColumnName("tracking_status_type_id");
 
-        entity.HasOne(e => e.StatusType)
+        entity.HasOne(e => e.TrackingStatusType)
             .WithMany()
-            .HasForeignKey(e => e.StatusTypeId);
+            .HasForeignKey(e => e.TrackingStatusTypeId);
 
         entity.Property(e => e.Priority)
             .HasColumnName("priority");

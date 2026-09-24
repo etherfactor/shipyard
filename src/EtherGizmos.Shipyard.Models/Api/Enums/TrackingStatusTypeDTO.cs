@@ -1,6 +1,6 @@
 namespace EtherGizmos.Shipyard.Api.Enums;
 
-public enum StatusTypeDTO
+public enum TrackingStatusTypeDTO
 {
     Unknown = 0,
     Waiting = 1,

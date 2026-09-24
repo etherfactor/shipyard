@@ -35,8 +35,18 @@ public class PackageConfiguration : IEntityTypeConfiguration<Package>
         entity.Property(e => e.TrackingNumber)
             .HasColumnName("tracking_number");
 
+        entity.Property(e => e.IsItemized)
+            .HasColumnName("is_itemized");
+
         entity.Property(e => e.Contents)
             .HasColumnName("contents");
+
+        entity.Property(e => e.OrderFulfillmentId)
+            .HasColumnName("order_fulfillment_id");
+
+        entity.HasOne(e => e.OrderFulfillment)
+            .WithOne()
+            .HasForeignKey<Package>(e => e.OrderFulfillmentId);
 
         entity.Property(e => e.EstimatedDeliveryAt)
             .HasColumnName("estimated_delivery_at_utc");
@@ -47,15 +57,42 @@ public class PackageConfiguration : IEntityTypeConfiguration<Package>
         entity.Property(e => e.NextPollAt)
             .HasColumnName("next_poll_at_utc");
 
-        entity.Property(e => e.LastStatusTypeId)
-            .HasColumnName("last_status_type_id");
+        entity.Property(e => e.LastTrackingStatusTypeId)
+            .HasColumnName("last_tracking_status_type_id");
 
-        entity.HasOne(e => e.LastStatusType)
+        entity.HasOne(e => e.LastTrackingStatusType)
             .WithMany()
-            .HasForeignKey(e => e.LastStatusTypeId);
+            .HasForeignKey(e => e.LastTrackingStatusTypeId);
 
         entity.Property(e => e.IsDelivered)
             .HasColumnName("is_delivered");
+
+        entity.Property(e => e.ReceivedAt)
+            .HasColumnName("received_at_utc");
+
+        entity.Property(e => e.ReceivedByUserId)
+            .HasColumnName("received_by_user_id");
+
+        entity.HasOne(e => e.ReceivedByUser)
+            .WithMany()
+            .HasForeignKey(e => e.ReceivedByUserId);
+
+        entity.Property(e => e.ResolvedAt)
+            .HasColumnName("resolved_at_utc");
+
+        entity.Property(e => e.ResolvedByUserId)
+            .HasColumnName("resolved_by_user_id");
+
+        entity.HasOne(e => e.ResolvedByUser)
+            .WithMany()
+            .HasForeignKey(e => e.ResolvedByUserId);
+
+        entity.Property(e => e.ResolvedReason)
+            .HasColumnName("resolved_reason");
+
+        entity.HasMany(e => e.PackageItems)
+            .WithOne(e => e.Package)
+            .HasForeignKey(e => e.PackageId);
 
         entity.HasMany(e => e.TrackingUpdates)
             .WithOne(e => e.Package)

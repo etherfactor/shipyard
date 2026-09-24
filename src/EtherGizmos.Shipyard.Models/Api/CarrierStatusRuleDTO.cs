@@ -19,7 +19,7 @@ public class CarrierStatusRuleDTO
     public string Pattern { get; set; } = null!;
 
     [Required]
-    public StatusTypeDTO StatusType { get; set; }
+    public TrackingStatusTypeDTO TrackingStatusType { get; set; }
 
     /// <summary>
     /// Lower numbers take precedence, in the case of a conflict.
@@ -40,14 +40,14 @@ public class CarrierStatusRuleDTOProfile : Profile
         toDto.MapMember(dest => dest.ModifiedAt, src => src.ModifiedAt);
         /*  End Audit  */
         toDto.MapMember(dest => dest.Pattern, src => src.Pattern);
-        toDto.MapMember(dest => dest.StatusType, src => src.StatusTypeId);
+        toDto.MapMember(dest => dest.TrackingStatusType, src => src.TrackingStatusTypeId);
         toDto.MapMember(dest => dest.Priority, src => src.Priority);
         toDto.MapMember(dest => dest.IsActive, src => src.IsActive);
 
         var fromDto = mapper.CreateMap<CarrierStatusRuleDTO, CarrierStatusRule>();
         fromDto.IgnoreAllMembers();
         fromDto.MapMember(dest => dest.Pattern, src => src.Pattern);
-        fromDto.MapMember(dest => dest.StatusTypeId, src => src.StatusType);
+        fromDto.MapMember(dest => dest.TrackingStatusTypeId, src => src.TrackingStatusType);
         fromDto.MapMember(dest => dest.Priority, src => src.Priority);
         fromDto.MapMember(dest => dest.IsActive, src => src.IsActive);
     })
@@ -62,7 +62,7 @@ public static class CarrierStatusRuleDTOExamples
         CreatedAt = DateTimeOffset.UtcNow,
         ModifiedAt = DateTimeOffset.UtcNow,
         Pattern = "^(?i)out for delivery$",
-        StatusType = StatusTypeDTO.OutForDelivery,
+        TrackingStatusType = TrackingStatusTypeDTO.OutForDelivery,
         Priority = 0,
         IsActive = true,
     };

@@ -24,7 +24,7 @@ public class CarrierStatusRuleDTOConfiguration : IModelConfiguration
             complex.Property(e => e.ModifiedAt);
             /*  End Audit  */
             complex.Property(e => e.Pattern);
-            complex.EnumProperty(e => e.StatusType);
+            complex.EnumProperty(e => e.TrackingStatusType);
             complex.Property(e => e.Priority);
             complex.Property(e => e.IsActive);
         }

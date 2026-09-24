@@ -12,9 +12,9 @@ public class CarrierStatusRule : Auditable, IEntity
 
     public virtual string Pattern { get; set; } = null!;
 
-    public virtual int StatusTypeId { get; set; }
+    public virtual int TrackingStatusTypeId { get; set; }
 
-    public virtual StatusType StatusType { get; set; } = null!;
+    public virtual TrackingStatusType TrackingStatusType { get; set; } = null!;
 
     public virtual int Priority { get; set; }
 

@@ -68,7 +68,7 @@ internal class PackageEtaChangedExtractor : IDomainEventExtractor
                 PreviousEta = original,
                 Updates = [.. package.TrackingUpdates.Select(e => new PackageEtaChangedEventUpdate()
                 {
-                    Status = e.StatusType.Name,
+                    Status = e.TrackingStatusType.Name,
                     OccurredAt = e.OccurredAt,
                     Location = e.Location,
                     Description = e.Description,

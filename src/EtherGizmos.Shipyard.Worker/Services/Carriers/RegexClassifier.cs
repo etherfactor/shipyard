@@ -39,10 +39,10 @@ internal class RegexClassifier : IRegexClassifier
             var regex = new Regex(rule.Pattern);
             if (regex.IsMatch(description))
             {
-                return (int)rule.StatusType;
+                return (int)rule.TrackingStatusType;
             }
         }
 
-        return StatusTypeId.Unknown;
+        return TrackingStatusTypeId.Unknown;
     }
 }
