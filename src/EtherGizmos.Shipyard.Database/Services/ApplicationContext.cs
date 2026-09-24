@@ -179,5 +179,13 @@ public class ApplicationContext : DbContext
                 && acl.PermissionId == PermissionId.Read
                 && acl.IsGrant == 1
                 && acl.UserId == record.Id));
+
+        //**********************************************************
+        // Add Value Converters
+
+        if (Database.IsNpgsql())
+        {
+            modelBuilder.AddGlobalColumnType<string>("citext");
+        }
     }
 }
