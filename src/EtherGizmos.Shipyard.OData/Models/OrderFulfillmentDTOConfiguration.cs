@@ -42,7 +42,7 @@ public class OrderFulfillmentDTOConfiguration : IModelConfiguration
             entity.Property(e => e.ResolvedByUserId);
             entity.HasOptional(e => e.ResolvedByUser);
             entity.Property(e => e.ResolvedReason);
-            entity.CollectionProperty(e => e.OrderFulfillmentItems);
+            entity.HasMany(e => e.OrderFulfillmentItems);
         }
     }
 }

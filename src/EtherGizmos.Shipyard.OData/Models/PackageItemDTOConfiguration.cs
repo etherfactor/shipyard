@@ -13,20 +13,28 @@ public class PackageItemDTOConfiguration : IModelConfiguration
         ApiVersion apiVersion,
         string? routePrefix)
     {
-        var complex = builder.ComplexType<PackageItemDTO>();
+        var entitySet = builder.EntitySet<PackageItemDTO>("packageItems");
+        var entity = entitySet.EntityType;
 
-        complex.Namespace = "EtherGizmos.Shipyard";
-        complex.Name = complex.Name.Replace("DTO", "");
+        entity.Namespace = "EtherGizmos.Shipyard";
+        entity.Name = entity.Name.Replace("DTO", "");
 
-        complex.IgnoreAll();
+        entity.IgnoreAll();
 
         if (apiVersion >= ApiVersions.V0_1)
         {
-            complex.Property(e => e.OrderFulfillmentItemId);
-            complex.HasOptional(e => e.OrderFulfillmentItem);
-            complex.Property(e => e.Description);
-            complex.Property(e => e.Quantity);
-            complex.Property(e => e.QuantityUnits);
+            entity.Property(e => e.Id);
+            /* Begin Audit */
+            entity.Property(e => e.CreatedAt);
+            entity.Property(e => e.ModifiedAt);
+            /*  End Audit  */
+            entity.Property(e => e.PackageId);
+            entity.HasRequired(e => e.Package);
+            entity.Property(e => e.OrderFulfillmentItemId);
+            entity.HasOptional(e => e.OrderFulfillmentItem);
+            entity.Property(e => e.Description);
+            entity.Property(e => e.Quantity);
+            entity.Property(e => e.QuantityUnits);
         }
     }
 }

@@ -37,7 +37,7 @@ public class OrderDTOConfiguration : IModelConfiguration
             entity.Property(e => e.OrderUrl);
             entity.Property(e => e.ExpectedShipStartOn);
             entity.Property(e => e.ExpectedShipEndOn);
-            entity.CollectionProperty(e => e.OrderItems);
+            entity.HasMany(e => e.OrderItems);
         }
     }
 }

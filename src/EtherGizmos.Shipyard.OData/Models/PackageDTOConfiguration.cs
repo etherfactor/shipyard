@@ -49,7 +49,7 @@ public class PackageDTOConfiguration : IModelConfiguration
             entity.Property(e => e.ResolvedByUserId);
             entity.HasOptional(e => e.ResolvedByUser);
             entity.Property(e => e.ResolvedReason);
-            entity.CollectionProperty(e => e.PackageItems);
+            entity.HasMany(e => e.PackageItems);
             entity.HasMany(e => e.TrackingUpdates);
 
             builder.Function("findUpdatedPackages")

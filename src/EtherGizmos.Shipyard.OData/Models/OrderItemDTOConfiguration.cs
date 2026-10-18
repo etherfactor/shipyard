@@ -13,20 +13,30 @@ public class OrderItemDTOConfiguration : IModelConfiguration
         ApiVersion apiVersion,
         string? routePrefix)
     {
-        var complex = builder.ComplexType<OrderItemDTO>();
+        var entitySet = builder.EntitySet<OrderItemDTO>("orderItems");
+        var entity = entitySet.EntityType;
 
-        complex.Namespace = "EtherGizmos.Shipyard";
-        complex.Name = complex.Name.Replace("DTO", "");
+        entity.Namespace = "EtherGizmos.Shipyard";
+        entity.Name = entity.Name.Replace("DTO", "");
 
-        complex.IgnoreAll();
+        entity.IgnoreAll();
 
         if (apiVersion >= ApiVersions.V0_1)
         {
-            complex.Property(e => e.Description);
-            complex.Property(e => e.Quantity);
-            complex.Property(e => e.QuantityUnits);
-            complex.Property(e => e.UnitPrice);
-            complex.Property(e => e.TotalPrice);
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id);
+            /* Begin Audit */
+            entity.Property(e => e.CreatedAt);
+            entity.Property(e => e.ModifiedAt);
+            /*  End Audit  */
+            entity.Property(e => e.OrderId);
+            entity.HasRequired(e => e.Order);
+            entity.Property(e => e.Description);
+            entity.Property(e => e.Quantity);
+            entity.Property(e => e.QuantityUnits);
+            entity.Property(e => e.UnitPrice);
+            entity.Property(e => e.TotalPrice);
         }
     }
 }

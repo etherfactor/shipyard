@@ -1,8 +1,9 @@
-﻿using EtherGizmos.Shipyard.Database.Enums;
+﻿using EtherGizmos.Common.Abstractions;
+using EtherGizmos.Shipyard.Database.Enums;
 
 namespace EtherGizmos.Shipyard.Database;
 
-public class OrderFulfillment
+public class OrderFulfillment : Auditable, IEntity
 {
     public virtual int Id { get; set; }
 
