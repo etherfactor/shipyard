@@ -58,11 +58,11 @@ export class DashboardComponent implements OnInit {
       .filter(e =>
         o.or(
           o.eq(
-            e.prop("lastStatusType"),
+            e.prop("lastTrackingStatusType"),
             o.string(StatusType.InTransit),
           ),
           o.eq(
-            e.prop("lastStatusType"),
+            e.prop("lastTrackingStatusType"),
             o.string(StatusType.OutForDelivery),
           ),
         ),
@@ -89,7 +89,7 @@ export class DashboardComponent implements OnInit {
             o.dateTime(DateTime.now().minus({ days: 30 })),
           ),
           o.eq(
-            e.prop("lastStatusType"),
+            e.prop("lastTrackingStatusType"),
             o.string(StatusType.Delivered),
           ),
         ),
@@ -112,7 +112,7 @@ export class DashboardComponent implements OnInit {
       .filter(e =>
         o.and(
           o.eq(
-            e.prop("lastStatusType"),
+            e.prop("lastTrackingStatusType"),
             o.string(StatusType.Unknown),
           ),
         ),

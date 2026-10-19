@@ -150,7 +150,7 @@ export class PackageDetailComponent implements OnInit {
 
       this.load();
     } else {
-      this.package$$.set({ lastStatusType: StatusType.Unknown } as Package);
+      this.package$$.set({ lastTrackingStatusType: StatusType.Unknown } as Package);
       this.form$$.set(packageForm(this.$form, {} as Package));
 
       this.onEdit();

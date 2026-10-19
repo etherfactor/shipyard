@@ -16,7 +16,7 @@ export const PackageZ = z.object({
   estimatedDeliveryAt: DateTimeZ.nullish(),
   lastPollAt: DateTimeZ,
   nextPollAt: DateTimeZ,
-  lastStatusType: z.nativeEnum(StatusType),
+  lastTrackingStatusType: z.enum(StatusType),
   isDelivered: z.boolean(),
   trackingUpdates: z.array(TrackingUpdateZ).nullish(),
 });
@@ -35,6 +35,6 @@ export const packageForm = formFactoryForModel<PackageF>(($form, model) => ({
   estimatedDeliveryAt: [model.estimatedDeliveryAt],
   lastPollAt: [model.lastPollAt],
   nextPollAt: [model.nextPollAt],
-  lastStatusType: [model.lastStatusType],
+  lastTrackingStatusType: [model.lastTrackingStatusType],
   isDelivered: [model.isDelivered],
 }));
