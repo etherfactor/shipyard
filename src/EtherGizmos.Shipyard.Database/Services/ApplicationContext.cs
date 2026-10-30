@@ -27,6 +27,8 @@ public class ApplicationContext : DbContext
 
     public virtual DbSet<AclGroup> AclGroups { get; set; }
 
+    public virtual DbSet<AclOrder> AclOrders { get; set; }
+
     public virtual DbSet<AclPackage> AclPackages { get; set; }
 
     public virtual DbSet<AclRole> AclRoles { get; set; }
@@ -45,7 +47,17 @@ public class ApplicationContext : DbContext
 
     public virtual DbSet<NotificationUnsubscribeKey> NotificationUnsubscribeKeys { get; set; }
 
+    public virtual DbSet<Order> Orders { get; set; }
+
+    public virtual DbSet<OrderFulfillment> OrderFulfillments { get; set; }
+
+    public virtual DbSet<OrderFulfillmentItem> OrderFulfillmentItems { get; set; }
+
+    public virtual DbSet<OrderItem> OrderItems { get; set; }
+
     public virtual DbSet<Package> Packages { get; set; }
+
+    public virtual DbSet<PackageItem> PackageItems { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
 
@@ -156,6 +168,38 @@ public class ApplicationContext : DbContext
                 && acl.IsGrant == 1
                 && acl.GroupId == record.Id));
 
+        modelBuilder.Entity<Order>()
+            .HasQueryFilter(record => _filterContext.Disabled || AclOrders.Any(acl =>
+                _userContext.UserId != null
+                && acl.PrincipalUserId == _userContext.UserId
+                && acl.PermissionId == PermissionId.Read
+                && acl.IsGrant == 1
+                && acl.OrderId == record.Id));
+
+        modelBuilder.Entity<OrderItem>()
+            .HasQueryFilter(record => _filterContext.Disabled || AclOrders.Any(acl =>
+                _userContext.UserId != null
+                && acl.PrincipalUserId == _userContext.UserId
+                && acl.PermissionId == PermissionId.Read
+                && acl.IsGrant == 1
+                && acl.OrderId == record.OrderId));
+
+        modelBuilder.Entity<OrderFulfillment>()
+            .HasQueryFilter(record => _filterContext.Disabled || AclOrders.Any(acl =>
+                _userContext.UserId != null
+                && acl.PrincipalUserId == _userContext.UserId
+                && acl.PermissionId == PermissionId.Read
+                && acl.IsGrant == 1
+                && acl.OrderId == record.OrderId));
+
+        modelBuilder.Entity<OrderFulfillmentItem>()
+            .HasQueryFilter(record => _filterContext.Disabled || AclOrders.Any(acl =>
+                _userContext.UserId != null
+                && acl.PrincipalUserId == _userContext.UserId
+                && acl.PermissionId == PermissionId.Read
+                && acl.IsGrant == 1
+                && acl.OrderId == record.OrderFulfillment.OrderId));
+
         modelBuilder.Entity<Package>()
             .HasQueryFilter(record => _filterContext.Disabled || AclPackages.Any(acl =>
                 _userContext.UserId != null
@@ -163,6 +207,14 @@ public class ApplicationContext : DbContext
                 && acl.PermissionId == PermissionId.Read
                 && acl.IsGrant == 1
                 && acl.PackageId == record.Id));
+
+        modelBuilder.Entity<PackageItem>()
+            .HasQueryFilter(record => _filterContext.Disabled || AclPackages.Any(acl =>
+                _userContext.UserId != null
+                && acl.PrincipalUserId == _userContext.UserId
+                && acl.PermissionId == PermissionId.Read
+                && acl.IsGrant == 1
+                && acl.PackageId == record.PackageId));
 
         modelBuilder.Entity<TrackingUpdate>()
             .HasQueryFilter(record => _filterContext.Disabled || AclPackages.Any(acl =>

@@ -1,4 +1,5 @@
 ﻿using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,6 +16,8 @@ public class PackageItemConfiguration : IEntityTypeConfiguration<PackageItem>
 
         entity.Property(e => e.Id)
             .HasColumnName("package_item_id");
+
+        entity.AuditProperties();
 
         entity.Property(e => e.PackageId)
             .HasColumnName("package_id");

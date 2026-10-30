@@ -1,9 +1,10 @@
 <div aria-live="polite" aria-atomic="true" class="position-absolute" style="right: 10px; bottom: 10px;">
-  @for (toast of toasts$$(); track toast) {
+  @for (toast of toasts$$(); track toast; let i = $index) {
   <ngb-toast [header]="toast.header"
              [autohide]="!!toast.delay"
              [delay]="toast.delay ?? 0"
              (hidden)="hide(toast)"
+             [class.mt-2]="i > 0"
              [class]="toast.theme ? [toast.theme] : []"
              role="alert"
              aria-live="assertive"

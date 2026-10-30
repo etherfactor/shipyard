@@ -22,9 +22,19 @@ public class Migration001_CreateOrderTables : AutoReversingMigration
             .WithColumn("total_price").AsDecimal(18, 3).Nullable()
             .WithColumn("order_url").AsString(int.MaxValue).Nullable()
             .WithColumn("expected_ship_start_on").AsDate().Nullable()
-            .WithColumn("expected_ship_end_on").AsDate().Nullable();
+            .WithColumn("expected_ship_end_on").AsDate().Nullable()
+            .WithColumn("group_id").AsInt32().NotNullable()
+            .WithColumn("securable_id").AsGuid().NotNullable();
 
         Create.AuditTriggerV1("orders", ("order_id", DbType.Int32));
+
+        Create.ForeignKey("FK_orders_group_id")
+            .FromTable("orders").ForeignColumn("group_id")
+            .ToTable("groups").PrimaryColumn("group_id");
+
+        Create.ForeignKey("FK_orders_securable_id")
+            .FromTable("orders").ForeignColumn("securable_id")
+            .ToTable("securables").InSchema("acl").PrimaryColumn("securable_id");
 
         /*
          * Create [dbo].[order_items]
@@ -76,7 +86,8 @@ public class Migration001_CreateOrderTables : AutoReversingMigration
             .WithColumn("received_by_user_id").AsGuid().Nullable()
             .WithColumn("resolved_at_utc").AsDateTime2().Nullable()
             .WithColumn("resolved_by_user_id").AsGuid().Nullable()
-            .WithColumn("resolved_reason").AsString(int.MaxValue).Nullable();
+            .WithColumn("resolved_reason").AsString(int.MaxValue).Nullable()
+            .WithColumn("securable_id").AsGuid().Nullable();
 
         Create.AuditTriggerV1("order_fulfillments", ("order_fulfillment_id", DbType.Int32));
 
@@ -115,6 +126,10 @@ public class Migration001_CreateOrderTables : AutoReversingMigration
         Create.Index("IX_order_fulfillments_resolved_at_utc")
             .OnTable("order_fulfillments")
             .OnColumn("resolved_at_utc").Ascending();
+
+        Create.ForeignKey("FK_order_fulfillments_securable_id")
+            .FromTable("order_fulfillments").ForeignColumn("securable_id")
+            .ToTable("securables").InSchema("acl").PrimaryColumn("securable_id");
 
         /*
          * Create [dbo].[order_fulfillment_items]

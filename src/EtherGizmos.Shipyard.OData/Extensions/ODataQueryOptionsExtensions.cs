@@ -128,8 +128,11 @@ public static class ODataQueryOptionsExtensions
             //Return that property name
             yield return (propertyName, propertyInfo);
 
+            var subElement = (IEdmStructuredType)item.NavigationSource.Type.AsElementType();
+            var subPropertyType = propertyInfo.PropertyType.AsElementType();
+
             //Then iterate over all expansions in that property
-            foreach (var subProperty in GetExpandPropertiesInternal(model, (IEdmStructuredType)item.NavigationSource.Type.AsElementType(), propertyInfo.PropertyType, item.SelectAndExpand))
+            foreach (var subProperty in GetExpandPropertiesInternal(model, subElement, subPropertyType, item.SelectAndExpand))
             {
                 //Return the current property and all sub-expansions
                 yield return ($"{propertyName}.{subProperty.Path}", subProperty.Property);

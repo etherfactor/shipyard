@@ -17,6 +17,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         }
 
         $toast.show({
+          id: "http-unexpected-error",
           header: getErrorHeader(err),
           body: isODataErrorResponse(body)
             ? getODataErrorBody(body)

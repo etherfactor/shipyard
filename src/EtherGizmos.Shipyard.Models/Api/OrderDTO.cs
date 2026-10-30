@@ -29,6 +29,8 @@ public class OrderDTO
     public DateOnly? ExpectedShipEndOn { get; set; }
 
     public List<OrderItemDTO> OrderItems { get; set; } = [];
+
+    public List<OrderFulfillmentDTO> OrderFulfillments { get; set; } = [];
 }
 
 public class OrderDTOProfile : Profile
@@ -50,6 +52,7 @@ public class OrderDTOProfile : Profile
         toDto.MapMember(dest => dest.ExpectedShipStartOn, src => src.ExpectedShipStartOn);
         toDto.MapMember(dest => dest.ExpectedShipEndOn, src => src.ExpectedShipEndOn);
         toDto.MapMember(dest => dest.OrderItems, src => src.OrderItems, opt => opt.ExplicitExpansion());
+        toDto.MapMember(dest => dest.OrderFulfillments, src => src.OrderFulfillments, opt => opt.ExplicitExpansion());
 
         var fromDto = mapper.CreateMap<OrderDTO, Order>();
         fromDto.IgnoreAllMembers();
@@ -80,6 +83,7 @@ public static class OrderDTOExamples
         ExpectedShipStartOn = DateOnly.FromDateTime(DateTime.Now),
         ExpectedShipEndOn = DateOnly.FromDateTime(DateTime.Now),
         OrderItems = null!,
+        OrderFulfillments = null!,
     };
 
     public static OrderDTO Post { get; } = Get;

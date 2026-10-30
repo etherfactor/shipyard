@@ -100,6 +100,7 @@ export class ImportHomeComponent {
     const parsed = ImportSpecZ.safeParse(data);
     if (!parsed.success) {
       this.$toast.show({
+        id: "import-document-invalid",
         header: "Invalid Document",
         body: "The selected document is not a valid Shipyard export document.",
         theme: "danger",
@@ -112,6 +113,7 @@ export class ImportHomeComponent {
       const result = await this.$import.verify(content, isJson ? "application/json" : "application/yaml");
       if (result.status === "Error") {
         this.$toast.show({
+          id: "import-document-invalid",
           header: "Invalid Document",
           body: "The selected document failed validation:\r\n" + result.errorMessage,
           theme: "danger",

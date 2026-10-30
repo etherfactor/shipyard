@@ -52,7 +52,8 @@ internal class AppBootstrapper : IBootstrapper
         var admin = await CreateOrUpdateRoleAsync(uow,
             systemId: AppConstants.Roles.SystemOwnerSystemId,
             name: "System Owner",
-            description: "The System Owner has unrestricted access to all data and configuration in Shipyard. This role can manage carriers, users, roles, and groups across the entire instance and can see and edit every package from every group.",
+            description: "The System Owner has unrestricted access to all data and configuration in Shipyard. " +
+                "This role can manage carriers, users, roles, and groups across the entire instance and can see and edit every package and order from every group.",
             permissions:
             [
                 //Global R/W/D on carriers
@@ -64,6 +65,11 @@ internal class AppBootstrapper : IBootstrapper
                 new(SecurableType: SecurableType.Package, PermissionId: PermissionId.Read, GrantType: PermissionGrantType.Full),
                 new(SecurableType: SecurableType.Package, PermissionId: PermissionId.Write, GrantType: PermissionGrantType.Full),
                 new(SecurableType: SecurableType.Package, PermissionId: PermissionId.Delete, GrantType: PermissionGrantType.Full),
+                
+                //Global R/W/D on orders
+                new(SecurableType: SecurableType.Order, PermissionId: PermissionId.Read, GrantType: PermissionGrantType.Full),
+                new(SecurableType: SecurableType.Order, PermissionId: PermissionId.Write, GrantType: PermissionGrantType.Full),
+                new(SecurableType: SecurableType.Order, PermissionId: PermissionId.Delete, GrantType: PermissionGrantType.Full),
 
                 //Global R/W/D on users
                 new(SecurableType: SecurableType.User, PermissionId: PermissionId.Read, GrantType: PermissionGrantType.Full),
@@ -86,7 +92,8 @@ internal class AppBootstrapper : IBootstrapper
         await CreateOrUpdateRoleAsync(uow,
             systemId: AppConstants.Roles.CarrierManagerSystemId,
             name: "Carrier Manager",
-            description: "The Carrier Manager can create, edit, and delete all carriers and tracking integrations. Grant this role to a user to allow them to connect carriers without necessarily granting them full system access.",
+            description: "The Carrier Manager can create, edit, and delete all carriers and tracking integrations. " +
+                "Grant this role to a user to allow them to connect carriers without necessarily granting them full system access.",
             permissions:
             [
                 //Global R/W/D on carriers
@@ -103,7 +110,8 @@ internal class AppBootstrapper : IBootstrapper
         await CreateOrUpdateRoleAsync(uow,
             systemId: AppConstants.Roles.UserManagerSystemId,
             name: "User Manager",
-            description: "The User Manager can create, edit, and deactivate users across all groups and adjust their roles and group memberships. Grant this role to a user to allow them to manage other users without necessarily granting them full system access.",
+            description: "The User Manager can create, edit, and deactivate users across all groups and adjust their roles and group memberships. " +
+                "Grant this role to a user to allow them to manage other users without necessarily granting them full system access.",
             permissions:
             [
                 //Global R/W/D on users
@@ -123,7 +131,8 @@ internal class AppBootstrapper : IBootstrapper
         await CreateOrUpdateRoleAsync(uow,
             systemId: AppConstants.Roles.GroupOwnerSystemId,
             name: "Group Owner",
-            description: "The Group Owner manages everything within a single group. They can add, edit, or remove users in their group and fully manage that group's packages.",
+            description: "The Group Owner manages everything within a single group. " +
+                "They can add, edit, or remove users in their group and fully manage that group's packages and orders.",
             permissions:
             [
                 //Global R on carriers
@@ -133,6 +142,11 @@ internal class AppBootstrapper : IBootstrapper
                 new(SecurableType: SecurableType.Package, PermissionId: PermissionId.Read, GrantType: PermissionGrantType.Filter),
                 new(SecurableType: SecurableType.Package, PermissionId: PermissionId.Write, GrantType: PermissionGrantType.Filter),
                 new(SecurableType: SecurableType.Package, PermissionId: PermissionId.Delete, GrantType: PermissionGrantType.Filter),
+                
+                //Filtered R/W/D on orders
+                new(SecurableType: SecurableType.Order, PermissionId: PermissionId.Read, GrantType: PermissionGrantType.Filter),
+                new(SecurableType: SecurableType.Order, PermissionId: PermissionId.Write, GrantType: PermissionGrantType.Filter),
+                new(SecurableType: SecurableType.Order, PermissionId: PermissionId.Delete, GrantType: PermissionGrantType.Filter),
                 
                 //Filtered R/W/D on users
                 new(SecurableType: SecurableType.User, PermissionId: PermissionId.Read, GrantType: PermissionGrantType.Filter),
@@ -151,7 +165,9 @@ internal class AppBootstrapper : IBootstrapper
         await CreateOrUpdateRoleAsync(uow,
             systemId: AppConstants.Roles.MemberSystemId,
             name: "Member",
-            description: "Members are standard users in a group. They can create, edit, and delete packages that belong to their own group, and they can view all carriers configured in the system. By default, they cannot see or manage other groups, users, roles, or carrier configuration.",
+            description: "Members are standard users in a group. " +
+                "They can create, edit, and delete packages and orders that belong to their own group, and they can view all carriers configured in the system. " +
+                "By default, they cannot see or manage other groups, users, roles, or carrier configuration.",
             permissions:
             [
                 //Global R on carriers
@@ -161,6 +177,11 @@ internal class AppBootstrapper : IBootstrapper
                 new(SecurableType: SecurableType.Package, PermissionId: PermissionId.Read, GrantType: PermissionGrantType.Filter),
                 new(SecurableType: SecurableType.Package, PermissionId: PermissionId.Write, GrantType: PermissionGrantType.Filter),
                 new(SecurableType: SecurableType.Package, PermissionId: PermissionId.Delete, GrantType: PermissionGrantType.Filter),
+
+                //Filtered R/W/D on orders
+                new(SecurableType: SecurableType.Order, PermissionId: PermissionId.Read, GrantType: PermissionGrantType.Filter),
+                new(SecurableType: SecurableType.Order, PermissionId: PermissionId.Write, GrantType: PermissionGrantType.Filter),
+                new(SecurableType: SecurableType.Order, PermissionId: PermissionId.Delete, GrantType: PermissionGrantType.Filter),
             ],
             cancellationToken: cancellationToken);
 
@@ -168,7 +189,8 @@ internal class AppBootstrapper : IBootstrapper
         await CreateOrUpdateRoleAsync(uow,
             systemId: AppConstants.Roles.ViewerSystemId,
             name: "Viewer",
-            description: "Viewers can see packages in their own group and view all carriers, but cannot create, edit, or delete anything. This role is ideal for users who just need to check the status of shipments without making any changes.",
+            description: "Viewers can see packages and orders in their own group and view all carriers, but cannot create, edit, or delete anything. " +
+                "This role is ideal for users who just need to check the status of shipments without making any changes.",
             permissions:
             [
                 //Global R on carriers
@@ -176,6 +198,9 @@ internal class AppBootstrapper : IBootstrapper
 
                 //Filtered R on packages
                 new(SecurableType: SecurableType.Package, PermissionId: PermissionId.Read, GrantType: PermissionGrantType.Filter),
+
+                //Filtered R on orders
+                new(SecurableType: SecurableType.Order, PermissionId: PermissionId.Read, GrantType: PermissionGrantType.Filter),
             ],
             cancellationToken: cancellationToken);
 

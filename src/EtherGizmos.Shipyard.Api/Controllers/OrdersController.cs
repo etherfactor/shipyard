@@ -1,4 +1,6 @@
 ﻿using Asp.Versioning;
+using EtherGizmos.Common;
+using EtherGizmos.Common.Abstractions;
 using EtherGizmos.Shipyard.Api;
 using EtherGizmos.Shipyard.Database;
 using EtherGizmos.Shipyard.Database.Enums;
@@ -7,7 +9,10 @@ using EtherGizmos.Shipyard.Swagger;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.EntityFrameworkCore;
+using OpenIddict.Abstractions;
 using Swashbuckle.AspNetCore.Filters;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace EtherGizmos.Shipyard.Controllers;
 
@@ -15,10 +20,15 @@ public class OrdersController : AutoODataController
 {
     private const string BaseRoute = "api/v{version:apiVersion}/orders";
 
+    private readonly IUnitOfWorkFactory _uowFactory;
+
     public OrdersController(
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        IUnitOfWorkFactory uowFactory)
         : base(serviceProvider)
-    { }
+    {
+        _uowFactory = uowFactory;
+    }
 
     [ApiVersion(1.0)]
     [HttpGet(BaseRoute)]
@@ -78,7 +88,24 @@ public class OrdersController : AutoODataController
             .DeleteAsync(cancellationToken);
 
     private IKeylessRequestBuilder<Order, OrderDTO> ForSet()
-        => ForSet<Order, OrderDTO>();
+        => ForSet<Order, OrderDTO>()
+        .OnCreating(SetGroupIdAsync);
+
+    private async Task SetGroupIdAsync(
+        Order db,
+        OrderDTO dto)
+    {
+        using var uow = _uowFactory.AsUnfiltered().Create();
+        var userRepo = uow.Repository<User>();
+
+        Guid.TryParse(User.GetClaim(Claims.Subject), out var userId);
+        var groupId = await userRepo.Data
+            .Where(e => e.Id == userId)
+            .Select(e => e.GroupId)
+            .SingleAsync();
+        
+        db.GroupId = groupId!.Value;
+    }
 
     private IKeyedRequestBuilder<Order, OrderDTO> ForItem(
         int id)

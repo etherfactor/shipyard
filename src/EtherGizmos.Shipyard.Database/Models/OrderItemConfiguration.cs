@@ -1,4 +1,5 @@
 ﻿using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,6 +16,8 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
 
         entity.Property(e => e.Id)
             .HasColumnName("order_item_id");
+
+        entity.AuditProperties();
 
         entity.Property(e => e.OrderId)
             .HasColumnName("order_id");

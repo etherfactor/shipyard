@@ -1,4 +1,5 @@
 ﻿using EtherGizmos.Shipyard.Database;
+using EtherGizmos.Shipyard.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,6 +16,8 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 
         entity.Property(e => e.Id)
             .HasColumnName("order_id");
+
+        entity.AuditProperties();
 
         entity.Property(e => e.Source)
             .HasColumnName("source");
@@ -40,5 +43,19 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         entity.HasMany(e => e.OrderItems)
             .WithOne(e => e.Order)
             .HasForeignKey(e => e.OrderId);
+
+        entity.HasMany(e => e.OrderFulfillments)
+            .WithOne(e => e.Order)
+            .HasForeignKey(e => e.OrderId);
+
+        entity.Property(e => e.GroupId)
+            .HasColumnName("group_id");
+
+        entity.HasOne(e => e.Group);
+
+        entity.Property(e => e.SecurableId)
+            .HasColumnName("securable_id");
+
+        entity.HasOne(e => e.Securable);
     }
 }

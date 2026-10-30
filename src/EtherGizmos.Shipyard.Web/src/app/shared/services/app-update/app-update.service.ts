@@ -31,6 +31,7 @@ export class AppUpdateService {
             evt.latestVersion.hash);
 
           this.$toast.show({
+            id: "app-update-available",
             header: "Update Available",
             body: "An update for Shipyard is available. Reload the application to apply the update.",
             actions: [

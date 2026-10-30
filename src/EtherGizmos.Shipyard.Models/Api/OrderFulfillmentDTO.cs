@@ -21,7 +21,7 @@ public class OrderFulfillmentDTO
 
     public string? Sender { get; set; }
 
-    public OrderFulfillmentStatusTypeDTO OrderFulfillmentStatusType { get; set; }
+    public OrderFulfillmentStatusTypeDTO OrderFulfillmentStatusType { get; set; } = OrderFulfillmentStatusTypeDTO.Pending;
 
     public DateOnly? ShippedOn { get; set; }
 
