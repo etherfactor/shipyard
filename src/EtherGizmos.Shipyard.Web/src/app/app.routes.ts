@@ -42,6 +42,11 @@ export const APP_ROUTES: ExtendedRoute[] = [
     loadChildren: () => import("./features/notification/unsubscribe.routes").then(m => m.UNSUBSCRIBE_ROUTES),
   },
   {
+    path: "orders",
+    loadChildren: () => import("./features/order/order.routes").then(m => m.ORDER_ROUTES),
+    canActivate: [authenticationGuard],
+  },
+  {
     path: "packages",
     loadChildren: () => import("./features/package/package.routes").then(m => m.PACKAGE_ROUTES),
     canActivate: [authenticationGuard],

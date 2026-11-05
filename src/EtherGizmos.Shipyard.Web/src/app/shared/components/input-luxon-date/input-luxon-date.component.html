@@ -1,1 +1,18 @@
-<p>input-luxon-date works!</p>
+@if (placeholder) {
+<div class="floating-label">
+  <input [id]="id"
+         type="date"
+         [class]="readonly ? 'form-control-plaintext' : 'form-control'"
+         [disabled]="disabled && !readonly"
+         [readonly]="readonly"
+         [(ngModel)]="value" />
+  <label [for]="id">{{placeholder}}</label>
+</div>
+} @else {
+<input [id]="id"
+       type="date"
+       [class]="readonly ? 'form-control-plaintext' : 'form-control'"
+       [disabled]="disabled && !readonly"
+       [readonly]="readonly"
+       [(ngModel)]="value" />
+}

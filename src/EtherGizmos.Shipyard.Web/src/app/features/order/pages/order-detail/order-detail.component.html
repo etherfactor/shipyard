@@ -1,1 +1,142 @@
-<p>order-detail works!</p>
+@let record = order$$();
+@let form = form$$();
+
+<!-- Header -->
+<div class="row">
+  <div class="col-12 mt-3">
+    @if (record?.id) {
+    <detail-header [text]="'Order Details'"
+                   [subtext]="'Viewing order #' + (record?.orderNumber ?? id$$())" />
+    } @else {
+    <detail-header [text]="'Order Details'"
+                   [subtext]="'Creating new order'" />
+    }
+  </div>
+</div>
+
+@if (record && form) {
+
+<!-- Summary -->
+<div class="row" [formGroup]="form">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-bag" text="Order Summary">
+      <div class="row">
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="source" class="col-sm-4 col-form-label">
+              Source
+            </label>
+            <div class="col-sm-8">
+              <input id="source"
+                     type="text"
+                     formControlName="source"
+                     [readonlyForm]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="orderNumber" class="col-sm-4 col-form-label">
+              Order number
+            </label>
+            <div class="col-sm-8">
+              <input id="orderNumber"
+                     type="text"
+                     formControlName="orderNumber"
+                     [readonlyForm]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="orderedOn" class="col-sm-4 col-form-label">
+              Ordered on
+            </label>
+            <div class="col-sm-8">
+              <input-luxon-date id="orderedOn"
+                                formControlName="orderedOn"
+                                [readonly]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="totalPrice" class="col-sm-4 col-form-label">
+              Total price
+            </label>
+            <div class="col-sm-8">
+              <div class="input-group">
+                <span [class.input-group-text]="isEditing$$()"
+                      [class.input-group-plaintext]="!isEditing$$()">
+                  $
+                </span>
+                <input id="totalPrice"
+                       type="number"
+                       formControlName="totalPrice"
+                       [readonlyForm]="!isEditing$$()" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="row mt-3">
+            <label for="orderUrl" class="col-sm-2 col-form-label">
+              Order URL
+            </label>
+            <div class="col-sm-10">
+              <input id="orderUrl"
+                     type="text"
+                     placeholder="https://..."
+                     formControlName="orderUrl"
+                     [readonlyForm]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="expectedShipStartOn" class="col-sm-4 col-form-label">
+              Expected ship start on
+            </label>
+            <div class="col-sm-8">
+              <input-luxon-date id="expectedShipStartOn"
+                                formControlName="expectedShipStartOn"
+                                [readonly]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row mt-3">
+            <label for="expectedShipEndOn" class="col-sm-4 col-form-label">
+              Expected ship end on
+            </label>
+            <div class="col-sm-8">
+              <input-luxon-date id="expectedShipEndOn"
+                                formControlName="expectedShipEndOn"
+                                [readonly]="!isEditing$$()" />
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </detail-box>
+  </div>
+</div>
+}
+
+<!-- Loading Overlay (same pattern as carrier) -->
+@if (isLoading$$()) {
+<div style="position: fixed; top: 0; left: 0; height: 100%; width: 100%; background-color: color-mix(in srgb, var(--bs-body-bg) 50%, transparent); z-index: 100;">
+</div>
+<div style="position: fixed; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%); z-index: 100%;">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+}

@@ -9,7 +9,7 @@ export const OrderItemZ = z.object({
   modifiedAt: DateTimeZ,
   orderId: z.number().int(),
   get order() {
-    return z.lazy(() => OrderZ);
+    return z.lazy(() => OrderZ).nullish();
   },
   description: z.string(),
   quantity: z.number(),

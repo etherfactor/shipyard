@@ -1,7 +1,8 @@
 export enum SecurableType {
   Carrier = "Carrier",
-  Package = "Package",
-  User = "User",
-  Role = "Role",
   Group = "Group",
+  Order = "Order",
+  Package = "Package",
+  Role = "Role",
+  User = "User",
 }

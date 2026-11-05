@@ -1,15 +1,15 @@
-import { Component, Input } from '@angular/core';
-import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { DateTime } from 'luxon';
+import { Component, Input } from "@angular/core";
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { DateTime } from "luxon";
 
 @Component({
-  selector: 'input-luxon-datetime',
+  selector: "input-luxon-datetime",
   standalone: true,
   imports: [
     FormsModule,
   ],
-  templateUrl: './input-luxon-datetime.component.html',
-  styleUrl: './input-luxon-datetime.component.scss',
+  templateUrl: "./input-luxon-datetime.component.html",
+  styleUrl: "./input-luxon-datetime.component.scss",
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -19,7 +19,6 @@ import { DateTime } from 'luxon';
   ]
 })
 export class InputLuxonDatetimeComponent implements ControlValueAccessor {
-
   private _value: string | null = null;
 
   @Input() id?: string;
@@ -36,7 +35,6 @@ export class InputLuxonDatetimeComponent implements ControlValueAccessor {
 
   set value(val: string | null) {
     if (this._value !== val) {
-      console.log('set', val);
       this._value = val;
 
       const emitValue = val ? DateTime.fromISO(val) : null;
@@ -46,10 +44,9 @@ export class InputLuxonDatetimeComponent implements ControlValueAccessor {
 
   writeValue(obj: DateTime | null): void {
     let newValue: string | null;
-    console.log('write', obj);
     if (obj && DateTime.isDateTime(obj)) {
       newValue = obj
-        .startOf('minute')
+        .startOf("minute")
         .toISO({
           suppressSeconds: true,
           suppressMilliseconds: true,

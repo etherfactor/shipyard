@@ -10,11 +10,11 @@ export const OrderFulfillmentItemZ = z.object({
   modifiedAt: DateTimeZ,
   orderFulfillmentId: z.number().int(),
   get orderFulfillment() {
-    return z.lazy(() => OrderFulfillmentZ);
+    return z.lazy(() => OrderFulfillmentZ).nullish();
   },
   orderItemId: z.number().int(),
   get orderItem() {
-    return z.lazy(() => OrderItemZ);
+    return z.lazy(() => OrderItemZ).nullish();
   },
   expectedQuantity: z.number(),
   receivedQuantity: z.number().nullish(),

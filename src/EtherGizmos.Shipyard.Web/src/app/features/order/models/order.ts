@@ -17,10 +17,10 @@ export const OrderZ = z.object({
   expectedShipStartOn: DateZ.nullish(),
   expectedShipEndOn: DateZ.nullish(),
   get orderItems() {
-    return z.lazy(() => OrderItemZ).array();
+    return z.lazy(() => OrderItemZ).array().nullish();
   },
   get orderFulfillments() {
-    return z.lazy(() => OrderFulfillmentZ).array();
+    return z.lazy(() => OrderFulfillmentZ).array().nullish();
   },
 });
 

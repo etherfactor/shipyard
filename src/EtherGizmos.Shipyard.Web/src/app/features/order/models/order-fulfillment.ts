@@ -27,7 +27,7 @@ export const OrderFulfillmentZ = z.object({
   resolvedByUser: z.lazy(() => UserZ),
   resolvedReason: z.string().nullish(),
   get orderFulfillmentItems() {
-    return z.lazy(() => OrderFulfillmentItemZ).array();
+    return z.lazy(() => OrderFulfillmentItemZ).array().nullish();
   },
 });
 

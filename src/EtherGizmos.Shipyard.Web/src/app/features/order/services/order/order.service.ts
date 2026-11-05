@@ -1,5 +1,6 @@
 import { inject, Injectable } from "@angular/core";
 import { ODataClient } from "@ethergizmos/odata-fluent-client";
+import { SafeAny } from "@ethergizmos/odata-fluent-client/dist/src/utils/types";
 import { narrowValidator, o } from "../../../../shared/utilities/odata/odata.util";
 import { Order, OrderF, OrderZ } from "../../models/order";
 
@@ -39,7 +40,12 @@ export class OrderService {
   }
 
   create(record: Partial<OrderF>) {
-    return this.$set.create(record);
+    return this.$set.create({
+      ...record,
+      orderedOn: record.orderedOn?.toISODate() as SafeAny,
+      expectedShipStartOn: record.expectedShipStartOn?.toISODate() as SafeAny,
+      expectedShipEndOn: record.expectedShipEndOn?.toISODate() as SafeAny,
+    });
   }
 
   update(id: number, record: Partial<OrderF>) {
