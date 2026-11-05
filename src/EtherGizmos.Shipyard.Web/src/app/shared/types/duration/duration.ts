@@ -26,9 +26,5 @@ export function parseDuration(value: unknown): Duration {
 export const DurationZ = z.custom<Duration>(value => {
   return isDuration(value) || isDurationString(value);
 }).transform(value => {
-  if (typeof value === 'string') {
-    return Duration.fromISOTime(value);
-  } else {
-    return value;
-  }
+  return parseDuration(value);
 });

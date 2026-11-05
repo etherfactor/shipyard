@@ -26,9 +26,5 @@ export function parseDateTime(value: unknown): DateTime {
 export const DateTimeZ = z.custom<DateTime>(value => {
   return isDateTime(value) || isDateTimeString(value);
 }).transform(value => {
-  if (typeof value === 'string') {
-    return DateTime.fromISO(value);
-  } else {
-    return value;
-  }
+  return parseDateTime(value);
 });
