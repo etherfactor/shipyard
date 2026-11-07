@@ -128,6 +128,96 @@
     </detail-box>
   </div>
 </div>
+
+<!-- Items -->
+<div class="row">
+  <div class="col-12 mt-3">
+    <detail-box icon="bi-list-ul" text="Items" [buttons]="itemButtons$$()">
+      <div class="table-responsive mt-3">
+        <table class="table table-sm table-transparent table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th class="text-nowrap">Description</th>
+              <th class="text-nowrap">Quantity</th>
+              <th class="text-nowrap">Units</th>
+              <th class="text-nowrap">Unit price</th>
+              <th class="text-nowrap">Total</th>
+              <th class="text-nowrap"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (itemForm of itemForms; let i = $index; track i) {
+            <tr [formGroup]="itemForm">
+              <!-- Description -->
+              <td>
+                <input type="text"
+                       style="min-width: 200px;"
+                       formControlName="description"
+                       [readonlyForm]="!isEditing$$()"
+                       formSize="small" />
+              </td>
+
+              <!-- Quantity -->
+              <td>
+                <input type="number"
+                       formControlName="quantity"
+                       [readonlyForm]="!isEditing$$()"
+                       formSize="small" />
+              </td>
+
+              <!-- Quantity units -->
+              <td>
+                <input type="text"
+                       formControlName="quantityUnits"
+                       [readonlyForm]="!isEditing$$()"
+                       formSize="small" />
+              </td>
+
+              <!-- Unit price -->
+              <td>
+                <div class="input-group input-group-sm flex-nowrap">
+                  <span [class.input-group-text]="isEditing$$()"
+                        [class.input-group-plaintext]="!isEditing$$()">
+                    $
+                  </span>
+                  <input type="number"
+                         formControlName="unitPrice"
+                         [readonlyForm]="!isEditing$$()"
+                         formSize="small" />
+                </div>
+              </td>
+
+              <!-- Total price -->
+              <td>
+                @let unitTotal = calcLineTotalFor(i);
+                @if (unitTotal) {
+                <div class="input-group input-group-sm flex-nowrap">
+                  <span class="input-group-plaintext">
+                    $
+                  </span>
+                  <input type="number"
+                         [value]="unitTotal"
+                         [readonlyForm]="true"
+                         formSize="small" />
+                </div>
+                }
+              </td>
+
+              <!-- Actions -->
+              <td>
+                <button class="btn btn-sm btn-danger" (click)="removeItem(i)" [disabled]="form.disabled">
+                  <span class="bi bi-x"></span>
+                </button>
+              </td>
+            </tr>
+            }
+          </tbody>
+
+        </table>
+      </div>
+    </detail-box>
+  </div>
+</div>
 }
 
 <!-- Loading Overlay (same pattern as carrier) -->

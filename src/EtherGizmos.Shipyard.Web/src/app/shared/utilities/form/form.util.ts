@@ -24,14 +24,12 @@ export function simpleForm<TModel, TControlTypes = never>($form: FormBuilder, mo
   return $form.nonNullable.group(config);
 }
 
-type RequiredIsh<TType> = { [K in keyof Required<TType>]: TType[K]; };
-
 export type InferArrayType<TData> = TData extends (infer UData)[] ? UData : never;
 
 type NoUndefined<TType> = TType extends undefined ? never : TType;
 type IfUndefined<TType> = TType extends undefined ? undefined : never;
 
-type ControlConfigMap<TModel, TControlTypes = never> = RequiredIsh<{
+type ControlConfigMap<TModel, TControlTypes = never> = Required<{
   [K in keyof TModel]:
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   NonNullable<TModel[K]> extends Array<any> ? (
