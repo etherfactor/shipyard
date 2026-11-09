@@ -138,10 +138,10 @@
           <thead>
             <tr>
               <th class="text-nowrap">Description</th>
-              <th class="text-nowrap">Quantity</th>
-              <th class="text-nowrap">Units</th>
-              <th class="text-nowrap">Unit price</th>
-              <th class="text-nowrap">Total</th>
+              <th class="text-nowrap" style="width: 1%; min-width: 100px;">Quantity</th>
+              <th class="text-nowrap" style="width: 1%; min-width: 100px;">Units</th>
+              <th class="text-nowrap" style="width: 1%; min-width: 150px;">Unit price</th>
+              <th class="text-nowrap" style="width: 1%; min-width: 150px;">Total</th>
               <th class="text-nowrap"></th>
             </tr>
           </thead>
@@ -160,6 +160,7 @@
               <!-- Quantity -->
               <td>
                 <input type="number"
+                       style="max-width: 100px;"
                        formControlName="quantity"
                        [readonlyForm]="!isEditing$$()"
                        formSize="small" />
@@ -168,6 +169,7 @@
               <!-- Quantity units -->
               <td>
                 <input type="text"
+                       style="max-width: 100px;"
                        formControlName="quantityUnits"
                        [readonlyForm]="!isEditing$$()"
                        formSize="small" />
@@ -175,7 +177,8 @@
 
               <!-- Unit price -->
               <td>
-                <div class="input-group input-group-sm flex-nowrap">
+                <div class="input-group input-group-sm flex-nowrap"
+                     style="min-width: 150px;">
                   <span [class.input-group-text]="isEditing$$()"
                         [class.input-group-plaintext]="!isEditing$$()">
                     $
