@@ -132,7 +132,7 @@
 <!-- Items -->
 <div class="row">
   <div class="col-12 mt-3">
-    <detail-box icon="bi-list-ul" text="Items" [buttons]="itemButtons$$()">
+    <detail-box icon="bi-list-ul" text="Purchased Items" [buttons]="itemButtons$$()">
       <div class="table-responsive mt-3">
         <table class="table table-sm table-transparent table-striped table-hover mb-0">
           <thead>
@@ -142,7 +142,9 @@
               <th class="text-nowrap" style="width: 1%; min-width: 100px;">Units</th>
               <th class="text-nowrap" style="width: 1%; min-width: 150px;">Unit price</th>
               <th class="text-nowrap" style="width: 1%; min-width: 150px;">Total</th>
-              <th class="text-nowrap"></th>
+              @if (isEditing$$()) {
+              <th style="width: 1px;"></th>
+              }
             </tr>
           </thead>
           <tbody>
@@ -207,11 +209,13 @@
               </td>
 
               <!-- Actions -->
+              @if (isEditing$$()) {
               <td>
                 <button class="btn btn-sm btn-danger" (click)="removeItem(i)" [disabled]="form.disabled">
                   <span class="bi bi-x"></span>
                 </button>
               </td>
+              }
             </tr>
             }
           </tbody>

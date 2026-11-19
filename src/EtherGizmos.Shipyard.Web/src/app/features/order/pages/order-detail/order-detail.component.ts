@@ -43,6 +43,7 @@ export class OrderDetailComponent {
   readonly order$$ = signal<Order | undefined>(undefined);
   readonly form$$ = signal<TypedFormGroup<OrderF> | undefined>(undefined);
 
+  readonly defaultItems$$ = signal<OrderItem[]>([]);
   itemForms: TypedFormGroup<OrderItemF>[] = [];
 
   readonly isLoading$$ = computed(() => this.isLoadingStack$$() > 0);
@@ -139,7 +140,7 @@ export class OrderDetailComponent {
       const data = await exec.data;
 
       this.order$$.set(data);
-      this.itemForms = data.orderItems!.map(item => orderItemForm(this.$form, item));
+      this.defaultItems$$.set(data.orderItems ?? []);
       this.init();
     } finally {
       this.isLoadingStack$$.set(this.isLoadingStack$$() - 1);
@@ -148,6 +149,7 @@ export class OrderDetailComponent {
 
   private init() {
     this.form$$.set(orderForm(this.$form, this.order$$()));
+    this.itemForms = this.defaultItems$$().map(item => orderItemForm(this.$form, item));
   }
 
   @Bound async onEdit() {
@@ -167,6 +169,13 @@ export class OrderDetailComponent {
 
     if (form.invalid) {
       form.markAllAsTouched();
+      return;
+    }
+
+    if (this.itemForms.some(form => form.invalid)) {
+      for (const form of this.itemForms) {
+        form.markAllAsTouched();
+      }
       return;
     }
 

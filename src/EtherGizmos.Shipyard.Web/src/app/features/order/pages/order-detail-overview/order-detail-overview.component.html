@@ -1,0 +1,164 @@
+@let record = order$$();
+
+<!-- Header -->
+<div class="row">
+  <div class="col-12 mt-3">
+    @if (record?.id) {
+    <detail-header [text]="getDisplayName()"
+                   [subtext]="'Viewing and managing fulfillments for order #' + id$$()" />
+    } @else {
+    <detail-header [text]="'Order Details'"
+                   [subtext]="'Creating new order'" />
+    }
+  </div>
+</div>
+
+@if (record) {
+<div class="row">
+  <div class="col-md-7">
+
+    <!-- Purchased Items -->
+    <div class="row">
+      <div class="col-12 mt-3">
+        <detail-box icon="bi-list-ul" text="Purchased Items">
+          <div class="d-flex flex-row mt-3" style="gap: 10px;">
+            <div class="small text-muted">
+              <div class="progress d-inline-block" style="height: 12px; width: 12px; border: 1px solid var(--bs-border-color-translucent);">
+                <div class="progress-bar h-100" style="background-color: rgb(63, 191, 145); width: 100%;"></div>
+              </div>
+              Received
+            </div>
+            <div class="small text-muted">
+              <div class="progress d-inline-block" style="height: 12px; width: 12px; border: 1px solid var(--bs-border-color-translucent);">
+                <div class="progress-bar h-100" style="background-color: rgb(151, 116, 209); width: 100%;"></div>
+              </div>
+              Shipped
+            </div>
+            <div class="small text-muted">
+              <div class="progress d-inline-block" style="height: 12px; width: 12px; border: 1px solid var(--bs-border-color-translucent);">
+                <div class="progress-bar h-100" style="background-color: rgb(109, 120, 130); width: 100%;"></div>
+              </div>
+              Pending
+            </div>
+            <div class="small text-muted">
+              <div class="progress d-inline-block" style="height: 12px; width: 12px; border: 1px solid var(--bs-border-color-translucent);">
+                <div class="progress-bar h-100" style="background-color: rgb(29, 34, 39); width: 100%;"></div>
+              </div>
+              Unassigned
+            </div>
+            <div class="small text-muted">
+              <div class="progress d-inline-block" style="height: 12px; width: 12px; border: 1px solid var(--bs-border-color-translucent);">
+                <div class="progress-bar h-100" style="background-color: rgb(239, 136, 140); width: 100%;"></div>
+              </div>
+              Missing
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm table-transparent table-striped table-hover mb-0">
+              <thead>
+                <tr>
+                  <th class="text-nowrap">Description</th>
+                  <th class="text-nowrap" style="width: 1%;">Ordered</th>
+                  <th class="text-nowrap" style="width: 1%;">Allocated</th>
+                  <th class="text-nowrap" style="width: 1%;">Remaining</th>
+                  <th class="text-nowrap" style="min-width: 270px; width: 270px;">Distribution</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of items$$(); let i = $index; track item.id) {
+                @let distribution = getDistributionFor(item.id);
+                <tr>
+                  <!-- Description -->
+                  <td class="align-middle">
+                    {{item.description}}
+                    @if (item.unitPrice) {
+                    <div class="small text-muted">
+                      {{item.unitPrice | currency}}/{{item.quantityUnits}} · {{item.unitPrice * item.quantity | currency}} total
+                    </div>
+                    }
+                  </td>
+
+                  <!-- Ordered -->
+                  <td class="align-middle text-end">
+                    {{item.quantity}}
+                  </td>
+
+                  <!-- Allocated -->
+                  <td class="align-middle text-end">
+                    {{distribution.total - distribution.unallocated}}
+                  </td>
+
+                  <!-- Remaining -->
+                  <td class="align-middle text-end"
+                      [class.text-success]="distribution.unallocated === 0"
+                      [class.text-warning]="distribution.unallocated !== 0">
+                    {{distribution.unallocated}}
+                  </td>
+
+                  <!-- Total price -->
+                  <td class="align-middle">
+                    <div class="d-flex flex-column">
+                      <div class="w-100">
+                        <div class="progress" style="height: 12px; border: 1px solid var(--bs-border-color-translucent);" role="progressbar" aria-label="Item distribution">
+                          <div class="progress-bar" style="background-color: rgb(63, 191, 145);" [style.width.%]="distribution.receivedPercentage * 100"></div>
+                          <div class="progress-bar" style="background-color: rgb(151, 116, 209);" [style.width.%]="distribution.shippedPercentage * 100"></div>
+                          <div class="progress-bar" style="background-color: rgb(109, 120, 130);" [style.width.%]="distribution.pendingPercentage * 100"></div>
+                          <div class="progress-bar" style="background-color: rgb(29, 34, 39);" [style.width.%]="distribution.unallocatedPercentage * 100"></div>
+                          <div class="progress-bar" style="background-color: rgb(239, 136, 140);" [style.width.%]="distribution.missingPercentage * 100"></div>
+                        </div>
+                      </div>
+                      <div class="w-100 text-start small text-muted ps-1 pe-1">
+                        {{getDistributionLabelFor(item.id)}}
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                }
+              </tbody>
+
+            </table>
+          </div>
+        </detail-box>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="col-md-5">
+
+    <!-- Order Summary -->
+    <div class="row">
+      <div class="col-12 mt-3">
+        <detail-box icon="bi-bag" text="Summary">
+          <div class="row">
+
+          </div>
+        </detail-box>
+      </div>
+    </div>
+
+    <!-- Shipments -->
+    <div class="row">
+      <div class="col-12 mt-3">
+        <detail-box icon="bi-box-seam" text="Shipments">
+          <div class="row">
+
+          </div>
+        </detail-box>
+      </div>
+    </div>
+
+  </div>
+</div>
+}
+
+<!-- Loading Overlay (same pattern as carrier) -->
+@if (isLoading$$()) {
+<div style="position: fixed; top: 0; left: 0; height: 100%; width: 100%; background-color: color-mix(in srgb, var(--bs-body-bg) 50%, transparent); z-index: 100;">
+</div>
+<div style="position: fixed; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%); z-index: 100%;">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+}

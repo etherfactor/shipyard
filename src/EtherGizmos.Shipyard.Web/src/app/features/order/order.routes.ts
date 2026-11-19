@@ -63,4 +63,25 @@ export const ORDER_ROUTES: ExtendedRoute[] = [
       ],
     },
   },
+  {
+    path: ":orderId/overview",
+    pathMatch: "full",
+    loadComponent: () => import("./pages/order-detail-overview/order-detail-overview.component").then(m => m.OrderDetailOverviewComponent),
+    title: "Shipyard | Order #:orderId",
+    canActivate: [
+      authorizationGuard(SecurableType.Order, PermissionId.Read),
+    ],
+    data: {
+      breadcrumb: {
+        label: "Order #{orderId}",
+        link: "/orders/{orderId}/overview",
+      },
+      parentBreadcrumbs: [
+        {
+          label: "Order List",
+          link: "/orders",
+        },
+      ],
+    },
+  },
 ];
